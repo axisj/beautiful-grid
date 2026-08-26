@@ -35,12 +35,11 @@ jobs:
       - name: Check out deployment source
         uses: actions/checkout@v6
 
-      - name: Check production prerequisites
+      - name: Check production edge prerequisites
         run: |
           set -Eeuo pipefail
           test -f "$EDGE_PROJECT_DIR/Caddyfile"
-          grep -q 'bgrid\.axisj\.com' "$EDGE_PROJECT_DIR/Caddyfile"
-          grep -q 'beautiful-grid-site:80' "$EDGE_PROJECT_DIR/Caddyfile"
+          test ! -L "$EDGE_PROJECT_DIR/Caddyfile"
           docker network inspect axstaff_default >/dev/null
           test "$(
             docker inspect axisj-edge-caddy \
@@ -122,12 +121,87 @@ jobs:
           umask 077
           install -d -m 700 "$PROJECT_DIR" "$PROJECT_DIR/scripts"
           install -m 600 docker-compose.prod.yml "$PROJECT_DIR/docker-compose.prod.yml"
+          install -m 600 deploy/edge/Caddyfile.fragment "$PROJECT_DIR/Caddyfile.fragment"
           install -m 700 scripts/deploy-local-production.sh "$PROJECT_DIR/scripts/deploy-local-production.sh"
+
+      - name: Configure shared edge route
+        run: |
+          set -Eeuo pipefail
+          caddyfile="$EDGE_PROJECT_DIR/Caddyfile"
+          backup="$PROJECT_DIR/Caddyfile.before-beautiful-grid"
+          marker="$PROJECT_DIR/.edge-route-added"
+
+          if grep -q 'bgrid\.axisj\.com' "$caddyfile"; then
+            grep -q 'beautiful-grid-site:80' "$caddyfile"
+            echo "BeautifulGrid edge route already exists."
+            exit 0
+          fi
+
+          cp -p "$caddyfile" "$backup"
+          chmod 600 "$backup"
+          {
+            printf '\n# BEGIN BEAUTIFUL-GRID\n'
+            cat "$PROJECT_DIR/Caddyfile.fragment"
+            printf '# END BEAUTIFUL-GRID\n'
+          } >> "$caddyfile"
+
+          if ! docker exec axisj-edge-caddy \
+            caddy validate \
+              --config /etc/caddy/Caddyfile \
+              --adapter caddyfile; then
+            cp -p "$backup" "$caddyfile"
+            exit 1
+          fi
+
+          if ! docker exec axisj-edge-caddy \
+            caddy reload \
+              --force \
+              --config /etc/caddy/Caddyfile \
+              --adapter caddyfile; then
+            cp -p "$backup" "$caddyfile"
+            docker exec axisj-edge-caddy \
+              caddy reload \
+                --force \
+                --config /etc/caddy/Caddyfile \
+                --adapter caddyfile || true
+            exit 1
+          fi
+
+          touch "$marker"
 
       - name: Deploy with rollback protection
         run: |
           set -Eeuo pipefail
           bash "$PROJECT_DIR/scripts/deploy-local-production.sh" "$DEPLOY_SHA"
+
+      - name: Restore new edge route after failed deployment
+        if: ${{ failure() }}
+        run: |
+          set -Eeuo pipefail
+          caddyfile="$EDGE_PROJECT_DIR/Caddyfile"
+          backup="$PROJECT_DIR/Caddyfile.before-beautiful-grid"
+          marker="$PROJECT_DIR/.edge-route-added"
+
+          if [ -f "$marker" ] && [ -f "$backup" ]; then
+            cp -p "$backup" "$caddyfile"
+            docker exec axisj-edge-caddy \
+              caddy validate \
+                --config /etc/caddy/Caddyfile \
+                --adapter caddyfile
+            docker exec axisj-edge-caddy \
+              caddy reload \
+                --force \
+                --config /etc/caddy/Caddyfile \
+                --adapter caddyfile
+          fi
+          rm -f "$marker" "$backup"
+
+      - name: Finalize shared edge route
+        if: ${{ success() }}
+        run: |
+          rm -f \
+            "$PROJECT_DIR/.edge-route-added" \
+            "$PROJECT_DIR/Caddyfile.before-beautiful-grid"
 
       - name: Report final disk usage
         if: ${{ always() }}

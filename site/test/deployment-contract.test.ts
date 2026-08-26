@@ -52,4 +52,16 @@ describe('self-hosted site deployment contracts', () => {
     expect(dockerfile).toContain('FROM node:22.22.3-alpine AS builder');
     expect(workflow).not.toMatch(/push:\s*\n/);
   });
+
+  it('adds the shared edge route with validation and restores it on deployment failure', () => {
+    const workflow = readRepositoryFile('.github/workflows/deploy-website.yml');
+
+    expect(workflow).toContain('Caddyfile.before-beautiful-grid');
+    expect(workflow).toContain('# BEGIN BEAUTIFUL-GRID');
+    expect(workflow).toContain('caddy validate');
+    expect(workflow).toContain('caddy reload');
+    expect(workflow).toContain('Restore new edge route after failed deployment');
+    expect(workflow).toContain('if: ${{ failure() }}');
+    expect(workflow).toContain('cp -p "$backup" "$caddyfile"');
+  });
 });

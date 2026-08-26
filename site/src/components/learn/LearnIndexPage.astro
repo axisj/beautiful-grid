@@ -123,29 +123,6 @@ const tracks = pageCopy.tracks.map(track => ({
 
 <MarketingLayout title={messages.indexTitle} description={messages.indexDescription} canonicalPath={learnIndexPath(locale)} locale={locale}>
   <main class="learn-hub">
-    <div class="learn-finder-bar">
-      <div class="container learn-finder-bar-inner">
-        <div class="learn-finder-search">
-          <label class="learn-visually-hidden" for="learn-catalog-search">{pageCopy.searchLabel}</label>
-          <div class="catalog-search">
-            <Search size={17} strokeWidth={1.9} aria-hidden="true" />
-            <input id="learn-catalog-search" type="search" placeholder={pageCopy.searchPlaceholder} autocomplete="off" data-learn-search />
-            <kbd>/</kbd>
-          </div>
-        </div>
-        <nav class="learn-shortcuts" aria-label={pageCopy.categoryJump}>
-          {grouped.map(group => (
-            <a href={`#category-${group.category}`}>
-              <group.meta.icon size={14} strokeWidth={1.9} aria-hidden="true" />
-              <strong>{group.label}</strong>
-              <small>{group.items.length}</small>
-            </a>
-          ))}
-        </nav>
-        <a class="learn-finder-result" href="#guide-catalog"><strong data-result-count>{pageCopy.results(visibleItems.length)}</strong><ArrowRight size={13} aria-hidden="true" /></a>
-      </div>
-    </div>
-
     <section class="container learning-paths" aria-labelledby="learning-paths-title">
       <div class="learn-section-heading">
         <div>
@@ -178,6 +155,29 @@ const tracks = pageCopy.tracks.map(track => ({
         ))}
       </div>
     </section>
+
+    <div class="learn-finder-bar">
+      <div class="container learn-finder-bar-inner">
+        <div class="learn-finder-search">
+          <label class="learn-visually-hidden" for="learn-catalog-search">{pageCopy.searchLabel}</label>
+          <div class="catalog-search">
+            <Search size={17} strokeWidth={1.9} aria-hidden="true" />
+            <input id="learn-catalog-search" type="search" placeholder={pageCopy.searchPlaceholder} autocomplete="off" data-learn-search />
+            <kbd>/</kbd>
+          </div>
+        </div>
+        <nav class="learn-shortcuts" aria-label={pageCopy.categoryJump}>
+          {grouped.map(group => (
+            <a href={`#category-${group.category}`}>
+              <group.meta.icon size={14} strokeWidth={1.9} aria-hidden="true" />
+              <strong>{group.label}</strong>
+              <small>{group.items.length}</small>
+            </a>
+          ))}
+        </nav>
+        <a class="learn-finder-result" href="#guide-catalog"><strong data-result-count>{pageCopy.results(visibleItems.length)}</strong><ArrowRight size={13} aria-hidden="true" /></a>
+      </div>
+    </div>
 
     <section class="guide-catalog" id="guide-catalog" aria-label={pageCopy.catalogTitle}>
       <div class="container">
@@ -242,7 +242,7 @@ const tracks = pageCopy.tracks.map(track => ({
   .learn-shortcuts a:hover { border-color: var(--site-border); background: var(--site-surface); color: var(--site-accent-strong); }
   .learn-shortcuts a :global(svg) { color: var(--site-text-muted); }
   .learn-shortcuts strong { font-size: 13px; font-weight: 730; white-space: nowrap; }
-  .learn-shortcuts small { display: grid; min-width: 18px; height: 18px; place-items: center; border-radius: 999px; background: var(--site-surface); color: var(--site-text-muted); font-family: var(--site-font-mono); font-size: 12px; }
+  .learn-shortcuts small { display: grid; min-width: 18px; height: 18px; place-items: center; border-radius: 999px; background: var(--site-surface); color: var(--site-text-muted); font-family: var(--site-font-mono); font-size: 13px; }
   .learn-finder-result { display: inline-flex; gap: 4px; align-items: center; color: var(--site-accent-strong); font-size: 13px; text-decoration: none; white-space: nowrap; }
   .learn-finder-result strong { font-family: var(--site-font-mono); }
   .learning-paths { padding-top: 72px; padding-bottom: 118px; }
@@ -275,7 +275,7 @@ const tracks = pageCopy.tracks.map(track => ({
   .catalog-search:focus-within { border-color: var(--site-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--site-accent) 13%, transparent); }
   .catalog-search input { width: 100%; border: 0; outline: 0; background: transparent; color: var(--site-text-primary); font: inherit; font-size: 14px; }
   .catalog-search input::placeholder { color: var(--site-text-muted); }
-  .catalog-search kbd { display: grid; width: 22px; height: 22px; place-items: center; border: 1px solid var(--site-border); border-radius: 5px; background: var(--site-surface); color: var(--site-text-muted); font-family: var(--site-font-mono); font-size: 12px; }
+  .catalog-search kbd { display: grid; width: 22px; height: 22px; place-items: center; border: 1px solid var(--site-border); border-radius: 5px; background: var(--site-surface); color: var(--site-text-muted); font-family: var(--site-font-mono); font-size: 13px; }
   .catalog-groups { display: grid; gap: 100px; }
   .catalog-group { scroll-margin-top: 158px; }
   .catalog-group-head { display: grid; grid-template-columns: 46px 46px 1fr auto; gap: 14px; align-items: center; margin-bottom: 22px; padding-bottom: 19px; border-bottom: 1px solid var(--site-border-strong); }
@@ -304,6 +304,7 @@ const tracks = pageCopy.tracks.map(track => ({
   .guide-card-actions a:hover { color: var(--site-accent-strong); }
   .guide-card-actions a + a { color: var(--site-text-muted); }
   .catalog-empty { display: grid; max-width: 520px; justify-items: center; margin: 72px auto 0; border: 1px dashed var(--site-border-strong); border-radius: 18px; padding: 46px 24px; color: var(--site-text-muted); text-align: center; }
+  .catalog-empty[hidden] { display: none; }
   .catalog-empty strong { margin-top: 15px; color: var(--site-text-primary); font-size: 16px; }
   .catalog-empty p { margin: 7px 0 0; color: var(--site-text-secondary); font-size: 13px; }
   :global(:root[data-theme='dark']) .learning-path-card--2 .path-card-icon { color: #c4b5fd; }

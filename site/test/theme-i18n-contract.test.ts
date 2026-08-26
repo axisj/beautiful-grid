@@ -79,7 +79,7 @@ describe('site theme and locale contracts', () => {
     expect(heroGridStyles).toContain('--hero-grid-cell-editable-bg: #111827;');
     expect(learnStyles).toContain('background-color: var(--site-control-bg);');
     expect(referenceStyles).toContain('background: var(--site-control-bg);');
-    expect(homepage).toContain(".capability-limit-note > strong { color: var(--site-text-primary); }");
+    expect(homepage).not.toContain('capability-limit-note');
     expect(productFacts).toContain(".environment-band::before { background:linear-gradient(135deg,rgba(37,99,235,.14),transparent); }");
   });
 

@@ -3,7 +3,6 @@ import MarketingLayout from '../layouts/MarketingLayout.astro';
 import { getCollection } from 'astro:content';
 import HomeHeroGrid from '../components/home/HomeHeroGrid';
 import { productFacts } from '../data/productFacts';
-import { publicApiMetrics } from '../data/publicApiMetrics';
 import { bundleMetrics } from '../data/bundleMetrics';
 import packageJson from '../../../package.json';
 import { localizePath, normalizeLocale, type Locale } from '../i18n';
@@ -68,11 +67,8 @@ const localize = <T,>(value: T): T => {
 };
 
 const liveExampleCount = (await getCollection('learn')).filter(
-  (item) => !item.data.draft && item.data.demoId,
+  (item) => item.data.locale === 'ko' && !item.data.draft && item.data.demoId,
 ).length;
-const runtimeDependencyCount = Object.keys(packageJson.dependencies ?? {}).length;
-const bundleJsShare = Math.round((bundleMetrics.initialJsGzipKiB / bundleMetrics.initialTotalGzipKiB) * 100);
-const publicApiCoverage = Math.round((publicApiMetrics.currentGridPropCount / publicApiMetrics.totalGridPropCount) * 100);
 
 const strengthStories = [
   {
@@ -238,29 +234,21 @@ const localizedFeaturedExamples = localize(featuredExamples);
           <div class="capability-card-head"><p>{t('대용량 데이터', 'Large datasets')}</p><span>01</span></div>
           <strong>550,000</strong>
           <h2>{t('실행 예제로 검증한 행 수', 'Rows verified in a runnable example')}</h2>
-          <span>{t('기본 행 높이 29px · 마지막 550,000번째 행까지 확인', '29px default row height · verified through row 550,000')}</span>
-          <div class="capability-limit-note">
-            <strong>{t('왜 55만 행인가?', 'Why 550K rows?')}</strong>
-            <p>{t('데이터 배열이 아니라 Chromium의 단일 스크롤 높이가 먼저 한계에 닿기 때문입니다.', 'Chromium’s single-scroll height limit is reached before the data array becomes the constraint.')}</p>
-            <div><code>15,950,030px</code><i aria-hidden="true">/</i><code>16,777,216px</code></div>
-            <span>{t('기본 행 높이 29px · 약 827,186px(4.9%) 여유', '29px default row height · about 827,186px (4.9%) headroom')}</span>
-            <span>{t('최대 행 높이: ⌊(상한 16,777,216 − 부가 30) ÷ 550,000⌋ = 30px', 'Maximum row height: floor((16,777,216 limit - 30 overhead) / 550,000) = 30px')}</span>
+          <div class="capability-facts" aria-label={t('대용량 예제 검증 조건', 'Large dataset verification details')}>
+            <span><em>{t('기본 행 높이', 'Row height')}</em><strong>29px</strong></span>
+            <span><em>{t('확인 범위', 'Verified range')}</em><strong>1 → 550K</strong></span>
           </div>
+          <span>{t('가상 스크롤로 첫 행부터 마지막 행까지 확인했습니다.', 'Verified from the first row to the last with virtual scrolling.')}</span>
         </article>
         <article class="capability-item capability-item-bundle">
           <div class="capability-card-head"><p>{t('번들사이즈', 'Bundle size')}</p><span>02</span></div>
           <strong>{bundleMetrics.initialTotalGzipKiB}<small>KiB</small></strong>
           <h2>{t('초기 JS + CSS 합산 gzip', 'Initial JS + CSS gzip total')}</h2>
-          <div class="bundle-composition" aria-label={t(`초기 번들에서 JS가 ${bundleJsShare}%를 차지합니다.`, `JavaScript accounts for ${bundleJsShare}% of the initial bundle.`)}>
-            <span><em>{t('번들 구성', 'Composition')}</em><strong>JS {bundleJsShare}%</strong></span>
-            <i style={`--bundle-js-share: ${bundleJsShare}%`}><b></b></i>
+          <div class="capability-facts" aria-label={t('초기 번들 구성', 'Initial bundle breakdown')}>
+            <span><em>JavaScript</em><strong>{bundleMetrics.initialJsGzipKiB} KiB</strong></span>
+            <span><em>CSS</em><strong>{bundleMetrics.cssGzipKiB} KiB</strong></span>
           </div>
-          <div class="bundle-breakdown" aria-label={t('초기 번들 구성', 'Initial bundle breakdown')}>
-            <span><em>JS</em><strong>{bundleMetrics.initialJsGzipKiB}</strong><small>KiB</small></span>
-            <i aria-hidden="true"></i>
-            <span><em>CSS</em><strong>{bundleMetrics.cssGzipKiB}</strong><small>KiB</small></span>
-          </div>
-          <span>{t('React 제외', 'React excluded')} · {t('열 재배치', 'column reorder')} {bundleMetrics.columnReorderJsGzipKiB}KiB · {t('열 도구상자', 'toolbox')} {bundleMetrics.toolboxJsGzipKiB}KiB · {t('검색/메뉴', 'search/menu')} {bundleMetrics.gridOptionalSurfacesJsGzipKiB}KiB {t('지연 로드', 'lazy-loaded')} · {t('런타임 의존성', 'runtime dependencies')} {runtimeDependencyCount}</span>
+          <span>{t('React 제외 · gzip level 9 측정', 'React excluded · measured with gzip level 9')}</span>
         </article>
         <article class="capability-item capability-item-fps is-measured" data-fps-card>
           <div class="capability-card-head"><p>{t('Performance', 'Performance')}</p><span>03</span></div>
@@ -274,20 +262,17 @@ const localizedFeaturedExamples = localize(featuredExamples);
         </article>
         <article class="capability-item capability-item-feature">
           <div class="capability-card-head"><p>{t('다양한 기능', 'Feature breadth')}</p><span>04</span></div>
-          <strong>{publicApiMetrics.currentGridPropCount}</strong>
-          <h2>{t('현재 지원하는 공개 Grid Props', 'Currently supported public Grid props')}</h2>
-          <div class="feature-coverage" aria-label={t(`전체 공개 속성의 ${publicApiCoverage}%를 현재 지원합니다.`, `${publicApiCoverage}% of public props are currently supported.`)}>
-            <span><em>{t('현재 API 비율', 'Current API')}</em><strong>{publicApiCoverage}%</strong></span>
-            <i style={`--api-coverage: ${publicApiCoverage}%`}><b></b></i>
+          <strong>{liveExampleCount}<small>{t('개', 'guides')}</small></strong>
+          <h2>{t('기능별 실행 가이드', 'Runnable feature guides')}</h2>
+          <div class="feature-tags" aria-label={t('주요 지원 기능', 'Key supported features')}>
+            <span>{t('셀 편집', 'Cell editing')}</span>
+            <span>{t('정렬·필터', 'Sort & filter')}</span>
+            <span>{t('행 선택', 'Row selection')}</span>
+            <span>{t('고정 열', 'Frozen columns')}</span>
+            <span>{t('셀 병합', 'Cell merge')}</span>
+            <span>{t('피벗·요약', 'Pivot/Summary')}</span>
           </div>
-          <div class="feature-counts">
-            <span><strong>{publicApiMetrics.totalGridPropCount}</strong><small>{t('전체', 'total')}</small></span>
-            <i aria-hidden="true">−</i>
-            <span><strong>{publicApiMetrics.deprecatedGridPropCount}</strong><small>deprecated</small></span>
-            <i aria-hidden="true">=</i>
-            <span class="is-current"><strong>{publicApiMetrics.currentGridPropCount}</strong><small>{t('현재 지원', 'current')}</small></span>
-          </div>
-          <span>{t(`BGridProps ${publicApiMetrics.totalGridPropCount}개 중 deprecated ${publicApiMetrics.deprecatedGridPropCount}개를 제외했습니다.`, `${publicApiMetrics.currentGridPropCount} current props, excluding ${publicApiMetrics.deprecatedGridPropCount} deprecated members from ${publicApiMetrics.totalGridPropCount} BGridProps.`)}</span>
+          <span>{t('편집부터 집계까지, 실제 예제와 소스로 바로 확인합니다.', 'Explore everything from editing to aggregation through real examples and source code.')}</span>
         </article>
       </div>
     </section>
@@ -1007,60 +992,6 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
       rgba(255, 255, 255, 0.9);
   }
 
-  .capability-limit-note {
-    margin-top: var(--home-space-3);
-    border-left: 2px solid #76a9f5;
-    border-radius: 0 10px 10px 0;
-    padding: 10px 12px;
-    background: rgba(237, 244, 255, 0.72);
-  }
-
-  .capability-limit-note > strong {
-    display: block;
-    color: #24436d;
-    font-size: 14px;
-    font-weight: 850;
-    line-height: 1.35;
-  }
-
-  .capability-limit-note > p {
-    margin: 7px 0 0;
-    color: #6c7d93;
-    font-size: 13px;
-    line-height: 1.65;
-    word-break: keep-all;
-  }
-
-  .capability-limit-note > div {
-    display: flex;
-    align-items: baseline;
-    gap: 5px;
-    margin-top: 9px;
-    color: #94a3b8;
-  }
-
-  .capability-limit-note code {
-    border: 0;
-    padding: 0;
-    background: transparent;
-    color: #426287;
-    font-size: 13px;
-    font-weight: 750;
-  }
-
-  .capability-limit-note i { font-size: 13px; font-style: normal; }
-
-  .capability-limit-note > span {
-    display: block;
-    margin-top: 5px;
-    color: #1d5fd4;
-    font-size: 13px;
-    font-weight: 760;
-    line-height: 1.55;
-  }
-
-  .capability-limit-note > span + span { color: #526f96; }
-
   .capability-card-head {
     display: flex;
     align-items: center;
@@ -1069,8 +1000,6 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     min-height: 24px;
     margin-bottom: clamp(24px, 2.4vw, 38px);
   }
-
-  .capability-item-primary .capability-card-head { margin-bottom: var(--home-space-3); }
 
   .capability-card-head p {
     margin: 0;
@@ -1207,119 +1136,63 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
       rgba(255, 255, 255, 0.9);
   }
 
-  .bundle-breakdown {
+  .capability-facts {
     display: grid;
-    grid-template-columns: 1fr 1px 1fr;
-    gap: var(--home-space-3);
-    align-items: stretch;
-    margin-top: var(--home-space-3);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: var(--home-space-4);
     border-top: 1px solid #e8edf4;
     padding-top: var(--home-space-4);
   }
 
-  .bundle-breakdown > span {
+  .capability-facts > span {
     display: grid;
-    grid-template-columns: 1fr auto auto;
-    align-items: baseline;
-    gap: 3px;
+    gap: 7px;
+    border: 1px solid #e4eaf2;
+    border-radius: 10px;
+    padding: 10px;
+    background: rgba(248, 251, 255, 0.76);
   }
 
-  .bundle-breakdown em {
+  .capability-facts em {
     color: #8492a6;
-    font-size: 13px;
-    font-style: normal;
-    font-weight: 820;
-    letter-spacing: .08em;
-  }
-
-  .bundle-breakdown strong {
-    color: #33445e;
-    font-family: var(--site-font-mono);
-    font-size: 15px;
-    letter-spacing: -.04em;
-  }
-
-  .bundle-breakdown small { color: #8492a6; font-size: 13px; font-weight: 760; }
-  .bundle-breakdown > i { width: 1px; background: #e3eaf3; }
-
-  .bundle-composition,
-  .feature-coverage {
-    display: grid;
-    gap: 9px;
-    margin-top: var(--home-space-5);
-  }
-
-  .bundle-composition > span,
-  .feature-coverage > span {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--home-space-2);
-  }
-
-  .bundle-composition em,
-  .feature-coverage em {
-    color: #7b899c;
     font-size: 13px;
     font-style: normal;
     font-weight: 760;
   }
 
-  .bundle-composition strong,
-  .feature-coverage strong {
-    color: #31435e;
+  .capability-facts strong {
+    color: #33445e;
     font-family: var(--site-font-mono);
-    font-size: 13px;
+    font-size: 15px;
+    letter-spacing: -.04em;
+    line-height: 1.1;
   }
 
-  .bundle-composition > i,
-  .feature-coverage > i {
-    position: relative;
-    display: block;
-    height: 7px;
-    overflow: hidden;
-    border-radius: 999px;
-    background: #eaf0f7;
-  }
-
-  .bundle-composition > i > b,
-  .feature-coverage > i > b {
-    position: absolute;
-    inset: 0 auto 0 0;
-    display: block;
-    border-radius: inherit;
-  }
-
-  .bundle-composition > i > b {
-    width: var(--bundle-js-share);
-    background: linear-gradient(90deg, #2563eb, #0ea5e9);
-  }
-
-  .feature-coverage > i > b {
-    width: var(--api-coverage);
-    background: linear-gradient(90deg, #2563eb, #7c3aed);
-  }
-
+  .capability-item-primary > span,
   .capability-item-bundle > span,
   .capability-item-feature > span { margin-top: auto; padding-top: var(--home-space-4); }
 
-  .feature-counts {
+  .feature-tags {
     display: grid;
-    grid-template-columns: 1fr auto 1fr auto 1.18fr;
-    gap: 7px;
-    align-items: center;
-    margin-top: var(--home-space-3);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: var(--home-space-4);
     border-top: 1px solid #e8edf4;
     padding-top: var(--home-space-4);
   }
 
-  .feature-counts > span { display: grid; gap: 4px; }
-  .feature-counts strong { color: #53647c; font-family: var(--site-font-mono); font-size: 16px; line-height: 1; }
-  .feature-counts small { color: #929fb0; font-size: 13px; font-weight: 760; white-space: nowrap; }
-  .feature-counts > i { color: #a8b3c2; font-style: normal; font-size: 13px; }
-  .feature-counts .is-current { border-radius: 8px; padding: 8px; background: #edf4ff; }
-  .feature-counts .is-current strong { color: #1d5fd4; }
-  .feature-counts .is-current small { color: #4f77b5; }
+  .feature-tags > span {
+    border: 1px solid #e4e8f3;
+    border-radius: 9px;
+    padding: 8px 9px;
+    background: rgba(248, 247, 255, 0.86);
+    color: #5b4b86;
+    font-size: 13px;
+    font-weight: 780;
+    line-height: 1.35;
+    white-space: nowrap;
+  }
 
   .section { padding: var(--home-section-space) 0; }
 
@@ -2245,33 +2118,19 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     border-color: var(--site-border);
     background: var(--site-surface);
   }
-  :global(html[data-theme='dark']) .bundle-breakdown,
-  :global(html[data-theme='dark']) .feature-counts { border-color: var(--site-border); }
-  :global(html[data-theme='dark']) .bundle-composition em,
-  :global(html[data-theme='dark']) .feature-coverage em { color: var(--site-text-muted); }
-  :global(html[data-theme='dark']) .bundle-composition strong,
-  :global(html[data-theme='dark']) .feature-coverage strong { color: var(--site-text-secondary); }
-  :global(html[data-theme='dark']) .bundle-composition > i,
-  :global(html[data-theme='dark']) .feature-coverage > i { background: var(--site-border); }
-  :global(html[data-theme='dark']) .bundle-breakdown > i { background: var(--site-border); }
-  :global(html[data-theme='dark']) .bundle-breakdown strong,
-  :global(html[data-theme='dark']) .feature-counts strong { color: var(--site-text-secondary); }
-  :global(html[data-theme='dark']) .bundle-breakdown em,
-  :global(html[data-theme='dark']) .bundle-breakdown small,
-  :global(html[data-theme='dark']) .feature-counts small,
-  :global(html[data-theme='dark']) .feature-counts > i { color: var(--site-text-muted); }
-  :global(html[data-theme='dark']) .feature-counts .is-current { background: var(--site-accent-soft); }
-  :global(html[data-theme='dark']) .feature-counts .is-current strong,
-  :global(html[data-theme='dark']) .feature-counts .is-current small { color: var(--site-accent-strong); }
-  :global(html[data-theme='dark']) .capability-limit-note {
-    border-left-color: var(--site-accent);
-    background: var(--site-accent-soft);
+  :global(html[data-theme='dark']) .capability-facts,
+  :global(html[data-theme='dark']) .feature-tags { border-color: var(--site-border); }
+  :global(html[data-theme='dark']) .capability-facts > span {
+    border-color: var(--site-border);
+    background: var(--site-surface);
   }
-  :global(html[data-theme='dark']) .capability-limit-note > strong { color: var(--site-text-primary); }
-  :global(html[data-theme='dark']) .capability-limit-note > p { color: var(--site-text-secondary); }
-  :global(html[data-theme='dark']) .capability-limit-note code,
-  :global(html[data-theme='dark']) .capability-limit-note > span { color: var(--site-accent-strong); }
-  :global(html[data-theme='dark']) .capability-limit-note > span + span { color: var(--site-text-secondary); }
+  :global(html[data-theme='dark']) .capability-facts strong { color: var(--site-text-secondary); }
+  :global(html[data-theme='dark']) .capability-facts em { color: var(--site-text-muted); }
+  :global(html[data-theme='dark']) .feature-tags > span {
+    border-color: var(--site-border);
+    background: var(--site-surface);
+    color: var(--site-text-secondary);
+  }
   :global(html[data-theme='dark']) .capability-item > span,
   :global(html[data-theme='dark']) .example-description,
   :global(html[data-theme='dark']) .quick-start-step small,

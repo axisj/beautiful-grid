@@ -6,7 +6,6 @@ import { createGridTheme, siteGridThemePalette } from '../src/data/datagridTheme
 import { themeColorTokenNames } from '../src/data/datagridThemeTokenGroups';
 import { legacyDocRedirects } from '../src/data/legacyRedirects';
 import { productFacts } from '../src/data/productFacts';
-import { publicApiMetrics } from '../src/data/publicApiMetrics';
 import { bundleMetrics } from '../src/data/bundleMetrics';
 
 const siteRoot = resolve(import.meta.dirname, '..');
@@ -54,20 +53,17 @@ describe('site product and navigation contracts', () => {
     expect(homepage).toContain('BeautifulGrid의 검증 가능한 규모와 지원 환경');
     expect(homepage).toContain('실행 예제로 검증한 행 수');
     expect(homepage).toContain('<strong>550,000</strong>');
-    expect(homepage).toContain('기본 행 높이 29px');
-    expect(homepage).toContain('왜 55만 행인가?');
-    expect(homepage).toContain('데이터 배열이 아니라 Chromium의 단일 스크롤 높이가 먼저 한계에 닿기 때문입니다');
-    expect(homepage).toContain('기본 행 높이 29px · 약 827,186px(4.9%) 여유');
-    expect(homepage).toContain('최대 행 높이: ⌊(상한 16,777,216 − 부가 30) ÷ 550,000⌋ = 30px');
-    expect(publicApiMetrics).toEqual({
-      totalGridPropCount: 52,
-      deprecatedGridPropCount: 2,
-      currentGridPropCount: 50,
-    });
-    expect(homepage).toContain('publicApiMetrics.currentGridPropCount');
-    expect(homepage).toContain('현재 지원하는 공개 Grid Props');
-    expect(homepage).toContain('deprecated ${publicApiMetrics.deprecatedGridPropCount}개를 제외했습니다.');
-    expect(homepage).toContain('const runtimeDependencyCount = Object.keys(packageJson.dependencies ?? {}).length');
+    expect(homepage).toContain("t('기본 행 높이', 'Row height')");
+    expect(homepage).toContain('<strong>29px</strong>');
+    expect(homepage).not.toContain('왜 55만 행인가?');
+    expect(homepage).not.toContain('capability-limit-note');
+    expect(homepage).toContain('<strong>{liveExampleCount}<small>');
+    expect(homepage).toContain('기능별 실행 가이드');
+    expect(homepage).toContain('편집부터 집계까지');
+    expect(homepage).toContain('class="feature-tags"');
+    expect(homepage).not.toContain('deprecated');
+    expect(homepage).not.toContain('feature-coverage');
+    expect(homepage).not.toContain('feature-counts');
     expect(bundleMetrics.initialTotalGzipKiB).toBeLessThanOrEqual(bundleMetrics.initialBundleBudgetGzipKiB);
     expect(bundleMetrics.columnReorderJsGzipKiB).toBeGreaterThan(0);
     expect(bundleMetrics.toolboxJsGzipKiB).toBeGreaterThan(0);
@@ -80,10 +76,11 @@ describe('site product and navigation contracts', () => {
     });
     expect(homepage).toContain('bundleMetrics.initialTotalGzipKiB');
     expect(homepage).toContain('초기 JS + CSS 합산 gzip');
-    expect(homepage).toContain('bundleMetrics.columnReorderJsGzipKiB');
-    expect(homepage).toContain('bundleMetrics.toolboxJsGzipKiB');
-    expect(homepage).toContain('bundleMetrics.gridOptionalSurfacesJsGzipKiB');
+    expect(homepage).toContain('bundleMetrics.initialJsGzipKiB');
+    expect(homepage).toContain('bundleMetrics.cssGzipKiB');
     expect(homepage).toContain('React 제외');
+    expect(homepage).not.toContain('bundle-composition');
+    expect(homepage).not.toContain('--bundle-js-share');
     expect(homepage).toContain("t('번들사이즈', 'Bundle size')");
     expect(homepage).toContain("t('Performance', 'Performance')");
     expect(homepage).toContain("t('내 브라우저에서 검사하기', 'Test in my browser')");
@@ -453,7 +450,7 @@ describe('site product and navigation contracts', () => {
 
     expect(homepage).toContain("import { getCollection } from 'astro:content';");
     expect(homepage).toContain("const liveExampleCount = (await getCollection('learn')).filter(");
-    expect(homepage).toContain('!item.data.draft && item.data.demoId');
+    expect(homepage).toContain("item.data.locale === 'ko' && !item.data.draft && item.data.demoId");
     expect(homepage).toContain('const featuredExamples = [');
     expect(homepage).toContain("href: '/learn/built-in-editors'");
     expect(homepage).toContain("href: '/learn/editor-plugins'");

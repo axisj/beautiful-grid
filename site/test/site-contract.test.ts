@@ -126,13 +126,13 @@ describe('site product and navigation contracts', () => {
     expect(homepage).not.toContain('.capability-item-fps.is-measured::before');
   });
 
-  it('links the decision section to examples and the detailed environment guide', () => {
+  it('links the decision section to runtime and open-source guidance', () => {
     const homepage = readSiteFile('src/pages/index.astro');
 
-    expect(homepage).toContain("href={localizePath('/learn', locale)} class=\"btn btn-primary\"");
-    expect(homepage).toContain("href={localizePath('/product-facts', locale)} class=\"btn btn-outline\"");
-    expect(homepage).toContain("t('실행 예제 살펴보기', 'Explore runnable examples')");
-    expect(homepage).toContain("t('도입 환경 확인', 'Check the adoption baseline')");
+    expect(homepage).toContain("href={localizePath('/product-facts', locale)} class=\"btn btn-primary\"");
+    expect(homepage).toContain("href={localizePath('/open-source', locale)} class=\"btn btn-outline\"");
+    expect(homepage).toContain("t('지원 환경 확인', 'Review runtime support')");
+    expect(homepage).toContain("t('오픈소스 안내', 'Explore open source')");
   });
 
   it('keeps the product facts route focused on runtime and compatibility guidance', () => {
@@ -426,8 +426,11 @@ describe('site product and navigation contracts', () => {
     expect(homepage).toContain('아름다운 기본 디자인으로 바로 시작하고');
     expect(homepage).toContain("t('5분 만에 시작하기', 'Get started in 5 minutes')");
     expect(homepage).toContain("t('라이브 데모 보기', 'View live demos')");
-    expect(homepage).toContain('React 생태계에 자연스럽게,');
-    expect(homepage).toContain('Excel 수식 엔진, Ribbon, 전용 디자이너까지 완전히 대체해야 한다면 별도 검토가 필요합니다.');
+    expect(homepage).toContain("t('도입 기준은 분명하게,', 'Clear adoption baseline,')");
+    expect(homepage).toContain("t('사용과 확장은 자유롭게.', 'open use and extension.')");
+    expect(homepage).toContain("t('최신 안정 브라우저 지원', 'Current stable browsers')");
+    expect(homepage).toContain("t('오픈소스', 'open source')");
+    expect(homepage).not.toContain('React 생태계에 자연스럽게,');
     expect(homepage).not.toContain('조회부터 편집·집계까지,');
     expect(homepage).not.toContain('complete the workflow in one screen.');
   });

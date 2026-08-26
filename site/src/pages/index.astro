@@ -486,36 +486,32 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
       <div class="container">
         <div class="decision-card">
           <div class="decision-copy">
-            <p class="eyebrow">{t('React에 맞춘 업무 그리드', 'A business grid made for React')}</p>
-            <h2>{t('React 생태계에 자연스럽게,', 'Seamless in the React ecosystem,')}<br />{t('업무 기능은 강력하게.', 'powerful across real data workflows.')}</h2>
+            <p class="eyebrow">{t('지원 환경 · 오픈소스', 'Runtime support · Open source')}</p>
+            <h2>{t('도입 기준은 분명하게,', 'Clear adoption baseline,')}<br />{t('사용과 확장은 자유롭게.', 'open use and extension.')}</h2>
             <p>
-              {t('컴포넌트와 상태 흐름은 React에 자연스럽게 맞추고, 가상 스크롤·편집·정렬·필터·선택·집계처럼 업무 화면에 필요한 기능은 하나의 그리드에 충실하게 담았습니다.', 'Components and state follow React naturally, while virtual scrolling, editing, sorting, filtering, selection, and aggregation remain fully integrated in one grid.')}
+              {t('BeautifulGrid가 동작하는 React·Node.js·브라우저 기준을 공개하고, Apache-2.0 라이선스와 전체 소스를 통해 도입 이후의 운영과 확장까지 직접 확인할 수 있습니다.', 'BeautifulGrid publishes its React, Node.js, and browser baseline. The Apache-2.0 license and complete source let you verify how the grid can be operated and extended after adoption.')}
             </p>
             <div class="decision-actions">
-              <a href={localizePath('/learn', locale)} class="btn btn-primary">{t('실행 예제 살펴보기', 'Explore runnable examples')}</a>
-              <a href={localizePath('/product-facts', locale)} class="btn btn-outline">{t('도입 환경 확인', 'Check the adoption baseline')}</a>
+              <a href={localizePath('/product-facts', locale)} class="btn btn-primary">{t('지원 환경 확인', 'Review runtime support')}</a>
+              <a href={localizePath('/open-source', locale)} class="btn btn-outline">{t('오픈소스 안내', 'Explore open source')}</a>
             </div>
           </div>
           <div class="decision-list">
-            <article class="decision-item decision-item-fit">
+            <article class="decision-item decision-item-environment">
               <span aria-hidden="true">01</span>
-              <div><strong>{t('React 상태 흐름에 자연스럽게', 'Natural React state flow')}</strong><p>{t('데이터와 선택, 편집 상태를 컴포넌트 흐름에 맞춰 제어합니다.', 'Control data, selection, and editing state through component flow.')}</p></div>
+              <div><strong>{t('React · Node.js 기준', 'React · Node.js baseline')}</strong><p>React {packageJson.peerDependencies.react} · Node.js {packageJson.engines.node}<br />{t('브라우저에서 마운트하는 클라이언트 컴포넌트입니다.', 'A client component mounted in the browser.')}</p></div>
             </article>
-            <article class="decision-item decision-item-fit">
+            <article class="decision-item decision-item-environment">
               <span aria-hidden="true">02</span>
-              <div><strong>{t('업무 기능을 한 컴포넌트에', 'Business features in one component')}</strong><p>{t('가상 스크롤부터 편집·정렬·필터·병합·요약까지 연결합니다.', 'Connect virtual scrolling, editing, sort, filter, merge, and summary.')}</p></div>
+              <div><strong>{t('최신 안정 브라우저 지원', 'Current stable browsers')}</strong><p>{t('Chrome, Edge, Safari, Firefox 최신 안정판을 기준으로 화면별 동작을 검증합니다.', 'Validate each screen against current stable Chrome, Edge, Safari, and Firefox.')}</p></div>
             </article>
-            <article class="decision-item decision-item-fit">
+            <article class="decision-item decision-item-open-source">
               <span aria-hidden="true">03</span>
-              <div><strong>{t('제품 디자인에 맞게 확장', 'Extend to match your product')}</strong><p>{t('렌더러와 편집 플러그인, CSS 변수로 화면의 문법을 유지합니다.', 'Preserve your visual language with renderers, editor plugins, and CSS variables.')}</p></div>
+              <div><strong>{productFacts.licenseName} {t('오픈소스', 'open source')}</strong><p>{t('개인과 기업 모두 라이선스 조건에 따라 상업적 사용, 수정과 배포가 가능합니다.', 'Individuals and companies may use, modify, and distribute it commercially under the license terms.')}</p></div>
             </article>
-            <article class="decision-item decision-item-fit">
+            <article class="decision-item decision-item-open-source">
               <span aria-hidden="true">04</span>
-              <div><strong>{t('대량 데이터도 필요한 만큼만', 'Process only what large data needs')}</strong><p>{t('가상화와 서버 조회 흐름으로 화면에 필요한 범위만 처리합니다.', 'Virtualization and server queries keep work scoped to the visible range.')}</p></div>
-            </article>
-            <article class="decision-item decision-item-check">
-              <span aria-hidden="true">!</span>
-              <div><strong>{t('도입 전에 확인할 범위', 'Confirm before adoption')}</strong><p>{t('Excel 수식 엔진, Ribbon, 전용 디자이너까지 완전히 대체해야 한다면 별도 검토가 필요합니다.', 'If you need a complete replacement for Excel formulas, Ribbon, or a dedicated designer, review that requirement separately.')}</p></div>
+              <div><strong>{t('공개된 소스와 개발 과정', 'Public source and development')}</strong><p>{t('TypeScript 소스, 이슈와 변경 이력을 GitHub에서 직접 확인하고 프로젝트에 맞게 확장할 수 있습니다.', 'Inspect the TypeScript source, issues, and change history on GitHub, then extend it for your project.')}</p></div>
             </article>
           </div>
         </div>
@@ -2148,9 +2144,8 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     font-weight: 900;
   }
 
-  .decision-item-fit > span { background: #e4f8ef; color: #057857; }
-  .decision-item-check { grid-column: 1 / -1; min-height: auto; }
-  .decision-item-check > span { background: #fff2e7; color: #c2410c; font-family: var(--site-font-sans); font-size: 13px; }
+  .decision-item-environment > span { background: #e8f1ff; color: #1d5fd4; }
+  .decision-item-open-source > span { background: #e4f8ef; color: #057857; }
   .decision-item strong { color: #26364d; font-size: 13px; }
   .decision-item p { margin: 5px 0 0; color: #718096; font-size: 13px; line-height: 1.65; }
 
@@ -2285,14 +2280,8 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     background: var(--site-accent-soft);
     color: var(--site-accent-strong);
   }
-  :global(html[data-theme='dark']) .decision-item-fit > span {
-    background: #073b35;
-    color: #6ee7b7;
-  }
-  :global(html[data-theme='dark']) .decision-item-check > span {
-    background: #422006;
-    color: #fcd34d;
-  }
+  :global(html[data-theme='dark']) .decision-item-environment > span { background: #172b4c; color: #8fb9ff; }
+  :global(html[data-theme='dark']) .decision-item-open-source > span { background: #073b35; color: #6ee7b7; }
   :global(html[data-theme='dark']) .strength-card-blue { --card-accent: #6ea8ff; --card-soft: #172b4c; }
   :global(html[data-theme='dark']) .strength-card-violet { --card-accent: #c4b5fd; --card-soft: #29234d; }
   :global(html[data-theme='dark']) .strength-card-cyan { --card-accent: #67e8f9; --card-soft: #123a45; }
@@ -2435,7 +2424,6 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     .quick-start-code-block-install pre { font-size: 14px; }
     .decision-card { padding: var(--home-space-5); }
     .decision-list { grid-template-columns: 1fr; }
-    .decision-item-check { grid-column: 1; }
     .decision-actions,
     .final-cta-actions { width: 100%; }
     .decision-actions .btn,

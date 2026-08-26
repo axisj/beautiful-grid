@@ -32,11 +32,15 @@ describe('self-hosted site deployment contracts', () => {
     const deployment = readRepositoryFile('scripts/deploy-local-production.sh');
 
     expect(compose).toContain('beautiful-grid-site');
+    expect(compose).toContain('platform: linux/amd64');
     expect(compose).toContain('127.0.0.1:7195:80');
     expect(compose).toContain('name: axstaff_default');
     expect(edge).toContain('reverse_proxy beautiful-grid-site:80');
     expect(deployment).toContain('http://127.0.0.1:7195/health');
     expect(deployment).toContain('http://beautiful-grid-site/health');
+    expect(deployment).toContain('axboot-datagrid-site-1');
+    expect(deployment).toContain('docker start "$legacy_container"');
+    expect(deployment).toContain('docker rm "$legacy_container"');
   });
 
   it('only permits manual production deployment from main', () => {

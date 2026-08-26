@@ -10,6 +10,8 @@ compose_project="${COMPOSE_PROJECT_NAME:-beautiful-grid}"
 compose_file="$project_dir/docker-compose.prod.yml"
 deployed_sha_file="$project_dir/.deployed-sha"
 previous_deployed_sha_file="$project_dir/.previous-deployed-sha"
+legacy_container="${BEAUTIFUL_GRID_LEGACY_CONTAINER:-axboot-datagrid-site-1}"
+legacy_was_running=0
 
 if [[ ! "$deploy_sha" =~ ^[0-9a-f]{40}$ ]]; then
   echo "::error::Deployment SHA is invalid."
@@ -180,13 +182,39 @@ rollback_on_failure() {
     echo "::error::Initial deployment failed; no local N-1 image exists."
     run_compose "$deploy_sha" down --remove-orphans || true
   fi
+  if [ "$legacy_was_running" = 1 ]; then
+    echo "Restoring legacy DataGrid container: ${legacy_container}"
+    docker start "$legacy_container" >/dev/null
+  fi
   remove_sha_image "$deploy_sha"
   exit "$status"
 }
 trap rollback_on_failure ERR
 
+if docker container inspect "$legacy_container" >/dev/null 2>&1; then
+  legacy_running="$(
+    docker inspect "$legacy_container" --format '{{.State.Running}}'
+  )"
+  if [ "$legacy_running" = true ]; then
+    legacy_port="$(docker port "$legacy_container" 80/tcp)"
+    if ! grep -q '127\.0\.0\.1:7195' <<<"$legacy_port"; then
+      echo "::error::Legacy DataGrid container does not own the expected port: ${legacy_port}"
+      exit 69
+    fi
+    echo "Stopping legacy DataGrid container for BeautifulGrid cutover."
+    docker stop --time 15 "$legacy_container" >/dev/null
+    legacy_was_running=1
+  fi
+fi
+
 run_compose "$deploy_sha" up -d --wait --wait-timeout 120 site
 verify_readiness "$deploy_sha"
+
+if [ "$legacy_was_running" = 1 ]; then
+  docker rm "$legacy_container" >/dev/null
+  legacy_was_running=0
+  echo "Removed retired DataGrid container: ${legacy_container}"
+fi
 
 trap - ERR
 

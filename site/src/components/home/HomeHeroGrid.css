@@ -8,7 +8,7 @@
 }
 
 .hero-grid-viewport {
-  --bgrid-font-size: 12px;
+  --bgrid-font-size: 13px;
   --hero-grid-cell-editable-bg: #ffffff;
   --hero-grid-cell-editable-hover-bg: #eff6ff;
   --hero-grid-cell-readonly-bg: #f1f5f9;
@@ -23,7 +23,7 @@
 .bgrid-editor-portal-root .ant-select-dropdown,
 .bgrid-editor-portal-root .ant-select-item,
 .bgrid-editor-portal-root .ant-select-item-option-content {
-  font-size: var(--bgrid-font-size, 12px);
+  font-size: var(--bgrid-font-size, 13px);
 }
 
 .hero-grid-viewport
@@ -65,7 +65,7 @@
   justify-content: center;
   border-radius: 999px;
   padding: 2px 7px;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 700;
   line-height: 18px;
 }

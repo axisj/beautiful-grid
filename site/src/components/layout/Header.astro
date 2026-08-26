@@ -22,7 +22,23 @@ const navigation = [
   <div class="container header-inner">
     <a href={localizePath('/', locale)} class="brand" aria-label={`BeautifulGrid ${messages.home}`} data-shell-home>
       <span class="brand-lockup" aria-hidden="true">
-        <span class="brand-symbol">B</span>
+        <svg
+          class="brand-symbol"
+          xmlns="http://www.w3.org/2000/svg"
+          width="36"
+          height="24"
+          viewBox="0 0 36 24"
+          focusable="false"
+        >
+          <path d="M18.7 20.8c-.9 0-1.6-.7-1.6-1.6s.7-1.6 1.6-1.6c3.1 0 5.6-2.5 5.6-5.6s-2.5-5.6-5.6-5.6c-.9 0-1.6-.7-1.6-1.6s.7-1.6 1.6-1.6c4.8 0 8.8 3.9 8.8 8.8s-4 8.8-8.8 8.8" fill="#78b9f3" />
+          <path d="M18.7 20.8h-7.8c-.9 0-1.6-.7-1.6-1.6s.7-1.6 1.6-1.6h7.8c.9 0 1.6.7 1.6 1.6s-.8 1.6-1.6 1.6" fill="#78b9f3" />
+          <linearGradient id="site-logo-symbol-gradient" x1="20.415" x2="1.355" y1="12" y2="12" gradientUnits="userSpaceOnUse">
+            <stop offset="0.511" stop-color="#78b9f3" />
+            <stop offset="1" stop-color="#3256de" />
+          </linearGradient>
+          <path d="M3 20.8c-.3 0-.5-.1-.7-.2-.8-.4-1.1-1.4-.7-2.2L9 4.1c.3-.5.8-.8 1.4-.9.6 0 1.1.3 1.4.8l8.3 14.4c.4.8.2 1.7-.6 2.2-.8.4-1.7.2-2.2-.6L10.5 8.1 4.4 19.9c-.3.6-.9.9-1.4.9" fill="url(#site-logo-symbol-gradient)" />
+          <path d="M33 20.8c-4.8 0-8.8-3.9-8.8-8.8s3.9-8.8 8.8-8.8c.9 0 1.6.7 1.6 1.6s-.7 1.6-1.6 1.6c-3.1 0-5.6 2.5-5.6 5.6s2.5 5.6 5.6 5.6c.9 0 1.6.7 1.6 1.6s-.7 1.6-1.6 1.6" fill="#3256de" />
+        </svg>
         <span class="brand-name">Beautiful<span>Grid</span></span>
       </span>
       <span class="version-badge">v{productFacts.version}</span>
@@ -70,10 +86,10 @@ const navigation = [
   .brand { display: inline-flex; width: max-content; align-items: center; gap: 10px; color: var(--site-text-primary); text-decoration: none; }
   .brand-lockup { display: inline-flex; align-items: center; gap: 9px; }
   .brand:hover, .primary-nav a:hover, .mobile-nav a:hover { text-decoration: none; }
-  .brand-symbol { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 9px; background: linear-gradient(135deg, var(--site-accent-strong), #7c3aed); color: white; font-size: 16px; font-weight: 900; box-shadow: 0 8px 22px -12px var(--site-accent-strong); }
+  .brand-symbol { display: block; width: 36px; height: 24px; flex: 0 0 auto; }
   .brand-name { color: var(--site-text-primary); font-size: 19px; font-weight: 800; line-height: 1; letter-spacing: -0.03em; }
   .brand-name span { color: var(--site-accent-strong); }
-  .version-badge { border: 1px solid var(--site-border); border-radius: 999px; padding: 2px 6px; background: var(--site-surface); color: var(--site-text-muted); font-family: var(--site-font-mono); font-size: 11px; font-weight: 700; }
+  .version-badge { border: 1px solid var(--site-border); border-radius: 999px; padding: 2px 6px; background: var(--site-surface); color: var(--site-text-muted); font-family: var(--site-font-mono); font-size: 13px; font-weight: 700; }
   .primary-nav { display: flex; align-items: center; gap: 21px; }
   .primary-nav a { display: inline-flex; align-items: center; gap: 4px; color: var(--site-text-secondary); font-size: 13px; font-weight: 700; transition: color 150ms ease; white-space: nowrap; }
   .nav-label { display: inline-flex; align-items: center; gap: 6px; }
@@ -91,7 +107,7 @@ const navigation = [
   .mobile-nav a:not(.preference-button) { display: flex; min-height: 44px; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--site-border); color: var(--site-text-secondary); font-size: 14px; font-weight: 700; }
   @media (max-width: 1080px) { .primary-nav { gap: 15px; } .header-inner { gap: 14px; } }
   @media (max-width: 960px) { .header-inner { display: flex; justify-content: space-between; } .desktop-only, .desktop-preferences { display: none; } .mobile-menu-btn { display: block; } }
-  @media (max-width: 420px) { .brand { gap: 7px; } .brand-lockup { gap: 7px; } .brand-symbol { width: 28px; height: 28px; } .brand-name { font-size: 17px; } .version-badge { display: none; } }
+  @media (max-width: 420px) { .brand { gap: 7px; } .brand-lockup { gap: 7px; } .brand-symbol { width: 36px; height: 24px; } .brand-name { font-size: 17px; } .version-badge { display: none; } }
 </style>
 
 <script is:inline define:vars={{

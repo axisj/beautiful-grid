@@ -71,6 +71,8 @@ const liveExampleCount = (await getCollection('learn')).filter(
   (item) => !item.data.draft && item.data.demoId,
 ).length;
 const runtimeDependencyCount = Object.keys(packageJson.dependencies ?? {}).length;
+const bundleJsShare = Math.round((bundleMetrics.initialJsGzipKiB / bundleMetrics.initialTotalGzipKiB) * 100);
+const publicApiCoverage = Math.round((publicApiMetrics.currentGridPropCount / publicApiMetrics.totalGridPropCount) * 100);
 
 const strengthStories = [
   {
@@ -233,7 +235,7 @@ const localizedFeaturedExamples = localize(featuredExamples);
 
       <div class="container capability-rail" aria-label={t('BeautifulGrid의 검증 가능한 규모와 지원 환경', 'Verified BeautifulGrid scale and support baseline')}>
         <article class="capability-item capability-item-primary">
-          <p>{t('대용량 데이터', 'Large datasets')}</p>
+          <div class="capability-card-head"><p>{t('대용량 데이터', 'Large datasets')}</p><span>01</span></div>
           <strong>550,000</strong>
           <h2>{t('실행 예제로 검증한 행 수', 'Rows verified in a runnable example')}</h2>
           <span>{t('기본 행 높이 29px · 마지막 550,000번째 행까지 확인', '29px default row height · verified through row 550,000')}</span>
@@ -245,34 +247,47 @@ const localizedFeaturedExamples = localize(featuredExamples);
             <span>{t('최대 행 높이: ⌊(상한 16,777,216 − 부가 30) ÷ 550,000⌋ = 30px', 'Maximum row height: floor((16,777,216 limit - 30 overhead) / 550,000) = 30px')}</span>
           </div>
         </article>
-        <article class="capability-item">
-          <p>{t('번들사이즈', 'Bundle size')}</p>
+        <article class="capability-item capability-item-bundle">
+          <div class="capability-card-head"><p>{t('번들사이즈', 'Bundle size')}</p><span>02</span></div>
           <strong>{bundleMetrics.initialTotalGzipKiB}<small>KiB</small></strong>
           <h2>{t('초기 JS + CSS 합산 gzip', 'Initial JS + CSS gzip total')}</h2>
-          <span>
-            JS {bundleMetrics.initialJsGzipKiB}KiB · CSS {bundleMetrics.cssGzipKiB}KiB · {t('React 제외', 'React excluded')} · {t('열 재배치', 'column reorder')}
-            {bundleMetrics.columnReorderJsGzipKiB}KiB · {t('열 도구상자', 'toolbox')} {bundleMetrics.toolboxJsGzipKiB}KiB · {t('검색/메뉴', 'search/menu')}
-            {bundleMetrics.gridOptionalSurfacesJsGzipKiB}KiB {t('지연 로드', 'lazy-loaded')} · {t('런타임 의존성', 'runtime dependencies')} {runtimeDependencyCount}
-          </span>
+          <div class="bundle-composition" aria-label={t(`초기 번들에서 JS가 ${bundleJsShare}%를 차지합니다.`, `JavaScript accounts for ${bundleJsShare}% of the initial bundle.`)}>
+            <span><em>{t('번들 구성', 'Composition')}</em><strong>JS {bundleJsShare}%</strong></span>
+            <i style={`--bundle-js-share: ${bundleJsShare}%`}><b></b></i>
+          </div>
+          <div class="bundle-breakdown" aria-label={t('초기 번들 구성', 'Initial bundle breakdown')}>
+            <span><em>JS</em><strong>{bundleMetrics.initialJsGzipKiB}</strong><small>KiB</small></span>
+            <i aria-hidden="true"></i>
+            <span><em>CSS</em><strong>{bundleMetrics.cssGzipKiB}</strong><small>KiB</small></span>
+          </div>
+          <span>{t('React 제외', 'React excluded')} · {t('열 재배치', 'column reorder')} {bundleMetrics.columnReorderJsGzipKiB}KiB · {t('열 도구상자', 'toolbox')} {bundleMetrics.toolboxJsGzipKiB}KiB · {t('검색/메뉴', 'search/menu')} {bundleMetrics.gridOptionalSurfacesJsGzipKiB}KiB {t('지연 로드', 'lazy-loaded')} · {t('런타임 의존성', 'runtime dependencies')} {runtimeDependencyCount}</span>
         </article>
         <article class="capability-item capability-item-fps is-measured" data-fps-card>
-          <p>{t('Performance', 'Performance')}</p>
+          <div class="capability-card-head"><p>{t('Performance', 'Performance')}</p><span>03</span></div>
           <div class="speed-values">
-            <strong><span data-fps-value>60</span><small>fps</small><em>{t('스크롤', 'scroll')}</em></strong>
-            <i aria-hidden="true"></i>
-            <strong><span data-mount-value>56.6</span><small>ms</small><em>{t('초기 마운트', 'initial mount')}</em></strong>
+            <strong><em>{t('스크롤', 'scroll')}</em><span data-fps-value>60</span><small>fps</small></strong>
+            <strong><em>{t('초기 마운트', 'initial mount')}</em><span data-mount-value>56.6</span><small>ms</small></strong>
           </div>
           <h2>{t('스크롤과 첫 화면 표시를 함께 측정', 'Measure scrolling and first paint together')}</h2>
-          <button type="button" data-fps-measure data-measure-ready={t('스크롤 다시 측정', 'Measure scroll again')} data-measure-running={t('측정 중', 'Measuring')} data-measure-progress={t('같은 구간을 아래위로 왕복하고 있습니다.', 'Scrolling the same range down and back.')} data-detail-prefix={t('Chromium · 72행 · 스크롤 p95', 'Chromium · 72 rows · scroll p95')} data-detail-mount={t('마운트', 'mount')}>{t('스크롤 다시 측정', 'Measure scroll again')}</button>
           <span data-fps-detail>{t('1440×1000 · 72행 · 스크롤 5회 중앙값 · 마운트 현재 로드', '1440×1000 · 72 rows · median of 5 scrolls · mount from current load')}</span>
+          <button type="button" data-fps-measure data-measure-ready={t('내 브라우저에서 검사하기', 'Test in my browser')} data-measure-running={t('측정 중', 'Measuring')} data-measure-progress={t('같은 구간을 아래위로 왕복하고 있습니다.', 'Scrolling the same range down and back.')} data-detail-prefix={t('Chromium · 72행 · 스크롤 p95', 'Chromium · 72 rows · scroll p95')} data-detail-mount={t('마운트', 'mount')}><span>{t('내 브라우저에서 검사하기', 'Test in my browser')}</span><i aria-hidden="true">↗</i></button>
         </article>
         <article class="capability-item capability-item-feature">
-          <p>{t('다양한 기능', 'Feature breadth')}</p>
+          <div class="capability-card-head"><p>{t('다양한 기능', 'Feature breadth')}</p><span>04</span></div>
           <strong>{publicApiMetrics.currentGridPropCount}</strong>
           <h2>{t('현재 지원하는 공개 Grid Props', 'Currently supported public Grid props')}</h2>
-          <span>
-            {t(`BGridProps ${publicApiMetrics.totalGridPropCount}개 중 deprecated ${publicApiMetrics.deprecatedGridPropCount}개를 제외했습니다.`, `${publicApiMetrics.currentGridPropCount} current props, excluding ${publicApiMetrics.deprecatedGridPropCount} deprecated members from ${publicApiMetrics.totalGridPropCount} BGridProps.`)}
-          </span>
+          <div class="feature-coverage" aria-label={t(`전체 공개 속성의 ${publicApiCoverage}%를 현재 지원합니다.`, `${publicApiCoverage}% of public props are currently supported.`)}>
+            <span><em>{t('현재 API 비율', 'Current API')}</em><strong>{publicApiCoverage}%</strong></span>
+            <i style={`--api-coverage: ${publicApiCoverage}%`}><b></b></i>
+          </div>
+          <div class="feature-counts">
+            <span><strong>{publicApiMetrics.totalGridPropCount}</strong><small>{t('전체', 'total')}</small></span>
+            <i aria-hidden="true">−</i>
+            <span><strong>{publicApiMetrics.deprecatedGridPropCount}</strong><small>deprecated</small></span>
+            <i aria-hidden="true">=</i>
+            <span class="is-current"><strong>{publicApiMetrics.currentGridPropCount}</strong><small>{t('현재 지원', 'current')}</small></span>
+          </div>
+          <span>{t(`BGridProps ${publicApiMetrics.totalGridPropCount}개 중 deprecated ${publicApiMetrics.deprecatedGridPropCount}개를 제외했습니다.`, `${publicApiMetrics.currentGridPropCount} current props, excluding ${publicApiMetrics.deprecatedGridPropCount} deprecated members from ${publicApiMetrics.totalGridPropCount} BGridProps.`)}</span>
         </article>
       </div>
     </section>
@@ -600,7 +615,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
       scroller.scrollTo({ top: originalScrollTop, behavior: 'auto' });
       fpsValue.textContent = String(fps);
       fpsDetail.textContent = `${fpsButton.dataset.detailPrefix ?? 'Chromium · 72 rows · scroll p95'} ${p95FrameTime.toFixed(1)}ms · ${fpsButton.dataset.detailMount ?? 'mount'} ${mountValue?.textContent ?? '--'}ms`;
-      fpsButton.textContent = fpsButton.dataset.measureReady ?? 'Measure scroll again';
+      fpsButton.innerHTML = `<span>${fpsButton.dataset.measureReady ?? 'Test in my browser'}</span><i aria-hidden="true">↗</i>`;
       fpsButton.disabled = false;
       fpsCard.classList.add('is-measured');
     };
@@ -671,7 +686,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   .eyebrow {
     margin: 0;
     color: #2563eb;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 850;
     letter-spacing: 0.14em;
     line-height: 1.5;
@@ -795,7 +810,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     color: #1d4ed8;
     cursor: pointer;
     font: inherit;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 850;
   }
 
@@ -805,7 +820,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     gap: var(--home-space-2);
     margin: var(--home-space-4) 0 0;
     color: #718097;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 620;
   }
 
@@ -902,7 +917,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     background: rgba(255, 255, 255, 0.94);
     box-shadow: 0 12px 32px -20px rgba(15, 23, 42, 0.45);
     color: #5f7088;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 760;
   }
 
@@ -963,9 +978,9 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     position: relative;
     display: flex;
     min-width: 0;
-    min-height: 224px;
+    min-height: 292px;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: flex-start;
     overflow: hidden;
     border: 0;
     border-radius: 18px;
@@ -981,6 +996,18 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   .capability-item-primary {
     background:
       radial-gradient(circle at 92% 5%, rgba(37, 99, 235, 0.14), transparent 42%),
+      rgba(255, 255, 255, 0.9);
+  }
+
+  .capability-item-bundle {
+    background:
+      radial-gradient(circle at 95% 7%, rgba(14, 165, 233, 0.09), transparent 38%),
+      rgba(255, 255, 255, 0.9);
+  }
+
+  .capability-item-feature {
+    background:
+      radial-gradient(circle at 92% 7%, rgba(124, 58, 237, 0.08), transparent 38%),
       rgba(255, 255, 255, 0.9);
   }
 
@@ -1021,30 +1048,54 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     padding: 0;
     background: transparent;
     color: #426287;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 750;
   }
 
-  .capability-limit-note i { font-size: 12px; font-style: normal; }
+  .capability-limit-note i { font-size: 13px; font-style: normal; }
 
   .capability-limit-note > span {
     display: block;
     margin-top: 5px;
     color: #1d5fd4;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 760;
     line-height: 1.55;
   }
 
   .capability-limit-note > span + span { color: #526f96; }
 
-  .capability-item > p {
-    order: -2;
-    margin: 0 auto auto 0;
+  .capability-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--home-space-3);
+    min-height: 24px;
+    margin-bottom: clamp(24px, 2.4vw, 38px);
+  }
+
+  .capability-item-primary .capability-card-head { margin-bottom: var(--home-space-3); }
+
+  .capability-card-head p {
+    margin: 0;
     color: #718198;
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 800;
     letter-spacing: 0.08em;
+  }
+
+  .capability-card-head > span {
+    display: grid;
+    width: 26px;
+    height: 26px;
+    place-items: center;
+    border: 1px solid #e1e8f2;
+    border-radius: 8px;
+    background: rgba(248, 251, 255, 0.84);
+    color: #9aa8ba;
+    font-family: var(--site-font-mono);
+    font-size: 13px;
+    font-weight: 800;
   }
 
   .capability-item > strong {
@@ -1058,31 +1109,36 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
 
   .capability-item-primary > strong { color: #1d5fd4; }
 
-  .capability-item sup,
-  .capability-item small {
+  .capability-item > strong small {
     margin-left: 3px;
     color: #3978df;
-    font-size: 0.38em;
+    font-size: 16px;
     font-weight: 850;
     letter-spacing: 0;
     vertical-align: super;
   }
 
-  .capability-item small { vertical-align: baseline; }
+  .capability-item > strong small { vertical-align: baseline; }
 
   .speed-values {
-    display: flex;
-    align-items: center;
-    gap: var(--home-space-3);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--home-space-2);
   }
 
   .speed-values > strong {
     display: grid;
     grid-template-columns: auto auto;
     align-items: baseline;
+    justify-content: start;
+    min-width: 0;
+    border: 1px solid rgba(218, 228, 240, 0.9);
+    border-radius: 12px;
+    padding: 12px 11px 11px;
+    background: rgba(248, 251, 255, 0.78);
     color: #132039;
     font-family: var(--site-font-mono);
-    font-size: clamp(28px, 2.6vw, 40px);
+    font-size: clamp(25px, 2.25vw, 36px);
     font-weight: 860;
     letter-spacing: -0.065em;
     line-height: 1;
@@ -1091,25 +1147,20 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   .speed-values small {
     margin-left: 3px;
     color: #3978df;
-    font-size: 0.38em;
+    font-size: 13px;
     letter-spacing: 0;
   }
 
   .speed-values em {
     grid-column: 1 / -1;
-    margin-top: 5px;
+    grid-row: 1;
+    margin: 0 0 12px;
     color: #7a8799;
     font-family: var(--site-font-sans);
-    font-size: 8px;
+    font-size: 13px;
     font-style: normal;
     font-weight: 760;
     letter-spacing: 0;
-  }
-
-  .speed-values > i {
-    width: 1px;
-    height: 44px;
-    background: #dfe7f1;
   }
 
   .capability-item h2 {
@@ -1123,26 +1174,35 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   .capability-item > span {
     margin-top: var(--home-space-2);
     color: #7a8799;
-    font-size: 10px;
+    font-size: 13px;
     line-height: 1.6;
     word-break: keep-all;
   }
 
   .capability-item-fps button {
-    align-self: flex-start;
-    margin-top: var(--home-space-2);
+    display: flex;
+    width: 100%;
+    min-height: 38px;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--home-space-3);
+    margin-top: auto;
     border: 1px solid #dfe8f3;
-    border-radius: 8px;
-    padding: 6px 9px;
+    border-radius: 10px;
+    padding: 8px 11px;
     background: #f8fbff;
     color: #1d5fd4;
     cursor: pointer;
     font: inherit;
-    font-size: 8px;
+    font-size: 13px;
     font-weight: 800;
+    text-align: left;
   }
 
+  .capability-item-fps button i { font-style: normal; font-size: 13px; transition: transform 150ms ease; }
+
   .capability-item-fps button:hover { border-color: #a9c7f4; background: #edf5ff; }
+  .capability-item-fps button:hover i { transform: translate(2px, -2px); }
   .capability-item-fps button:disabled { cursor: wait; opacity: 0.62; }
 
   .capability-item-fps.is-measured {
@@ -1150,6 +1210,120 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
       radial-gradient(circle at 92% 8%, rgba(5, 150, 105, 0.09), transparent 40%),
       rgba(255, 255, 255, 0.9);
   }
+
+  .bundle-breakdown {
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    gap: var(--home-space-3);
+    align-items: stretch;
+    margin-top: var(--home-space-3);
+    border-top: 1px solid #e8edf4;
+    padding-top: var(--home-space-4);
+  }
+
+  .bundle-breakdown > span {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: baseline;
+    gap: 3px;
+  }
+
+  .bundle-breakdown em {
+    color: #8492a6;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 820;
+    letter-spacing: .08em;
+  }
+
+  .bundle-breakdown strong {
+    color: #33445e;
+    font-family: var(--site-font-mono);
+    font-size: 15px;
+    letter-spacing: -.04em;
+  }
+
+  .bundle-breakdown small { color: #8492a6; font-size: 13px; font-weight: 760; }
+  .bundle-breakdown > i { width: 1px; background: #e3eaf3; }
+
+  .bundle-composition,
+  .feature-coverage {
+    display: grid;
+    gap: 9px;
+    margin-top: var(--home-space-5);
+  }
+
+  .bundle-composition > span,
+  .feature-coverage > span {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--home-space-2);
+  }
+
+  .bundle-composition em,
+  .feature-coverage em {
+    color: #7b899c;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 760;
+  }
+
+  .bundle-composition strong,
+  .feature-coverage strong {
+    color: #31435e;
+    font-family: var(--site-font-mono);
+    font-size: 13px;
+  }
+
+  .bundle-composition > i,
+  .feature-coverage > i {
+    position: relative;
+    display: block;
+    height: 7px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #eaf0f7;
+  }
+
+  .bundle-composition > i > b,
+  .feature-coverage > i > b {
+    position: absolute;
+    inset: 0 auto 0 0;
+    display: block;
+    border-radius: inherit;
+  }
+
+  .bundle-composition > i > b {
+    width: var(--bundle-js-share);
+    background: linear-gradient(90deg, #2563eb, #0ea5e9);
+  }
+
+  .feature-coverage > i > b {
+    width: var(--api-coverage);
+    background: linear-gradient(90deg, #2563eb, #7c3aed);
+  }
+
+  .capability-item-bundle > span,
+  .capability-item-feature > span { margin-top: auto; padding-top: var(--home-space-4); }
+
+  .feature-counts {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1.18fr;
+    gap: 7px;
+    align-items: center;
+    margin-top: var(--home-space-3);
+    border-top: 1px solid #e8edf4;
+    padding-top: var(--home-space-4);
+  }
+
+  .feature-counts > span { display: grid; gap: 4px; }
+  .feature-counts strong { color: #53647c; font-family: var(--site-font-mono); font-size: 16px; line-height: 1; }
+  .feature-counts small { color: #929fb0; font-size: 13px; font-weight: 760; white-space: nowrap; }
+  .feature-counts > i { color: #a8b3c2; font-style: normal; font-size: 13px; }
+  .feature-counts .is-current { border-radius: 8px; padding: 8px; background: #edf4ff; }
+  .feature-counts .is-current strong { color: #1d5fd4; }
+  .feature-counts .is-current small { color: #4f77b5; }
 
   .section { padding: var(--home-section-space) 0; }
 
@@ -1240,7 +1414,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     gap: var(--home-space-2);
     color: var(--card-accent);
     font-family: var(--site-font-mono);
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 850;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -1281,7 +1455,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     gap: var(--home-space-2);
     margin-top: var(--home-space-5);
     color: #33445d;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 780;
   }
 
@@ -1303,7 +1477,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     padding: var(--home-space-2) var(--home-space-3);
     background: rgba(255, 255, 255, 0.72);
     color: color-mix(in srgb, var(--card-accent) 80%, #172033);
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 760;
     text-decoration: none;
   }
@@ -1361,7 +1535,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     right: -2px;
     color: var(--card-accent);
     font-family: var(--site-font-mono);
-    font-size: 8px;
+    font-size: 13px;
     font-weight: 850;
   }
 
@@ -1375,7 +1549,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   }
 
   .scale-caption strong { color: #16315f; font-family: var(--site-font-mono); font-size: 27px; }
-  .scale-caption span { color: #718097; font-size: 9px; }
+  .scale-caption span { color: #718097; font-size: 13px; }
 
   .mini-grid-edit { inset: 16px 18px 42px; }
 
@@ -1393,8 +1567,8 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     box-shadow: 0 16px 26px -18px rgba(72, 32, 128, 0.6);
   }
 
-  .editor-popover span { grid-column: 1 / -1; color: #8a789f; font-size: 8px; }
-  .editor-popover strong { color: #3c2b55; font-size: 11px; }
+  .editor-popover span { grid-column: 1 / -1; color: #8a789f; font-size: 13px; }
+  .editor-popover strong { color: #3c2b55; font-size: 13px; }
   .editor-popover i { color: var(--card-accent); font-style: normal; }
 
   .edit-path {
@@ -1407,7 +1581,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     justify-content: space-between;
     color: #816c9e;
     font-family: var(--site-font-mono);
-    font-size: 8px;
+    font-size: 13px;
   }
 
   .edit-path i { color: var(--card-accent); font-style: normal; }
@@ -1418,7 +1592,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     border-bottom: 1px solid #dfe7ef;
   }
 
-  .query-header span { padding: 12px 10px; color: #41536a; font-size: 8px; font-weight: 780; }
+  .query-header span { padding: 12px 10px; color: #41536a; font-size: 13px; font-weight: 780; }
   .query-header span + span { border-left: 1px solid #e6ecf3; }
 
   .query-pills {
@@ -1433,7 +1607,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     padding: 5px 7px;
     background: var(--card-soft);
     color: var(--card-accent);
-    font-size: 7px;
+    font-size: 13px;
     font-weight: 780;
   }
 
@@ -1450,7 +1624,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   }
 
   .query-result strong { color: #164e63; font-family: var(--site-font-mono); font-size: 22px; }
-  .query-result span { color: #728395; font-size: 8px; }
+  .query-result span { color: #728395; font-size: 13px; }
   .query-result i { margin-left: auto; color: var(--card-accent); font-style: normal; }
 
   .insight-bars {
@@ -1482,7 +1656,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     padding-top: 12px;
   }
 
-  .insight-summary span { color: #789187; font-family: var(--site-font-mono); font-size: 7px; }
+  .insight-summary span { color: #789187; font-family: var(--site-font-mono); font-size: 13px; }
   .insight-summary strong { color: #0f6d50; font-family: var(--site-font-mono); font-size: 14px; }
 
   .performance-section {
@@ -1531,7 +1705,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
 
   .performance-links a {
     color: #b9e8ff;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 760;
     text-decoration: none;
   }
@@ -1541,7 +1715,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     border-left: 2px solid #2c4564;
     padding-left: var(--home-space-4);
     color: #6f8199;
-    font-size: 10px;
+    font-size: 13px;
     line-height: 1.7;
   }
 
@@ -1575,7 +1749,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   .budget-viewport > span {
     color: #7689a2;
     font-family: var(--site-font-mono);
-    font-size: 8px;
+    font-size: 13px;
     font-weight: 780;
     letter-spacing: 0.12em;
   }
@@ -1594,7 +1768,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     margin-left: 4px;
     color: #7c90a9;
     font-family: var(--site-font-sans);
-    font-size: 9px;
+    font-size: 13px;
     letter-spacing: 0;
   }
 
@@ -1602,7 +1776,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   .budget-viewport p {
     margin: 8px 0 0;
     color: #75869c;
-    font-size: 9px;
+    font-size: 13px;
   }
 
   .budget-canvas {
@@ -1674,7 +1848,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     gap: 8px;
     margin: 0;
     color: #74869e;
-    font-size: 9px;
+    font-size: 13px;
     line-height: 1.5;
   }
 
@@ -1694,7 +1868,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     gap: var(--home-space-2);
     margin-top: var(--home-space-4);
     color: #1d5fd4;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 780;
     text-decoration: none;
   }
@@ -1746,7 +1920,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     justify-content: space-between;
     color: #8794a7;
     font-family: var(--site-font-mono);
-    font-size: 9px;
+    font-size: 13px;
     font-weight: 780;
   }
 
@@ -1763,7 +1937,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   .example-card > p {
     margin: var(--home-space-7) 0 0;
     color: #2563eb;
-    font-size: 9px;
+    font-size: 13px;
     font-weight: 820;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -1782,7 +1956,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     max-width: 360px;
     margin-top: var(--home-space-4);
     color: #6d7b8e;
-    font-size: 11px;
+    font-size: 13px;
     line-height: 1.7;
     word-break: keep-all;
   }
@@ -1874,12 +2048,12 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     background: #e8eef7;
     color: currentColor;
     font-family: var(--site-font-mono);
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 850;
   }
 
   .quick-start-step strong { display: block; color: #263850; font-size: 13px; }
-  .quick-start-step small { display: block; margin-top: 4px; color: #7c8ba0; font-size: 11px; line-height: 1.45; }
+  .quick-start-step small { display: block; margin-top: 4px; color: #7c8ba0; font-size: 13px; line-height: 1.45; }
 
   .quick-start-code-block {
     min-width: 0;
@@ -1970,15 +2144,15 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     place-items: center;
     border-radius: 9px;
     font-family: var(--site-font-mono);
-    font-size: 8px;
+    font-size: 13px;
     font-weight: 900;
   }
 
   .decision-item-fit > span { background: #e4f8ef; color: #057857; }
   .decision-item-check { grid-column: 1 / -1; min-height: auto; }
   .decision-item-check > span { background: #fff2e7; color: #c2410c; font-family: var(--site-font-sans); font-size: 13px; }
-  .decision-item strong { color: #26364d; font-size: 12px; }
-  .decision-item p { margin: 5px 0 0; color: #718096; font-size: 10px; line-height: 1.65; }
+  .decision-item strong { color: #26364d; font-size: 13px; }
+  .decision-item p { margin: 5px 0 0; color: #718096; font-size: 13px; line-height: 1.65; }
 
   .final-cta {
     position: relative;
@@ -2057,8 +2231,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   :global(html[data-theme='dark']) .decision-item strong { color: var(--site-text-primary); }
   :global(html[data-theme='dark']) .install-prompt,
   :global(html[data-theme='dark']) .capability-item-primary > strong,
-  :global(html[data-theme='dark']) .capability-item sup,
-  :global(html[data-theme='dark']) .capability-item small,
+  :global(html[data-theme='dark']) .capability-item > strong small,
   :global(html[data-theme='dark']) .speed-values small { color: var(--site-accent); }
   :global(html[data-theme='dark']) .copy-command,
   :global(html[data-theme='dark']) .capability-item-fps button {
@@ -2067,12 +2240,34 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     color: var(--site-accent-strong);
   }
   :global(html[data-theme='dark']) .hero-trust-note,
-  :global(html[data-theme='dark']) .capability-item > p,
+  :global(html[data-theme='dark']) .capability-card-head p,
   :global(html[data-theme='dark']) .speed-values em { color: var(--site-text-muted); }
   :global(html[data-theme='dark']) .hero-trust-note span { color: #6ee7b7; }
   :global(html[data-theme='dark']) .capability-item > strong,
   :global(html[data-theme='dark']) .speed-values > strong { color: var(--site-text-primary); }
-  :global(html[data-theme='dark']) .speed-values > i { background: var(--site-border-strong); }
+  :global(html[data-theme='dark']) .capability-card-head > span,
+  :global(html[data-theme='dark']) .speed-values > strong {
+    border-color: var(--site-border);
+    background: var(--site-surface);
+  }
+  :global(html[data-theme='dark']) .bundle-breakdown,
+  :global(html[data-theme='dark']) .feature-counts { border-color: var(--site-border); }
+  :global(html[data-theme='dark']) .bundle-composition em,
+  :global(html[data-theme='dark']) .feature-coverage em { color: var(--site-text-muted); }
+  :global(html[data-theme='dark']) .bundle-composition strong,
+  :global(html[data-theme='dark']) .feature-coverage strong { color: var(--site-text-secondary); }
+  :global(html[data-theme='dark']) .bundle-composition > i,
+  :global(html[data-theme='dark']) .feature-coverage > i { background: var(--site-border); }
+  :global(html[data-theme='dark']) .bundle-breakdown > i { background: var(--site-border); }
+  :global(html[data-theme='dark']) .bundle-breakdown strong,
+  :global(html[data-theme='dark']) .feature-counts strong { color: var(--site-text-secondary); }
+  :global(html[data-theme='dark']) .bundle-breakdown em,
+  :global(html[data-theme='dark']) .bundle-breakdown small,
+  :global(html[data-theme='dark']) .feature-counts small,
+  :global(html[data-theme='dark']) .feature-counts > i { color: var(--site-text-muted); }
+  :global(html[data-theme='dark']) .feature-counts .is-current { background: var(--site-accent-soft); }
+  :global(html[data-theme='dark']) .feature-counts .is-current strong,
+  :global(html[data-theme='dark']) .feature-counts .is-current small { color: var(--site-accent-strong); }
   :global(html[data-theme='dark']) .capability-limit-note {
     border-left-color: var(--site-accent);
     background: var(--site-accent-soft);
@@ -2235,8 +2430,8 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     .quick-start-item { grid-template-columns: 1fr; gap: var(--home-space-2); }
     .quick-start-step { height: 82px; gap: 10px; padding: 12px; }
     .quick-start-step > span:first-child { width: 26px; height: 26px; flex-basis: 26px; }
-    .quick-start-step strong { font-size: 12px; line-height: 1.35; }
-    .quick-start-code-block pre { padding: var(--home-space-5) var(--home-space-4); font-size: 12px; }
+    .quick-start-step strong { font-size: 13px; line-height: 1.35; }
+    .quick-start-code-block pre { padding: var(--home-space-5) var(--home-space-4); font-size: 13px; }
     .quick-start-code-block-install pre { font-size: 14px; }
     .decision-card { padding: var(--home-space-5); }
     .decision-list { grid-template-columns: 1fr; }

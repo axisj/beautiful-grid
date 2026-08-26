@@ -60,7 +60,7 @@ export const commonMessages = {
     openMenu: '메뉴 열기',
     closeMenu: '메뉴 닫기',
     guideExamples: '가이드 & 예제',
-    adoptionGuide: '도입 안내',
+    adoptionGuide: '지원 환경',
     openSource: '오픈소스',
     theme: '테마',
     themeMenu: '테마 선택',

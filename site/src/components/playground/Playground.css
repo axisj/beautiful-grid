@@ -34,7 +34,7 @@
 
 .playground-shell-title span {
   color: var(--site-text-muted);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .playground-mode-tabs {
@@ -118,7 +118,7 @@
   margin-bottom: 5px;
   color: var(--site-accent);
   font-family: var(--site-font-mono);
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -135,7 +135,7 @@
   max-width: 300px;
   margin: 6px 0 0;
   color: var(--site-text-muted);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.55;
   word-break: keep-all;
 }
@@ -144,7 +144,7 @@
   min-height: 34px;
   flex: 0 0 auto;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -282,7 +282,7 @@
   align-items: center;
   padding: 12px 13px;
   color: var(--site-text-primary);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
 }
 
@@ -305,7 +305,7 @@
 .playground-control-form .ant-form-item-label > label {
   height: auto;
   color: #475569;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -362,7 +362,7 @@
 
 .playground-toggle-row span {
   color: #475569;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -374,7 +374,7 @@
   background: #eff6ff;
   color: #1e3a8a;
   font-family: var(--site-font-mono);
-  font-size: 10px;
+  font-size: 13px;
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
@@ -384,7 +384,7 @@
   margin-bottom: 2px;
   color: #2563eb;
   font-family: var(--site-font-sans);
-  font-size: 10px;
+  font-size: 13px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -428,7 +428,7 @@
   color: #dbeafe;
   background: #0b1120 !important;
   font-family: var(--site-font-mono);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.7;
   scrollbar-color: #475569 #0b1120;
   scrollbar-width: thin;
@@ -522,7 +522,7 @@
   color: #334155;
   cursor: pointer;
   font: inherit;
-  font-size: 9px;
+  font-size: 13px;
   font-weight: 800;
 }
 
@@ -567,7 +567,7 @@
 
 .theme-color-meta strong {
   color: #334155;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .theme-color-meta code {
@@ -575,7 +575,7 @@
   overflow: hidden;
   color: #94a3b8;
   font-family: var(--site-font-mono);
-  font-size: 9px;
+  font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -607,7 +607,7 @@
 .theme-preview-head p {
   margin: 4px 0 0;
   color: #94a3b8;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .theme-preview-badge {
@@ -615,7 +615,7 @@
   padding: 5px 9px;
   background: var(--bgrid-body-active-bg, #dbeafe);
   color: var(--bgrid-primary-color, #2563eb);
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 800;
 }
 
@@ -635,7 +635,7 @@
 .props-preview-note span {
   color: #94a3b8;
   font-family: var(--site-font-mono);
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .props-change-grid-custom .bgrid-body-tr:nth-child(3n) {

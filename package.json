@@ -80,8 +80,9 @@
     "site:check": "npm --prefix site run check",
     "site:build": "npm --prefix site run build",
     "site:test": "npm --prefix site run test",
+    "site:test:font-size": "node scripts/check-site-font-sizes.mjs",
     "verify:library": "npm run lint && npm test && npm run test:library:css && npm run test:library:consumers && npm run test:library:bundle && echo 'BeautifulGrid library verification passed'",
-    "verify:site": "npm run site:test && npm run site:check && npm run site:build && echo 'BeautifulGrid website verification passed'"
+    "verify:site": "npm run site:test:font-size && npm run site:test && npm run site:check && npm run site:build && echo 'BeautifulGrid website verification passed'"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [

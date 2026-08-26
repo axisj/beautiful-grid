@@ -31,7 +31,7 @@ BeautifulGrid는 현대적인 **CSS 커스텀 프로퍼티(CSS Variables)** 설�
 [role='grid'] {
   /* 폰트 및 타이포그래피 */
   --bgrid-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --bgrid-font-size: 12px;
+  --bgrid-font-size: 13px;
 
   /* 테두리 및 구분선 */
   --bgrid-border-color-base: #cbd5e1;

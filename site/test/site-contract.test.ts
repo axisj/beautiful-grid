@@ -18,7 +18,9 @@ describe('site product and navigation contracts', () => {
   it('uses the independent BeautifulGrid brand lockup', () => {
     const header = readSiteFile('src/components/layout/Header.astro');
 
-    expect(header).toContain('<span class="brand-symbol">B</span>');
+    expect(header).toContain('class="brand-symbol"');
+    expect(header).toContain('viewBox="0 0 36 24"');
+    expect(header).toContain('id="site-logo-symbol-gradient"');
     expect(header).toContain('<span class="brand-name">Beautiful<span>Grid</span></span>');
     expect(header).toContain('aria-label={`BeautifulGrid ${messages.home}`}');
     expect(header).not.toContain('axboot-wordmark');
@@ -84,6 +86,8 @@ describe('site product and navigation contracts', () => {
     expect(homepage).toContain('React 제외');
     expect(homepage).toContain("t('번들사이즈', 'Bundle size')");
     expect(homepage).toContain("t('Performance', 'Performance')");
+    expect(homepage).toContain("t('내 브라우저에서 검사하기', 'Test in my browser')");
+    expect(homepage).not.toContain("t('스크롤 다시 측정', 'Measure scroll again')");
     expect(homepage).toContain("t('다양한 기능', 'Feature breadth')");
     expect(homepage).not.toContain('독립 실행으로 확인한 기능');
     expect(homepage).toContain('data-fps-measure');

@@ -31,7 +31,7 @@ A theme changes the visual tokens for the entire grid. Style customization adds 
 [role='grid'] {
   /* Font and typography */
   --bgrid-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --bgrid-font-size: 12px;
+  --bgrid-font-size: 13px;
 
   /* Borders and separators */
   --bgrid-border-color-base: #cbd5e1;

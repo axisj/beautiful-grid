@@ -101,7 +101,7 @@ export default function OrderListGrid() {
           <span style={{
             padding: '2px 8px',
             borderRadius: '12px',
-            fontSize: '11px',
+          fontSize: '13px',
             fontWeight: 600,
             backgroundColor: badge.bg,
             color: badge.color,

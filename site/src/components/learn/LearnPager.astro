@@ -1,0 +1,111 @@
+---
+import { getCollection } from 'astro:content';
+import { localeFromPath, type Locale } from '../../i18n';
+import { learnCategoryOrder, learnMessages, learnPath, learnSlug } from './learnLocale';
+
+interface Props {
+  locale?: Locale;
+  currentSlug: string;
+}
+
+const { currentSlug, locale: localeProp } = Astro.props;
+const locale = localeProp || localeFromPath(Astro.url.pathname);
+const messages = learnMessages[locale];
+const allLearn = await getCollection('learn');
+
+const sorted = allLearn
+  .filter(item => item.data.locale === locale && !item.data.draft)
+  .sort((a, b) => {
+    const catA = learnCategoryOrder.indexOf(a.data.category);
+    const catB = learnCategoryOrder.indexOf(b.data.category);
+    if (catA !== catB) return catA - catB;
+    return a.data.order - b.data.order;
+  });
+
+const currentIndex = sorted.findIndex(item => learnSlug(item.id) === currentSlug);
+
+const prevItem = currentIndex > 0 ? sorted[currentIndex - 1] : null;
+const nextItem = currentIndex < sorted.length - 1 ? sorted[currentIndex + 1] : null;
+---
+
+<nav aria-label={messages.pagination} class="learn-pager">
+  {prevItem ? (
+    <a href={learnPath(learnSlug(prevItem.id), locale)} class="pager-btn prev">
+      <div class="pager-label">
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m15 18-6-6 6-6"/>
+        </svg>
+        <span>{messages.previous}</span>
+      </div>
+      <div class="pager-title">{prevItem.data.title}</div>
+    </a>
+  ) : (
+    <div class="pager-placeholder" />
+  )}
+
+  {nextItem && (
+    <a href={learnPath(learnSlug(nextItem.id), locale)} class="pager-btn next">
+      <div class="pager-label">
+        <span>{messages.next}</span>
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m9 18 6-6-6-6"/>
+        </svg>
+      </div>
+      <div class="pager-title">{nextItem.data.title}</div>
+    </a>
+  )}
+</nav>
+
+<style>
+  .learn-pager {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--site-border);
+  }
+  .pager-btn {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--site-border);
+    border-radius: var(--site-radius-sm, 8px);
+    background-color: var(--site-surface, #f7f9fc);
+    text-decoration: none;
+    max-width: 48%;
+    flex-grow: 1;
+    transition: all 0.15s ease;
+  }
+  .pager-btn:hover {
+    border-color: var(--site-accent);
+    background-color: var(--site-surface-elevated, #ffffff);
+    transform: translateY(-2px);
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+  }
+  .pager-btn.next {
+    text-align: right;
+    align-items: flex-end;
+  }
+  .pager-label {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--site-text-muted);
+    margin-bottom: 0.375rem;
+  }
+  .pager-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--site-text-primary);
+    line-height: 1.4;
+  }
+  .pager-placeholder {
+    flex-grow: 1;
+  }
+</style>

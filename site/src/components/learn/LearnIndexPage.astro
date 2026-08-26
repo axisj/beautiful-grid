@@ -1,0 +1,89 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import MarketingLayout from '../../layouts/MarketingLayout.astro';
+import type { Locale } from '../../i18n';
+import {
+  categoryLabel,
+  learnCategoryOrder,
+  learnDemoPath,
+  learnIndexPath,
+  learnMessages,
+  learnPath,
+  learnSlug,
+} from './learnLocale';
+
+interface Props {
+  locale: Locale;
+  items: CollectionEntry<'learn'>[];
+}
+
+const { locale, items } = Astro.props;
+const messages = learnMessages[locale];
+const grouped = learnCategoryOrder
+  .map(category => ({
+    category,
+    label: categoryLabel(category, locale),
+    items: items
+      .filter(item => item.data.locale === locale && item.data.category === category && !item.data.draft)
+      .sort((a, b) => a.data.order - b.data.order),
+  }))
+  .filter(group => group.items.length > 0);
+---
+
+<MarketingLayout title={messages.indexTitle} description={messages.indexDescription} canonicalPath={learnIndexPath(locale)} locale={locale}>
+  <div class="container" style="padding-top: 4rem; padding-bottom: 6rem;">
+    <header style="max-width: 48rem; margin-bottom: 4rem;">
+      <div class="badge badge-accent" style="margin-bottom: 1rem;">LEARN & EXAMPLES</div>
+      <h1 style="font-size: 2.75rem; font-weight: 800; letter-spacing: -0.025em; line-height: 1.15; margin: 0 0 1rem;">{messages.indexHeading}</h1>
+      <p style="font-size: 1.25rem; color: var(--site-text-secondary); line-height: 1.6; margin: 0;">{messages.indexIntro}</p>
+    </header>
+
+    <div style="display: flex; flex-direction: column; gap: 4rem;">
+      {grouped.map(group => (
+        <section>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 2px solid var(--site-border);">
+            <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--site-text-primary); margin: 0;">{group.label}</h2>
+            <span style="font-size: 0.875rem; color: var(--site-text-muted); font-weight: 500; white-space: nowrap;">{messages.guideCount(group.items.length)}</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); gap: 1.5rem;">
+            {group.items.map(item => {
+              const slug = learnSlug(item.id);
+              const hasDemo = Boolean(item.data.demoId);
+              const hasStandaloneDemo = item.data.demoId === slug;
+              return (
+                <div class="card learn-catalog-card">
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                    <span class="badge" style="text-transform: uppercase; font-size: 0.6875rem;">{group.label}</span>
+                    {hasDemo && <span class="badge badge-accent" style="font-size: 0.6875rem;">LIVE DEMO</span>}
+                  </div>
+                  <h3 style="font-size: 1.25rem; font-weight: 700; margin: 0 0 0.5rem; color: var(--site-text-primary);">{item.data.title}</h3>
+                  <p style="font-size: 0.9375rem; color: var(--site-text-secondary); line-height: 1.6; margin: 0 0 1.25rem; flex-grow: 1;">{item.data.description}</p>
+                  <div style="display: flex; flex-wrap: wrap; gap: 0.375rem; margin-bottom: 1.5rem;">
+                    {item.data.features.map(feature => (
+                      <span style="font-size: 0.75rem; color: var(--site-text-muted); background-color: var(--site-surface); padding: 0.125rem 0.375rem; border-radius: 4px; border: 1px solid var(--site-border);">#{feature}</span>
+                    ))}
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding-top: 1rem; border-top: 1px solid var(--site-border);">
+                    <a href={learnPath(slug, locale)} class="btn btn-primary" style="font-size: 0.8125rem; padding: 0.4375rem 0.875rem;">
+                      <span>{messages.details}</span>
+                      <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </a>
+                    {hasStandaloneDemo && (
+                      <a href={learnDemoPath(slug, locale)} target="_blank" rel="noopener noreferrer" style="font-size: 0.8125rem; color: var(--site-text-secondary); text-decoration: none;" title={messages.demoOnlyTitle}>{messages.demoOnly} ↗</a>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      ))}
+    </div>
+  </div>
+</MarketingLayout>
+
+<style>
+  .learn-catalog-card { display: flex; flex-direction: column; transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease; }
+  .learn-catalog-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px -6px rgba(15, 23, 42, 0.1); border-color: var(--site-border-strong); }
+</style>

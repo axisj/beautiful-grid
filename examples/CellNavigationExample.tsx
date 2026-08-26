@@ -1,0 +1,171 @@
+import * as React from 'react';
+import { BGrid, type BGridCellAddress, type BGridColumn, type BGridDataItem } from 'beautiful-grid';
+import DataGridContainer from '../components/DataGridContainer';
+import { useContainerSize } from '../hooks/useContainerSize';
+import { applyEditingDataChange } from './editing/shared';
+
+interface OrderRow {
+  orderNo: string;
+  customer: string;
+  category: string;
+  product: string;
+  status: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+}
+
+const categories = ['오피스', '디자인', '분석', '자동화'];
+const products = ['Workspace Pro', 'Design System', 'Analytics Seat', 'Automation Pack'];
+const customers = ['AxisJ Studio', 'Northwind', 'Paperworks', 'Seoul Labs', 'Mono Office', 'Orbit Works'];
+
+const initialData: BGridDataItem<OrderRow>[] = Array.from({ length: 48 }, (_, index) => {
+  const quantity = (index % 9) + 1;
+  const unitPrice = 12000 + (index % 6) * 4500;
+  const groupIndex = Math.floor(index / 4) % categories.length;
+
+  return {
+    values: {
+      orderNo: `A-${String(2401 + index).padStart(4, '0')}`,
+      customer: customers[index % customers.length],
+      category: categories[groupIndex],
+      product: products[groupIndex],
+      status: ['완료', '배송 중', '준비'][index % 3],
+      quantity,
+      unitPrice,
+      total: quantity * unitPrice,
+    },
+  };
+});
+
+export default function CellNavigationExample() {
+  const [data, setData] = React.useState(initialData);
+  const [activeCell, setActiveCell] = React.useState<BGridCellAddress>({ rowIndex: 0, columnIndex: 1 });
+  const [navigationEnabled, setNavigationEnabled] = React.useState(true);
+  const [selectionEnabled, setSelectionEnabled] = React.useState(true);
+  const [wrap, setWrap] = React.useState(false);
+  const [editOnEnter, setEditOnEnter] = React.useState(true);
+  const [lastActivation, setLastActivation] = React.useState('없음');
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const { width, height } = useContainerSize(containerRef);
+
+  const columns = React.useMemo<BGridColumn<OrderRow>[]>(
+    () => [
+      { key: 'orderNo', label: '주문 번호', width: 110, editable: false },
+      {
+        key: 'customer',
+        label: '고객 · 편집 가능',
+        width: 170,
+        editable: true,
+        editor: {
+          type: 'text',
+          ariaLabel: '고객 편집',
+          inputProps: { maxLength: 50, autoComplete: 'off' },
+        },
+      },
+      { key: 'category', label: '분류 · 병합', width: 110, editable: false },
+      {
+        key: 'product',
+        label: '상품 · 편집 가능',
+        width: 180,
+        editable: true,
+        editor: {
+          type: 'text',
+          ariaLabel: '상품 편집',
+          inputProps: { maxLength: 80, autoComplete: 'off' },
+        },
+      },
+      { key: 'status', label: '상태', width: 100, align: 'center', editable: false },
+      { key: 'quantity', label: '수량', width: 80, align: 'right', editable: false },
+      {
+        key: 'unitPrice',
+        label: '단가',
+        width: 110,
+        align: 'right',
+        editable: false,
+        itemRender: ({ value }) => <>{Number(value).toLocaleString()}원</>,
+      },
+      {
+        key: 'total',
+        label: '합계',
+        width: 120,
+        align: 'right',
+        editable: false,
+        itemRender: ({ value }) => <strong>{Number(value).toLocaleString()}원</strong>,
+      },
+    ],
+    [],
+  );
+
+  return (
+    <div className='flex min-h-0 flex-col gap-3'>
+      <div className='rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700'>
+        <div className='mb-2 flex flex-wrap items-center gap-x-4 gap-y-2'>
+          <Toggle label='키보드 이동' checked={navigationEnabled} onChange={setNavigationEnabled} />
+          <Toggle label='범위 선택' checked={selectionEnabled} onChange={setSelectionEnabled} />
+          <Toggle label='경계 순환' checked={wrap} onChange={setWrap} />
+          <Toggle label='Enter로 편집' checked={editOnEnter} onChange={setEditOnEnter} />
+        </div>
+        <p className='m-0 leading-6'>
+          셀 클릭 후 <kbd>방향키</kbd>, <kbd>Home</kbd>/<kbd>End</kbd>, <kbd>PageUp</kbd>/<kbd>PageDown</kbd>,{' '}
+          <kbd>Tab</kbd>을 사용하세요. <kbd>Shift</kbd>+방향키는 범위를 확장합니다. 편집 가능한 셀에서는{' '}
+          <kbd>Enter</kbd> 또는 <kbd>F2</kbd>로 편집을 시작하고, 그 외 셀에서는 <kbd>Enter</kbd> 또는 <kbd>Space</kbd>로
+          클릭 콜백을 실행합니다.
+        </p>
+        <output aria-live='polite' className='mt-2 block font-mono text-xs text-blue-700'>
+          활성 셀: 행 {activeCell.rowIndex + 1}, 열 {activeCell.columnIndex + 1}
+        </output>
+        <output aria-live='polite' className='mt-1 block font-mono text-xs text-slate-600'>
+          마지막 클릭 활성화: {lastActivation}
+        </output>
+      </div>
+
+      <DataGridContainer ref={containerRef} style={{ height: 420 }}>
+        <BGrid<OrderRow>
+          width={width}
+          height={height}
+          columns={columns}
+          data={data}
+          frozenColumnIndex={1}
+          editable
+          editTrigger='dblclick'
+          variant='vertical-bordered'
+          cellMergeOptions={{ columnsMap: { 2: { mergeBy: 'category' } } }}
+          cellSelectionOptions={{ enabled: selectionEnabled }}
+          cellNavigationOptions={{
+            enabled: navigationEnabled,
+            activeCell,
+            onActiveCellChange: cell => {
+              if (cell) setActiveCell(cell);
+            },
+            wrap,
+            editOnEnter,
+          }}
+          onChangeData={(rowIndex, _columnIndex, values, _column, meta) => {
+            setData(current => applyEditingDataChange(current, rowIndex, values, meta));
+          }}
+          onClick={({ index, columnIndex, item, column }) => {
+            setLastActivation(`${item.orderNo} · 행 ${index + 1}, 열 ${columnIndex + 1} (${String(column.label)})`);
+          }}
+        />
+      </DataGridContainer>
+    </div>
+  );
+}
+
+function Toggle({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <label className='inline-flex cursor-pointer items-center gap-1.5 font-medium'>
+      <input type='checkbox' checked={checked} onChange={event => onChange(event.target.checked)} />
+      <span>{label}</span>
+    </label>
+  );
+}

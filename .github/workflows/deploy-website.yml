@@ -1,0 +1,139 @@
+name: Deploy Website
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-website-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build and deploy on production Mac
+    if: github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, macOS, ARM64]
+    timeout-minutes: 20
+    environment: production
+    env:
+      DEPLOY_SHA: ${{ github.sha }}
+      PROJECT_DIR: /Users/user/.local/share/beautiful-grid-deploy
+      EDGE_PROJECT_DIR: /Users/user/.local/share/axisj-edge
+      MIN_BUILD_FREE_DISK_KB: 4194304
+
+    steps:
+      - name: Configure runner tools
+        run: |
+          {
+            echo "/Applications/Docker.app/Contents/Resources/bin"
+            echo "/opt/homebrew/bin"
+            echo "/usr/local/bin"
+          } >> "$GITHUB_PATH"
+
+      - name: Check out deployment source
+        uses: actions/checkout@v6
+
+      - name: Check production prerequisites
+        run: |
+          set -Eeuo pipefail
+          test -f "$EDGE_PROJECT_DIR/Caddyfile"
+          grep -q 'bgrid\.axisj\.com' "$EDGE_PROJECT_DIR/Caddyfile"
+          grep -q 'beautiful-grid-site:80' "$EDGE_PROJECT_DIR/Caddyfile"
+          docker network inspect axstaff_default >/dev/null
+          test "$(
+            docker inspect axisj-edge-caddy \
+              --format '{{if .State.Health}}{{.State.Health.Status}}{{end}}'
+          )" = healthy
+
+      - name: Check build disk capacity
+        run: |
+          set -Eeuo pipefail
+          available_kb="$(df -Pk / | awk 'NR == 2 { print $4 }')"
+          if ! [[ "$available_kb" =~ ^[0-9]+$ ]]; then
+            echo "::error::Unable to determine production disk capacity."
+            exit 1
+          fi
+          if [ "$available_kb" -lt "$MIN_BUILD_FREE_DISK_KB" ]; then
+            docker builder prune --all --force | tail -n 1
+            docker image prune --force | tail -n 1
+            available_kb="$(df -Pk / | awk 'NR == 2 { print $4 }')"
+          fi
+          if [ "$available_kb" -lt "$MIN_BUILD_FREE_DISK_KB" ]; then
+            echo "::error::Build requires ${MIN_BUILD_FREE_DISK_KB} KiB free; ${available_kb} KiB is available."
+            exit 1
+          fi
+          docker system df
+
+      - name: Prepare pinned base images
+        run: |
+          set -Eeuo pipefail
+
+          pull_base_image() {
+            local image_ref="$1"
+            local attempt
+
+            if docker image inspect "$image_ref" >/dev/null 2>&1; then
+              echo "Base image already available: ${image_ref}"
+              return
+            fi
+
+            for attempt in 1 2 3; do
+              if perl -e 'alarm shift; exec @ARGV' \
+                180 \
+                docker pull --platform linux/amd64 "$image_ref"; then
+                return
+              fi
+              echo "::warning::Base image pull attempt ${attempt} failed: ${image_ref}"
+            done
+
+            echo "::error::Unable to prepare base image: ${image_ref}"
+            return 1
+          }
+
+          pull_base_image node:22.22.3-alpine
+          pull_base_image nginx:1.28-alpine
+
+      - name: Build production site image
+        id: build_image
+        run: |
+          set -Eeuo pipefail
+          docker build \
+            --platform linux/amd64 \
+            --file deploy/site/Dockerfile \
+            --tag "beautiful-grid-site:${DEPLOY_SHA}" \
+            .
+          docker image inspect \
+            "beautiful-grid-site:${DEPLOY_SHA}" \
+            --format '{{.Os}}/{{.Architecture}}' \
+            | grep -qx 'linux/amd64'
+
+      - name: Clean failed image build
+        if: ${{ failure() && steps.build_image.outcome == 'failure' }}
+        run: |
+          docker image rm "beautiful-grid-site:${DEPLOY_SHA}" >/dev/null 2>&1 || true
+          docker builder prune --all --force | tail -n 1 || true
+          docker image prune --force | tail -n 1 || true
+
+      - name: Install deployment bundle
+        run: |
+          set -Eeuo pipefail
+          umask 077
+          install -d -m 700 "$PROJECT_DIR" "$PROJECT_DIR/scripts"
+          install -m 600 docker-compose.prod.yml "$PROJECT_DIR/docker-compose.prod.yml"
+          install -m 700 scripts/deploy-local-production.sh "$PROJECT_DIR/scripts/deploy-local-production.sh"
+
+      - name: Deploy with rollback protection
+        run: |
+          set -Eeuo pipefail
+          bash "$PROJECT_DIR/scripts/deploy-local-production.sh" "$DEPLOY_SHA"
+
+      - name: Report final disk usage
+        if: ${{ always() }}
+        run: |
+          df -h /
+          docker system df
+          docker image ls beautiful-grid-site \
+            --format '{{.Repository}}:{{.Tag}} {{.Size}} {{.CreatedSince}}' \
+            | sort || true

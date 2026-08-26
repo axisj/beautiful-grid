@@ -1,0 +1,30 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+---
+
+<Layout title="404 - 페이지를 찾을 수 없습니다 | BeautifulGrid" description="요청하신 페이지를 찾을 수 없습니다." noIndex>
+  <Header adaptiveLocale />
+  <main class="container" style="text-align: center; padding: 6rem 1.5rem; min-height: 50vh; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+    <h1 style="font-size: 3rem; margin: 0 0 1rem; color: var(--site-accent);">404</h1>
+    <p data-404-message data-ko="요청하신 페이지가 존재하지 않거나 이동되었습니다." data-en="The page you requested does not exist or has moved." style="font-size: 1.125rem; color: var(--site-text-secondary); margin-bottom: 2rem;">요청하신 페이지가 존재하지 않거나 이동되었습니다.</p>
+    <a href="/" class="btn btn-primary" data-404-home data-ko="홈으로 돌아가기" data-en="Return home">홈으로 돌아가기</a>
+  </main>
+  <Footer adaptiveLocale />
+</Layout>
+
+<script>
+  const english404 = window.location.pathname === '/en' || window.location.pathname.startsWith('/en/');
+  if (english404) {
+    document.documentElement.lang = 'en';
+    document.title = '404 - Page not found | BeautifulGrid';
+    const description = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+    if (description) description.content = 'The requested page could not be found.';
+  }
+  document.querySelectorAll<HTMLElement>('[data-404-message], [data-404-home]').forEach(element => {
+    element.textContent = english404 ? element.dataset.en ?? '' : element.dataset.ko ?? '';
+  });
+  const homeLink = document.querySelector<HTMLAnchorElement>('[data-404-home]');
+  if (homeLink) homeLink.href = english404 ? '/en/' : '/';
+</script>

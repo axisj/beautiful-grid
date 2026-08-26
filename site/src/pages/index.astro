@@ -1,0 +1,2264 @@
+---
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+import { getCollection } from 'astro:content';
+import HomeHeroGrid from '../components/home/HomeHeroGrid';
+import { productFacts } from '../data/productFacts';
+import { publicApiMetrics } from '../data/publicApiMetrics';
+import { bundleMetrics } from '../data/bundleMetrics';
+import packageJson from '../../../package.json';
+import { localizePath, normalizeLocale, type Locale } from '../i18n';
+
+interface Props { locale?: Locale; }
+
+const locale = normalizeLocale(Astro.props.locale);
+const canonicalPath = localizePath('/', locale);
+
+const englishCopy: Record<string, string> = {
+  '대용량 탐색': 'Large-scale exploration',
+  '55만 행도 필요한 만큼만 그려 빠르게 살펴봅니다.': 'Explore 550,000 rows while rendering only what the screen needs.',
+  '가상 스크롤로 현재 보이는 행만 그리고, 고정 열로 기준 정보를 붙잡습니다. 화면 크기가 달라져도 넓고 긴 데이터를 끊김 없이 살펴볼 수 있습니다.': 'Virtual scrolling renders only visible rows while frozen columns keep reference data in view. Explore wide, long datasets smoothly across screen sizes.',
+  '현재 화면에 필요한 셀만 렌더링': 'Render only the cells the viewport needs',
+  '55만 행 예제': '550K-row example',
+  '고정 열': 'Frozen columns',
+  '리사이즈': 'Resize',
+  '셀 편집': 'Cell editing',
+  '셀에서 입력하고 저장한 뒤, 다음 칸으로 바로 이동합니다.': 'Edit and save in place, then move directly to the next cell.',
+  '텍스트·날짜·선택 입력기를 바로 쓰거나 Ant Design 구성 요소를 연결할 수 있습니다. 유효성 검사와 키보드 이동까지 한 흐름으로 이어집니다.': 'Use built-in text, date, and select editors or connect Ant Design components. Validation and keyboard movement stay in one flow.',
+  '입력·검증·저장·이동을 한 번에 처리': 'Edit, validate, save, and move in one flow',
+  '내장 편집기': 'Built-in editors',
+  '에디터 플러그인': 'Editor plugins',
+  '키보드 이동': 'Keyboard navigation',
+  '조회와 선택': 'Query and selection',
+  '정렬·필터로 찾고, 선택한 행을 다음 업무로 넘깁니다.': 'Find records with sort and filter, then pass selected rows into the next task.',
+  '여러 조건으로 정렬하고 값·텍스트·숫자를 필터링합니다. 검색과 행 선택 결과는 화면 안에서 처리하거나 서버 조회 조건으로 그대로 넘길 수 있습니다.': 'Sort by multiple conditions and filter values, text, or numbers. Process search and selection locally or pass the query to a server.',
+  '조회 조건과 선택 상태를 한곳에서 관리': 'Manage query and selection state together',
+  '정렬·필터': 'Sorting & filtering',
+  '검색': 'Search',
+  '행 선택': 'Row selection',
+  '구조화와 집계': 'Structure and aggregation',
+  '반복 항목은 묶고, 숫자는 한눈에 읽히게 집계합니다.': 'Group repeated values and aggregate numbers into readable results.',
+  '열 그룹과 셀 병합으로 구조를 드러내고, 요약 행과 피벗으로 필요한 수치를 모읍니다. 행·열 배치와 색상도 업무 기준에 맞게 조정할 수 있습니다.': 'Reveal structure with column groups and merged cells, then collect key figures with summary rows and pivots. Adjust layout and color to your workflow.',
+  '업무 기준에 맞춘 묶음·집계·표현': 'Grouping, aggregation, and presentation for real work',
+  '셀 병합': 'Cell merge',
+  '55만 행 업무 데이터': '550K-row business dataset',
+  '기본 행 높이를 유지한 채 첫 행부터 550,000번째 행까지 가상 스크롤로 탐색합니다.': 'Virtual-scroll from the first row to row 550,000 at the default row height.',
+  '텍스트, Select, Date 입력과 저장·취소·이동 규칙을 셀 안에서 실행합니다.': 'Run text, Select, and Date editing with save, cancel, and move rules inside each cell.',
+  'UI 연동': 'UI integration',
+  'Ant Design 편집 플러그인': 'Ant Design editor plugins',
+  'Select, TreeSelect, Cascader, DatePicker 등 기존 UI 체계를 편집기에 연결합니다.': 'Connect Select, TreeSelect, Cascader, DatePicker, and your existing UI system to cell editors.',
+  '조회 조건': 'Query controls',
+  '정렬·필터 툴박스': 'Sort & filter toolbox',
+  '다중 정렬과 값·텍스트·숫자 필터를 제어형 query로 다룹니다.': 'Control multi-sort and value, text, and numeric filters through one query.',
+  '병합 편집': 'Merged editing',
+  '병합 셀 편집': 'Merged-cell editing',
+  '병합된 범위의 변경을 하나의 트랜잭션으로 미리 보고 저장합니다.': 'Preview and save changes across a merged range as one transaction.',
+  '집계': 'Aggregation',
+  'Pivot과 Summary': 'Pivot and Summary',
+  '반복되는 행을 그룹화하고 사용자 집계 결과를 읽기 좋은 구조로 만듭니다.': 'Group repeated rows and present custom aggregates in a readable structure.',
+};
+
+const t = (ko: string, en?: string) => locale === 'en' ? (en ?? englishCopy[ko] ?? ko) : ko;
+const localize = <T,>(value: T): T => {
+  if (typeof value === 'string') return t(value) as T;
+  if (Array.isArray(value)) return value.map(localize) as T;
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([key, entry]) => [key, localize(entry)])) as T;
+  }
+  return value;
+};
+
+const liveExampleCount = (await getCollection('learn')).filter(
+  (item) => !item.data.draft && item.data.demoId,
+).length;
+const runtimeDependencyCount = Object.keys(packageJson.dependencies ?? {}).length;
+
+const strengthStories = [
+  {
+    number: '01',
+    kicker: '대용량 탐색',
+    title: '55만 행도 필요한 만큼만 그려 빠르게 살펴봅니다.',
+    description:
+      '가상 스크롤로 현재 보이는 행만 그리고, 고정 열로 기준 정보를 붙잡습니다. 화면 크기가 달라져도 넓고 긴 데이터를 끊김 없이 살펴볼 수 있습니다.',
+    outcome: '현재 화면에 필요한 셀만 렌더링',
+    tone: 'blue',
+    visual: 'scale',
+    links: [
+      { label: '55만 행 예제', href: '/learn/virtual-scroll' },
+      { label: '고정 열', href: '/learn/frozen-columns' },
+      { label: '리사이즈', href: '/learn/container-resize' },
+    ],
+  },
+  {
+    number: '02',
+    kicker: '셀 편집',
+    title: '셀에서 입력하고 저장한 뒤, 다음 칸으로 바로 이동합니다.',
+    description:
+      '텍스트·날짜·선택 입력기를 바로 쓰거나 Ant Design 구성 요소를 연결할 수 있습니다. 유효성 검사와 키보드 이동까지 한 흐름으로 이어집니다.',
+    outcome: '입력·검증·저장·이동을 한 번에 처리',
+    tone: 'violet',
+    visual: 'editing',
+    links: [
+      { label: '내장 편집기', href: '/learn/built-in-editors' },
+      { label: '에디터 플러그인', href: '/learn/editor-plugins' },
+      { label: '키보드 이동', href: '/learn/cell-navigation' },
+    ],
+  },
+  {
+    number: '03',
+    kicker: '조회와 선택',
+    title: '정렬·필터로 찾고, 선택한 행을 다음 업무로 넘깁니다.',
+    description:
+      '여러 조건으로 정렬하고 값·텍스트·숫자를 필터링합니다. 검색과 행 선택 결과는 화면 안에서 처리하거나 서버 조회 조건으로 그대로 넘길 수 있습니다.',
+    outcome: '조회 조건과 선택 상태를 한곳에서 관리',
+    tone: 'cyan',
+    visual: 'query',
+    links: [
+      { label: '정렬·필터', href: '/learn/sorting-filtering' },
+      { label: '검색', href: '/learn/search' },
+      { label: '행 선택', href: '/learn/row-selection' },
+    ],
+  },
+  {
+    number: '04',
+    kicker: '구조화와 집계',
+    title: '반복 항목은 묶고, 숫자는 한눈에 읽히게 집계합니다.',
+    description:
+      '열 그룹과 셀 병합으로 구조를 드러내고, 요약 행과 피벗으로 필요한 수치를 모읍니다. 행·열 배치와 색상도 업무 기준에 맞게 조정할 수 있습니다.',
+    outcome: '업무 기준에 맞춘 묶음·집계·표현',
+    tone: 'emerald',
+    visual: 'insight',
+    links: [
+      { label: '셀 병합', href: '/learn/cell-merge' },
+      { label: 'Summary', href: '/learn/summary' },
+      { label: 'Pivot', href: '/learn/pivot' },
+    ],
+  },
+];
+const localizedStrengthStories = localize(strengthStories);
+
+const featuredExamples = [
+  {
+    index: '01',
+    tag: '대용량 탐색',
+    title: '55만 행 업무 데이터',
+    description: '기본 행 높이를 유지한 채 첫 행부터 550,000번째 행까지 가상 스크롤로 탐색합니다.',
+    href: '/learn/virtual-scroll',
+  },
+  {
+    index: '02',
+    tag: '셀 편집',
+    title: '내장 편집기',
+    description: '텍스트, Select, Date 입력과 저장·취소·이동 규칙을 셀 안에서 실행합니다.',
+    href: '/learn/built-in-editors',
+  },
+  {
+    index: '03',
+    tag: 'UI 연동',
+    title: 'Ant Design 편집 플러그인',
+    description: 'Select, TreeSelect, Cascader, DatePicker 등 기존 UI 체계를 편집기에 연결합니다.',
+    href: '/learn/editor-plugins',
+  },
+  {
+    index: '04',
+    tag: '조회 조건',
+    title: '정렬·필터 툴박스',
+    description: '다중 정렬과 값·텍스트·숫자 필터를 제어형 query로 다룹니다.',
+    href: '/learn/sorting-filtering',
+  },
+  {
+    index: '05',
+    tag: '병합 편집',
+    title: '병합 셀 편집',
+    description: '병합된 범위의 변경을 하나의 트랜잭션으로 미리 보고 저장합니다.',
+    href: '/learn/editing-merged-cells',
+  },
+  {
+    index: '06',
+    tag: '집계',
+    title: 'Pivot과 Summary',
+    description: '반복되는 행을 그룹화하고 사용자 집계 결과를 읽기 좋은 구조로 만듭니다.',
+    href: '/learn/pivot',
+  },
+];
+const localizedFeaturedExamples = localize(featuredExamples);
+---
+
+<MarketingLayout
+  title={t('BeautifulGrid — 아름답고 강력한 오픈소스 React Data Grid', 'BeautifulGrid — Beautiful, Powerful Open-Source React Data Grid')}
+  description={t('아름다운 기본 디자인과 편집, 정렬, 필터링, 선택, 병합, 집계, 피벗을 React에 자연스럽게 연결하는 Apache-2.0 오픈소스 Data Grid입니다.', 'An Apache-2.0 open-source React Data Grid with beautiful defaults and powerful editing, sorting, filtering, selection, merging, aggregation, and pivoting.')}
+  canonicalPath={canonicalPath}
+  locale={locale}
+>
+  <div class="homepage">
+    <section class="hero-section">
+      <div class="hero-grid-pattern" aria-hidden="true"></div>
+      <div class="container hero-layout">
+        <div class="hero-copy">
+          <p class="hero-kicker"><span></span> {t('오픈소스 · Apache-2.0', 'Open Source · Apache-2.0')}</p>
+          <h1>
+            {t('아름답게, 강력하게.', 'Beautiful. Powerful.')}<br />{' '}
+            <span>{t('React로 자연스럽게.', 'Naturally React.')}</span>
+          </h1>
+          <p class="hero-description">
+            {t('아름다운 기본 디자인으로 바로 시작하고, 편집·정렬·필터·병합·집계·피벗까지 업무에 필요한 데이터 기능을 React 방식으로 유연하게 확장하세요.', 'Start with a beautiful default and scale to advanced editing, sorting, filtering, merging, aggregation, and pivoting—all designed to fit naturally into React.')}
+          </p>
+          <div class="hero-actions">
+            <a href={localizePath('/learn/getting-started', locale)} class="btn btn-primary btn-large">{t('5분 만에 시작하기', 'Get started in 5 minutes')} <span aria-hidden="true">→</span></a>
+            <a href={localizePath('/learn', locale)} class="btn btn-secondary btn-large">{t('라이브 데모 보기', 'View live demos')}</a>
+          </div>
+          <div class="install-command" aria-label={t('npm 설치 명령', 'npm installation command')}>
+            <span class="install-prompt" aria-hidden="true">$</span>
+            <code>npm i {productFacts.packageName}</code>
+            <button type="button" class="copy-command" data-copy-command data-copy-ready={t('복사', 'Copy')} data-copy-success={t('복사됨', 'Copied')} aria-label={t('설치 명령 복사', 'Copy installation command')}>{t('복사', 'Copy')}</button>
+          </div>
+          <p class="hero-trust-note">
+            <span aria-hidden="true">✓</span>
+            {t('Apache-2.0 오픈소스 · 모든 기능을 실행 예제와 실제 소스로 확인하세요.', 'Apache-2.0 open source · Verify every feature with runnable examples and real source.')}
+          </p>
+        </div>
+
+        <div class="hero-visual" aria-label={t('직접 편집하고 정렬할 수 있는 주문 데이터 그리드', 'Editable and sortable order DataGrid')}>
+          <div class="hero-grid-stage">
+            <div class="hero-grid-loading" data-hero-grid-loading role="status" aria-live="polite">
+              <div class="hero-grid-loading-head" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="hero-grid-loading-body">
+                <span class="hero-grid-loading-status"><i aria-hidden="true"></i>{t('데이터 그리드 불러오는 중', 'Loading DataGrid')}</span>
+              </div>
+              <div class="hero-grid-loading-foot" aria-hidden="true"><span></span><span></span></div>
+            </div>
+            <HomeHeroGrid locale={locale} client:only="react" />
+          </div>
+        </div>
+      </div>
+
+      <div class="container capability-rail" aria-label={t('BeautifulGrid의 검증 가능한 규모와 지원 환경', 'Verified BeautifulGrid scale and support baseline')}>
+        <article class="capability-item capability-item-primary">
+          <p>{t('대용량 데이터', 'Large datasets')}</p>
+          <strong>550,000</strong>
+          <h2>{t('실행 예제로 검증한 행 수', 'Rows verified in a runnable example')}</h2>
+          <span>{t('기본 행 높이 29px · 마지막 550,000번째 행까지 확인', '29px default row height · verified through row 550,000')}</span>
+          <div class="capability-limit-note">
+            <strong>{t('왜 55만 행인가?', 'Why 550K rows?')}</strong>
+            <p>{t('데이터 배열이 아니라 Chromium의 단일 스크롤 높이가 먼저 한계에 닿기 때문입니다.', 'Chromium’s single-scroll height limit is reached before the data array becomes the constraint.')}</p>
+            <div><code>15,950,030px</code><i aria-hidden="true">/</i><code>16,777,216px</code></div>
+            <span>{t('기본 행 높이 29px · 약 827,186px(4.9%) 여유', '29px default row height · about 827,186px (4.9%) headroom')}</span>
+            <span>{t('최대 행 높이: ⌊(상한 16,777,216 − 부가 30) ÷ 550,000⌋ = 30px', 'Maximum row height: floor((16,777,216 limit - 30 overhead) / 550,000) = 30px')}</span>
+          </div>
+        </article>
+        <article class="capability-item">
+          <p>{t('번들사이즈', 'Bundle size')}</p>
+          <strong>{bundleMetrics.initialTotalGzipKiB}<small>KiB</small></strong>
+          <h2>{t('초기 JS + CSS 합산 gzip', 'Initial JS + CSS gzip total')}</h2>
+          <span>
+            JS {bundleMetrics.initialJsGzipKiB}KiB · CSS {bundleMetrics.cssGzipKiB}KiB · {t('React 제외', 'React excluded')} · {t('열 재배치', 'column reorder')}
+            {bundleMetrics.columnReorderJsGzipKiB}KiB · {t('열 도구상자', 'toolbox')} {bundleMetrics.toolboxJsGzipKiB}KiB · {t('검색/메뉴', 'search/menu')}
+            {bundleMetrics.gridOptionalSurfacesJsGzipKiB}KiB {t('지연 로드', 'lazy-loaded')} · {t('런타임 의존성', 'runtime dependencies')} {runtimeDependencyCount}
+          </span>
+        </article>
+        <article class="capability-item capability-item-fps is-measured" data-fps-card>
+          <p>{t('Performance', 'Performance')}</p>
+          <div class="speed-values">
+            <strong><span data-fps-value>60</span><small>fps</small><em>{t('스크롤', 'scroll')}</em></strong>
+            <i aria-hidden="true"></i>
+            <strong><span data-mount-value>56.6</span><small>ms</small><em>{t('초기 마운트', 'initial mount')}</em></strong>
+          </div>
+          <h2>{t('스크롤과 첫 화면 표시를 함께 측정', 'Measure scrolling and first paint together')}</h2>
+          <button type="button" data-fps-measure data-measure-ready={t('스크롤 다시 측정', 'Measure scroll again')} data-measure-running={t('측정 중', 'Measuring')} data-measure-progress={t('같은 구간을 아래위로 왕복하고 있습니다.', 'Scrolling the same range down and back.')} data-detail-prefix={t('Chromium · 72행 · 스크롤 p95', 'Chromium · 72 rows · scroll p95')} data-detail-mount={t('마운트', 'mount')}>{t('스크롤 다시 측정', 'Measure scroll again')}</button>
+          <span data-fps-detail>{t('1440×1000 · 72행 · 스크롤 5회 중앙값 · 마운트 현재 로드', '1440×1000 · 72 rows · median of 5 scrolls · mount from current load')}</span>
+        </article>
+        <article class="capability-item capability-item-feature">
+          <p>{t('다양한 기능', 'Feature breadth')}</p>
+          <strong>{publicApiMetrics.currentGridPropCount}</strong>
+          <h2>{t('현재 지원하는 공개 Grid Props', 'Currently supported public Grid props')}</h2>
+          <span>
+            {t(`BGridProps ${publicApiMetrics.totalGridPropCount}개 중 deprecated ${publicApiMetrics.deprecatedGridPropCount}개를 제외했습니다.`, `${publicApiMetrics.currentGridPropCount} current props, excluding ${publicApiMetrics.deprecatedGridPropCount} deprecated members from ${publicApiMetrics.totalGridPropCount} BGridProps.`)}
+          </span>
+        </article>
+      </div>
+    </section>
+
+    <section class="section strengths-section" id="strengths">
+      <div class="container">
+        <div class="section-heading section-heading-split">
+          <div>
+            <p class="eyebrow">{t('업무 흐름별 핵심 기능', 'Core capabilities by workflow')}</p>
+            <h2>{t('기능을 나열하지 않고,', 'More than a feature list—')}<br />{t('일을 끝내는 흐름으로 연결했습니다.', 'a connected path to finished work.')}</h2>
+          </div>
+          <p>
+            {t('그리드에서 자주 마주치는 문제를 대용량 탐색, 셀 편집, 조회와 선택, 구조화와 집계의 네 가지 흐름으로 나눠 실제 예제와 함께 정리했습니다.', 'Common grid problems are organized into four workflows—large-scale exploration, cell editing, query and selection, and structured aggregation—with runnable examples.')}
+          </p>
+        </div>
+
+        <div class="strength-grid">
+          {localizedStrengthStories.map((story) => (
+            <article class={`strength-card strength-card-${story.tone}`}>
+              <div class="strength-copy">
+                <div class="strength-meta">
+                  <span>{story.number}</span>
+                  <span>{story.kicker}</span>
+                </div>
+                <h3>{story.title}</h3>
+                <p>{story.description}</p>
+                <div class="strength-outcome"><span aria-hidden="true">↳</span>{story.outcome}</div>
+                <nav class="strength-links" aria-label={`${story.kicker} ${t('관련 실행 예제', 'runnable examples')}`}>
+                  {story.links.map((link) => (
+                    <a href={localizePath(link.href, locale)}>{link.label}<span aria-hidden="true">↗</span></a>
+                  ))}
+                </nav>
+              </div>
+
+              <div class={`strength-visual strength-visual-${story.visual}`} aria-hidden="true">
+                {story.visual === 'scale' && (
+                  <>
+                    <div class="mini-grid mini-grid-scale"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                    <div class="scale-window"><span>{t('현재 화면', 'Viewport')}</span></div>
+                    <div class="scale-caption"><strong>{t('55만', '550K')}</strong><span>{t('행', 'rows')}</span></div>
+                  </>
+                )}
+                {story.visual === 'editing' && (
+                  <>
+                    <div class="mini-grid mini-grid-edit"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                    <div class="editor-popover"><span>Status</span><strong>{t('배송 중', 'Shipping')}</strong><i>⌄</i></div>
+                    <div class="edit-path"><span>{t('입력', 'Edit')}</span><i>→</i><span>{t('저장', 'Save')}</span><i>→</i><span>{t('다음 칸', 'Next cell')}</span></div>
+                  </>
+                )}
+                {story.visual === 'query' && (
+                  <>
+                    <div class="query-header"><span>{t('고객', 'Customer')}</span><span>{t('상태', 'Status')}</span><span>{t('금액', 'Amount')}</span></div>
+                    <div class="query-pills"><span>{t('상태 = 배송 중', 'Status = Shipping')}</span><span>{t('금액 ≥ 100,000', 'Amount ≥ 100,000')}</span></div>
+                    <div class="query-result"><strong>24</strong><span>{t('조건에 맞는 행', 'matching rows')}</span><i>↓</i></div>
+                  </>
+                )}
+                {story.visual === 'insight' && (
+                  <>
+                    <div class="insight-bars"><span></span><span></span><span></span><span></span></div>
+                    <div class="insight-summary"><span>{t('합계', 'Total')}</span><strong>₩ 48,920,000</strong></div>
+                    <div class="insight-groups"><i></i><i></i><i></i></div>
+                  </>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="section performance-section">
+      <div class="container performance-layout">
+        <div class="performance-copy">
+          <p class="eyebrow eyebrow-dark">{t('가상 스크롤의 원리', 'How virtual scrolling works')}</p>
+          <h2>{t('55만 행을 열어도,', 'Even with 550K rows,')}<br />{t('화면에는 필요한 셀만 그립니다.', 'only needed cells reach the screen.')}</h2>
+          <p>
+            {t('55만 행 × 24열이면 셀은 모두 1,320만 개입니다. BeautifulGrid는 이를 한꺼번에 그리지 않고, 지금 보이는 약 20행 × 12열만 화면에 표시합니다.', 'A 550,000 × 24 dataset contains 13.2 million cells. BeautifulGrid does not render them at once; it displays roughly the 20 × 12 cells currently visible.')}
+          </p>
+          <div class="performance-links">
+            <a href={localizePath('/learn/virtual-scroll', locale)}>{t('55만 행 예제 열기', 'Open the 550K-row example')} <span aria-hidden="true">→</span></a>
+            <a href={localizePath('/learn/pagination', locale)}>{t('페이지네이션 보기', 'View pagination')} <span aria-hidden="true">→</span></a>
+          </div>
+          <p class="performance-disclaimer">
+            {t('셀이 그려지는 방식을 설명하기 위한 예시이며 속도 측정 결과는 아닙니다. 실제 성능은 셀 구성과 브라우저 환경에 따라 달라집니다.', 'This illustrates how cells are rendered; it is not a benchmark. Actual performance varies with cell composition and browser environment.')}
+          </p>
+        </div>
+
+        <div class="render-budget" aria-label={t('전체 1,320만 셀의 데이터 공간 안에서 현재 보이는 약 240셀만 렌더링하는 구조', 'A structure rendering about 240 visible cells from a 13.2-million-cell data space')}>
+          <div class="budget-summary">
+            <span>{t('전체 데이터 공간', 'Full data space')}</span>
+            <strong>13,200,000<small>{t('셀', 'cells')}</small></strong>
+            <p>550,000 {t('행', 'rows')} × 24 {t('열', 'columns')}</p>
+          </div>
+          <div class="budget-canvas">
+            <div class="budget-grid" aria-hidden="true">
+              {Array.from({ length: 120 }).map(() => <i></i>)}
+            </div>
+            <div class="budget-viewport">
+              <span>{t('현재 보이는 영역', 'Current viewport')}</span>
+              <strong>≈ 240<small>{t('셀', 'cells')}</small></strong>
+              <p>{t('약 20행 × 12열', 'About 20 rows × 12 columns')}</p>
+            </div>
+          </div>
+          <p class="budget-legend"><i aria-hidden="true"></i> {t('그리드의 사각형 뷰포트 안에 필요한 셀만 그립니다.', 'Only cells needed inside the rectangular viewport are rendered.')}</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section examples-section">
+      <div class="container">
+        <div class="section-heading section-heading-split">
+          <div>
+            <p class="eyebrow">{t('직접 확인하는 기능', 'Features you can run')}</p>
+            <h2>{t('기능은 설명보다,', 'Features are clearest')}<br />{t('움직일 때 더 분명해집니다.', 'when you can use them.')}</h2>
+          </div>
+          <div class="examples-heading-aside">
+            <p>{t('실제 그리드를 조작하고 구현 소스를 나란히 확인하세요. 필요한 업무 흐름부터 골라 프로젝트에 바로 연결할 수 있습니다.', 'Operate the real grid and inspect its source side by side. Start with the workflow you need and connect it directly to your project.')}</p>
+            <a href={localizePath('/learn', locale)}>{t(`실행 가이드 ${liveExampleCount}개 모두 보기`, `View all ${liveExampleCount} runnable guides`)} <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+
+        <div class="example-grid">
+          {localizedFeaturedExamples.map((example) => (
+            <a href={localizePath(example.href, locale)} class="example-card">
+              <div class="example-card-top">
+                <span>{example.index}</span>
+                <span class="example-live"><i aria-hidden="true"></i> {t('실행 가능', 'Runnable')}</span>
+              </div>
+              <p>{example.tag}</p>
+              <h3>{example.title}</h3>
+              <span class="example-description">{example.description}</span>
+              <span class="example-arrow" aria-hidden="true">↗</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="section quick-start-section">
+      <div class="container">
+        <div class="quick-start-intro">
+          <div>
+            <p class="eyebrow">{t('3단계 빠른 시작', 'Three-step quick start')}</p>
+            <h2>{t('설치부터 첫 그리드까지,', 'From install to first grid,')}<br />{t('세 단계로 시작합니다.', 'start in three steps.')}</h2>
+          </div>
+          <div class="quick-start-summary">
+            <p>{t('패키지를 설치하고 기본 CSS를 불러온 뒤, 열과 행 데이터만 연결하면 첫 그리드가 완성됩니다.', 'Install the package, import the base CSS, and connect columns and row data to complete your first grid.')}</p>
+            <a href={localizePath('/learn/getting-started', locale)} class="text-link">{t('전체 설치 가이드 보기', 'View the full installation guide')} <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+
+        <div class="quick-start-list" aria-label={t('빠른 시작 3단계', 'Three quick-start steps')}>
+          <article class="quick-start-item">
+            <header class="quick-start-step">
+              <span>01</span><span><strong>{t('패키지 설치', 'Install the package')}</strong><small>{t('npm으로 시작합니다.', 'Start with npm.')}</small></span>
+            </header>
+            <div class="quick-start-code-block quick-start-code-block-install">
+              <pre><code><span class="code-blue">$</span> npm i <span class="code-green">{productFacts.packageName}</span></code></pre>
+            </div>
+          </article>
+
+          <article class="quick-start-item">
+            <header class="quick-start-step">
+              <span>02</span><span><strong>{t('스타일 연결', 'Connect styles')}</strong><small>{t('기본 CSS를 불러옵니다.', 'Import the base CSS.')}</small></span>
+            </header>
+            <div class="quick-start-code-block">
+              <pre><code><span class="code-violet">import</span> <span class="code-green">'beautiful-grid/style.css'</span>;
+
+<span class="code-comment">// Your application entry</span>
+createRoot(document.getElementById(<span class="code-green">'root'</span>)!).render(&lt;<span class="code-blue">App</span> /&gt;);</code></pre>
+            </div>
+          </article>
+
+          <article class="quick-start-item">
+            <header class="quick-start-step">
+              <span>03</span><span><strong>{t('데이터 연결', 'Connect data')}</strong><small>{t('타입과 행을 전달합니다.', 'Pass types and rows.')}</small></span>
+            </header>
+            <div class="quick-start-code-block">
+              <pre><code><span class="code-violet">import</span> &#123; BGrid, <span class="code-blue">type</span> BGridColumn &#125; <span class="code-violet">from</span> <span class="code-green">'beautiful-grid'</span>;
+
+<span class="code-violet">type</span> Order = &#123; id: number; customer: string &#125;;
+<span class="code-violet">const</span> columns: BGridColumn&lt;Order&gt;[] = [
+  &#123; key: <span class="code-green">'id'</span>, label: <span class="code-green">'ID'</span>, width: <span class="code-number">80</span> &#125;,
+  &#123; key: <span class="code-green">'customer'</span>, label: <span class="code-green">'{t('고객', 'Customer')}'</span>, width: <span class="code-number">180</span> &#125;,
+];
+<span class="code-violet">const</span> rows = [&#123; values: &#123; id: <span class="code-number">1</span>, customer: <span class="code-green">'AXISJ'</span> &#125; &#125;];
+
+&lt;<span class="code-blue">BGrid</span> width=&#123;<span class="code-number">640</span>&#125; height=&#123;<span class="code-number">360</span>&#125; columns=&#123;columns&#125; data=&#123;rows&#125; rowKey=<span class="code-green">"id"</span> /&gt;</code></pre>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section decision-section">
+      <div class="container">
+        <div class="decision-card">
+          <div class="decision-copy">
+            <p class="eyebrow">{t('React에 맞춘 업무 그리드', 'A business grid made for React')}</p>
+            <h2>{t('React 생태계에 자연스럽게,', 'Seamless in the React ecosystem,')}<br />{t('업무 기능은 강력하게.', 'powerful across real data workflows.')}</h2>
+            <p>
+              {t('컴포넌트와 상태 흐름은 React에 자연스럽게 맞추고, 가상 스크롤·편집·정렬·필터·선택·집계처럼 업무 화면에 필요한 기능은 하나의 그리드에 충실하게 담았습니다.', 'Components and state follow React naturally, while virtual scrolling, editing, sorting, filtering, selection, and aggregation remain fully integrated in one grid.')}
+            </p>
+            <div class="decision-actions">
+              <a href={localizePath('/learn', locale)} class="btn btn-primary">{t('실행 예제 살펴보기', 'Explore runnable examples')}</a>
+              <a href={localizePath('/product-facts', locale)} class="btn btn-outline">{t('도입 환경 확인', 'Check the adoption baseline')}</a>
+            </div>
+          </div>
+          <div class="decision-list">
+            <article class="decision-item decision-item-fit">
+              <span aria-hidden="true">01</span>
+              <div><strong>{t('React 상태 흐름에 자연스럽게', 'Natural React state flow')}</strong><p>{t('데이터와 선택, 편집 상태를 컴포넌트 흐름에 맞춰 제어합니다.', 'Control data, selection, and editing state through component flow.')}</p></div>
+            </article>
+            <article class="decision-item decision-item-fit">
+              <span aria-hidden="true">02</span>
+              <div><strong>{t('업무 기능을 한 컴포넌트에', 'Business features in one component')}</strong><p>{t('가상 스크롤부터 편집·정렬·필터·병합·요약까지 연결합니다.', 'Connect virtual scrolling, editing, sort, filter, merge, and summary.')}</p></div>
+            </article>
+            <article class="decision-item decision-item-fit">
+              <span aria-hidden="true">03</span>
+              <div><strong>{t('제품 디자인에 맞게 확장', 'Extend to match your product')}</strong><p>{t('렌더러와 편집 플러그인, CSS 변수로 화면의 문법을 유지합니다.', 'Preserve your visual language with renderers, editor plugins, and CSS variables.')}</p></div>
+            </article>
+            <article class="decision-item decision-item-fit">
+              <span aria-hidden="true">04</span>
+              <div><strong>{t('대량 데이터도 필요한 만큼만', 'Process only what large data needs')}</strong><p>{t('가상화와 서버 조회 흐름으로 화면에 필요한 범위만 처리합니다.', 'Virtualization and server queries keep work scoped to the visible range.')}</p></div>
+            </article>
+            <article class="decision-item decision-item-check">
+              <span aria-hidden="true">!</span>
+              <div><strong>{t('도입 전에 확인할 범위', 'Confirm before adoption')}</strong><p>{t('Excel 수식 엔진, Ribbon, 전용 디자이너까지 완전히 대체해야 한다면 별도 검토가 필요합니다.', 'If you need a complete replacement for Excel formulas, Ribbon, or a dedicated designer, review that requirement separately.')}</p></div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta">
+      <div class="container final-cta-inner">
+        <div>
+          <p class="eyebrow eyebrow-dark">{t('프로젝트에 연결하기', 'Connect it to your project')}</p>
+          <h2>{t('당신의 React 화면에서,', 'Start directly')}<br />{t('바로 시작해 보세요.', 'in your React screen.')}</h2>
+          <p>{t('Playground에서 열 구성과 스타일을 먼저 맞춰 보고, 실행 예제의 코드를 실제 프로젝트 흐름에 연결하세요.', 'Tune columns and styles in the Playground, then connect runnable example code to your project workflow.')}</p>
+        </div>
+        <div class="final-cta-actions">
+          <a href={localizePath('/playground', locale)} class="btn btn-light btn-large">{t('Playground 열기', 'Open Playground')} <span aria-hidden="true">→</span></a>
+          <a href={productFacts.repositoryUrl} class="btn btn-dark-outline btn-large" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</MarketingLayout>
+
+<script>
+  const copyButton = document.querySelector<HTMLButtonElement>('[data-copy-command]');
+  copyButton?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText('npm i beautiful-grid');
+      const previousLabel = copyButton.textContent;
+      copyButton.textContent = copyButton.dataset.copySuccess ?? 'Copied';
+      window.setTimeout(() => { copyButton.textContent = previousLabel; }, 1400);
+    } catch {
+      copyButton.textContent = 'npm i beautiful-grid';
+    }
+  });
+
+  const fpsCard = document.querySelector<HTMLElement>('[data-fps-card]');
+  const fpsButton = fpsCard?.querySelector<HTMLButtonElement>('[data-fps-measure]');
+  const fpsValue = fpsCard?.querySelector<HTMLElement>('[data-fps-value]');
+  const mountValue = fpsCard?.querySelector<HTMLElement>('[data-mount-value]');
+  const fpsDetail = fpsCard?.querySelector<HTMLElement>('[data-fps-detail]');
+  const heroGridStage = document.querySelector<HTMLElement>('.hero-grid-stage');
+  const heroGridLoading = heroGridStage?.querySelector<HTMLElement>('[data-hero-grid-loading]');
+
+  const markHeroGridReady = () => {
+    heroGridStage?.classList.add('is-ready');
+    heroGridLoading?.setAttribute('aria-hidden', 'true');
+  };
+
+  const updateMountValue = (duration: number) => {
+    if (mountValue) mountValue.textContent = duration.toFixed(1);
+  };
+
+  const storedMountDuration = Number(document.documentElement.dataset.bgridHomeGridMountMs);
+  if (Number.isFinite(storedMountDuration) && storedMountDuration > 0) {
+    updateMountValue(storedMountDuration);
+    markHeroGridReady();
+  }
+
+  window.addEventListener('bgrid-home-grid-mounted', ((event: CustomEvent<{ duration: number }>) => {
+    updateMountValue(event.detail.duration);
+    markHeroGridReady();
+  }) as EventListener);
+
+  fpsButton?.addEventListener('click', () => {
+    const scroller = document.querySelector<HTMLElement>('.hero-grid-stage .bgrid-scroll-container');
+    if (!scroller || !fpsValue || !fpsDetail || !fpsCard) return;
+
+    const duration = 2200;
+    const maximumScrollTop = Math.max(scroller.scrollHeight - scroller.clientHeight, 0);
+    const originalScrollTop = scroller.scrollTop;
+    const frameTimes: number[] = [];
+    let startedAt: number | undefined;
+
+    fpsButton.disabled = true;
+    fpsButton.textContent = fpsButton.dataset.measureRunning ?? 'Measuring';
+    fpsDetail.textContent = fpsButton.dataset.measureProgress ?? 'Scrolling the same range down and back.';
+
+    const measureFrame = (now: number) => {
+      startedAt ??= now;
+      frameTimes.push(now);
+
+      const elapsed = now - startedAt;
+      const progress = Math.min(elapsed / duration, 1);
+      const scrollProgress = progress <= 0.5 ? progress * 2 : (1 - progress) * 2;
+      scroller.scrollTo({ top: maximumScrollTop * scrollProgress, behavior: 'auto' });
+
+      if (elapsed < duration) {
+        window.requestAnimationFrame(measureFrame);
+        return;
+      }
+
+      const measuredDuration = frameTimes.at(-1)! - frameTimes[0];
+      const fps = Math.round((frameTimes.length - 1) / (measuredDuration / 1000));
+      const frameGaps = frameTimes.slice(1).map((time, index) => time - frameTimes[index]).sort((a, b) => a - b);
+      const p95FrameTime = frameGaps[Math.floor(frameGaps.length * 0.95)] ?? 0;
+
+      scroller.scrollTo({ top: originalScrollTop, behavior: 'auto' });
+      fpsValue.textContent = String(fps);
+      fpsDetail.textContent = `${fpsButton.dataset.detailPrefix ?? 'Chromium · 72 rows · scroll p95'} ${p95FrameTime.toFixed(1)}ms · ${fpsButton.dataset.detailMount ?? 'mount'} ${mountValue?.textContent ?? '--'}ms`;
+      fpsButton.textContent = fpsButton.dataset.measureReady ?? 'Measure scroll again';
+      fpsButton.disabled = false;
+      fpsCard.classList.add('is-measured');
+    };
+
+    window.requestAnimationFrame(measureFrame);
+  });
+
+</script>
+
+<style>
+  :global(html) { scroll-behavior: smooth; }
+
+  .homepage {
+    --home-space-1: 4px;
+    --home-space-2: 8px;
+    --home-space-3: 12px;
+    --home-space-4: 16px;
+    --home-space-5: 24px;
+    --home-space-6: 32px;
+    --home-space-7: 40px;
+    --home-space-8: 48px;
+    --home-space-9: 64px;
+    --home-space-10: 80px;
+    --home-space-11: 96px;
+    --home-section-space: clamp(80px, 8vw, 120px);
+    overflow: clip;
+    background: #ffffff;
+    font-kerning: normal;
+    text-rendering: optimizeLegibility;
+  }
+
+  .hero-section {
+    position: relative;
+    padding: clamp(64px, 7vw, 96px) 0 0;
+    background:
+      radial-gradient(circle at 78% 9%, rgba(58, 129, 255, 0.15), transparent 29%),
+      linear-gradient(180deg, #f7faff 0%, #ffffff 82%);
+  }
+
+  .hero-grid-pattern {
+    position: absolute;
+    inset: 0;
+    opacity: 0.52;
+    background-image:
+      linear-gradient(rgba(37, 99, 235, 0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(37, 99, 235, 0.055) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: linear-gradient(to bottom, #000 0%, transparent 76%);
+    pointer-events: none;
+  }
+
+  .hero-layout {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 108rem;
+    padding-inline: clamp(16px, 2.5vw, 40px);
+  }
+
+  .hero-copy,
+  .hero-visual,
+  .strength-copy,
+  .performance-copy,
+  .quick-start-intro,
+  .decision-copy { min-width: 0; }
+
+  .hero-kicker,
+  .eyebrow {
+    margin: 0;
+    color: #2563eb;
+    font-size: 11px;
+    font-weight: 850;
+    letter-spacing: 0.14em;
+    line-height: 1.5;
+    text-transform: uppercase;
+  }
+
+  .hero-copy {
+    display: flex;
+    max-width: 1040px;
+    flex-direction: column;
+    align-items: center;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .hero-kicker {
+    display: flex;
+    align-items: center;
+    gap: var(--home-space-3);
+    margin-bottom: var(--home-space-5);
+    color: #41516a;
+    letter-spacing: 0.09em;
+  }
+
+  .hero-kicker > span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #2563eb;
+    box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.1);
+  }
+
+  .hero-copy h1 {
+    max-width: 1020px;
+    margin: 0;
+    color: #0b1220;
+    font-size: clamp(52px, 5.4vw, 80px);
+    font-weight: 880;
+    letter-spacing: -0.028em;
+    line-height: 1.08;
+    word-break: keep-all;
+  }
+
+  .hero-copy h1 span {
+    background: linear-gradient(98deg, #1d4ed8 2%, #1677e8 52%, #0796a8 100%);
+    background-clip: text;
+    color: transparent;
+  }
+
+  .hero-description {
+    max-width: 760px;
+    margin: var(--home-space-6) 0 0;
+    color: #526178;
+    font-size: 17px;
+    font-weight: 520;
+    line-height: 1.85;
+    word-break: keep-all;
+  }
+
+  .hero-actions,
+  .decision-actions,
+  .final-cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--home-space-3);
+  }
+
+  .hero-actions { justify-content: center; margin-top: var(--home-space-6); }
+
+  .btn-large {
+    min-height: 50px;
+    border-radius: 12px;
+    padding: 0 var(--home-space-5);
+    font-size: 14px;
+    font-weight: 780;
+  }
+
+  .btn-primary {
+    background: linear-gradient(180deg, #377cf1 0%, #1e5fda 100%);
+    box-shadow: 0 18px 34px -20px rgba(30, 95, 218, 0.86);
+  }
+
+  .btn-primary:hover { transform: translateY(-2px); }
+
+  .install-command {
+    display: flex;
+    width: min(100%, 440px);
+    align-items: center;
+    gap: var(--home-space-3);
+    margin-top: var(--home-space-4);
+    border: 1px solid #dbe4f0;
+    border-radius: 12px;
+    padding: var(--home-space-2) var(--home-space-2) var(--home-space-2) var(--home-space-4);
+    background: rgba(255, 255, 255, 0.86);
+    box-shadow: 0 18px 38px -34px rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(12px);
+  }
+
+  .install-command code {
+    min-width: 0;
+    flex: 1;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: #27364d;
+    font-size: 14px;
+  }
+
+  .install-prompt {
+    color: #2563eb;
+    font-family: var(--site-font-mono);
+    font-weight: 850;
+  }
+
+  .copy-command {
+    min-width: 58px;
+    border: 0;
+    border-radius: 8px;
+    padding: var(--home-space-2) var(--home-space-3);
+    background: #edf4ff;
+    color: #1d4ed8;
+    cursor: pointer;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 850;
+  }
+
+  .hero-trust-note {
+    display: flex;
+    align-items: center;
+    gap: var(--home-space-2);
+    margin: var(--home-space-4) 0 0;
+    color: #718097;
+    font-size: 11px;
+    font-weight: 620;
+  }
+
+  .hero-trust-note span { color: #059669; font-weight: 900; }
+
+  .hero-visual {
+    position: relative;
+    width: 100%;
+    margin-top: var(--home-space-9);
+    container-type: inline-size;
+  }
+
+  .hero-grid-stage {
+    position: relative;
+    display: grid;
+    overflow: hidden;
+    background: #ffffff;
+  }
+
+  .hero-grid-stage > :global(astro-island),
+  .hero-grid-stage :global(.hero-grid-demo),
+  .hero-grid-loading {
+    min-width: 0;
+    grid-area: 1 / 1;
+  }
+
+  .hero-grid-loading {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    height: 520px;
+    grid-template-rows: 42px minmax(0, 1fr) 34px;
+    overflow: hidden;
+    background: #ffffff;
+    opacity: 1;
+    transition: opacity 180ms ease, visibility 180ms ease;
+  }
+
+  .hero-grid-stage.is-ready .hero-grid-loading {
+    visibility: hidden;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  .hero-grid-loading-head {
+    display: grid;
+    grid-template-columns: 46px 0.8fr 1.1fr 1.25fr 0.75fr 0.9fr;
+    align-items: center;
+    gap: 18px;
+    border-bottom: 1px solid #e3eaf3;
+    padding: 0 18px;
+    background: #f7f9fc;
+  }
+
+  .hero-grid-loading-head span,
+  .hero-grid-loading-foot span {
+    height: 8px;
+    border-radius: 999px;
+    background: #e5ebf3;
+  }
+
+  .hero-grid-loading-head span:first-child { width: 18px; justify-self: center; }
+  .hero-grid-loading-head span:nth-child(4) { width: 72%; }
+  .hero-grid-loading-head span:nth-child(5) { width: 58%; }
+
+  .hero-grid-loading-body {
+    position: relative;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background-color: #ffffff;
+    background-image:
+      linear-gradient(90deg, transparent 0 46px, rgba(226, 232, 240, 0.72) 46px 47px, transparent 47px),
+      repeating-linear-gradient(180deg, transparent 0 28px, rgba(226, 232, 240, 0.72) 28px 29px);
+  }
+
+  .hero-grid-loading-body::before {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, transparent 26%, rgba(241, 245, 249, 0.82) 46%, transparent 66%);
+    content: '';
+    transform: translateX(-100%);
+    animation: hero-grid-loading-shimmer 1.5s ease-in-out infinite;
+  }
+
+  .hero-grid-loading-status {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    border-radius: 999px;
+    padding: 9px 14px;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 12px 32px -20px rgba(15, 23, 42, 0.45);
+    color: #5f7088;
+    font-size: 11px;
+    font-weight: 760;
+  }
+
+  .hero-grid-loading-status i {
+    width: 13px;
+    height: 13px;
+    border: 2px solid #c9d8ee;
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    animation: hero-grid-loading-spin 720ms linear infinite;
+  }
+
+  .hero-grid-loading-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #e3eaf3;
+    padding: 0 18px;
+    background: #f9fbfd;
+  }
+
+  .hero-grid-loading-foot span:first-child { width: 88px; }
+  .hero-grid-loading-foot span:last-child { width: 54px; }
+
+  @keyframes hero-grid-loading-shimmer {
+    to { transform: translateX(100%); }
+  }
+
+  @keyframes hero-grid-loading-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @container (max-width: 999px) {
+    .hero-grid-loading { height: 420px; }
+  }
+
+  @container (max-width: 719px) {
+    .hero-grid-loading { height: 340px; }
+  }
+
+  @container (max-width: 519px) {
+    .hero-grid-loading { height: 280px; }
+  }
+
+  .capability-rail {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1.35fr 1fr 1fr 1.1fr;
+    gap: var(--home-space-4);
+    width: 100%;
+    max-width: 108rem;
+    margin-top: var(--home-space-9);
+    padding-inline: clamp(16px, 2.5vw, 40px);
+  }
+
+  .capability-item {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    min-height: 224px;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+    border: 0;
+    border-radius: 18px;
+    padding: var(--home-space-5);
+    background: rgba(255, 255, 255, 0.88);
+    box-shadow:
+      0 1px 3px rgba(15, 23, 42, 0.05),
+      0 22px 52px -42px rgba(32, 55, 88, 0.55),
+      inset 0 0 0 1px rgba(211, 221, 234, 0.72);
+    backdrop-filter: blur(16px);
+  }
+
+  .capability-item-primary {
+    background:
+      radial-gradient(circle at 92% 5%, rgba(37, 99, 235, 0.14), transparent 42%),
+      rgba(255, 255, 255, 0.9);
+  }
+
+  .capability-limit-note {
+    margin-top: var(--home-space-3);
+    border-left: 2px solid #76a9f5;
+    border-radius: 0 10px 10px 0;
+    padding: 10px 12px;
+    background: rgba(237, 244, 255, 0.72);
+  }
+
+  .capability-limit-note > strong {
+    display: block;
+    color: #24436d;
+    font-size: 14px;
+    font-weight: 850;
+    line-height: 1.35;
+  }
+
+  .capability-limit-note > p {
+    margin: 7px 0 0;
+    color: #6c7d93;
+    font-size: 13px;
+    line-height: 1.65;
+    word-break: keep-all;
+  }
+
+  .capability-limit-note > div {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    margin-top: 9px;
+    color: #94a3b8;
+  }
+
+  .capability-limit-note code {
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: #426287;
+    font-size: 12px;
+    font-weight: 750;
+  }
+
+  .capability-limit-note i { font-size: 12px; font-style: normal; }
+
+  .capability-limit-note > span {
+    display: block;
+    margin-top: 5px;
+    color: #1d5fd4;
+    font-size: 12px;
+    font-weight: 760;
+    line-height: 1.55;
+  }
+
+  .capability-limit-note > span + span { color: #526f96; }
+
+  .capability-item > p {
+    order: -2;
+    margin: 0 auto auto 0;
+    color: #718198;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+  }
+
+  .capability-item > strong {
+    color: #132039;
+    font-family: var(--site-font-mono);
+    font-size: clamp(34px, 3.2vw, 48px);
+    font-weight: 860;
+    letter-spacing: -0.065em;
+    line-height: 1;
+  }
+
+  .capability-item-primary > strong { color: #1d5fd4; }
+
+  .capability-item sup,
+  .capability-item small {
+    margin-left: 3px;
+    color: #3978df;
+    font-size: 0.38em;
+    font-weight: 850;
+    letter-spacing: 0;
+    vertical-align: super;
+  }
+
+  .capability-item small { vertical-align: baseline; }
+
+  .speed-values {
+    display: flex;
+    align-items: center;
+    gap: var(--home-space-3);
+  }
+
+  .speed-values > strong {
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: baseline;
+    color: #132039;
+    font-family: var(--site-font-mono);
+    font-size: clamp(28px, 2.6vw, 40px);
+    font-weight: 860;
+    letter-spacing: -0.065em;
+    line-height: 1;
+  }
+
+  .speed-values small {
+    margin-left: 3px;
+    color: #3978df;
+    font-size: 0.38em;
+    letter-spacing: 0;
+  }
+
+  .speed-values em {
+    grid-column: 1 / -1;
+    margin-top: 5px;
+    color: #7a8799;
+    font-family: var(--site-font-sans);
+    font-size: 8px;
+    font-style: normal;
+    font-weight: 760;
+    letter-spacing: 0;
+  }
+
+  .speed-values > i {
+    width: 1px;
+    height: 44px;
+    background: #dfe7f1;
+  }
+
+  .capability-item h2 {
+    margin: var(--home-space-3) 0 0;
+    color: #26364d;
+    font-size: 13px;
+    font-weight: 820;
+    letter-spacing: -0.008em;
+  }
+
+  .capability-item > span {
+    margin-top: var(--home-space-2);
+    color: #7a8799;
+    font-size: 10px;
+    line-height: 1.6;
+    word-break: keep-all;
+  }
+
+  .capability-item-fps button {
+    align-self: flex-start;
+    margin-top: var(--home-space-2);
+    border: 1px solid #dfe8f3;
+    border-radius: 8px;
+    padding: 6px 9px;
+    background: #f8fbff;
+    color: #1d5fd4;
+    cursor: pointer;
+    font: inherit;
+    font-size: 8px;
+    font-weight: 800;
+  }
+
+  .capability-item-fps button:hover { border-color: #a9c7f4; background: #edf5ff; }
+  .capability-item-fps button:disabled { cursor: wait; opacity: 0.62; }
+
+  .capability-item-fps.is-measured {
+    background:
+      radial-gradient(circle at 92% 8%, rgba(5, 150, 105, 0.09), transparent 40%),
+      rgba(255, 255, 255, 0.9);
+  }
+
+  .section { padding: var(--home-section-space) 0; }
+
+  .section-heading {
+    margin-bottom: clamp(40px, 5vw, 64px);
+  }
+
+  .section-heading-split {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.68fr);
+    align-items: end;
+    gap: clamp(40px, 7vw, 96px);
+  }
+
+  .section-heading h2,
+  .performance-copy h2,
+  .quick-start-intro h2,
+  .decision-copy h2,
+  .final-cta h2 {
+    margin: 12px 0 0;
+    color: #0f172a;
+    font-size: clamp(36px, 4.3vw, 54px);
+    font-weight: 850;
+    letter-spacing: -0.018em;
+    line-height: 1.16;
+    word-break: keep-all;
+  }
+
+  .section-heading > p,
+  .examples-heading-aside p,
+  .quick-start-intro > p,
+  .decision-copy > p,
+  .final-cta p {
+    margin: 0;
+    color: #66758a;
+    font-size: 15px;
+    line-height: 1.82;
+    word-break: keep-all;
+  }
+
+  .strengths-section { background: #ffffff; }
+
+  .strength-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--home-space-4);
+  }
+
+  .strength-card {
+    position: relative;
+    display: grid;
+    min-height: 430px;
+    overflow: hidden;
+    border: 1px solid #dfe7f1;
+    border-radius: 24px;
+    padding: clamp(32px, 3.2vw, 40px);
+    background: #fbfdff;
+    box-shadow: 0 26px 56px -48px rgba(15, 23, 42, 0.54);
+  }
+
+  .strength-card:nth-child(1),
+  .strength-card:nth-child(4) { grid-column: span 7; }
+  .strength-card:nth-child(2),
+  .strength-card:nth-child(3) { grid-column: span 5; }
+
+  .strength-card-blue { --card-accent: #2563eb; --card-soft: #eaf2ff; }
+  .strength-card-violet { --card-accent: #7c3aed; --card-soft: #f2edff; }
+  .strength-card-cyan { --card-accent: #0284a8; --card-soft: #e6f8fb; }
+  .strength-card-emerald { --card-accent: #059669; --card-soft: #e8f8f1; }
+
+  .strength-card::after {
+    position: absolute;
+    inset: auto -100px -160px auto;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: var(--card-soft);
+    content: '';
+    opacity: 0.72;
+    pointer-events: none;
+  }
+
+  .strength-copy { position: relative; z-index: 2; max-width: 600px; }
+
+  .strength-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--home-space-2);
+    color: var(--card-accent);
+    font-family: var(--site-font-mono);
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .strength-meta span:first-child {
+    display: grid;
+    width: 31px;
+    height: 31px;
+    place-items: center;
+    border-radius: 9px;
+    background: var(--card-soft);
+  }
+
+  .strength-card h3 {
+    max-width: 650px;
+    margin: 24px 0 0;
+    color: #152036;
+    font-size: clamp(24px, 2.5vw, 34px);
+    font-weight: 820;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+    word-break: keep-all;
+  }
+
+  .strength-card p {
+    max-width: 650px;
+    margin: 16px 0 0;
+    color: #68778c;
+    font-size: 13px;
+    line-height: 1.78;
+    word-break: keep-all;
+  }
+
+  .strength-outcome {
+    display: flex;
+    align-items: center;
+    gap: var(--home-space-2);
+    margin-top: var(--home-space-5);
+    color: #33445d;
+    font-size: 11px;
+    font-weight: 780;
+  }
+
+  .strength-outcome span { color: var(--card-accent); font-size: 16px; }
+
+  .strength-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--home-space-2);
+    margin-top: var(--home-space-5);
+  }
+
+  .strength-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--home-space-1);
+    border: 1px solid color-mix(in srgb, var(--card-accent) 18%, #dce5ef);
+    border-radius: 999px;
+    padding: var(--home-space-2) var(--home-space-3);
+    background: rgba(255, 255, 255, 0.72);
+    color: color-mix(in srgb, var(--card-accent) 80%, #172033);
+    font-size: 10px;
+    font-weight: 760;
+    text-decoration: none;
+  }
+
+  .strength-links a:hover { border-color: var(--card-accent); background: #ffffff; }
+
+  .strength-visual {
+    position: absolute;
+    z-index: 1;
+    right: 28px;
+    bottom: 26px;
+    width: min(43%, 300px);
+    height: 150px;
+    border: 1px solid color-mix(in srgb, var(--card-accent) 17%, #dfe7f1);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.86);
+    box-shadow: 0 24px 52px -40px rgba(15, 23, 42, 0.58);
+    backdrop-filter: blur(10px);
+  }
+
+  .strength-card:nth-child(2) .strength-visual,
+  .strength-card:nth-child(3) .strength-visual {
+    right: -26px;
+    bottom: -24px;
+    width: 66%;
+    transform: rotate(-2deg);
+  }
+
+  .mini-grid {
+    position: absolute;
+    inset: 18px;
+    overflow: hidden;
+    border: 1px solid #e3eaf3;
+    border-radius: 10px;
+    background-image: linear-gradient(#e7edf4 1px, transparent 1px), linear-gradient(90deg, #e7edf4 1px, transparent 1px);
+    background-size: 100% 20px, 36px 100%;
+  }
+
+  .mini-grid i { display: none; }
+
+  .scale-window {
+    position: absolute;
+    right: 30px;
+    top: 48px;
+    width: 94px;
+    height: 54px;
+    border: 2px solid var(--card-accent);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--card-soft) 70%, transparent);
+  }
+
+  .scale-window span {
+    position: absolute;
+    top: -18px;
+    right: -2px;
+    color: var(--card-accent);
+    font-family: var(--site-font-mono);
+    font-size: 8px;
+    font-weight: 850;
+  }
+
+  .scale-caption {
+    position: absolute;
+    left: 30px;
+    bottom: 26px;
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+  }
+
+  .scale-caption strong { color: #16315f; font-family: var(--site-font-mono); font-size: 27px; }
+  .scale-caption span { color: #718097; font-size: 9px; }
+
+  .mini-grid-edit { inset: 16px 18px 42px; }
+
+  .editor-popover {
+    position: absolute;
+    top: 36px;
+    right: 25px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    width: 132px;
+    border: 2px solid var(--card-accent);
+    border-radius: 9px;
+    padding: 8px 10px;
+    background: #ffffff;
+    box-shadow: 0 16px 26px -18px rgba(72, 32, 128, 0.6);
+  }
+
+  .editor-popover span { grid-column: 1 / -1; color: #8a789f; font-size: 8px; }
+  .editor-popover strong { color: #3c2b55; font-size: 11px; }
+  .editor-popover i { color: var(--card-accent); font-style: normal; }
+
+  .edit-path {
+    position: absolute;
+    right: 22px;
+    bottom: 14px;
+    left: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #816c9e;
+    font-family: var(--site-font-mono);
+    font-size: 8px;
+  }
+
+  .edit-path i { color: var(--card-accent); font-style: normal; }
+
+  .query-header {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr;
+    border-bottom: 1px solid #dfe7ef;
+  }
+
+  .query-header span { padding: 12px 10px; color: #41536a; font-size: 8px; font-weight: 780; }
+  .query-header span + span { border-left: 1px solid #e6ecf3; }
+
+  .query-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 13px 12px;
+  }
+
+  .query-pills span {
+    border-radius: 999px;
+    padding: 5px 7px;
+    background: var(--card-soft);
+    color: var(--card-accent);
+    font-size: 7px;
+    font-weight: 780;
+  }
+
+  .query-result {
+    position: absolute;
+    right: 14px;
+    bottom: 12px;
+    left: 14px;
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    border-top: 1px solid #e6ecf3;
+    padding-top: 10px;
+  }
+
+  .query-result strong { color: #164e63; font-family: var(--site-font-mono); font-size: 22px; }
+  .query-result span { color: #728395; font-size: 8px; }
+  .query-result i { margin-left: auto; color: var(--card-accent); font-style: normal; }
+
+  .insight-bars {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    left: 18px;
+    display: flex;
+    align-items: flex-end;
+    gap: 7px;
+    height: 55px;
+  }
+
+  .insight-bars span { flex: 1; border-radius: 4px 4px 1px 1px; background: #d8eee6; }
+  .insight-bars span:nth-child(1) { height: 42%; }
+  .insight-bars span:nth-child(2) { height: 76%; background: #9bd8c0; }
+  .insight-bars span:nth-child(3) { height: 58%; }
+  .insight-bars span:nth-child(4) { height: 92%; background: var(--card-accent); }
+
+  .insight-summary {
+    position: absolute;
+    right: 18px;
+    bottom: 20px;
+    left: 18px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-top: 1px solid #dfeae5;
+    padding-top: 12px;
+  }
+
+  .insight-summary span { color: #789187; font-family: var(--site-font-mono); font-size: 7px; }
+  .insight-summary strong { color: #0f6d50; font-family: var(--site-font-mono); font-size: 14px; }
+
+  .performance-section {
+    position: relative;
+    background: #0b1425;
+    color: #ffffff;
+  }
+
+  .performance-section::before {
+    position: absolute;
+    inset: 0;
+    opacity: 0.3;
+    background-image: linear-gradient(rgba(148, 163, 184, 0.09) 1px, transparent 1px), linear-gradient(90deg, rgba(148, 163, 184, 0.09) 1px, transparent 1px);
+    background-size: 44px 44px;
+    content: '';
+    mask-image: radial-gradient(circle at 78% 50%, black, transparent 62%);
+    pointer-events: none;
+  }
+
+  .performance-layout {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 0.78fr) minmax(500px, 1.22fr);
+    align-items: center;
+    gap: clamp(48px, 8vw, 112px);
+  }
+
+  .eyebrow-dark,
+  .final-cta .eyebrow-dark { color: #67e8f9; }
+  .performance-copy h2, .final-cta h2 { color: #f8fbff; }
+
+  .performance-copy > p:not(.eyebrow):not(.performance-disclaimer) {
+    margin: var(--home-space-5) 0 0;
+    color: #aab8ca;
+    font-size: 14px;
+    line-height: 1.85;
+    word-break: keep-all;
+  }
+
+  .performance-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--home-space-3) var(--home-space-5);
+    margin-top: var(--home-space-5);
+  }
+
+  .performance-links a {
+    color: #b9e8ff;
+    font-size: 11px;
+    font-weight: 760;
+    text-decoration: none;
+  }
+
+  .performance-disclaimer {
+    margin: var(--home-space-5) 0 0;
+    border-left: 2px solid #2c4564;
+    padding-left: var(--home-space-4);
+    color: #6f8199;
+    font-size: 10px;
+    line-height: 1.7;
+  }
+
+  .render-budget {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(150px, 0.42fr) minmax(330px, 1fr);
+    align-items: stretch;
+    gap: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 25px;
+    padding: 22px 22px 18px;
+    background: rgba(17, 31, 53, 0.78);
+    box-shadow: 0 34px 80px -48px rgba(16, 185, 240, 0.38);
+    backdrop-filter: blur(10px);
+  }
+
+  .budget-summary {
+    display: flex;
+    min-height: 290px;
+    flex-direction: column;
+    justify-content: center;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 18px;
+    padding: 22px;
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .budget-summary > span,
+  .budget-viewport > span {
+    color: #7689a2;
+    font-family: var(--site-font-mono);
+    font-size: 8px;
+    font-weight: 780;
+    letter-spacing: 0.12em;
+  }
+
+  .budget-summary > strong {
+    margin-top: 14px;
+    color: #d5dfeb;
+    font-family: var(--site-font-mono);
+    font-size: clamp(28px, 3.5vw, 44px);
+    letter-spacing: -0.06em;
+    line-height: 1;
+  }
+
+  .budget-summary strong small,
+  .budget-viewport strong small {
+    margin-left: 4px;
+    color: #7c90a9;
+    font-family: var(--site-font-sans);
+    font-size: 9px;
+    letter-spacing: 0;
+  }
+
+  .budget-summary p,
+  .budget-viewport p {
+    margin: 8px 0 0;
+    color: #75869c;
+    font-size: 9px;
+  }
+
+  .budget-canvas {
+    position: relative;
+    min-height: 290px;
+    overflow: hidden;
+    border: 1px solid rgba(125, 211, 252, 0.2);
+    border-radius: 18px;
+    background: linear-gradient(145deg, rgba(14, 116, 144, 0.11), rgba(37, 99, 235, 0.06));
+  }
+
+  .budget-grid {
+    position: absolute;
+    inset: 16px;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: repeat(10, 1fr);
+    gap: 2px;
+    opacity: 0.52;
+  }
+
+  .budget-grid i {
+    border: 1px solid rgba(125, 211, 252, 0.16);
+    border-radius: 2px;
+    background: rgba(125, 211, 252, 0.035);
+  }
+
+  .budget-viewport {
+    position: absolute;
+    z-index: 2;
+    right: 38px;
+    bottom: 34px;
+    display: flex;
+    width: min(64%, 270px);
+    min-height: 150px;
+    flex-direction: column;
+    justify-content: flex-end;
+    border: 2px solid #38bdf8;
+    border-radius: 12px;
+    padding: 20px;
+    background: linear-gradient(145deg, rgba(8, 47, 73, 0.94), rgba(23, 74, 135, 0.91));
+    box-shadow: 0 18px 44px -22px rgba(56, 189, 248, 0.72), inset 0 0 0 1px rgba(224, 242, 254, 0.08);
+  }
+
+  .budget-viewport::before {
+    position: absolute;
+    inset: 9px;
+    border: 1px dashed rgba(125, 211, 252, 0.25);
+    border-radius: 7px;
+    content: '';
+    pointer-events: none;
+  }
+
+  .budget-viewport > * { position: relative; z-index: 1; }
+  .budget-viewport > span { color: #9edcf7; }
+  .budget-viewport > strong {
+    margin-top: 6px;
+    color: #f0fbff;
+    font-family: var(--site-font-mono);
+    font-size: 36px;
+    letter-spacing: -0.05em;
+    line-height: 1;
+  }
+
+  .budget-legend {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    color: #74869e;
+    font-size: 9px;
+    line-height: 1.5;
+  }
+
+  .budget-legend i {
+    width: 16px;
+    height: 10px;
+    border: 1px solid #38bdf8;
+    border-radius: 2px;
+  }
+
+  .examples-section { background: #f5f8fc; }
+
+  .examples-heading-aside a,
+  .text-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--home-space-2);
+    margin-top: var(--home-space-4);
+    color: #1d5fd4;
+    font-size: 11px;
+    font-weight: 780;
+    text-decoration: none;
+  }
+
+  .example-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-top: 1px solid #d8e2ee;
+    border-left: 1px solid #d8e2ee;
+  }
+
+  .example-card {
+    position: relative;
+    min-height: 270px;
+    overflow: hidden;
+    border-right: 1px solid #d8e2ee;
+    border-bottom: 1px solid #d8e2ee;
+    padding: var(--home-space-5);
+    background: rgba(255, 255, 255, 0.72);
+    color: inherit;
+    text-decoration: none;
+    transition: background 180ms ease, box-shadow 180ms ease;
+  }
+
+  .example-card::before {
+    position: absolute;
+    right: -48px;
+    bottom: -76px;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(37, 99, 235, 0.1), transparent 68%);
+    content: '';
+    opacity: 0;
+    transition: opacity 180ms ease;
+  }
+
+  .example-card:hover {
+    z-index: 1;
+    background: #ffffff;
+    box-shadow: inset 0 0 0 1px #79a9f4, 0 18px 42px -38px rgba(29, 78, 216, 0.82);
+  }
+  .example-card:hover::before { opacity: 1; }
+  .example-card:hover .example-arrow { border-color: #8bb4f4; background: #edf5ff; }
+
+  .example-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #8794a7;
+    font-family: var(--site-font-mono);
+    font-size: 9px;
+    font-weight: 780;
+  }
+
+  .example-live {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #0f8c68;
+    letter-spacing: 0.08em;
+  }
+
+  .example-live i { width: 5px; height: 5px; border-radius: 50%; background: #10b981; }
+
+  .example-card > p {
+    margin: var(--home-space-7) 0 0;
+    color: #2563eb;
+    font-size: 9px;
+    font-weight: 820;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .example-card h3 {
+    margin: var(--home-space-2) 0 0;
+    color: #172238;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .example-description {
+    display: block;
+    max-width: 360px;
+    margin-top: var(--home-space-4);
+    color: #6d7b8e;
+    font-size: 11px;
+    line-height: 1.7;
+    word-break: keep-all;
+  }
+
+  .example-arrow {
+    position: absolute;
+    right: 26px;
+    bottom: 24px;
+    display: grid;
+    width: 30px;
+    height: 30px;
+    place-items: center;
+    border: 1px solid #d9e3ee;
+    border-radius: 50%;
+    color: #2563eb;
+  }
+
+  .quick-start-section {
+    border-block: 1px solid #e8eef6;
+    background:
+      radial-gradient(circle at 84% 6%, rgba(37, 99, 235, 0.08), transparent 31%),
+      linear-gradient(180deg, #f8fbff 0%, #ffffff 72%);
+  }
+
+  .quick-start-section > .container {
+    display: block;
+  }
+
+  .quick-start-intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.72fr);
+    align-items: end;
+    gap: clamp(40px, 7vw, 96px);
+    margin-bottom: clamp(36px, 4.5vw, 56px);
+  }
+
+  .quick-start-intro h2 { max-width: 760px; }
+
+  .quick-start-summary {
+    max-width: 520px;
+    padding-bottom: 4px;
+  }
+
+  .quick-start-summary > p {
+    margin: 0;
+    color: #607089;
+    font-size: 15px;
+    line-height: 1.82;
+    word-break: keep-all;
+  }
+
+  .quick-start-summary .text-link {
+    display: inline-flex;
+    margin-top: var(--home-space-4);
+  }
+
+  .quick-start-list { display: grid; gap: var(--home-space-4); }
+
+  .quick-start-item {
+    display: grid;
+    grid-template-columns: minmax(250px, 0.32fr) minmax(0, 1fr);
+    align-items: start;
+    gap: var(--home-space-4);
+  }
+
+  .quick-start-step {
+    display: flex;
+    width: 100%;
+    height: 112px;
+    box-sizing: border-box;
+    align-items: center;
+    gap: 14px;
+    border: 1px solid #d7e2ef;
+    border-radius: 18px;
+    padding: 20px;
+    background: #f5f8fc;
+    color: #1d5fd4;
+    text-align: left;
+    box-shadow: 0 20px 45px -40px rgba(24, 52, 92, 0.75);
+  }
+
+  .quick-start-step > span:first-child {
+    display: grid;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+    place-items: center;
+    border-radius: 9px;
+    background: #e8eef7;
+    color: currentColor;
+    font-family: var(--site-font-mono);
+    font-size: 10px;
+    font-weight: 850;
+  }
+
+  .quick-start-step strong { display: block; color: #263850; font-size: 13px; }
+  .quick-start-step small { display: block; margin-top: 4px; color: #7c8ba0; font-size: 11px; line-height: 1.45; }
+
+  .quick-start-code-block {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid #223049;
+    border-radius: 18px;
+    background: #0d1728;
+    box-shadow: 0 30px 65px -48px rgba(11, 26, 48, 0.9);
+  }
+
+  .quick-start-code-block pre {
+    min-width: 0;
+    overflow-x: auto;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    padding: 30px 36px;
+    background: transparent !important;
+    color: #dce7f5;
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .quick-start-code-block-install pre { font-size: 16px; }
+
+  .code-violet { color: #c4b5fd; }
+  .code-green { color: #86efac; }
+  .code-blue { color: #7dd3fc; }
+  .code-number { color: #fbbf24; }
+  .code-comment { color: #60728c; }
+
+  .decision-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 0.82fr) minmax(480px, 1.18fr);
+    overflow: hidden;
+    gap: clamp(48px, 8vw, 96px);
+    border: 1px solid #d9e4f0;
+    border-radius: 26px;
+    padding: clamp(40px, 6vw, 72px);
+    background:
+      radial-gradient(circle at 88% 8%, rgba(14, 165, 233, 0.11), transparent 31%),
+      linear-gradient(135deg, #f1f6ff 0%, #ffffff 54%, #f0fbfa 100%);
+  }
+
+  .decision-card::after {
+    position: absolute;
+    right: -60px;
+    top: -90px;
+    width: 300px;
+    height: 300px;
+    opacity: 0.4;
+    background-image: linear-gradient(#9dc8ff 1px, transparent 1px), linear-gradient(90deg, #9dc8ff 1px, transparent 1px);
+    background-size: 28px 28px;
+    content: '';
+    mask-image: linear-gradient(145deg, #000, transparent 70%);
+    transform: rotate(10deg);
+  }
+
+  .decision-copy,
+  .decision-list { position: relative; z-index: 1; }
+  .decision-copy > p:not(.eyebrow) { margin-top: var(--home-space-5); }
+  .decision-actions { margin-top: var(--home-space-6); }
+
+  .decision-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: center;
+    gap: 12px;
+  }
+
+  .decision-item {
+    display: flex;
+    min-height: 126px;
+    gap: var(--home-space-3);
+    border: 1px solid rgba(148, 163, 184, 0.27);
+    border-radius: 15px;
+    padding: var(--home-space-4);
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(8px);
+  }
+
+  .decision-item > span {
+    display: grid;
+    width: 30px;
+    height: 30px;
+    flex: none;
+    place-items: center;
+    border-radius: 9px;
+    font-family: var(--site-font-mono);
+    font-size: 8px;
+    font-weight: 900;
+  }
+
+  .decision-item-fit > span { background: #e4f8ef; color: #057857; }
+  .decision-item-check { grid-column: 1 / -1; min-height: auto; }
+  .decision-item-check > span { background: #fff2e7; color: #c2410c; font-family: var(--site-font-sans); font-size: 13px; }
+  .decision-item strong { color: #26364d; font-size: 12px; }
+  .decision-item p { margin: 5px 0 0; color: #718096; font-size: 10px; line-height: 1.65; }
+
+  .final-cta {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(80px, 9vw, 112px) 0;
+    background: #1458d3;
+  }
+
+  .final-cta::before {
+    position: absolute;
+    inset: 0;
+    opacity: 0.42;
+    background:
+      radial-gradient(circle at 84% 12%, rgba(34, 211, 238, 0.72), transparent 24%),
+      linear-gradient(120deg, transparent 0 55%, rgba(255, 255, 255, 0.08) 55% 56%, transparent 56% 100%);
+    content: '';
+  }
+
+  .final-cta-inner {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--home-space-8);
+  }
+
+  .final-cta p:not(.eyebrow) { max-width: 650px; margin-top: var(--home-space-4); color: #d5e6ff; }
+  .btn-light {
+    border-color: #ffffff;
+    background: #ffffff;
+    color: #1d4ed8;
+    box-shadow: 0 18px 38px -24px rgba(7, 34, 91, 0.58);
+  }
+  .btn-light:hover { border-color: #ffffff; background: #f5f9ff; color: #174eb4; }
+  .btn-dark-outline { border-color: rgba(255, 255, 255, 0.44); color: #ffffff; }
+  .btn-dark-outline:hover { border-color: #ffffff; background: rgba(255, 255, 255, 0.09); color: #ffffff; }
+
+  :global(html[data-theme='dark']) .homepage {
+    background: var(--site-page-bg);
+    color: var(--site-text-primary);
+  }
+
+  :global(html[data-theme='dark']) .hero-section {
+    background:
+      radial-gradient(circle at 78% 9%, rgba(59, 130, 246, 0.18), transparent 29%),
+      linear-gradient(180deg, #101827 0%, var(--site-page-bg) 82%);
+  }
+
+  :global(html[data-theme='dark']) .hero-grid-pattern { opacity: 0.28; }
+  :global(html[data-theme='dark']) .hero-copy h1,
+  :global(html[data-theme='dark']) .section-heading h2,
+  :global(html[data-theme='dark']) .strength-card h3,
+  :global(html[data-theme='dark']) .quick-start-intro h2,
+  :global(html[data-theme='dark']) .decision-copy h2 { color: var(--site-text-primary); }
+  :global(html[data-theme='dark']) .hero-kicker,
+  :global(html[data-theme='dark']) .hero-description,
+  :global(html[data-theme='dark']) .section-heading-split > p,
+  :global(html[data-theme='dark']) .strength-copy > p,
+  :global(html[data-theme='dark']) .quick-start-summary > p,
+  :global(html[data-theme='dark']) .decision-copy > p:not(.eyebrow) { color: var(--site-text-secondary); }
+  :global(html[data-theme='dark']) .install-command,
+  :global(html[data-theme='dark']) .capability-item,
+  :global(html[data-theme='dark']) .strength-card,
+  :global(html[data-theme='dark']) .example-card,
+  :global(html[data-theme='dark']) .quick-start-step,
+  :global(html[data-theme='dark']) .decision-item {
+    border-color: var(--site-border);
+    background: var(--site-surface-elevated);
+    box-shadow: none;
+  }
+  :global(html[data-theme='dark']) .install-command code,
+  :global(html[data-theme='dark']) .capability-item h2,
+  :global(html[data-theme='dark']) .strength-outcome,
+  :global(html[data-theme='dark']) .example-card h3,
+  :global(html[data-theme='dark']) .quick-start-step strong,
+  :global(html[data-theme='dark']) .decision-item strong { color: var(--site-text-primary); }
+  :global(html[data-theme='dark']) .install-prompt,
+  :global(html[data-theme='dark']) .capability-item-primary > strong,
+  :global(html[data-theme='dark']) .capability-item sup,
+  :global(html[data-theme='dark']) .capability-item small,
+  :global(html[data-theme='dark']) .speed-values small { color: var(--site-accent); }
+  :global(html[data-theme='dark']) .copy-command,
+  :global(html[data-theme='dark']) .capability-item-fps button {
+    border-color: var(--site-border-strong);
+    background: var(--site-accent-soft);
+    color: var(--site-accent-strong);
+  }
+  :global(html[data-theme='dark']) .hero-trust-note,
+  :global(html[data-theme='dark']) .capability-item > p,
+  :global(html[data-theme='dark']) .speed-values em { color: var(--site-text-muted); }
+  :global(html[data-theme='dark']) .hero-trust-note span { color: #6ee7b7; }
+  :global(html[data-theme='dark']) .capability-item > strong,
+  :global(html[data-theme='dark']) .speed-values > strong { color: var(--site-text-primary); }
+  :global(html[data-theme='dark']) .speed-values > i { background: var(--site-border-strong); }
+  :global(html[data-theme='dark']) .capability-limit-note {
+    border-left-color: var(--site-accent);
+    background: var(--site-accent-soft);
+  }
+  :global(html[data-theme='dark']) .capability-limit-note > strong { color: var(--site-text-primary); }
+  :global(html[data-theme='dark']) .capability-limit-note > p { color: var(--site-text-secondary); }
+  :global(html[data-theme='dark']) .capability-limit-note code,
+  :global(html[data-theme='dark']) .capability-limit-note > span { color: var(--site-accent-strong); }
+  :global(html[data-theme='dark']) .capability-limit-note > span + span { color: var(--site-text-secondary); }
+  :global(html[data-theme='dark']) .capability-item > span,
+  :global(html[data-theme='dark']) .example-description,
+  :global(html[data-theme='dark']) .quick-start-step small,
+  :global(html[data-theme='dark']) .decision-item p { color: var(--site-text-muted); }
+  :global(html[data-theme='dark']) .quick-start-step > span:first-child {
+    background: var(--site-accent-soft);
+    color: var(--site-accent-strong);
+  }
+  :global(html[data-theme='dark']) .decision-item-fit > span {
+    background: #073b35;
+    color: #6ee7b7;
+  }
+  :global(html[data-theme='dark']) .decision-item-check > span {
+    background: #422006;
+    color: #fcd34d;
+  }
+  :global(html[data-theme='dark']) .strength-card-blue { --card-accent: #6ea8ff; --card-soft: #172b4c; }
+  :global(html[data-theme='dark']) .strength-card-violet { --card-accent: #c4b5fd; --card-soft: #29234d; }
+  :global(html[data-theme='dark']) .strength-card-cyan { --card-accent: #67e8f9; --card-soft: #123a45; }
+  :global(html[data-theme='dark']) .strength-card-emerald { --card-accent: #6ee7b7; --card-soft: #073b35; }
+  :global(html[data-theme='dark']) .strength-links a,
+  :global(html[data-theme='dark']) .strength-visual {
+    border-color: var(--site-border-strong);
+    background: var(--site-control-bg);
+    color: var(--card-accent);
+    box-shadow: none;
+  }
+  :global(html[data-theme='dark']) .strength-links a:hover { border-color: var(--card-accent); background: var(--site-control-hover-bg); }
+  :global(html[data-theme='dark']) .mini-grid {
+    border-color: var(--site-border);
+    background-color: var(--site-control-bg);
+    background-image: linear-gradient(var(--site-border) 1px, transparent 1px), linear-gradient(90deg, var(--site-border) 1px, transparent 1px);
+  }
+  :global(html[data-theme='dark']) .scale-caption strong,
+  :global(html[data-theme='dark']) .editor-popover strong,
+  :global(html[data-theme='dark']) .query-header span,
+  :global(html[data-theme='dark']) .query-result strong,
+  :global(html[data-theme='dark']) .insight-summary strong { color: var(--site-text-primary); }
+  :global(html[data-theme='dark']) .scale-caption span,
+  :global(html[data-theme='dark']) .editor-popover span,
+  :global(html[data-theme='dark']) .edit-path,
+  :global(html[data-theme='dark']) .query-result span,
+  :global(html[data-theme='dark']) .insight-summary span { color: var(--site-text-muted); }
+  :global(html[data-theme='dark']) .editor-popover { background: var(--site-surface-elevated); box-shadow: none; }
+  :global(html[data-theme='dark']) .query-header,
+  :global(html[data-theme='dark']) .query-result,
+  :global(html[data-theme='dark']) .insight-summary { border-color: var(--site-border); }
+  :global(html[data-theme='dark']) .query-header span + span { border-color: var(--site-border); }
+  :global(html[data-theme='dark']) .insight-bars span { background: #1d4b46; }
+  :global(html[data-theme='dark']) .insight-bars span:nth-child(2) { background: #277866; }
+  :global(html[data-theme='dark']) .strengths-section,
+  :global(html[data-theme='dark']) .examples-section,
+  :global(html[data-theme='dark']) .quick-start-section { background: var(--site-page-bg); }
+  :global(html[data-theme='dark']) .decision-card {
+    border-color: var(--site-border);
+    background: linear-gradient(135deg, #111b2d, #131d2b 52%, #102322);
+  }
+  :global(html[data-theme='dark']) .hero-grid-stage { background: #111827; }
+  :global(html[data-theme='dark']) .hero-grid-loading { background: #111827; }
+  :global(html[data-theme='dark']) .hero-grid-loading-head,
+  :global(html[data-theme='dark']) .hero-grid-loading-foot {
+    border-color: #263247;
+    background: #151f30;
+  }
+  :global(html[data-theme='dark']) .hero-grid-loading-head span,
+  :global(html[data-theme='dark']) .hero-grid-loading-foot span { background: #2a374c; }
+  :global(html[data-theme='dark']) .hero-grid-loading-body {
+    background-color: #111827;
+    background-image:
+      linear-gradient(90deg, transparent 0 46px, rgba(51, 65, 85, 0.72) 46px 47px, transparent 47px),
+      repeating-linear-gradient(180deg, transparent 0 28px, rgba(51, 65, 85, 0.72) 28px 29px);
+  }
+  :global(html[data-theme='dark']) .hero-grid-loading-body::before {
+    background: linear-gradient(100deg, transparent 26%, rgba(51, 65, 85, 0.34) 46%, transparent 66%);
+  }
+  :global(html[data-theme='dark']) .hero-grid-loading-status {
+    background: rgba(23, 32, 51, 0.94);
+    color: #a9b6c9;
+  }
+  :global(html[data-theme='dark']) .capability-item {
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.18),
+      0 22px 52px -42px rgba(0, 0, 0, 0.9),
+      inset 0 0 0 1px rgba(74, 89, 112, 0.58);
+  }
+
+  @media (max-width: 1100px) {
+    .capability-rail { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .strength-card:nth-child(n) { grid-column: span 6; }
+    .performance-layout { grid-template-columns: 1fr; }
+    .performance-copy { max-width: 720px; }
+    .decision-card { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 820px) {
+    .hero-section { padding-top: var(--home-space-8); }
+    .hero-copy h1 { font-size: clamp(44px, 9vw, 64px); }
+    .section-heading-split { grid-template-columns: 1fr; align-items: start; }
+    .section-heading-split > p,
+    .examples-heading-aside { max-width: 660px; }
+    .strength-card:nth-child(n) { grid-column: 1 / -1; }
+    .strength-card:nth-child(2) .strength-visual,
+    .strength-card:nth-child(3) .strength-visual { right: 28px; bottom: 26px; width: min(43%, 300px); transform: none; }
+    .example-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .quick-start-intro { grid-template-columns: 1fr; align-items: start; gap: var(--home-space-5); }
+    .quick-start-summary { max-width: 650px; }
+    .quick-start-item { grid-template-columns: minmax(190px, 0.28fr) minmax(0, 1fr); }
+    .quick-start-step { height: 96px; padding: 16px; }
+    .final-cta-inner { align-items: flex-start; flex-direction: column; }
+  }
+
+  @media (max-width: 620px) {
+    .hero-section { padding-top: var(--home-space-6); }
+    .hero-layout,
+    .capability-rail { padding-inline: var(--home-space-2); }
+    .hero-copy h1 { font-size: 39px; line-height: 1.1; }
+    :global(html[lang='en']) .hero-copy h1 { font-size: 35px; }
+    :global(html[lang='en']) .hero-kicker { max-width: 340px; }
+    .hero-copy h1 br { display: none; }
+    .hero-copy h1 span { margin-left: 0.12em; }
+    .hero-description { margin-top: var(--home-space-5); font-size: 15px; }
+    .hero-actions { display: grid; grid-template-columns: 1fr; }
+    .hero-actions .btn { width: 100%; }
+    .install-command { max-width: none; }
+    .capability-rail { grid-template-columns: 1fr; gap: var(--home-space-2); }
+    .capability-item { min-height: 192px; }
+    .section { padding: var(--home-space-9) 0; }
+    .section-heading h2,
+    .performance-copy h2,
+    .quick-start-intro h2,
+    .decision-copy h2,
+    .final-cta h2 { font-size: 34px; }
+    .strength-card { min-height: 560px; padding: var(--home-space-5); }
+    .strength-card h3 { font-size: 25px; }
+    .strength-visual,
+    .strength-card:nth-child(2) .strength-visual,
+    .strength-card:nth-child(3) .strength-visual {
+      right: 20px;
+      bottom: 20px;
+      left: 20px;
+      width: auto;
+      height: 142px;
+    }
+    .render-budget { grid-template-columns: 1fr; gap: var(--home-space-3); padding: var(--home-space-4); }
+    .budget-summary { min-height: auto; padding: var(--home-space-4); }
+    .budget-canvas { min-height: 280px; }
+    .budget-viewport { right: 22px; bottom: 22px; width: min(72%, 260px); min-height: 142px; }
+    .budget-legend { grid-column: 1; }
+    .example-grid { grid-template-columns: 1fr; }
+    .example-card { min-height: 245px; }
+    .quick-start-item { grid-template-columns: 1fr; gap: var(--home-space-2); }
+    .quick-start-step { height: 82px; gap: 10px; padding: 12px; }
+    .quick-start-step > span:first-child { width: 26px; height: 26px; flex-basis: 26px; }
+    .quick-start-step strong { font-size: 12px; line-height: 1.35; }
+    .quick-start-code-block pre { padding: var(--home-space-5) var(--home-space-4); font-size: 12px; }
+    .quick-start-code-block-install pre { font-size: 14px; }
+    .decision-card { padding: var(--home-space-5); }
+    .decision-list { grid-template-columns: 1fr; }
+    .decision-item-check { grid-column: 1; }
+    .decision-actions,
+    .final-cta-actions { width: 100%; }
+    .decision-actions .btn,
+    .final-cta-actions .btn { width: 100%; }
+  }
+
+  @media (max-width: 360px) {
+    .hero-copy h1 { font-size: 35px; }
+    .strength-card { min-height: 590px; }
+    .strength-links a { padding-inline: 8px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html) { scroll-behavior: auto; }
+    .btn-primary,
+    .example-card,
+    .example-card::before { transition: none; }
+    .hero-grid-loading-body::before,
+    .hero-grid-loading-status i { animation: none; }
+  }
+</style>

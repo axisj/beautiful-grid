@@ -1,0 +1,12 @@
+.data-grid-container {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+  font-size: 13px;
+}
+
+.data-grid-container > .bgrid-root {
+  position: absolute;
+  inset: 0;
+}

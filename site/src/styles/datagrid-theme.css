@@ -1,0 +1,343 @@
+.site-grid-theme.bgrid-root,
+.site-grid-theme .bgrid-root {
+  --bgrid-primary-color: #3073f1;
+  --bgrid-header-bg: #f3f5f8;
+  --bgrid-header-color: #20252f;
+  --bgrid-header-hover-bg: #e4e9ef;
+  --bgrid-header-group-bg: #e9ecf0;
+  --bgrid-footer-bg: #f6f7f9;
+  --bgrid-summary-bg: #eaeff9;
+  --bgrid-border-color-base: #d3d9e1;
+  --bgrid-border-color-light: #d9dee4;
+  --bgrid-border-color-subtle: #ebeff3;
+  --bgrid-header-separator-color: #d3d9e1;
+  --bgrid-frozen-boundary-color: #aab4c1;
+  --bgrid-row-selector-color: #ffffff;
+  --bgrid-body-bg: #ffffff;
+  --bgrid-body-color: #3c434d;
+  --bgrid-body-odd-bg: #fafbfc;
+  --bgrid-body-hover-bg: #f1f5fa;
+  --bgrid-body-hover-odd-bg: #ebf0f7;
+  --bgrid-body-active-bg: #e1f0ff;
+  --bgrid-row-reorder-guide-color: #3073f1;
+  --bgrid-row-reorder-preview-bg: #e1f0ff;
+  --bgrid-cell-selected-bg: #e1f0ff;
+  --bgrid-cell-selected-border-color: #4f94f8;
+  --bgrid-active-cell-color: #3073f1;
+  --bgrid-active-cell-bg: #ffffff;
+  --bgrid-active-cell-ring-color: #3073f1;
+  --bgrid-editor-bg: #ffffff;
+  --bgrid-selection-axis-bg: #dbeafe;
+  --bgrid-selection-axis-color: #2c68e7;
+  --bgrid-selection-axis-border-color: #3b82f6;
+  --bgrid-cell-edited-bg: #fff7ed;
+  --bgrid-cell-edited-color: #c2410c;
+  --bgrid-cell-edited-border-color: #fdba74;
+  --bgrid-cell-value-changed-bg: #fff7ed;
+  --bgrid-cell-value-changed-color: #c2410c;
+  --bgrid-cell-value-changed-border-color: #fdba74;
+  --bgrid-scroll-bg: #ffffff;
+  --bgrid-scroll-track-bg: #f4f6f8;
+  --bgrid-scroll-thumb-bg: #c0c7d6;
+  --bgrid-scroll-thumb-hover-bg: #979fac;
+  --bgrid-scroll-corner-bg: #c0c7d6;
+  --bgrid-scrollbar-modern-track-bg: #eff3f6;
+  --bgrid-scrollbar-modern-thumb-bg: #aab4c0;
+  --bgrid-scrollbar-modern-thumb-hover-bg: #8692a1;
+  --bgrid-scrollbar-modern-button-hover-bg: #e5e9ef;
+  --bgrid-scrollbar-modern-icon-color: #7b8898;
+  --bgrid-scrollbar-modern-gutter-bg: #f2f5f8;
+  --bgrid-scrollbar-modern-gutter-border-color: #dae0e9;
+  --bgrid-scrollbar-classic-border-color: #b8c0ca;
+  --bgrid-scrollbar-classic-gutter-bg: #f2f5f8;
+  --bgrid-scrollbar-classic-gutter-border-color: #dae0e9;
+  --bgrid-scrollbar-classic-track-bg: #f4f6f8;
+  --bgrid-scrollbar-classic-thumb-bg: #d9dee4;
+  --bgrid-scrollbar-classic-thumb-hover-bg: #c0c7d6;
+  --bgrid-scrollbar-classic-button-bg: #f6f7f9;
+  --bgrid-scrollbar-classic-button-hover-bg: #e5e9ef;
+  --bgrid-scrollbar-classic-icon-color: #3c434d;
+  --bgrid-loading-bg: rgba(48, 115, 241, 0.08);
+  --bgrid-loading-color: rgba(48, 115, 241, 0.18);
+  --bgrid-loading-second-color: #64748b;
+  --bgrid-toolbox-bg: #ffffff;
+  --bgrid-toolbox-color: #334155;
+  --bgrid-toolbox-muted-color: #64748b;
+  --bgrid-toolbox-control-bg: #ffffff;
+  --bgrid-toolbox-control-color: #334155;
+  --bgrid-toolbox-control-border-color: #d4dce8;
+  --bgrid-toolbox-control-placeholder-color: #94a3b8;
+  --bgrid-toolbox-hover-bg: #eff6ff;
+  --bgrid-toolbox-active-bg: #dbeafe;
+  --bgrid-toolbox-danger-color: #dc2626;
+  --bgrid-toolbox-danger-bg: #fef2f2;
+  --bgrid-toolbox-button-bg: #f8fafc;
+  --bgrid-toolbox-primary-hover-color: #1d4ed8;
+  --bgrid-toolbox-primary-contrast-color: #ffffff;
+  --bgrid-toolbox-notice-bg: #f8fafc;
+  --bgrid-toolbox-scroll-thumb-bg: #b8c2d1;
+  --bgrid-toolbox-scroll-track-bg: #f1f5f9;
+  --bgrid-toolbox-focus-ring-color: #bfdbfe;
+  --bgrid-search-bg: #ffffff;
+  --bgrid-search-color: #334155;
+  --bgrid-search-border-color: #d4dce8;
+  --bgrid-search-control-bg: #f8fafc;
+  --bgrid-search-control-color: #1f2937;
+  --bgrid-search-control-border-color: #cbd5e1;
+  --bgrid-search-muted-color: #64748b;
+  --bgrid-search-focus-ring-color: #3b82f6;
+  --bgrid-search-button-hover-bg: #f1f5f9;
+  --bgrid-search-match-bg: rgba(250, 204, 21, 0.28);
+  --bgrid-search-match-border-color: #ca8a04;
+  --bgrid-search-current-bg: rgba(249, 115, 22, 0.3);
+  --bgrid-search-current-border-color: #f97316;
+  --bgrid-context-menu-bg: #ffffff;
+  --bgrid-context-menu-color: #334155;
+  --bgrid-context-menu-border-color: #d4dce8;
+  --bgrid-context-menu-hover-bg: #eff6ff;
+  --bgrid-context-menu-muted-color: #64748b;
+  --bgrid-floating-z-editor: 9999;
+  --bgrid-floating-z-toolbox: 20;
+  --bgrid-floating-z-context-menu: 30;
+  --bgrid-search-z-index: 31;
+}
+
+:root[data-theme='dark'] .site-grid-theme.bgrid-root,
+:root[data-theme='dark'] .site-grid-theme .bgrid-root {
+  --bgrid-primary-color: #6ea8ff;
+  --bgrid-header-bg: #182338;
+  --bgrid-header-color: #e6edf7;
+  --bgrid-header-hover-bg: #24334e;
+  --bgrid-header-group-bg: #202d45;
+  --bgrid-footer-bg: #151f33;
+  --bgrid-summary-bg: #1a2942;
+  --bgrid-border-color-base: #34445f;
+  --bgrid-border-color-light: #2d3d57;
+  --bgrid-border-color-subtle: #233149;
+  --bgrid-header-separator-color: #3b4b66;
+  --bgrid-frozen-boundary-color: #536580;
+  --bgrid-row-selector-color: #111a2c;
+  --bgrid-body-bg: #111a2c;
+  --bgrid-body-color: #ced8e8;
+  --bgrid-body-odd-bg: #141f33;
+  --bgrid-body-hover-bg: #1c2b45;
+  --bgrid-body-hover-odd-bg: #20304a;
+  --bgrid-body-active-bg: #1b3559;
+  --bgrid-row-reorder-guide-color: #6ea8ff;
+  --bgrid-row-reorder-preview-bg: #1b3559;
+  --bgrid-cell-selected-bg: #1b3559;
+  --bgrid-cell-selected-border-color: #6ea8ff;
+  --bgrid-active-cell-color: #8bb8ff;
+  --bgrid-active-cell-bg: #16223a;
+  --bgrid-active-cell-ring-color: #6ea8ff;
+  --bgrid-editor-bg: #16223a;
+  --bgrid-selection-axis-bg: #1a3355;
+  --bgrid-selection-axis-color: #b4d0ff;
+  --bgrid-selection-axis-border-color: #6ea8ff;
+  --bgrid-cell-edited-bg: #452b1c;
+  --bgrid-cell-edited-color: #fdba74;
+  --bgrid-cell-edited-border-color: #c46b2f;
+  --bgrid-cell-value-changed-bg: #452b1c;
+  --bgrid-cell-value-changed-color: #fdba74;
+  --bgrid-cell-value-changed-border-color: #c46b2f;
+  --bgrid-scroll-bg: #111a2c;
+  --bgrid-scroll-track-bg: #172238;
+  --bgrid-scroll-thumb-bg: #4b5c76;
+  --bgrid-scroll-thumb-hover-bg: #657792;
+  --bgrid-scroll-corner-bg: #34445f;
+  --bgrid-scrollbar-modern-track-bg: #172238;
+  --bgrid-scrollbar-modern-thumb-bg: #4b5c76;
+  --bgrid-scrollbar-modern-thumb-hover-bg: #657792;
+  --bgrid-scrollbar-modern-button-hover-bg: #24334e;
+  --bgrid-scrollbar-modern-icon-color: #a8b5c9;
+  --bgrid-scrollbar-modern-gutter-bg: #131d30;
+  --bgrid-scrollbar-modern-gutter-border-color: #2d3d57;
+  --bgrid-scrollbar-classic-border-color: #4b5c76;
+  --bgrid-scrollbar-classic-gutter-bg: #131d30;
+  --bgrid-scrollbar-classic-gutter-border-color: #2d3d57;
+  --bgrid-scrollbar-classic-track-bg: #172238;
+  --bgrid-scrollbar-classic-thumb-bg: #4b5c76;
+  --bgrid-scrollbar-classic-thumb-hover-bg: #657792;
+  --bgrid-scrollbar-classic-button-bg: #182338;
+  --bgrid-scrollbar-classic-button-hover-bg: #24334e;
+  --bgrid-scrollbar-classic-icon-color: #dbe5f4;
+  --bgrid-loading-bg: rgba(110, 168, 255, 0.1);
+  --bgrid-loading-color: rgba(110, 168, 255, 0.22);
+  --bgrid-loading-second-color: #94a3b8;
+  --bgrid-toolbox-bg: #151f33;
+  --bgrid-toolbox-color: #dbe5f4;
+  --bgrid-toolbox-muted-color: #94a3b8;
+  --bgrid-toolbox-control-bg: #111a2c;
+  --bgrid-toolbox-control-color: #e2e8f0;
+  --bgrid-toolbox-control-border-color: #3a4a65;
+  --bgrid-toolbox-control-placeholder-color: #77869d;
+  --bgrid-toolbox-hover-bg: #1b3559;
+  --bgrid-toolbox-active-bg: #23436d;
+  --bgrid-toolbox-danger-color: #fca5a5;
+  --bgrid-toolbox-danger-bg: #3a1d27;
+  --bgrid-toolbox-button-bg: #182338;
+  --bgrid-toolbox-primary-hover-color: #9ac2ff;
+  --bgrid-toolbox-primary-contrast-color: #08111f;
+  --bgrid-toolbox-notice-bg: #182338;
+  --bgrid-toolbox-scroll-thumb-bg: #536580;
+  --bgrid-toolbox-scroll-track-bg: #172238;
+  --bgrid-toolbox-focus-ring-color: #315f99;
+  --bgrid-search-bg: #151f33;
+  --bgrid-search-color: #dbe5f4;
+  --bgrid-search-border-color: #3a4a65;
+  --bgrid-search-control-bg: #111a2c;
+  --bgrid-search-control-color: #e2e8f0;
+  --bgrid-search-control-border-color: #4a5b75;
+  --bgrid-search-muted-color: #94a3b8;
+  --bgrid-search-focus-ring-color: #6ea8ff;
+  --bgrid-search-button-hover-bg: #24334e;
+  --bgrid-search-match-bg: rgba(250, 204, 21, 0.2);
+  --bgrid-search-match-border-color: #facc15;
+  --bgrid-search-current-bg: rgba(249, 115, 22, 0.24);
+  --bgrid-search-current-border-color: #fb923c;
+  --bgrid-context-menu-bg: #151f33;
+  --bgrid-context-menu-color: #dbe5f4;
+  --bgrid-context-menu-border-color: #3a4a65;
+  --bgrid-context-menu-hover-bg: #1b3559;
+  --bgrid-context-menu-muted-color: #94a3b8;
+}
+
+/* Demo controls share the site theme while leaving deliberately selected Grid
+   palettes (for example, the Theme guide's brand preset) free to demonstrate
+   their own token values. */
+:root[data-theme='dark'] .site-demo-renderer {
+  color: var(--site-text-primary);
+}
+
+:root[data-theme='dark'] .site-demo-renderer :is(.bg-white, .bg-slate-50, .bg-slate-100) {
+  border-color: var(--site-border) !important;
+  background-color: var(--site-surface) !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer :is(.text-slate-700, .text-slate-800, .text-slate-900) {
+  color: var(--site-text-primary) !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer :is(.text-gray-500, .text-slate-400, .text-slate-500, .text-slate-600) {
+  color: var(--site-text-secondary) !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer .border-slate-200 {
+  border-color: var(--site-border) !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer :is(.bg-blue-100, .bg-violet-100) { background-color: #172b4c !important; }
+:root[data-theme='dark'] .site-demo-renderer .bg-emerald-100 { background-color: #073b35 !important; }
+:root[data-theme='dark'] .site-demo-renderer .bg-amber-100 { background-color: #422006 !important; }
+:root[data-theme='dark'] .site-demo-renderer .bg-rose-100 { background-color: #450a0a !important; }
+:root[data-theme='dark'] .site-demo-renderer :is(.text-blue-600, .text-blue-700) { color: #9ac2ff !important; }
+:root[data-theme='dark'] .site-demo-renderer :is(.text-emerald-600, .text-emerald-700) { color: #6ee7b7 !important; }
+:root[data-theme='dark'] .site-demo-renderer .text-amber-700 { color: #fcd34d !important; }
+:root[data-theme='dark'] .site-demo-renderer :is(.text-rose-600, .text-rose-700) { color: #fca5a5 !important; }
+:root[data-theme='dark'] .site-demo-renderer .text-violet-700 { color: #c4b5fd !important; }
+
+:root[data-theme='dark'] .site-demo-renderer .row-out-of-stock {
+  background-color: #450a0a !important;
+  color: #fca5a5 !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer .row-low-stock {
+  background-color: #422006 !important;
+  color: #fcd34d !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer .editing-example-cell-editable {
+  --editing-example-color: var(--bgrid-body-color);
+  --editing-example-bg: var(--bgrid-body-bg);
+  --editing-example-hover-bg: var(--bgrid-body-hover-bg);
+}
+
+:root[data-theme='dark'] .site-demo-renderer .editing-example-cell-readonly {
+  --editing-example-color: var(--site-text-secondary);
+  --editing-example-bg: #172033;
+  --editing-example-hover-bg: #243248;
+}
+
+:root[data-theme='dark'] .site-demo-renderer .item-render-example {
+  --item-render-ink: var(--site-text-primary);
+  --item-render-muted: var(--site-text-secondary);
+}
+
+:root[data-theme='dark'] .site-demo-renderer .item-render-example__toolbar {
+  border-color: var(--site-border);
+  background: linear-gradient(135deg, var(--site-surface) 0%, var(--site-accent-soft) 100%);
+}
+
+:root[data-theme='dark'] .site-demo-renderer .item-render-example__filter {
+  border-color: var(--site-border-strong);
+  background: var(--site-control-bg);
+  color: var(--site-text-primary);
+}
+
+:root[data-theme='dark'] .site-demo-renderer .item-render-center__mark {
+  border-color: #315f99;
+  background: #172b4c;
+  color: #9ac2ff;
+}
+
+:root[data-theme='dark'] .site-demo-renderer :is(
+  .item-render-center__copy strong,
+  .item-render-trend__metric strong,
+  .item-render-heatmap strong,
+  .item-render-gauge__ring strong
+) { color: var(--site-text-primary); }
+
+:root[data-theme='dark'] .site-demo-renderer :is(.item-render-center__copy small, .item-render-heatmap > span, .item-render-gauge__label) {
+  color: var(--site-text-secondary);
+}
+
+:root[data-theme='dark'] .site-demo-renderer .item-render-gauge__ring::after { background: var(--site-control-bg); }
+:root[data-theme='dark'] .site-demo-renderer .item-render-status--healthy { background: #073b35; color: #6ee7b7; }
+:root[data-theme='dark'] .site-demo-renderer .item-render-status--watch { background: #422006; color: #fcd34d; }
+:root[data-theme='dark'] .site-demo-renderer .item-render-status--critical { background: #450a0a; color: #fca5a5; }
+:root[data-theme='dark'] .site-demo-renderer .item-render-action { border-color: #7f1d1d; background: #3a1d27; color: #fca5a5; }
+
+:root[data-theme='dark'] .site-demo-renderer .theming-example {
+  --theming-panel-bg: var(--site-surface);
+  --theming-panel-border: var(--site-border);
+  --theming-panel-color: var(--site-text-primary);
+}
+
+:root[data-theme='dark'] .site-demo-renderer :is(.theming-example__intro strong, .theming-example__token small) {
+  color: var(--site-text-primary);
+}
+
+:root[data-theme='dark'] .site-demo-renderer :is(.theming-example__intro span, .theming-example__class-name > span, .theming-example__hint) {
+  color: var(--site-text-secondary);
+}
+
+:root[data-theme='dark'] .site-demo-renderer :is(.theming-example__class-name, .theming-example__token) {
+  background: var(--site-control-bg);
+}
+
+:root[data-theme='dark'] .site-demo-renderer .theming-example__token code { color: var(--site-text-secondary); }
+
+:root[data-theme='dark'] .site-demo-renderer .column-groups-header-overview {
+  background-color: #172b4c !important;
+  color: #bfdbfe !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer .column-groups-header-customer {
+  background-color: #073b35 !important;
+  color: #a7f3d0 !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer .column-groups-header-total {
+  --bgrid-header-hover-bg: #4a3511 !important;
+  background-color: #422006 !important;
+  color: #fde68a !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer aside {
+  background: var(--site-surface) !important;
+  color: var(--site-text-secondary) !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer [style*='color: blue'] {
+  color: var(--site-accent) !important;
+}

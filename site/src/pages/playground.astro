@@ -1,0 +1,56 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/layout/Header.astro';
+import Playground from '../components/playground/Playground';
+import { localizePath, normalizeLocale, type Locale } from '../i18n';
+
+interface Props { locale?: Locale; }
+const locale = normalizeLocale(Astro.props.locale);
+const isEn = locale === 'en';
+---
+<Layout title="Playground & Theme Builder - BeautifulGrid" description={isEn ? 'Configure BeautifulGrid props and build a theme with a live preview and copyable source.' : 'BeautifulGrid의 props와 테마를 실시간 프리뷰와 복사 가능한 소스로 구성합니다.'} canonicalPath={localizePath('/playground', locale)} locale={locale}>
+  <Header locale={locale} />
+  <div class="playground-wrapper">
+    <Playground locale={locale} client:only="react">
+      <div slot="fallback" class="playground-loading" role="status" aria-live="polite">
+        <span class="playground-loading-spinner" aria-hidden="true"></span>
+        <strong>{isEn ? 'Loading Playground.' : 'Playground를 불러오는 중입니다.'}</strong>
+      </div>
+    </Playground>
+  </div>
+</Layout>
+
+<style>
+  .playground-wrapper {
+    height: calc(100vh - 69px);
+    height: calc(100dvh - 69px);
+    overflow: hidden;
+  }
+
+  .playground-loading {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    color: var(--site-text-secondary);
+    background: var(--site-surface);
+  }
+
+  .playground-loading-spinner {
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid var(--site-border-strong);
+    border-top-color: var(--site-accent);
+    border-radius: 50%;
+    animation: playground-spin 0.8s linear infinite;
+  }
+
+  @keyframes playground-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .playground-loading-spinner { animation: none; }
+  }
+</style>

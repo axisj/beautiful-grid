@@ -1,0 +1,35 @@
+{
+  "name": "site",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "check": "astro check",
+    "test": "vitest run",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.6.1",
+    "@astrojs/mdx": "^7.0.5",
+    "@astrojs/react": "^6.0.2",
+    "@astrojs/sitemap": "^3.7.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "antd": "^5.29.3",
+    "astro": "^7.2.2",
+    "dayjs": "^1.11.22",
+    "lucide-react": "^1.31.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.10"
+  }
+}

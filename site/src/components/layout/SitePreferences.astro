@@ -1,0 +1,178 @@
+---
+import { ChevronDown, Languages, Monitor, Moon, Sun } from 'lucide-react';
+import { commonMessages, localeMeta, localizePath, type Locale } from '../../i18n';
+
+interface Props { locale?: Locale; idPrefix?: string; compact?: boolean; adaptiveLocale?: boolean; }
+
+const { locale = 'ko', idPrefix = 'header', compact = false, adaptiveLocale = false } = Astro.props;
+const messages = commonMessages[locale];
+const targetLocale: Locale = locale === 'ko' ? 'en' : 'ko';
+const targetPath = localizePath(`${Astro.url.pathname}${Astro.url.search}${Astro.url.hash}`, targetLocale);
+const menuId = `${idPrefix}-theme-menu`;
+const themeOptions = [
+  { value: 'light', label: messages.themeLight, Icon: Sun },
+  { value: 'dark', label: messages.themeDark, Icon: Moon },
+  { value: 'system', label: messages.themeSystem, Icon: Monitor },
+] as const;
+---
+
+<div class:list={['site-preferences', { 'site-preferences-compact': compact }]} data-site-preferences data-adaptive-locale={adaptiveLocale ? 'true' : undefined}>
+  <a class="preference-button language-button" href={targetPath} hreflang={targetLocale} lang={targetLocale}
+    aria-label={messages.changeLanguage} data-locale-switch data-target-locale={targetLocale} title={messages.changeLanguage}>
+    <Languages size={16} strokeWidth={2} aria-hidden="true" />
+    <span data-locale-switch-label>{localeMeta[targetLocale].shortLabel}</span>
+  </a>
+  <div class="theme-picker" data-theme-picker>
+    <button class="preference-button theme-trigger" type="button" aria-label={messages.themeMenu}
+      aria-expanded="false" aria-controls={menuId} data-theme-trigger>
+      <span class="theme-trigger-icons" aria-hidden="true">
+        <Sun className="theme-icon theme-icon-light" size={16} strokeWidth={2} />
+        <Moon className="theme-icon theme-icon-dark" size={16} strokeWidth={2} />
+        <Monitor className="theme-icon theme-icon-system" size={16} strokeWidth={2} />
+      </span>
+      <span class="theme-trigger-label" data-theme-trigger-label>{messages.theme}</span>
+      <ChevronDown className="theme-chevron" size={13} strokeWidth={2} aria-hidden="true" />
+    </button>
+    <div id={menuId} class="theme-menu" role="menu" aria-label={messages.themeMenu} hidden data-theme-menu>
+      {themeOptions.map(({ value, label, Icon }) => (
+        <button type="button" role="menuitemradio" aria-checked="false" data-theme-option={value} data-theme-label={label}
+          data-label-ko={value === 'light' ? commonMessages.ko.themeLight : value === 'dark' ? commonMessages.ko.themeDark : commonMessages.ko.themeSystem}
+          data-label-en={value === 'light' ? commonMessages.en.themeLight : value === 'dark' ? commonMessages.en.themeDark : commonMessages.en.themeSystem}>
+          <Icon size={16} strokeWidth={2} aria-hidden="true" /><span>{label}</span><span class="theme-option-check" aria-hidden="true">✓</span>
+        </button>
+      ))}
+    </div>
+  </div>
+</div>
+
+<script>
+  import { commonMessages, localeMeta, type Locale } from '../../i18n';
+  type ThemePreference = 'light' | 'dark' | 'system';
+  type ThemeApi = { setPreference: (preference: ThemePreference) => void; getPreference: () => string; getResolved: () => string };
+  declare global { interface Window { __BGrid_SITE_THEME__?: ThemeApi } }
+  const localeStorageKey = 'bgrid-site-locale';
+  const closePicker = (picker: HTMLElement, returnFocus = false) => {
+    const trigger = picker.querySelector<HTMLButtonElement>('[data-theme-trigger]');
+    const menu = picker.querySelector<HTMLElement>('[data-theme-menu]');
+    if (!trigger || !menu) return;
+    trigger.setAttribute('aria-expanded', 'false'); menu.hidden = true;
+    if (returnFocus) trigger.focus();
+  };
+  const updatePicker = (picker: HTMLElement) => {
+    const preference = (window.__BGrid_SITE_THEME__?.getPreference() || 'system') as ThemePreference;
+    const label = picker.querySelector<HTMLElement>('[data-theme-trigger-label]');
+    const activeOption = picker.querySelector<HTMLElement>(`[data-theme-option="${preference}"]`);
+    picker.dataset.themePreference = preference;
+    if (label && activeOption?.dataset.themeLabel) label.textContent = activeOption.dataset.themeLabel;
+    picker.querySelectorAll<HTMLElement>('[data-theme-option]').forEach((option) => {
+      option.setAttribute('aria-checked', String(option.dataset.themeOption === preference));
+    });
+  };
+  document.querySelectorAll<HTMLElement>('[data-site-preferences]').forEach((preferences) => {
+    if (preferences.dataset.adaptiveLocale === 'true') {
+      const currentLocale: Locale = window.location.pathname === '/en' || window.location.pathname.startsWith('/en/') ? 'en' : 'ko';
+      const nextLocale: Locale = currentLocale === 'en' ? 'ko' : 'en';
+      const languageLink = preferences.querySelector<HTMLAnchorElement>('[data-locale-switch]');
+      const languageLabel = preferences.querySelector<HTMLElement>('[data-locale-switch-label]');
+      const currentPath = window.location.pathname;
+      const unprefixedPath = currentPath === '/en' ? '/' : currentPath.startsWith('/en/') ? currentPath.slice(3) || '/' : currentPath;
+      if (languageLink) {
+        languageLink.dataset.targetLocale = nextLocale;
+        languageLink.href = nextLocale === 'en' ? `/en${unprefixedPath === '/' ? '/' : unprefixedPath}` : unprefixedPath;
+        languageLink.lang = nextLocale;
+        languageLink.hreflang = nextLocale;
+        const changeLabel = commonMessages[currentLocale].changeLanguage;
+        languageLink.setAttribute('aria-label', changeLabel);
+        languageLink.title = changeLabel;
+      }
+      if (languageLabel) languageLabel.textContent = localeMeta[nextLocale].shortLabel;
+      preferences.querySelector<HTMLButtonElement>('[data-theme-trigger]')?.setAttribute('aria-label', commonMessages[currentLocale].themeMenu);
+      preferences.querySelector<HTMLElement>('[data-theme-menu]')?.setAttribute('aria-label', commonMessages[currentLocale].themeMenu);
+      preferences.querySelectorAll<HTMLElement>('[data-theme-option]').forEach((option) => {
+        const localizedLabel = currentLocale === 'en' ? option.dataset.labelEn : option.dataset.labelKo;
+        if (!localizedLabel) return;
+        option.dataset.themeLabel = localizedLabel;
+        const text = option.querySelector('span:not(.theme-option-check)');
+        if (text) text.textContent = localizedLabel;
+      });
+    }
+    preferences.querySelector<HTMLAnchorElement>('[data-locale-switch]')?.addEventListener('click', (event) => {
+      const locale = (event.currentTarget as HTMLAnchorElement).dataset.targetLocale;
+      try { if (locale) window.localStorage.setItem(localeStorageKey, locale); } catch {}
+    });
+    const picker = preferences.querySelector<HTMLElement>('[data-theme-picker]');
+    const trigger = picker?.querySelector<HTMLButtonElement>('[data-theme-trigger]');
+    const menu = picker?.querySelector<HTMLElement>('[data-theme-menu]');
+    if (!picker || !trigger || !menu) return;
+    updatePicker(picker);
+    trigger.addEventListener('click', () => {
+      const willOpen = trigger.getAttribute('aria-expanded') !== 'true';
+      document.querySelectorAll<HTMLElement>('[data-theme-picker]').forEach((other) => closePicker(other));
+      trigger.setAttribute('aria-expanded', String(willOpen)); menu.hidden = !willOpen;
+      if (willOpen) menu.querySelector<HTMLButtonElement>('[aria-checked="true"]')?.focus();
+    });
+    trigger.addEventListener('keydown', (event) => {
+      if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+      event.preventDefault();
+      document.querySelectorAll<HTMLElement>('[data-theme-picker]').forEach((other) => closePicker(other));
+      trigger.setAttribute('aria-expanded', 'true');
+      menu.hidden = false;
+      const options = menu.querySelectorAll<HTMLButtonElement>('[data-theme-option]');
+      options[event.key === 'ArrowUp' ? options.length - 1 : 0]?.focus();
+    });
+    picker.querySelectorAll<HTMLButtonElement>('[data-theme-option]').forEach((option) => {
+      option.addEventListener('click', () => {
+        window.__BGrid_SITE_THEME__?.setPreference(option.dataset.themeOption as ThemePreference);
+        document.querySelectorAll<HTMLElement>('[data-theme-picker]').forEach(updatePicker);
+        closePicker(picker, true);
+      });
+    });
+    picker.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') { event.preventDefault(); closePicker(picker, true); }
+      const options = Array.from(picker.querySelectorAll<HTMLButtonElement>('[data-theme-option]'));
+      const currentIndex = event.target instanceof Element
+        ? options.indexOf(event.target.closest<HTMLButtonElement>('[data-theme-option]') as HTMLButtonElement)
+        : -1;
+      let nextIndex = currentIndex;
+      if (event.key === 'ArrowDown') nextIndex = (currentIndex + 1 + options.length) % options.length;
+      if (event.key === 'ArrowUp') nextIndex = currentIndex < 0 ? options.length - 1 : (currentIndex - 1 + options.length) % options.length;
+      if (event.key === 'Home') nextIndex = 0;
+      if (event.key === 'End') nextIndex = options.length - 1;
+      if (nextIndex !== currentIndex && options[nextIndex]) {
+        event.preventDefault();
+        options[nextIndex].focus();
+      }
+    });
+  });
+  document.addEventListener('click', (event) => {
+    document.querySelectorAll<HTMLElement>('[data-theme-picker]').forEach((picker) => {
+      if (event.target instanceof Node && !picker.contains(event.target)) closePicker(picker);
+    });
+  });
+  window.addEventListener('bgrid-site-theme-change', () => {
+    document.querySelectorAll<HTMLElement>('[data-theme-picker]').forEach(updatePicker);
+  });
+</script>
+
+<style>
+  .site-preferences { display: inline-flex; align-items: center; gap: 6px; }
+  .preference-button { display: inline-flex; min-width: 40px; min-height: 40px; align-items: center; justify-content: center; gap: 6px; border: 1px solid var(--site-border); border-radius: 10px; padding: 0 10px; background: var(--site-control-bg); color: var(--site-text-secondary); font: inherit; font-size: 12px; font-weight: 750; line-height: 1; text-decoration: none; cursor: pointer; transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease; }
+  .preference-button:hover { border-color: var(--site-border-strong); background: var(--site-control-hover-bg); color: var(--site-text-primary); text-decoration: none; }
+  .theme-picker { position: relative; }
+  .theme-trigger-icons { display: grid; place-items: center; }
+  :global(.theme-icon) { display: none; grid-area: 1 / 1; }
+  :global(html[data-theme-preference='light'] .theme-icon-light), :global(html[data-theme-preference='dark'] .theme-icon-dark), :global(html[data-theme-preference='system'] .theme-icon-system) { display: block; }
+  :global(.theme-chevron) { transition: transform 150ms ease; }
+  .theme-trigger[aria-expanded='true'] :global(.theme-chevron) { transform: rotate(180deg); }
+  .theme-menu { position: absolute; top: calc(100% + 8px); right: 0; z-index: 140; width: 164px; border: 1px solid var(--site-border); border-radius: 12px; padding: 6px; background: var(--site-surface-elevated); box-shadow: var(--site-shadow-menu); }
+  .theme-menu[hidden] { display: none; }
+  .theme-menu button { display: grid; width: 100%; min-height: 40px; grid-template-columns: 20px 1fr 18px; align-items: center; gap: 8px; border: 0; border-radius: 8px; padding: 0 9px; background: transparent; color: var(--site-text-secondary); font: inherit; font-size: 12px; font-weight: 700; text-align: left; cursor: pointer; }
+  .theme-menu button:hover, .theme-menu button:focus-visible, .theme-menu button[aria-checked='true'] { background: var(--site-accent-soft); color: var(--site-accent-strong); }
+  .theme-option-check { opacity: 0; text-align: center; }
+  .theme-menu button[aria-checked='true'] .theme-option-check { opacity: 1; }
+  .site-preferences-compact { width: 100%; }
+  .site-preferences-compact .preference-button { min-height: 44px; }
+  .site-preferences-compact .language-button, .site-preferences-compact .theme-picker, .site-preferences-compact .theme-trigger { flex: 1; }
+  .site-preferences-compact .theme-menu { right: 0; left: 0; width: auto; }
+  @media (max-width: 420px) { .theme-trigger-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); } .theme-trigger { padding-inline: 9px; } }
+</style>

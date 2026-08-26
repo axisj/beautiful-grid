@@ -1,0 +1,107 @@
+---
+import { getCollection } from 'astro:content';
+import type { Locale } from '../../i18n';
+import { categoryLabel, learnMessages, learnPath, learnSlug } from './learnLocale';
+
+interface Props {
+  locale: Locale;
+  relatedSlugs: string[];
+}
+
+const { locale, relatedSlugs } = Astro.props;
+const messages = learnMessages[locale];
+if (!relatedSlugs || relatedSlugs.length === 0) {
+  return null;
+}
+
+const allLearn = await getCollection('learn');
+const relatedItems = allLearn.filter(item => {
+  const slug = learnSlug(item.id);
+  return item.data.locale === locale && !item.data.draft && relatedSlugs.includes(slug);
+});
+---
+
+{relatedItems.length > 0 && (
+  <section class="related-guides-section">
+    <h2>{messages.relatedGuides}</h2>
+    <div class="related-cards-grid">
+      {relatedItems.map(item => {
+        const slug = learnSlug(item.id);
+        return (
+          <a href={learnPath(slug, locale)} class="card related-card">
+            <div class="related-card-badge">{categoryLabel(item.data.category, locale)}</div>
+            <h3 class="related-card-title">{item.data.title}</h3>
+            <p class="related-card-desc">{item.data.description}</p>
+            <div class="related-card-footer">
+              <span>{messages.readMore}</span>
+              <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14"/>
+                <path d="m12 5 7 7-7 7"/>
+              </svg>
+            </div>
+          </a>
+        );
+      })}
+    </div>
+  </section>
+)}
+
+<style>
+  .related-guides-section {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--site-border);
+  }
+  .related-guides-section h2 {
+    font-size: 1.375rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--site-text-primary);
+  }
+  .related-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.25rem;
+  }
+  .related-card {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .related-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--site-accent);
+    box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.08);
+    text-decoration: none;
+  }
+  .related-card-badge {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--site-text-muted);
+    margin-bottom: 0.5rem;
+  }
+  .related-card-title {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: var(--site-text-primary);
+    margin: 0 0 0.5rem;
+  }
+  .related-card-desc {
+    font-size: 0.875rem;
+    color: var(--site-text-secondary);
+    line-height: 1.5;
+    margin: 0 0 1rem;
+    flex-grow: 1;
+  }
+  .related-card-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--site-accent);
+  }
+</style>

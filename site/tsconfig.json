@@ -1,0 +1,20 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "include": [
+    ".astro/types.d.ts",
+    "**/*"
+  ],
+  "exclude": [
+    "dist"
+  ],
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "beautiful-grid": ["../beautiful-grid/index.tsx"],
+      "beautiful-grid/*": ["../beautiful-grid/*"]
+    }
+  }
+}

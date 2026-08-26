@@ -1,0 +1,28 @@
+---
+import { localeMeta, normalizeLocale, type Locale } from '../i18n';
+import { themeBootstrapScript } from '../i18n/theme';
+interface Props { title: string; target: string; locale?: Locale; }
+const { title, target, locale: localeProp = 'ko' } = Astro.props;
+const locale = normalizeLocale(localeProp);
+const canonicalUrl = new URL(target, Astro.site || 'https://bgrid.axisj.com');
+---
+<!doctype html>
+<html lang={localeMeta[locale].htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script is:inline set:html={themeBootstrapScript}></script>
+    <meta name="robots" content="noindex, follow" />
+    <meta http-equiv="refresh" content={`0; url=${target}`} />
+    <link rel="canonical" href={canonicalUrl} />
+    <title>{title}</title>
+    <script is:inline define:vars={{ target }}>window.location.replace(target);</script>
+  </head>
+  <body><main><p>{locale === 'ko' ? '이 페이지는 Learn으로 통합되었습니다.' : 'This page has moved to Learn.'}</p><a href={target}>{locale === 'ko' ? '새 학습 페이지로 이동' : 'Go to the new Learn page'}</a></main></body>
+</html>
+<style>
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #ffffff; color: #101828; }
+  :global(html[data-theme='dark']) body { background: #0b1120; color: #f2f6fc; }
+  main { display: grid; min-height: 100dvh; place-content: center; justify-items: center; padding: 2rem; text-align: center; }
+  a { color: #2563eb; font-weight: 700; }
+</style>

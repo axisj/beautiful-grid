@@ -1,0 +1,18 @@
+---
+import { getCollection } from 'astro:content';
+import LearnArticlePage from '../../components/learn/LearnArticlePage.astro';
+
+export async function getStaticPaths() {
+  const allLearn = await getCollection('learn');
+  return allLearn
+    .filter(item => item.data.locale === 'ko' && !item.data.draft)
+    .map(item => ({
+      params: { slug: item.id.replace(/\.(md|mdx)$/, '') },
+      props: { item },
+    }));
+}
+
+const { item } = Astro.props;
+---
+
+<LearnArticlePage locale="ko" item={item} />

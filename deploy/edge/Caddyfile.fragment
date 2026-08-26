@@ -1,0 +1,4 @@
+bgrid.axisj.com {
+	encode zstd gzip
+	reverse_proxy beautiful-grid-site:80
+}

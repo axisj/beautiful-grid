@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://bgrid.axisj.com/sitemap-index.xml

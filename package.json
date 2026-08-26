@@ -1,0 +1,131 @@
+{
+  "name": "beautiful-grid",
+  "version": "1.0.0-rc.1",
+  "description": "A beautiful, powerful, open-source React Data Grid.",
+  "homepage": "https://bgrid.axisj.com",
+  "bugs": {
+    "url": "https://github.com/axisj/beautiful-grid/issues"
+  },
+  "keywords": [
+    "react",
+    "typescript",
+    "data-grid",
+    "datagrid",
+    "data-table",
+    "virtual-scroll",
+    "editable-grid"
+  ],
+  "author": "AXISJ",
+  "types": "dist/types/index.d.ts",
+  "module": "dist/esm/index.js",
+  "main": "dist/cjs/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "./editors": {
+      "types": "./dist/types/editors/index.d.ts",
+      "import": "./dist/esm/editors/index.js",
+      "require": "./dist/cjs/editors/index.js"
+    },
+    "./style.css": "./dist/style.css"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axisj/beautiful-grid.git"
+  },
+  "license": "Apache-2.0",
+  "sideEffects": [
+    "*.css"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "volta": {
+    "node": "24.16.0"
+  },
+  "scripts": {
+    "dev": "npm run site:dev",
+    "build": "npm run site:build",
+    "preview": "npm --prefix site run preview",
+    "lint": "eslint .",
+    "build:library:clean": "rimraf ./dist",
+    "build:library:style": "mkdir -p ./dist && ncp beautiful-grid/style.css ./dist/style.css",
+    "build:library:cjs": "tsc --p tsconfigs/tsconfig.library.cjs.json",
+    "build:library:esm": "tsc --p tsconfigs/tsconfig.library.esm.json",
+    "build:library:types": "tsc --p tsconfigs/tsconfig.library.types.json",
+    "build:library:manifest": "node ./scripts/create-dist-package-json.mjs",
+    "build:library": "npm run build:library:clean && npm run build:library:style && npm run build:library:cjs && npm run build:library:esm && npm run build:library:types && npm run build:library:manifest",
+    "measure:library:bundle": "npm run build:library && node ./scripts/measure-library-bundle.mjs",
+    "update:library:bundle-metrics": "npm run build:library && node ./scripts/measure-library-bundle.mjs --write",
+    "test:library:bundle": "npm run build:library && node ./scripts/measure-library-bundle.mjs --check",
+    "pack:library": "npm pack ./dist",
+    "publish:library": "npm publish ./dist --access public",
+    "prepublishOnly": "npm run build:library",
+    "test": "vitest run",
+    "test:library:consumers": "node ./scripts/test-library-consumers.mjs",
+    "test:library:css": "npm run build:library:style && node scripts/check-library-css.mjs",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "site:dev": "npm --prefix site run dev",
+    "site:check": "npm --prefix site run check",
+    "site:build": "npm --prefix site run build",
+    "site:test": "npm --prefix site run test",
+    "verify:library": "npm run lint && npm test && npm run test:library:css && npm run test:library:consumers && npm run test:library:bundle && echo 'BeautifulGrid library verification passed'",
+    "verify:site": "npm run site:test && npm run site:check && npm run site:build && echo 'BeautifulGrid website verification passed'"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
+  "dependencies": {
+    "sortablejs": "^1.15.3",
+    "zustand": "^4.5.7"
+  },
+  "peerDependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.2",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^16.0.0",
+    "@types/node": "^24.10.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@types/sortablejs": "^1.15.8",
+    "@types/uuid": "^9.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.68.0",
+    "@typescript-eslint/parser": "^8.68.0",
+    "@vitejs/plugin-react": "^6.1.0",
+    "antd": "^5.29.3",
+    "autoprefixer": "^10.4.21",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.9.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "happy-dom": "^20.9.0",
+    "lucide-react": "^1.31.0",
+    "ncp": "^2.0.0",
+    "postcss": "^8.5.26",
+    "prettier": "^2.7.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.9.3",
+    "uuid": "^14.0.2",
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11"
+  }
+}

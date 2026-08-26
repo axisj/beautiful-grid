@@ -1,0 +1,52 @@
+---
+import { apiReferenceGroups, apiTypeId } from '../../data/apiReference';
+import { localeFromPath, localizePath } from '../../i18n';
+
+const locale = localeFromPath(Astro.url.pathname);
+const isEn = locale === 'en';
+const groupLabels: Record<string, string> = {
+  core: 'Core component types', data: 'Data and events', query: 'Sort, filter, and toolbox',
+  selection: 'Selection and editing', layout: 'Layout and display', reorder: 'Reordering', pivot: 'Pivot',
+};
+---
+
+<aside class="api-sidebar" aria-label={isEn ? 'TypeScript API menu' : 'TypeScript API 메뉴'}>
+  <div class="api-sidebar-heading">
+    <a href={localizePath('/api/props', locale)}>TypeScript API</a>
+    <span>Public types</span>
+  </div>
+  <label class="api-filter-label" for="api-type-filter">{isEn ? 'Find a type' : '타입 찾기'}</label>
+  <input id="api-type-filter" class="api-type-filter" type="search" placeholder={isEn ? 'e.g. BGridColumn' : '예: BGridColumn'} autocomplete="off" />
+  <nav class="api-type-nav">
+    {apiReferenceGroups.map(group => (
+      <section class="api-nav-group">
+        <h2>{isEn ? (groupLabels[group.id] ?? group.label) : group.label}</h2>
+        <ul>
+          {group.entries.map(entry => (
+            <li data-api-nav-item data-api-name={entry.name.toLowerCase()}>
+              <a href={`#${apiTypeId(entry.name)}`}>
+                <code>{entry.name}</code>
+                <span>{entry.kind}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </nav>
+</aside>
+
+<script>
+  const filter = document.querySelector<HTMLInputElement>('#api-type-filter');
+  const items = document.querySelectorAll<HTMLElement>('[data-api-nav-item]');
+  const groups = document.querySelectorAll<HTMLElement>('.api-nav-group');
+  filter?.addEventListener('input', () => {
+    const query = filter.value.trim().toLowerCase();
+    items.forEach(item => {
+      item.hidden = Boolean(query) && !item.dataset.apiName?.includes(query);
+    });
+    groups.forEach(group => {
+      group.hidden = Boolean(query) && !group.querySelector('[data-api-nav-item]:not([hidden])');
+    });
+  });
+</script>

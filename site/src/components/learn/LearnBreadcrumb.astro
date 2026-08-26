@@ -1,0 +1,55 @@
+---
+import type { Locale } from '../../i18n';
+import { learnIndexPath, learnMessages } from './learnLocale';
+
+interface Props {
+  locale: Locale;
+  categoryLabel: string;
+  title: string;
+}
+
+const { locale, categoryLabel, title } = Astro.props;
+const messages = learnMessages[locale];
+---
+<nav aria-label={messages.breadcrumb} class="learn-breadcrumb">
+  <ol>
+    <li><a href={learnIndexPath(locale)}>Learn</a></li>
+    <li class="separator">/</li>
+    <li><span>{categoryLabel}</span></li>
+    <li class="separator">/</li>
+    <li aria-current="page" class="current"><span>{title}</span></li>
+  </ol>
+</nav>
+
+<style>
+  .learn-breadcrumb {
+    font-size: 0.875rem;
+    color: var(--site-text-muted);
+    margin-bottom: 0.75rem;
+  }
+  .learn-breadcrumb ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.375rem;
+  }
+  .learn-breadcrumb a {
+    color: var(--site-text-secondary);
+    text-decoration: none;
+  }
+  .learn-breadcrumb a:hover {
+    color: var(--site-accent);
+    text-decoration: underline;
+  }
+  .separator {
+    color: var(--site-text-muted);
+    user-select: none;
+  }
+  .current {
+    color: var(--site-text-primary);
+    font-weight: 500;
+  }
+</style>

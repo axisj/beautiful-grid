@@ -1,0 +1,359 @@
+---
+import { ArrowRight, Check, CheckCircle2, Code2, Globe2, Monitor, PackageCheck, Server, ShieldAlert, Smartphone } from 'lucide-react';
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+import { productFacts } from '../data/productFacts';
+import { localizePath, normalizeLocale, type Locale } from '../i18n';
+
+interface Props { locale?: Locale; }
+const locale = normalizeLocale(Astro.props.locale);
+const t = (ko: string, en: string) => locale === 'en' ? en : ko;
+
+const environmentSummary = [
+  { label: 'React', value: '19.2.x', detail: t('React DOM과 함께 사용', 'Use with React DOM'), icon: Code2 },
+  { label: 'Node.js', value: t('22.12 이상', '22.12 or newer'), detail: t('개발·빌드 기준', 'Development and build baseline'), icon: Server },
+  { label: t('브라우저', 'Browser'), value: t('최신 안정판', 'Latest stable'), detail: t('표준 DOM API 기준', 'Standard DOM API baseline'), icon: Globe2 },
+  { label: t('렌더링', 'Rendering'), value: 'Client only', detail: t('브라우저에서 마운트', 'Mounted in the browser'), icon: Monitor },
+];
+
+const browserGroups = [
+  {
+    title: t('데스크톱 업무 화면', 'Desktop workspaces'), status: t('권장', 'Recommended'), tone: 'recommended', icon: Monitor,
+    browsers: ['Chrome', 'Microsoft Edge', 'Safari', 'Firefox'],
+    detail: t('최신 안정 버전을 권장합니다. 키보드 이동과 다중 셀 편집처럼 밀도 높은 업무 흐름은 실제 사용자 브라우저에서 검증하세요.', 'Use the latest stable release. Validate dense workflows such as keyboard navigation and multi-cell editing in your users’ actual browsers.'),
+  },
+  {
+    title: t('모바일·태블릿', 'Mobile and tablet'), status: t('화면별 검증', 'Verify per screen'), tone: 'verify', icon: Smartphone,
+    browsers: ['iOS Safari', 'Chrome for Android'],
+    detail: t('조회, 선택, 간단한 편집은 최신 모바일 브라우저에서 확인할 수 있습니다. 대량 편집 화면은 데스크톱 환경을 권장합니다.', 'Querying, selection, and simple editing work in current mobile browsers. Use desktop environments for large editing workflows.'),
+  },
+  {
+    title: t('레거시·제한 환경', 'Legacy and restricted environments'), status: t('별도 검토', 'Review separately'), tone: 'caution', icon: ShieldAlert,
+    browsers: ['Internet Explorer', t('사내 레거시 브라우저', 'Internal legacy browsers'), t('강한 보안 정책 환경', 'Strict security-policy environments')],
+    detail: t('지원 대상으로 삼지 않습니다. ResizeObserver, Pointer Events, CSS 변수, structuredClone과 폴리필 정책을 먼저 확인하세요.', 'These are not supported targets. Review ResizeObserver, Pointer Events, CSS variables, structuredClone, and your polyfill policy first.'),
+  },
+];
+
+const deploymentChecks = [
+  [t('스타일 로드', 'Load styles'), t('패키지의 style.css를 한 번 불러와 기본 레이아웃과 테마 변수를 적용합니다.', 'Import the package style.css once to apply the base layout and theme variables.')],
+  [t('그리드 영역 크기', 'Size the grid viewport'), t('그리드를 감싸는 영역에 너비와 높이를 지정합니다. 가상 스크롤은 이 뷰포트를 기준으로 동작합니다.', 'Give the grid container an explicit width and height. Virtual scrolling uses this viewport.')],
+  [t('클라이언트 렌더링', 'Client rendering'), t('SSR 프레임워크에서는 DataGrid를 브라우저에서만 마운트합니다. 서버 렌더 단계에서 DOM API를 호출하지 않도록 분리하세요.', 'In SSR frameworks, mount DataGrid only in the browser and keep DOM API calls out of server rendering.')],
+  [t('화면별 검증', 'Validate each screen'), t('사용할 itemRender, 편집기, 드래그·선택 흐름을 실제 데이터 양과 목표 브라우저에서 함께 테스트합니다.', 'Test itemRender, editors, drag, and selection with production-like data volumes in target browsers.')],
+];
+---
+
+<MarketingLayout title={t('실행 환경 및 도입 안내 | BeautifulGrid', 'Runtime & Adoption Guide | BeautifulGrid')} description={t('BeautifulGrid를 도입하기 전 확인할 React·Node.js·브라우저 환경과 클라이언트 렌더링, 배포 점검 사항을 안내합니다.', 'Review the React, Node.js, browser, client-rendering, and deployment baseline before adopting BeautifulGrid.')} canonicalPath={localizePath('/product-facts', locale)} locale={locale}>
+  <section class="environment-hero">
+    <div class="container">
+      <div class="environment-hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow"><span></span> Runtime baseline · v{productFacts.version}</p>
+          <h1>{t('도입 전에,', 'Before adoption,')}<br />{t('실행 환경부터 맞추세요.', 'align the runtime baseline.')}</h1>
+          <p class="hero-description">{t('BeautifulGrid는 React 업무 화면을 위한 클라이언트 렌더링 컴포넌트입니다. 런타임부터 브라우저, 배포 조건까지 실제 프로젝트에 필요한 기준만 정리했습니다.', 'BeautifulGrid is a client-rendered component for React business applications. This page focuses on the runtime, browser, and deployment conditions a real project needs.')}</p>
+          <div class="hero-actions">
+            <a href={localizePath('/learn/getting-started', locale)} class="btn btn-primary">{t('시작 가이드 보기', 'Open getting started')} <ArrowRight size={16} aria-hidden="true" /></a>
+            <a href={localizePath('/playground', locale)} class="btn btn-outline">{t('Playground에서 검증', 'Validate in Playground')}</a>
+          </div>
+        </div>
+
+        <aside class="runtime-card" aria-label={t('BeautifulGrid 도입 기준', 'BeautifulGrid adoption baseline')}>
+          <div class="runtime-card-head"><div><span class="status-dot" aria-hidden="true"></span><strong>{t('도입 기준', 'Adoption baseline')}</strong></div><span>4 checks</span></div>
+          <div class="runtime-checks">
+            {environmentSummary.map((item) => (
+              <div class="runtime-check"><item.icon size={18} strokeWidth={1.8} aria-hidden="true" /><span>{item.label}</span><strong>{item.value}</strong><Check size={16} strokeWidth={2.5} aria-hidden="true" /></div>
+            ))}
+          </div>
+          <div class="runtime-note"><CheckCircle2 size={20} aria-hidden="true" /><p><strong>{t('가장 정확한 기준은 실제 화면입니다.', 'The real screen is the most accurate baseline.')}</strong>{t('사용자 브라우저, 데이터 크기, 커스텀 셀 UI를 함께 검증하세요.', 'Validate the user browser, data volume, and custom cell UI together.')}</p></div>
+        </aside>
+      </div>
+
+      <div class="environment-summary" aria-label={t('핵심 실행 환경', 'Core runtime environment')}>
+        {environmentSummary.map((item) => (
+          <div class="summary-item"><item.icon size={18} strokeWidth={1.8} aria-hidden="true" /><div><span>{item.label}</span><strong>{item.value}</strong><p>{item.detail}</p></div></div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section container environment-section browser-section">
+    <div class="section-heading-row">
+      <div class="section-heading"><p class="eyebrow">{t('권장 브라우저 · Browser strategy', 'Recommended browsers · Strategy')}</p><h2>{t('최신 브라우저를 기준으로,', 'Use current browsers,')}<br />{t('화면별로 검증합니다.', 'then validate each screen.')}</h2></div>
+      <p class="section-intro">{t('가상 스크롤과 셀 상호작용에는 표준 DOM·CSS 기능이 사용됩니다. 오래된 버전을 폭넓게 보장하기보다 실제 사용 환경의 최신 안정판을 기준으로 확인하세요.', 'Virtual scrolling and cell interactions use standard DOM and CSS capabilities. Target the latest stable release in the real environment instead of broadly promising old versions.')}</p>
+    </div>
+
+    <div class="browser-grid">
+      {browserGroups.map((group, index) => (
+        <article class:list={['browser-card', `browser-card--${group.tone}`]}>
+          <div class="browser-card-top"><span class="browser-index">0{index + 1}</span><span class="browser-status">{group.status}</span></div>
+          <div class="browser-icon"><group.icon size={24} strokeWidth={1.8} aria-hidden="true" /></div>
+          <h3>{group.title}</h3>
+          <div class="browser-pills">{group.browsers.map((browser) => <span>{browser}</span>)}</div>
+          <p>{group.detail}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="environment-band">
+    <div class="container environment-band-grid">
+      <div class="deployment-copy">
+        <p class="eyebrow">Development & deployment</p>
+        <h2>{t('React 프로젝트에', 'Connect cleanly to')}<br />{t('가볍게 연결합니다.', 'a React project.')}</h2>
+        <p>{t('TypeScript 타입, ESM·CommonJS 모듈, 별도 스타일시트를 제공합니다. 타입 안전한 열과 행 구성을 위해 TypeScript 사용을 권장합니다.', 'The package provides TypeScript types, ESM and CommonJS modules, and a separate stylesheet. TypeScript is recommended for type-safe columns and rows.')}</p>
+        <div class="install-command" aria-label={t('npm 설치 명령', 'npm installation command')}><span aria-hidden="true">$</span><code>npm install {productFacts.packageName}</code><span class="command-ready"><span></span> npm</span></div>
+      </div>
+      <div class="deployment-list">
+        <div class="deployment-list-head"><span>PRODUCTION CHECKLIST</span><strong>{deploymentChecks.length} / {deploymentChecks.length}</strong></div>
+        {deploymentChecks.map(([title, detail], index) => (
+          <div class="deployment-item"><span>0{index + 1}</span><p><strong>{title}</strong>{detail}</p><Check size={17} strokeWidth={2.4} aria-hidden="true" /></div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section container environment-section product-section">
+    <div class="section-heading-row product-heading-row">
+      <div class="section-heading compact"><p class="eyebrow">Product scope</p><h2>{t('잘하는 일과,', 'Separate strengths')}<br />{t('확인할 경계를 나눴습니다.', 'from boundaries to review.')}</h2></div>
+      <p class="section-intro">{t('편집·탐색·집계가 이어지는 React 업무 흐름에 집중합니다. 아래 범위와 제약을 프로젝트 요구사항에 맞춰 확인하세요.', 'BeautifulGrid focuses on React workflows that connect editing, exploration, and aggregation. Review the scope and limitations against your project requirements.')}</p>
+    </div>
+
+    <div class="product-layout">
+      <div class="feature-panel">
+        <div class="panel-heading"><div><span class="panel-kicker">INCLUDED</span><h3>{t('기본 제공 기능', 'Included capabilities')}</h3></div><span class="panel-count">{productFacts.features.length}</span></div>
+        <div class="feature-list">
+          {productFacts.features.map((feature) => (
+            <div><span class="feature-check" aria-hidden="true"><Check size={14} strokeWidth={2.7} /></span><p><strong>{feature.name[locale]}</strong>{feature.note?.[locale] ?? t('업무 화면의 데이터 흐름에 맞게 구성할 수 있습니다.', 'Configure it around the data flow of your application.')}</p></div>
+          ))}
+        </div>
+      </div>
+      <div class="scope-panel">
+        <div class="panel-heading scope-heading"><div><span class="panel-kicker">CHECK FIRST</span><h3>{t('도입 전 확인할 범위', 'Review before adoption')}</h3></div><ShieldAlert size={22} aria-hidden="true" /></div>
+        {productFacts.limitations.map((limitation, index) => (
+          <div class="scope-item"><span>0{index + 1}</span><div><strong>{limitation.name[locale]}</strong><p>{limitation.description[locale]}</p></div></div>
+        ))}
+        <div class="scope-item license-item"><span>03</span><div><strong>{t('라이선스와 배포', 'License and distribution')}</strong><p>{t('BeautifulGrid는 Apache-2.0 오픈소스입니다. 개인과 기업 모두', 'BeautifulGrid is open source under Apache-2.0. Individuals and businesses may use it in')} <a href={productFacts.licenseUrl} target="_blank" rel="noopener noreferrer">{t('라이선스 조건', 'commercial projects under the license terms')} ↗</a>{t('에 따라 상업 프로젝트에서 사용할 수 있습니다.', '.')}</p></div></div>
+      </div>
+    </div>
+
+    <div class="fact-bar">
+      <div><PackageCheck size={18} aria-hidden="true" /><span>{t('패키지', 'Package')}</span><code>{productFacts.packageName}</code></div>
+      <div><span>{t('현재 버전', 'Current version')}</span><strong>{productFacts.version}</strong></div>
+      <div><span>{t('소스', 'Source')}</span><a href={productFacts.repositoryUrl} target="_blank" rel="noopener noreferrer">{t('GitHub에서 보기 ↗', 'View on GitHub ↗')}</a></div>
+      <p>{t('검토일', 'Reviewed')} {productFacts.lastReviewedAt}</p>
+    </div>
+
+    <div class="decision-cta">
+      <div><p class="eyebrow">Ready to validate?</p><h2>{t('실제 데이터로', 'Validate adoption')}<br />{t('도입 가능성을 확인하세요.', 'with real data.')}</h2></div>
+      <div><p>{t('기능을 추측하는 대신 Playground와 실행 예제에서 목표 데이터, 편집기, 브라우저 조합을 직접 검증할 수 있습니다.', 'Instead of guessing, validate your target data, editor, and browser combination in the Playground and runnable examples.')}</p><div class="hero-actions"><a href={localizePath('/playground', locale)} class="btn btn-primary">{t('Playground 열기', 'Open Playground')} <ArrowRight size={16} aria-hidden="true" /></a><a href={localizePath('/learn', locale)} class="btn btn-outline">{t('실행 예제 보기', 'View runnable examples')}</a></div></div>
+    </div>
+  </section>
+</MarketingLayout>
+
+<style>
+  .environment-hero { position: relative; overflow: hidden; padding: 104px 0 0; background: linear-gradient(rgba(37,99,235,.035) 1px,transparent 1px), linear-gradient(90deg,rgba(37,99,235,.035) 1px,transparent 1px), radial-gradient(circle at 84% 20%,rgba(96,165,250,.22),transparent 30%), linear-gradient(180deg,#f8fbff 0%,#fff 100%); background-size: 44px 44px,44px 44px,auto,auto; }
+  .environment-hero::after { position: absolute; right: -140px; top: 100px; width: 430px; height: 430px; border: 1px solid rgba(37,99,235,.09); border-radius: 50%; content: ''; }
+  .environment-hero-grid,.environment-band-grid,.product-layout { display: grid; grid-template-columns: minmax(0,1.08fr) minmax(340px,.78fr); gap: clamp(44px,7vw,116px); align-items: center; }
+  .hero-copy,.deployment-copy,.section-heading,.section-intro,.feature-panel,.scope-panel { min-width: 0; }
+  h1,h2,h3,p { margin-top: 0; }
+  h1,h2 { color: var(--site-text-primary); letter-spacing: -.06em; word-break: keep-all; }
+  h1 { max-width: 820px; margin-bottom: 26px; font-size: clamp(46px,5vw,72px); line-height: 1.06; }
+  h2 { margin-bottom: 20px; font-size: clamp(36px,4vw,54px); line-height: 1.12; }
+  .eyebrow { margin-bottom: 24px; color: #2563eb; font-size: 11px; font-weight: 850; letter-spacing: .13em; text-transform: uppercase; }
+  .hero-copy .eyebrow { display: flex; align-items: center; gap: 9px; }
+  .hero-copy .eyebrow span { width: 26px; height: 2px; background: #2563eb; }
+  .hero-description,.section-intro,.deployment-copy>p { color: var(--site-text-secondary); font-size: 17px; line-height: 1.85; }
+  .hero-description { max-width: 680px; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 11px; margin-top: 32px; }
+  .hero-actions .btn { min-height: 44px; padding-inline: 18px; }
+  .runtime-card { position: relative; z-index: 1; overflow: hidden; border: 1px solid #26334c; border-radius: 24px; padding: 20px; background: #111a2c; color: #fff; box-shadow: 0 34px 80px -46px rgba(15,23,42,.8); }
+  .runtime-card::before { position: absolute; top: -80px; right: -50px; width: 220px; height: 220px; border-radius: 50%; background: rgba(59,130,246,.16); content: ''; }
+  .runtime-card-head { position: relative; display: flex; align-items: center; justify-content: space-between; padding: 3px 3px 17px; border-bottom: 1px solid rgba(148,163,184,.18); }
+  .runtime-card-head div { display: flex; align-items: center; gap: 9px; }
+  .runtime-card-head strong { font-size: 13px; }
+  .runtime-card-head>span { color: #7f8da7; font-family: var(--site-font-mono); font-size: 10px; text-transform: uppercase; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 0 4px rgba(52,211,153,.12); }
+  .runtime-checks { display: grid; padding: 9px 0; }
+  .runtime-check { display: grid; grid-template-columns: 24px 1fr auto 18px; gap: 10px; align-items: center; min-height: 51px; border-bottom: 1px solid rgba(148,163,184,.12); }
+  .runtime-check:last-child { border-bottom: 0; }
+  .runtime-check>svg:first-child { color: #78a8ff; }
+  .runtime-check>svg:last-child { color: #34d399; }
+  .runtime-check span { color: #8fa0ba; font-size: 12px; }
+  .runtime-check strong { color: #f8fafc; font-family: var(--site-font-mono); font-size: 12px; }
+  .runtime-note { display: flex; gap: 11px; margin-top: 5px; border: 1px solid rgba(96,165,250,.17); border-radius: 14px; padding: 14px; background: rgba(37,99,235,.1); }
+  .runtime-note>svg { flex: 0 0 auto; color: #60a5fa; }
+  .runtime-note p { margin: 0; color: #9eabc0; font-size: 11px; line-height: 1.6; }
+  .runtime-note strong { display: block; margin-bottom: 2px; color: #dbeafe; }
+  .environment-summary { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(4,1fr); margin-top: 82px; border: 1px solid #dbe5f1; border-bottom: 0; border-radius: 22px 22px 0 0; background: rgba(255,255,255,.9); box-shadow: 0 24px 60px -52px rgba(15,23,42,.7); backdrop-filter: blur(12px); }
+  .summary-item { display: grid; grid-template-columns: 24px 1fr; gap: 13px; min-height: 128px; padding: 25px; border-right: 1px solid #e2e8f0; }
+  .summary-item:last-child { border-right: 0; }
+  .summary-item>svg { margin-top: 2px; color: #7c8da6; }
+  .summary-item span,.fact-bar span { display: block; color: #7c8a9f; font-size: 11px; font-weight: 760; }
+  .summary-item strong { display: block; margin: 5px 0 4px; color: #2563eb; font-size: 19px; letter-spacing: -.04em; }
+  .summary-item p { margin: 0; color: #8491a5; font-size: 12px; line-height: 1.5; }
+  .environment-section { padding-top: 108px; padding-bottom: 108px; }
+  .section-heading-row { display: grid; grid-template-columns: minmax(0,1.05fr) minmax(300px,.7fr); gap: clamp(44px,8vw,120px); align-items: end; }
+  .section-heading h2 { margin-bottom: 0; }
+  .section-heading.compact { max-width: 780px; }
+  .section-intro { margin: 0 0 3px; }
+  .browser-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 52px; }
+  .browser-card { position: relative; min-height: 340px; overflow: hidden; border: 1px solid #dde6f1; border-radius: 20px; padding: 25px; background: #fff; transition: border-color 160ms ease,box-shadow 160ms ease,transform 160ms ease; }
+  .browser-card:hover { border-color: #c4d6ef; box-shadow: 0 28px 60px -48px rgba(15,23,42,.8); transform: translateY(-3px); }
+  .browser-card::after { position: absolute; right: -48px; bottom: -72px; width: 170px; height: 170px; border-radius: 50%; background: #eff6ff; content: ''; }
+  .browser-card--verify::after { background: #f5f3ff; }
+  .browser-card--caution::after { background: #fff7ed; }
+  .browser-card-top { display: flex; align-items: center; justify-content: space-between; }
+  .browser-index { color: #a2afc1; font-family: var(--site-font-mono); font-size: 11px; font-weight: 800; }
+  .browser-status { border-radius: 999px; padding: 4px 9px; background: #ecfdf5; color: #047857; font-size: 10px; font-weight: 800; }
+  .browser-card--verify .browser-status { background: #f5f3ff; color: #6d28d9; }
+  .browser-card--caution .browser-status { background: #fff7ed; color: #c2410c; }
+  .browser-icon { display: grid; width: 46px; height: 46px; margin: 31px 0 23px; place-items: center; border: 1px solid #dbeafe; border-radius: 14px; background: #f6f9ff; color: #2563eb; }
+  .browser-card--verify .browser-icon { border-color: #e9d5ff; background: #faf5ff; color: #7c3aed; }
+  .browser-card--caution .browser-icon { border-color: #fed7aa; background: #fffaf4; color: #ea580c; }
+  .browser-card h3 { margin-bottom: 15px; color: #1e293b; font-size: 19px; letter-spacing: -.04em; }
+  .browser-card p { position: relative; z-index: 1; margin: 17px 0 0; color: #65748a; font-size: 13px; line-height: 1.72; }
+  .browser-pills { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 6px; }
+  .browser-pills span { border: 1px solid #e3ebf6; border-radius: 7px; padding: 4px 7px; background: #f8fafc; color: #526178; font-size: 10px; font-weight: 740; }
+  .environment-band { position: relative; overflow: hidden; padding: 108px 0; background: #f2f6fd; }
+  .environment-band::before { position: absolute; left: 0; top: 0; width: 42%; height: 100%; background: linear-gradient(135deg,rgba(219,234,254,.45),transparent); content: ''; }
+  .environment-band-grid { position: relative; align-items: start; }
+  .deployment-copy>p { max-width: 650px; }
+  .install-command { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; max-width: 520px; margin-top: 29px; border: 1px solid #26334c; border-radius: 13px; padding: 14px 16px; background: #121b2c; box-shadow: 0 20px 50px -38px rgba(15,23,42,.9); }
+  .install-command>span:first-child { color: #60a5fa; font-family: var(--site-font-mono); font-weight: 800; }
+  .install-command code { overflow: hidden; border: 0; padding: 0; background: transparent; color: #f8fafc; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+  .command-ready { display: flex; align-items: center; gap: 6px; color: #7f8da7; font-family: var(--site-font-mono); font-size: 9px; }
+  .command-ready span { width: 6px; height: 6px; border-radius: 50%; background: #34d399; }
+  .deployment-list { overflow: hidden; border: 1px solid #d6e2f0; border-radius: 20px; background: #fff; box-shadow: 0 30px 70px -58px rgba(15,23,42,.8); }
+  .deployment-list-head { display: flex; align-items: center; justify-content: space-between; min-height: 48px; padding: 0 21px; border-bottom: 1px solid #e5edf6; background: #f8fafc; }
+  .deployment-list-head span { color: #8491a5; font-family: var(--site-font-mono); font-size: 9px; letter-spacing: .08em; }
+  .deployment-list-head strong { color: #059669; font-family: var(--site-font-mono); font-size: 10px; }
+  .deployment-item { display: grid; grid-template-columns: 34px 1fr 18px; gap: 10px; padding: 20px 21px; border-bottom: 1px solid #e8eef7; }
+  .deployment-item:last-child { border-bottom: 0; }
+  .deployment-item>span { color: #2563eb; font-family: var(--site-font-mono); font-size: 11px; font-weight: 800; }
+  .deployment-item>svg { margin-top: 3px; color: #10b981; }
+  .deployment-item p { margin: 0; color: #6b7890; font-size: 12px; line-height: 1.65; }
+  .deployment-item strong { display: block; margin-bottom: 3px; color: #1e293b; font-size: 13px; }
+  .product-section { padding-bottom: 112px; }
+  .product-layout { align-items: stretch; margin-top: 50px; gap: 16px; grid-template-columns: minmax(0,1.25fr) minmax(330px,.75fr); }
+  .feature-panel,.scope-panel { border: 1px solid #dbe5f1; border-radius: 22px; padding: 28px; background: #fff; }
+  .scope-panel { border-color: #26334c; background: #151e31; color: #fff; }
+  .panel-heading { display: flex; align-items: center; justify-content: space-between; padding-bottom: 21px; border-bottom: 1px solid #e5ebf3; }
+  .panel-heading h3 { margin: 4px 0 0; color: #1e293b; font-size: 19px; }
+  .panel-kicker { color: #8491a5; font-family: var(--site-font-mono); font-size: 9px; font-weight: 800; letter-spacing: .09em; }
+  .panel-count { display: grid; width: 33px; height: 33px; place-items: center; border-radius: 10px; background: #eff6ff; color: #2563eb; font-family: var(--site-font-mono); font-size: 11px; font-weight: 800; }
+  .scope-heading { border-color: rgba(148,163,184,.18); }
+  .scope-heading h3 { color: #f8fafc; }
+  .scope-heading .panel-kicker { color: #7f8da7; }
+  .scope-heading>svg { color: #f59e0b; }
+  .feature-list { display: grid; grid-template-columns: repeat(2,1fr); gap: 0 22px; }
+  .feature-list>div { display: flex; gap: 10px; min-height: 76px; padding: 17px 0; border-bottom: 1px solid #edf2f7; }
+  .feature-check { display: grid; flex: 0 0 25px; width: 25px; height: 25px; place-items: center; border-radius: 8px; background: #ecfdf5; color: #059669; }
+  .feature-list p,.scope-item p { margin: 0; color: #718096; font-size: 12px; line-height: 1.55; }
+  .feature-list strong { display: block; margin-bottom: 3px; color: #1e293b; font-size: 13px; }
+  .scope-item { display: grid; grid-template-columns: 34px 1fr; gap: 7px; padding: 20px 0; border-bottom: 1px solid rgba(148,163,184,.16); }
+  .scope-item>span { color: #64748b; font-family: var(--site-font-mono); font-size: 10px; font-weight: 800; }
+  .scope-item strong { display: block; margin-bottom: 5px; color: #f1f5f9; font-size: 13px; }
+  .scope-item p { color: #9ba9bd; }
+  .license-item { margin-top: 10px; border: 1px solid rgba(251,191,36,.2); border-radius: 13px; padding: 15px; background: rgba(245,158,11,.08); }
+  .license-item a { color: #fbbf24; font-weight: 750; }
+  .fact-bar { display: grid; grid-template-columns: 1.2fr .7fr 1fr auto; gap: 23px; align-items: center; margin-top: 16px; border: 1px solid #dbe5f1; border-radius: 15px; padding: 17px 21px; background: #f8fafc; }
+  .fact-bar>div:first-child { display: grid; grid-template-columns: 23px 1fr; }
+  .fact-bar>div:first-child svg { grid-row: 1/3; align-self: center; color: #2563eb; }
+  .fact-bar code,.fact-bar strong,.fact-bar a { display: block; margin-top: 4px; color: #172033; font-size: 12px; font-weight: 750; }
+  .fact-bar code { border: 0; padding: 0; background: transparent; }
+  .fact-bar a { color: #2563eb; }
+  .fact-bar p { margin: 0; color: #8491a5; font-family: var(--site-font-mono); font-size: 9px; white-space: nowrap; }
+  .decision-cta { display: grid; grid-template-columns: 1.1fr .9fr; gap: clamp(44px,9vw,130px); align-items: end; margin-top: 88px; border-radius: 26px; padding: clamp(34px,5vw,62px); background: linear-gradient(125deg,#111a2c 0%,#17284c 100%); box-shadow: 0 30px 70px -55px rgba(15,23,42,.95); }
+  .decision-cta h2 { margin: 0; color: #fff; font-size: clamp(32px,3.4vw,48px); }
+  .decision-cta>div:last-child>p { margin: 0; color: #a9b5c7; font-size: 14px; line-height: 1.75; }
+  .decision-cta .btn-outline { border-color: #536179; color: #fff; }
+  .decision-cta .btn-outline:hover { background: rgba(255,255,255,.08); }
+  :global(html[data-theme='dark']) .environment-hero { background: linear-gradient(rgba(96,165,250,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(96,165,250,.04) 1px,transparent 1px),radial-gradient(circle at 84% 20%,rgba(37,99,235,.18),transparent 30%),linear-gradient(180deg,#101827 0%,var(--site-page-bg) 100%); background-size:44px 44px,44px 44px,auto,auto; }
+  :global(html[data-theme='dark']) .environment-summary,
+  :global(html[data-theme='dark']) .browser-card,
+  :global(html[data-theme='dark']) .deployment-list,
+  :global(html[data-theme='dark']) .feature-panel,
+  :global(html[data-theme='dark']) .fact-bar { border-color:var(--site-border); background:var(--site-surface-elevated); box-shadow:none; }
+  :global(html[data-theme='dark']) .environment-band { background:var(--site-surface); }
+  :global(html[data-theme='dark']) .environment-band::before { background:linear-gradient(135deg,rgba(37,99,235,.14),transparent); }
+  :global(html[data-theme='dark']) .summary-item,
+  :global(html[data-theme='dark']) .deployment-list-head,
+  :global(html[data-theme='dark']) .deployment-item,
+  :global(html[data-theme='dark']) .feature-list>div,
+  :global(html[data-theme='dark']) .panel-heading { border-color:var(--site-border); }
+  :global(html[data-theme='dark']) .deployment-list-head { background:var(--site-surface); }
+  :global(html[data-theme='dark']) .eyebrow,
+  :global(html[data-theme='dark']) .summary-item strong,
+  :global(html[data-theme='dark']) .deployment-item>span,
+  :global(html[data-theme='dark']) .fact-bar>div:first-child svg,
+  :global(html[data-theme='dark']) .fact-bar a { color:var(--site-accent); }
+  :global(html[data-theme='dark']) .hero-copy .eyebrow span { background:var(--site-accent); }
+  :global(html[data-theme='dark']) .browser-card h3,
+  :global(html[data-theme='dark']) .deployment-item strong,
+  :global(html[data-theme='dark']) .panel-heading h3,
+  :global(html[data-theme='dark']) .feature-list strong,
+  :global(html[data-theme='dark']) .fact-bar code,
+  :global(html[data-theme='dark']) .fact-bar strong { color:var(--site-text-primary); }
+  :global(html[data-theme='dark']) .browser-card p,
+  :global(html[data-theme='dark']) .deployment-item p,
+  :global(html[data-theme='dark']) .feature-list p,
+  :global(html[data-theme='dark']) .summary-item p { color:var(--site-text-secondary); }
+  :global(html[data-theme='dark']) .browser-index,
+  :global(html[data-theme='dark']) .panel-kicker,
+  :global(html[data-theme='dark']) .summary-item span,
+  :global(html[data-theme='dark']) .fact-bar span,
+  :global(html[data-theme='dark']) .fact-bar p { color:var(--site-text-muted); }
+  :global(html[data-theme='dark']) .browser-status { background:#073b35; color:#6ee7b7; }
+  :global(html[data-theme='dark']) .browser-card--verify .browser-status { background:#312e81; color:#c4b5fd; }
+  :global(html[data-theme='dark']) .browser-card--caution .browser-status { background:#422006; color:#fdba74; }
+  :global(html[data-theme='dark']) .browser-icon { border-color:#315f99; background:#172b4c; color:#9ac2ff; }
+  :global(html[data-theme='dark']) .browser-card--verify .browser-icon { border-color:#5b4da8; background:#29234d; color:#c4b5fd; }
+  :global(html[data-theme='dark']) .browser-card--caution .browser-icon { border-color:#7c4a1d; background:#422006; color:#fdba74; }
+  :global(html[data-theme='dark']) .panel-count { background:var(--site-accent-soft); color:var(--site-accent-strong); }
+  :global(html[data-theme='dark']) .feature-check { background:#073b35; color:#6ee7b7; }
+  :global(html[data-theme='dark']) .scope-item>span { color:var(--site-text-muted); }
+  :global(html[data-theme='dark']) .browser-pills span { border-color:var(--site-border); background:var(--site-surface); color:var(--site-text-secondary); }
+  :global(html[data-theme='dark']) .browser-card::after { opacity:.12; }
+  @media (max-width:1000px) {
+    .environment-hero-grid,.environment-band-grid { grid-template-columns: 1fr; gap: 42px; }
+    .runtime-card { max-width: 680px; }
+    .section-heading-row { grid-template-columns: 1fr; gap: 24px; }
+    .section-intro { max-width: 740px; }
+  }
+  @media (max-width:840px) {
+    .environment-hero { padding-top: 76px; }
+    .environment-summary { grid-template-columns: repeat(2,1fr); }
+    .summary-item:nth-child(2) { border-right: 0; }
+    .summary-item:nth-child(-n+2) { border-bottom: 1px solid var(--site-border); }
+    .browser-grid { grid-template-columns: 1fr; }
+    .browser-card { min-height: 0; }
+    .product-layout,.decision-cta { grid-template-columns: 1fr; }
+    .fact-bar { grid-template-columns: repeat(2,1fr); }
+    .fact-bar p { grid-column: 1/-1; }
+  }
+  @media (max-width:560px) {
+    .environment-hero { padding-top: 62px; background-size: 32px 32px,32px 32px,auto,auto; }
+    h1 { font-size: clamp(38px,11.5vw,46px); line-height: 1.08; }
+    h2 { font-size: 34px; }
+    h1 br,h2 br { display: none; }
+    .hero-description,.section-intro,.deployment-copy>p { font-size: 15px; line-height: 1.78; }
+    .hero-actions { align-items: stretch; flex-direction: column; }
+    .hero-actions .btn { width: 100%; }
+    .runtime-card { padding: 16px; border-radius: 19px; }
+    .runtime-check { grid-template-columns: 22px 1fr auto 16px; }
+    .environment-summary { margin-top: 54px; border-radius: 18px 18px 0 0; }
+    .summary-item { display: block; min-height: 126px; padding: 18px; }
+    .summary-item>svg { margin-bottom: 8px; }
+    .environment-section,.environment-band { padding-top: 76px; padding-bottom: 76px; }
+    .browser-grid { margin-top: 36px; }
+    .browser-card { padding: 22px; }
+    .browser-icon { margin-top: 24px; }
+    .install-command { grid-template-columns: auto minmax(0,1fr); }
+    .command-ready { display: none; }
+    .deployment-item { grid-template-columns: 27px 1fr 16px; padding: 18px 16px; }
+    .feature-panel,.scope-panel { padding: 22px; }
+    .feature-list { grid-template-columns: 1fr; }
+    .fact-bar { grid-template-columns: 1fr; gap: 14px; }
+    .fact-bar p { grid-column: auto; white-space: normal; }
+    .decision-cta { gap: 28px; margin-top: 64px; border-radius: 20px; padding: 28px 22px; }
+  }
+  @media (prefers-reduced-motion:reduce) { .browser-card { transition: none; } }
+</style>

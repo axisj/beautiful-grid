@@ -1,0 +1,111 @@
+.lookup-editor-autocomplete.ant-select {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+}
+
+.lookup-editor-autocomplete.ant-select .ant-select-selector {
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100%;
+  padding: 0 !important;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  box-shadow: none !important;
+}
+
+.lookup-editor-autocomplete.ant-select .ant-select-selection-wrap,
+.lookup-editor-autocomplete.ant-select .ant-select-selection-search,
+.lookup-editor-autocomplete.ant-select .ant-select-selection-search-input {
+  height: 100% !important;
+  min-height: 0;
+  max-height: 100%;
+  color: inherit;
+  font: inherit !important;
+}
+
+.lookup-editor-autocomplete.ant-select .ant-select-selection-wrap {
+  align-items: center;
+}
+
+.lookup-editor-autocomplete.ant-select .ant-select-selection-search-input {
+  padding: 0;
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+
+.lookup-editor-autocomplete-popup.ant-select-dropdown {
+  margin-top: -3px;
+  padding: 4px;
+  border: 1px solid var(--site-border, #e1e7ef);
+  border-radius: 0 0 var(--site-radius-sm, 8px) var(--site-radius-sm, 8px);
+  font-family: var(--bgrid-font-family, inherit);
+  font-size: var(--bgrid-font-size, 13px);
+  box-shadow: 0 12px 28px -16px rgb(15 23 42 / 55%);
+}
+
+.lookup-editor-autocomplete-option {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.lookup-editor-autocomplete-option strong {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lookup-editor-autocomplete-option small {
+  flex: 0 0 auto;
+  color: var(--site-text-muted, #8491a5);
+  font-size: 11px;
+}
+
+.lookup-editor-modal .ant-modal-content {
+  border: 1px solid var(--site-border, #e1e7ef);
+  border-radius: var(--site-radius-md, 14px);
+  box-shadow: var(--site-shadow-soft, 0 24px 60px -44px rgb(15 23 42 / 52%));
+}
+
+.lookup-editor-modal .ant-modal-title {
+  color: var(--site-text-primary, #101828);
+  font-size: 18px;
+}
+
+.lookup-editor-modal-content {
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.lookup-editor-modal-content .ant-input-search {
+  width: 100%;
+}
+
+.lookup-editor-grid {
+  min-width: 0;
+  border-radius: var(--site-radius-sm, 8px);
+}
+
+@media (max-width: 620px) {
+  .lookup-editor-modal .ant-modal-content {
+    padding: 18px;
+  }
+
+  .lookup-editor-grid {
+    height: 240px !important;
+  }
+}

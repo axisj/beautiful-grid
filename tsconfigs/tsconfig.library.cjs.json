@@ -1,0 +1,24 @@
+{
+  "extends": "../tsconfig.build.json",
+  "compilerOptions": {
+    "outDir": "../dist/cjs",
+    "module": "commonjs",
+    "target": "es5",
+    "downlevelIteration": true,
+    "allowJs": false,
+    "declaration": false,
+    "declarationMap": false,
+    "incremental": false,
+    "sourceMap": false,
+    "noEmit": false,
+    "jsx": "react",
+    "jsxImportSource": ""
+  },
+  "include": [
+    "../beautiful-grid/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/tree.ts"
+  ]
+}

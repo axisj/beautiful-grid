@@ -1,0 +1,114 @@
+---
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+import { localizePath, normalizeLocale, type Locale } from '../i18n';
+import { productFacts } from '../data/productFacts';
+
+interface Props { locale?: Locale; }
+const locale = normalizeLocale(Astro.props.locale);
+const t = (ko: string, en: string) => locale === 'ko' ? ko : en;
+---
+
+<MarketingLayout
+  title={t('오픈소스 | BeautifulGrid', 'Open Source | BeautifulGrid')}
+  description={t('BeautifulGrid는 Apache-2.0으로 공개된 오픈소스 React Data Grid입니다. 상업적 사용, 수정, 배포 조건과 상표 정책을 확인하세요.', 'BeautifulGrid is an open-source React Data Grid under Apache-2.0. Review commercial use, modification, distribution, and trademark terms.')}
+  canonicalPath={localizePath('/open-source', locale)}
+  locale={locale}
+>
+  <main class="open-source-page">
+    <section class="open-source-hero">
+      <div class="container hero-inner">
+        <p class="eyebrow">{t('OPEN SOURCE · APACHE-2.0', 'OPEN SOURCE · APACHE-2.0')}</p>
+        <h1>{t('코드부터', 'Open code.')}{locale === 'ko' && <br class="ko-mobile-break" />}{t(' 개발 과정까지,', '')}<br /><span>{t('열린 BeautifulGrid.', 'Open development.')}</span></h1>
+        <p>{t('BeautifulGrid는 소스 코드와 이슈, 개발 과정을 공개합니다. 개인과 기업 모두 Apache-2.0 조건에 따라 상업 프로젝트에서 사용할 수 있습니다.', 'BeautifulGrid develops its source, issues, and product direction in public. Individuals and companies can use it in commercial projects under the Apache-2.0 terms.')}</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary btn-large" href={productFacts.repositoryUrl} target="_blank" rel="noopener noreferrer">{t('GitHub에서 소스 보기', 'View source on GitHub')} <span aria-hidden="true">↗</span></a>
+          <a class="btn btn-secondary btn-large" href={productFacts.licenseUrl} target="_blank" rel="noopener noreferrer">{t('라이선스 전문', 'Read the license')}</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="container principles-section">
+      <div class="section-heading">
+        <p class="eyebrow">{t('OPEN BY DESIGN', 'OPEN BY DESIGN')}</p>
+        <h2>{t('사용할 자유와 확인할 신뢰', 'Freedom to use. Confidence to inspect.')}</h2>
+      </div>
+      <div class="principles-grid">
+        <article>
+          <span>01</span>
+          <h3>{t('상업적으로 사용하세요', 'Use it commercially')}</h3>
+          <p>{t('사내 도구부터 고객에게 제공하는 서비스까지 Apache-2.0 조건에 따라 사용할 수 있습니다.', 'Use BeautifulGrid in internal tools and customer-facing products under the Apache-2.0 terms.')}</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h3>{t('직접 확인하고 수정하세요', 'Inspect and modify')}</h3>
+          <p>{t('실제 구현과 테스트를 확인하고, 프로젝트 요구에 맞게 수정하거나 확장할 수 있습니다.', 'Review the implementation and tests, then modify or extend the grid for your project.')}</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h3>{t('특정 서비스에 종속되지 마세요', 'Avoid vendor lock-in')}</h3>
+          <p>{t('공개된 소스와 표준 React·TypeScript 환경을 기반으로 직접 빌드하고 운영할 수 있습니다.', 'Build and operate from public source using a standard React and TypeScript toolchain.')}</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="license-section">
+      <div class="container license-grid">
+        <div>
+          <p class="eyebrow">{t('LICENSE RESPONSIBILITIES', 'LICENSE RESPONSIBILITIES')}</p>
+          <h2>{t('열려 있는 만큼, 고지는 명확하게', 'Open permissions, clear notices')}</h2>
+          <p>{t('Apache-2.0은 폭넓은 사용 권한과 명시적인 특허 조항을 제공합니다. 재배포할 때는 라이선스와 저작권 고지를 유지하고, 수정한 파일에는 변경 사실을 표시해야 합니다.', 'Apache-2.0 provides broad permissions and an explicit patent grant. Redistributions must preserve license and copyright notices, and modified files should state that changes were made.')}</p>
+        </div>
+        <ul>
+          <li><strong>LICENSE</strong><span>{t('Apache-2.0 전문', 'Apache-2.0 terms')}</span></li>
+          <li><strong>NOTICE</strong><span>{t('저작권과 기여자 고지', 'Copyright and contributor notices')}</span></li>
+          <li><strong>TRADEMARK</strong><span>{t('BeautifulGrid 이름과 브랜드 사용 정책', 'BeautifulGrid name and brand policy')}</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="container contribute-section">
+      <div>
+        <p class="eyebrow">{t('DEVELOPED IN THE OPEN', 'DEVELOPED IN THE OPEN')}</p>
+        <h2>{t('사용 경험을 들려주세요.', 'Share what you learn.')}</h2>
+        <p>{t('커뮤니티 규모를 과장하지 않습니다. 버그, 아이디어, 실제 사용 사례를 공개 이슈로 나누는 것부터 함께 시작합니다.', 'We do not overstate the size of the community. We start by sharing bugs, ideas, and real-world use cases in public issues.')}</p>
+      </div>
+      <div class="contribute-actions">
+        <a class="btn btn-primary" href={productFacts.repositoryUrl + '/issues'} target="_blank" rel="noopener noreferrer">{t('이슈 열기', 'Open an issue')} <span aria-hidden="true">↗</span></a>
+        <a class="btn btn-outline" href={localizePath('/learn/getting-started', locale)}>{t('시작하기', 'Get started')} <span aria-hidden="true">→</span></a>
+      </div>
+    </section>
+  </main>
+</MarketingLayout>
+
+<style>
+  .open-source-page { background: var(--site-page-bg); }
+  .open-source-hero { overflow: hidden; padding: 112px 0 100px; background: radial-gradient(circle at 75% 24%, color-mix(in srgb, var(--site-accent) 22%, transparent), transparent 34%), linear-gradient(180deg, color-mix(in srgb, var(--site-accent) 5%, var(--site-page-bg)), var(--site-page-bg)); text-align: center; }
+  .hero-inner { max-width: 900px; }
+  .eyebrow { margin: 0 0 18px; color: var(--site-accent-strong); font-family: var(--site-font-mono); font-size: 12px; font-weight: 850; letter-spacing: .12em; }
+  .open-source-hero h1 { margin: 0; color: var(--site-text-primary); font-size: clamp(48px, 7vw, 86px); line-height: 1.02; letter-spacing: -.06em; }
+  .ko-mobile-break { display: none; }
+  .open-source-hero h1 span { color: var(--site-accent-strong); }
+  .open-source-hero p:not(.eyebrow) { max-width: 760px; margin: 28px auto 0; color: var(--site-text-secondary); font-size: 18px; line-height: 1.8; word-break: keep-all; }
+  .hero-actions { display: flex; justify-content: center; gap: 12px; margin-top: 34px; }
+  .principles-section { padding: 100px 0; }
+  .section-heading { max-width: 720px; margin-bottom: 42px; }
+  .section-heading h2, .license-grid h2, .contribute-section h2 { margin: 0; color: var(--site-text-primary); font-size: clamp(34px, 5vw, 54px); line-height: 1.12; letter-spacing: -.045em; }
+  .principles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .principles-grid article { min-height: 270px; border-radius: 24px; padding: 30px; background: var(--site-surface); box-shadow: var(--site-shadow-soft); }
+  .principles-grid article > span { color: var(--site-accent-strong); font-family: var(--site-font-mono); font-size: 11px; font-weight: 800; }
+  .principles-grid h3 { margin: 58px 0 12px; color: var(--site-text-primary); font-size: 21px; }
+  .principles-grid p, .license-grid p, .contribute-section p { margin: 0; color: var(--site-text-secondary); font-size: 15px; line-height: 1.75; word-break: keep-all; }
+  .license-section { padding: 92px 0; background: var(--site-surface); }
+  .license-grid { display: grid; grid-template-columns: 1fr .78fr; gap: 90px; align-items: center; }
+  .license-grid h2 { margin-bottom: 22px; }
+  .license-grid ul { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+  .license-grid li { display: flex; align-items: center; justify-content: space-between; gap: 20px; border: 1px solid var(--site-border); border-radius: 16px; padding: 18px 20px; background: var(--site-overlay-bg); }
+  .license-grid li strong { color: var(--site-text-primary); font-family: var(--site-font-mono); font-size: 12px; }
+  .license-grid li span { color: var(--site-text-muted); font-size: 13px; text-align: right; }
+  .contribute-section { display: flex; align-items: flex-end; justify-content: space-between; gap: 60px; padding-top: 100px; padding-bottom: 110px; }
+  .contribute-section > div:first-child { max-width: 720px; }
+  .contribute-section h2 { margin-bottom: 20px; }
+  .contribute-actions { display: flex; gap: 10px; flex: 0 0 auto; }
+  @media (max-width: 900px) { .principles-grid { grid-template-columns: 1fr; } .principles-grid article { min-height: 220px; } .license-grid { grid-template-columns: 1fr; gap: 48px; } .contribute-section { align-items: flex-start; flex-direction: column; } }
+  @media (max-width: 560px) { .open-source-hero { padding: 80px 0 72px; } .open-source-hero h1 { font-size: 44px; } .ko-mobile-break { display: initial; } .open-source-hero p:not(.eyebrow) { font-size: 16px; } .hero-actions, .contribute-actions { display: grid; width: 100%; } .hero-actions .btn, .contribute-actions .btn { width: 100%; } .principles-section { padding: 72px 0; } .license-section { padding: 72px 0; } .contribute-section { padding-top: 72px; padding-bottom: 80px; } }
+</style>

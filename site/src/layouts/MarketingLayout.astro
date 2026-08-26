@@ -1,0 +1,37 @@
+---
+import Layout from './Layout.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import type { Locale } from '../i18n';
+
+interface Props {
+  title: string;
+  description?: string;
+  canonicalPath?: string;
+  locale?: Locale;
+}
+
+const props = Astro.props;
+---
+<Layout {...props}>
+  <div class="marketing-shell">
+    <Header locale={props.locale} />
+    <main class="marketing-main">
+      <slot />
+    </main>
+    <Footer locale={props.locale} />
+  </div>
+</Layout>
+
+<style>
+  .marketing-shell {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+  }
+
+  .marketing-main {
+    min-width: 0;
+    flex: 1;
+  }
+</style>

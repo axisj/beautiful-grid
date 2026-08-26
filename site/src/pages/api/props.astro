@@ -1,0 +1,82 @@
+---
+import ReferenceLayout from '../../layouts/ReferenceLayout.astro';
+import { apiMemberId, apiReferenceEntries, apiReferenceGroups, apiTypeId } from '../../data/apiReference';
+import { productFacts } from '../../data/productFacts';
+import { localizePath, normalizeLocale, type Locale } from '../../i18n';
+
+const sourceBase = `${productFacts.repositoryUrl}/blob/master/beautiful-grid/types.ts`;
+interface Props { locale?: Locale; }
+const locale = normalizeLocale(Astro.props.locale);
+const isEn = locale === 'en';
+const t = (ko: string, en: string) => isEn ? en : ko;
+const groupLabels: Record<string, string> = {
+  core: 'Core component types', data: 'Data and events', query: 'Sort, filter, and toolbox',
+  selection: 'Selection and editing', layout: 'Layout and display', reorder: 'Reordering', pivot: 'Pivot',
+};
+---
+
+<ReferenceLayout
+  title="TypeScript API Reference | BeautifulGrid"
+  description={t('BeautifulGrid가 공개하는 TypeScript 인터페이스, 타입, enum과 각 멤버를 확인합니다.', 'Explore the public TypeScript interfaces, types, enums, and members exposed by BeautifulGrid.')}
+  canonicalPath={localizePath('/api/props', locale)}
+  locale={locale}
+>
+  <header class="api-header">
+    <p class="api-eyebrow">TypeScript API Reference</p>
+    <h1>Public interfaces &amp; types</h1>
+    <p>
+      {t('beautiful-grid 사용자가 직접 구성하거나 콜백에서 받는 공개 타입을 라이브러리 소스와 같은 시그니처로 설명합니다.', 'Public types configured by beautiful-grid users or received in callbacks are documented with signatures matching the library source.')}
+    </p>
+    <div class="api-note">
+      {t('총', 'Includes')} <strong>{apiReferenceEntries.length}{t('개', '')}</strong> {t('공개 타입을 제공합니다. Zustand store와 렌더링 구현에만 쓰는', 'public types. Internal types used only by the Zustand store and rendering implementation, such as')} <code>AppModel</code>, <code>AppActions</code> {t('등의 내부 타입은 사용 API에서 제외했습니다.', 'are excluded from the consumer API.')}
+    </div>
+  </header>
+
+  {apiReferenceGroups.map(group => (
+    <section class="api-group" aria-labelledby={`api-group-${group.id}`}>
+      <h2 id={`api-group-${group.id}`} class="api-group-title">{isEn ? (groupLabels[group.id] ?? group.label) : group.label}</h2>
+      {group.entries.map(entry => (
+        <article id={apiTypeId(entry.name)} class="api-entry">
+          <header class="api-entry-header">
+            <div class="api-entry-heading-row">
+              <h3><code>{entry.name}</code></h3>
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <span class="api-kind">{entry.kind}</span>
+                <a class="api-source-link" href={`${sourceBase}#L${entry.sourceLine}`} target="_blank" rel="noopener noreferrer" aria-label={`${t('소스에서', 'View')} ${entry.name} ${t('보기', 'in source')}`}>
+                  {t('소스', 'source')} ↗
+                </a>
+              </div>
+            </div>
+            <p class="api-entry-summary">{isEn ? `Public ${entry.kind} exported for DataGrid configuration and callbacks.` : entry.summary}</p>
+            <pre class="api-declaration"><code>{entry.declaration}</code></pre>
+          </header>
+
+          {entry.members.length > 0 && (
+            <div class="api-table-scroll">
+              <table class="api-member-table">
+                <thead>
+                  <tr><th>Member</th><th>Type</th><th>{t('설명', 'Description')}</th></tr>
+                </thead>
+                <tbody>
+                  {entry.members.map(member => (
+                    <tr id={apiMemberId(entry.name, member.name)}>
+                      <td>
+                        <code>{member.name}</code><br />
+                        <span class={member.required ? 'api-required' : 'api-optional'}>
+                          {member.required ? 'required' : 'optional'}
+                        </span>
+                        {member.deprecated && <span class="api-deprecated">deprecated</span>}
+                      </td>
+                      <td><code>{member.type}</code></td>
+                      <td>{isEn ? `Configuration contract for ${member.name}. See the declaration and linked source for the exact signature.` : member.description}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </article>
+      ))}
+    </section>
+  ))}
+</ReferenceLayout>

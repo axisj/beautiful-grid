@@ -1,0 +1,205 @@
+---
+import { getCollection } from 'astro:content';
+import { localeFromPath, type Locale } from '../../i18n';
+import { categoryLabel, learnCategoryOrder, learnIndexPath, learnMessages, learnPath, learnSlug } from './learnLocale';
+
+interface Props {
+  locale?: Locale;
+  currentSlug?: string;
+}
+
+const { currentSlug, locale: localeProp } = Astro.props;
+const locale = localeProp || localeFromPath(Astro.url.pathname);
+const messages = learnMessages[locale];
+const allLearn = await getCollection('learn');
+
+const grouped = learnCategoryOrder.map(cat => {
+  const items = allLearn
+    .filter(item => item.data.locale === locale && item.data.category === cat && !item.data.draft)
+    .sort((a, b) => a.data.order - b.data.order);
+  return {
+    category: cat,
+    label: categoryLabel(cat, locale),
+    items,
+  };
+}).filter(g => g.items.length > 0);
+
+const splitLocalizedTitle = (title: string) => {
+  const match = title.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
+
+  return match
+    ? { korean: match[1].trim(), english: match[2].trim() }
+    : { korean: title, english: '' };
+};
+---
+
+<nav aria-label={messages.navigation} class="learn-sidebar" data-learn-sidebar>
+  <div class="sidebar-top-title">
+    <a href={learnIndexPath(locale)} class="overview-link">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+        <path d="M6 6h10"/>
+        <path d="M6 10h10"/>
+      </svg>
+      <span>{messages.overview}</span>
+    </a>
+  </div>
+
+  {grouped.map(group => (
+    <div class="sidebar-section">
+      <div class="sidebar-category-title">{group.label}</div>
+      <ul class="sidebar-nav-list">
+        {group.items.map(item => {
+          const slug = learnSlug(item.id);
+          const isCurrent = currentSlug === slug;
+          const title = locale === 'ko'
+            ? splitLocalizedTitle(item.data.title)
+            : { korean: '', english: item.data.title };
+          return (
+            <li>
+              <a
+                href={learnPath(slug, locale)}
+                class:list={['sidebar-item-link', { active: isCurrent }]}
+                aria-current={isCurrent ? 'page' : undefined}
+                aria-label={title.korean ? `${title.english} / ${title.korean}` : title.english}
+              >
+                {title.english && <span class="sidebar-item-title-en" lang="en">{title.english}</span>}
+                {title.korean && <span class="sidebar-item-title-ko" lang="ko">{title.korean}</span>}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  ))}
+</nav>
+
+<script>
+  const revealCurrentLearnItem = () => {
+    document.querySelectorAll<HTMLElement>('[data-learn-sidebar]').forEach(sidebar => {
+      const currentItem = sidebar.querySelector<HTMLElement>('[aria-current="page"]');
+      if (!currentItem) return;
+
+      const menuItems = Array.from(sidebar.querySelectorAll<HTMLElement>('.sidebar-item-link'));
+      const currentIndex = menuItems.indexOf(currentItem);
+      const scrollTarget = currentIndex > 0 ? menuItems[currentIndex - 1] : currentItem;
+      const sidebarRect = sidebar.getBoundingClientRect();
+      const scrollTargetRect = scrollTarget.getBoundingClientRect();
+      const scrollTargetOffset = scrollTargetRect.top - sidebarRect.top + sidebar.scrollTop;
+
+      sidebar.scrollTop = Math.max(0, scrollTargetOffset);
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', revealCurrentLearnItem, { once: true });
+  } else {
+    requestAnimationFrame(revealCurrentLearnItem);
+  }
+</script>
+
+<style>
+  .learn-sidebar {
+    position: sticky;
+    top: 5rem;
+    max-height: calc(100vh - 6rem);
+    overflow-y: auto;
+    padding-right: 0.75rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--site-border-strong, #cbd5e1) var(--site-surface, #f7f9fc);
+  }
+  .learn-sidebar::-webkit-scrollbar {
+    width: 10px;
+  }
+  .learn-sidebar::-webkit-scrollbar-track {
+    background: var(--site-surface, #f7f9fc);
+    border-radius: 999px;
+  }
+  .learn-sidebar::-webkit-scrollbar-thumb {
+    background: var(--site-border-strong, #cbd5e1);
+    border: 2px solid var(--site-surface, #f7f9fc);
+    border-radius: 999px;
+  }
+  .learn-sidebar::-webkit-scrollbar-thumb:hover {
+    background: var(--site-text-muted, #64748b);
+  }
+  .sidebar-top-title {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--site-border);
+  }
+  .overview-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--site-text-primary);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+  .overview-link:hover {
+    color: var(--site-accent);
+    text-decoration: none;
+  }
+  .sidebar-section {
+    margin-bottom: 1.75rem;
+  }
+  .sidebar-category-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--site-text-muted);
+    margin-bottom: 0.5rem;
+    padding-left: 0.5rem;
+  }
+  .sidebar-nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+  .sidebar-item-link {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.125rem;
+    padding: 0.5rem 0.625rem;
+    font-weight: 500;
+    color: var(--site-text-secondary);
+    border-radius: var(--site-radius-sm, 6px);
+    text-decoration: none;
+    transition: all 0.15s ease;
+    line-height: 1.3;
+  }
+  .sidebar-item-title-en {
+    color: inherit;
+    font-size: 0.8125rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
+  }
+  .sidebar-item-title-ko {
+    color: var(--site-text-muted);
+    font-size: 0.75rem;
+    font-weight: 500;
+    word-break: keep-all;
+  }
+  .sidebar-item-link:hover {
+    color: var(--site-text-primary);
+    background-color: var(--site-surface, #f7f9fc);
+    text-decoration: none;
+  }
+  .sidebar-item-link.active {
+    color: var(--site-accent, #2563eb);
+    background-color: rgba(37, 99, 235, 0.08);
+    font-weight: 600;
+  }
+  .sidebar-item-link:hover .sidebar-item-title-ko,
+  .sidebar-item-link.active .sidebar-item-title-ko {
+    color: inherit;
+  }
+</style>

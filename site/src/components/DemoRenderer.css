@@ -1,0 +1,30 @@
+.site-demo-renderer {
+  position: relative;
+  min-height: 400px;
+}
+
+.site-demo-loading {
+  padding: 2rem;
+  color: var(--site-text-secondary);
+  text-align: center;
+}
+
+.demo-only-surface .site-demo-renderer {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.demo-only-surface .site-demo-renderer > :only-child {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.demo-only-surface .site-demo-renderer .data-grid-container {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+}

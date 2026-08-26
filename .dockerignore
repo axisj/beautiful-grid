@@ -1,0 +1,14 @@
+.git
+.astro
+.demo-dist
+.vercel
+coverage
+dist
+node_modules
+site/.astro
+site/dist
+site/node_modules
+test-results
+.playwright-results
+playwright-report
+*.tgz

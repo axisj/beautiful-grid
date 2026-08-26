@@ -1,0 +1,57 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import { localizePath, type Locale } from '../../i18n';
+import LearnLayout from '../../layouts/LearnLayout.astro';
+import LearnBreadcrumb from './LearnBreadcrumb.astro';
+import LiveDemoPanel from './LiveDemoPanel';
+import SourceCodePanel from './SourceCodePanel.astro';
+import RelatedGuides from './RelatedGuides.astro';
+import LearnPager from './LearnPager.astro';
+import { categoryLabel, learnMessages, learnSlug } from './learnLocale';
+
+interface Props {
+  locale: Locale;
+  item: CollectionEntry<'learn'>;
+}
+
+const { locale, item } = Astro.props;
+const slug = learnSlug(item.id);
+const messages = learnMessages[locale];
+const { Content } = await render(item);
+---
+
+<LearnLayout title={`${item.data.title} | BeautifulGrid Learn`} description={item.data.description} canonicalPath={localizePath(item.data.canonicalPath, locale)} locale={locale} currentSlug={slug}>
+  <article>
+    <header class="learn-header">
+      <LearnBreadcrumb locale={locale} categoryLabel={categoryLabel(item.data.category, locale)} title={item.data.title} />
+      <h1>{item.data.title}</h1>
+      <p class="learn-header-desc">{item.data.description}</p>
+      <div class="learn-meta-bar">
+        <div class="learn-tags">{item.data.features.map(feature => <span class="badge">#{feature}</span>)}</div>
+        <span>{messages.reviewedAt}: {item.data.lastReviewedAt}</span>
+        {item.data.relatedApi.length > 0 && (
+          <div class="learn-related-api">
+            <span style="color: var(--site-text-muted);">{messages.relatedApi}:</span>
+            {item.data.relatedApi.map(apiPath => (
+              <a href={localizePath(apiPath, locale)} style="font-family: var(--site-font-mono); font-size: 0.8125rem;">{apiPath.split('#')[1] || 'API'}</a>
+            ))}
+          </div>
+        )}
+      </div>
+    </header>
+
+    {item.data.demoId && (
+      <section aria-label={messages.liveDemoSection}>
+        <LiveDemoPanel client:only="react" locale={locale} demoId={item.data.demoId} slug={slug} title={item.data.title} />
+      </section>
+    )}
+    {item.data.demoId && (
+      <section aria-label={messages.sourceSection}>
+        <SourceCodePanel locale={locale} demoId={item.data.demoId} />
+      </section>
+    )}
+    <div class="learn-content"><Content /></div>
+    <RelatedGuides locale={locale} relatedSlugs={item.data.relatedGuides} />
+    <LearnPager locale={locale} currentSlug={slug} />
+  </article>
+</LearnLayout>

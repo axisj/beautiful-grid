@@ -1,0 +1,30 @@
+---
+import Layout from './Layout.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import LearnSidebar from '../components/learn/LearnSidebar.astro';
+import '../styles/learn.css';
+import type { Locale } from '../i18n';
+
+interface Props {
+  title: string;
+  description?: string;
+  canonicalPath?: string;
+  locale?: Locale;
+  currentSlug?: string;
+}
+
+const props = Astro.props;
+---
+<Layout {...props}>
+  <Header locale={props.locale} />
+  <div class="container learn-container">
+    <aside class="learn-sidebar-wrapper">
+      <LearnSidebar currentSlug={props.currentSlug} />
+    </aside>
+    <main class="learn-main">
+      <slot />
+    </main>
+  </div>
+  <Footer locale={props.locale} />
+</Layout>

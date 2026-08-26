@@ -1,0 +1,284 @@
+.theming-example {
+  --theming-panel-bg: #f8fafc;
+  --theming-panel-border: #dbe2ea;
+  --theming-panel-color: #334155;
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  gap: 12px;
+  color: var(--theming-panel-color);
+}
+
+.theming-example__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--theming-panel-border);
+  border-radius: 12px;
+  background: var(--theming-panel-bg);
+}
+
+.theming-example__intro strong,
+.theming-example__intro span {
+  display: block;
+}
+
+.theming-example__intro strong {
+  margin-bottom: 3px;
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.theming-example__intro span {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.theming-example__option {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.theming-example__tokens {
+  display: grid;
+  grid-template-columns: minmax(170px, 1.25fr) repeat(4, minmax(130px, 1fr));
+  gap: 8px;
+}
+
+.theming-example__class-name,
+.theming-example__token {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 10px;
+  border: 1px solid var(--theming-panel-border);
+  border-radius: 9px;
+  background: #ffffff;
+}
+
+.theming-example__class-name {
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.theming-example__class-name > span {
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.theming-example__class-name code {
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.theming-example__swatch {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+}
+
+.theming-example__token > span:last-child,
+.theming-example__token code,
+.theming-example__token small {
+  display: block;
+  min-width: 0;
+}
+
+.theming-example__token code {
+  overflow: hidden;
+  color: #475569;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.theming-example__token small {
+  margin-top: 2px;
+  color: #0f172a;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.theming-example .theming-example__grid-container {
+  height: 350px;
+}
+
+.theming-example__hint {
+  margin: -3px 0 0;
+  color: #64748b;
+  font-size: 11px;
+}
+
+/* className으로 Grid 루트에 범위를 한정해 CSS 변수만 오버라이드합니다. */
+.site-grid-theme .bgrid-root.theming-example-grid.bgrid-theme-brand {
+  --bgrid-font-size: 13px;
+  --bgrid-primary-color: #0f766e;
+  --bgrid-header-bg: #0f766e;
+  --bgrid-header-color: #ffffff;
+  --bgrid-header-font-weight: 700;
+  --bgrid-header-hover-bg: #115e59;
+  --bgrid-border-color-base: #99d5ca;
+  --bgrid-border-color-light: #b7e2da;
+  --bgrid-border-color-subtle: #d9f2ed;
+  --bgrid-header-separator-color: #5eead4;
+  --bgrid-frozen-boundary-color: #0f766e;
+  --bgrid-border-radius: 10px;
+  --bgrid-row-selector-color: #0f766e;
+  --bgrid-body-bg: #f7fffd;
+  --bgrid-body-color: #134e4a;
+  --bgrid-body-odd-bg: #ecfdf9;
+  --bgrid-body-hover-bg: #d9f8f1;
+  --bgrid-body-hover-odd-bg: #ccfbf1;
+  --bgrid-body-active-bg: #ccfbf1;
+  --bgrid-cell-selected-bg: #99f6e4;
+  --bgrid-cell-selected-border-color: #0f766e;
+  --bgrid-active-cell-bg: #ffffff;
+  --bgrid-active-cell-ring-color: #0f766e;
+  --bgrid-selection-axis-bg: #99f6e4;
+  --bgrid-selection-axis-color: #115e59;
+  --bgrid-selection-axis-border-color: #0f766e;
+  --bgrid-footer-bg: #dff7f2;
+  --bgrid-scroll-bg: #f0fdfa;
+  --bgrid-scroll-track-bg: #d5f5ed;
+  --bgrid-scroll-thumb-bg: #5eead4;
+  --bgrid-scroll-thumb-hover-bg: #2dd4bf;
+  --bgrid-scrollbar-modern-track-bg: #d5f5ed;
+  --bgrid-scrollbar-modern-thumb-bg: #5eead4;
+  --bgrid-scrollbar-modern-thumb-hover-bg: #2dd4bf;
+  --bgrid-scrollbar-modern-button-hover-bg: #ccfbf1;
+  --bgrid-scrollbar-modern-icon-color: #0f766e;
+  --bgrid-scrollbar-modern-gutter-bg: #f0fdfa;
+  --bgrid-scrollbar-modern-gutter-border-color: #99d5ca;
+}
+
+.site-grid-theme .bgrid-root.theming-example-grid.bgrid-theme-dark {
+  --bgrid-font-size: 13px;
+  --bgrid-primary-color: #38bdf8;
+  --bgrid-header-bg: #1e293b;
+  --bgrid-header-color: #f8fafc;
+  --bgrid-header-font-weight: 650;
+  --bgrid-header-hover-bg: #334155;
+  --bgrid-border-color-base: #475569;
+  --bgrid-border-color-light: #334155;
+  --bgrid-border-color-subtle: #263449;
+  --bgrid-header-separator-color: #64748b;
+  --bgrid-frozen-boundary-color: #64748b;
+  --bgrid-border-radius: 8px;
+  --bgrid-row-selector-color: #0f172a;
+  --bgrid-body-bg: #0f172a;
+  --bgrid-body-color: #e2e8f0;
+  --bgrid-body-odd-bg: #111c2f;
+  --bgrid-body-hover-bg: #1e293b;
+  --bgrid-body-hover-odd-bg: #263449;
+  --bgrid-body-active-bg: #164e63;
+  --bgrid-cell-selected-bg: #164e63;
+  --bgrid-cell-selected-border-color: #38bdf8;
+  --bgrid-active-cell-bg: #0f172a;
+  --bgrid-active-cell-ring-color: #38bdf8;
+  --bgrid-selection-axis-bg: #164e63;
+  --bgrid-selection-axis-color: #7dd3fc;
+  --bgrid-selection-axis-border-color: #38bdf8;
+  --bgrid-footer-bg: #1e293b;
+  --bgrid-scroll-bg: #0f172a;
+  --bgrid-scroll-track-bg: #1e293b;
+  --bgrid-scroll-thumb-bg: #475569;
+  --bgrid-scroll-thumb-hover-bg: #64748b;
+  --bgrid-scrollbar-modern-track-bg: #1e293b;
+  --bgrid-scrollbar-modern-thumb-bg: #475569;
+  --bgrid-scrollbar-modern-thumb-hover-bg: #64748b;
+  --bgrid-scrollbar-modern-button-hover-bg: #334155;
+  --bgrid-scrollbar-modern-icon-color: #94a3b8;
+  --bgrid-scrollbar-modern-gutter-bg: #1e293b;
+  --bgrid-scrollbar-modern-gutter-border-color: #475569;
+}
+
+[role='grid'].theming-example-grid .theming-example-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 62px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+[role='grid'].theming-example-grid .theming-example-status--healthy {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+[role='grid'].theming-example-grid .theming-example-status--warning {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+[role='grid'].theming-example-grid .theming-example-status--scheduled {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+[role='grid'].theming-example-grid.bgrid-theme-dark .theming-example-status--healthy {
+  background: #14532d;
+  color: #bbf7d0;
+}
+
+[role='grid'].theming-example-grid.bgrid-theme-dark .theming-example-status--warning {
+  background: #7c2d12;
+  color: #fed7aa;
+}
+
+[role='grid'].theming-example-grid.bgrid-theme-dark .theming-example-status--scheduled {
+  background: #312e81;
+  color: #c7d2fe;
+}
+
+@media (max-width: 900px) {
+  .theming-example__tokens {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .theming-example__class-name {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .theming-example__toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .theming-example__toolbar .ant-segmented {
+    width: 100%;
+  }
+
+  .theming-example__toolbar .ant-segmented-item {
+    flex: 1;
+  }
+
+  .theming-example__tokens {
+    grid-template-columns: 1fr;
+  }
+
+  .theming-example__class-name {
+    grid-column: auto;
+  }
+
+  .theming-example .theming-example__grid-container {
+    height: 330px;
+  }
+}

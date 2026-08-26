@@ -1,0 +1,16 @@
+export const legacyDocRedirects: Record<string, string> = {
+  'accessibility-and-keyboard': 'accessibility-and-keyboard',
+  'cell-merge': 'cell-merge',
+  'column-reorder': 'column-reorder',
+  'data-and-columns': 'data-and-columns',
+  editing: 'editing',
+  'frozen-columns': 'frozen-columns',
+  'getting-started': 'getting-started',
+  'loading-and-empty-state': 'loading',
+  pivot: 'pivot',
+  selection: 'row-selection',
+  'sorting-and-filtering': 'sorting-filtering',
+  summary: 'summary',
+  theming: 'theming',
+  'virtual-scroll': 'virtual-scroll',
+};

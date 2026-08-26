@@ -1,0 +1,21 @@
+.editing-example-cell-editable {
+  --editing-example-bg: #ffffff;
+  --editing-example-hover-bg: #dbeafe;
+}
+
+.editing-example-cell-readonly {
+  --editing-example-color: #525252;
+  --editing-example-bg: #f5f5f5;
+  --editing-example-hover-bg: #e5e5e5;
+}
+
+.bgrid-body-table
+  td:is(.editing-example-cell-editable, .editing-example-cell-readonly):not(:is(.bgrid-cell-selected, .bgrid-cell-edited, .bgrid-cell-value-changed, .bgrid-cell-editing)) {
+  color: var(--editing-example-color, inherit);
+  background-color: var(--editing-example-bg);
+}
+
+.bgrid-body-table tr.bgrid-row-hover
+  > td:is(.editing-example-cell-editable, .editing-example-cell-readonly):not(:is(.bgrid-cell-selected, .bgrid-cell-edited, .bgrid-cell-value-changed, .bgrid-cell-editing)) {
+  background-color: var(--editing-example-hover-bg);
+}

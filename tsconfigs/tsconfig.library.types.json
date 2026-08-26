@@ -1,0 +1,23 @@
+{
+  "extends": "../tsconfig.build.json",
+  "compilerOptions": {
+    "outDir": "../dist/types",
+    "module": "esnext",
+    "target": "es2019",
+    "allowJs": false,
+    "declaration": true,
+    "declarationMap": false,
+    "emitDeclarationOnly": true,
+    "incremental": false,
+    "noEmit": false,
+    "jsx": "react",
+    "jsxImportSource": ""
+  },
+  "include": [
+    "../beautiful-grid/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/tree.ts"
+  ]
+}

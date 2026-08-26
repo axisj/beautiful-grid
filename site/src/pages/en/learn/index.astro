@@ -1,0 +1,10 @@
+---
+import { getCollection } from 'astro:content';
+import LearnIndexPage from '../../../components/learn/LearnIndexPage.astro';
+
+const items = (await getCollection('learn')).filter(
+  item => item.data.locale === 'en' && item.id.startsWith('en/') && !item.data.draft,
+);
+---
+
+<LearnIndexPage locale="en" items={items} />

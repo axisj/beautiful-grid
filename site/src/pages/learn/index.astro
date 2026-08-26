@@ -1,0 +1,8 @@
+---
+import { getCollection } from 'astro:content';
+import LearnIndexPage from '../../components/learn/LearnIndexPage.astro';
+
+const items = (await getCollection('learn')).filter(item => item.data.locale === 'ko' && !item.data.draft);
+---
+
+<LearnIndexPage locale="ko" items={items} />

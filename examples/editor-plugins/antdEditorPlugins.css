@@ -1,0 +1,92 @@
+.bgrid-antd-select-editor.ant-select,
+.bgrid-antd-cascader-editor.ant-select,
+.bgrid-antd-tree-select-editor.ant-select,
+.bgrid-antd-date-editor.ant-picker,
+.bgrid-antd-time-editor.ant-picker,
+.bgrid-antd-color-editor {
+  color: inherit;
+  font: inherit;
+}
+
+.bgrid-antd-select-editor.ant-select .ant-select-selector,
+.bgrid-antd-date-editor.ant-picker,
+.bgrid-antd-time-editor.ant-picker {
+  padding: 0 6px;
+  border-radius: 0;
+  color: inherit;
+  font: inherit;
+}
+
+.bgrid-antd-cascader-editor.ant-select .ant-select-selector,
+.bgrid-antd-tree-select-editor.ant-select .ant-select-selector {
+  padding: 0 5.5px !important;
+  border-radius: 0;
+  color: inherit;
+  font: inherit;
+}
+
+.bgrid-antd-cascader-editor.ant-select .ant-select-selection-search,
+.bgrid-antd-tree-select-editor.ant-select .ant-select-selection-search {
+  inset-inline-start: 0;
+  inset-inline-end: 0;
+}
+
+.bgrid-antd-select-editor.ant-select .ant-select-selection-item,
+.bgrid-antd-select-editor.ant-select .ant-select-selection-placeholder,
+.bgrid-antd-select-editor.ant-select .ant-select-selection-search-input,
+.bgrid-antd-cascader-editor.ant-select .ant-select-selection-item,
+.bgrid-antd-cascader-editor.ant-select .ant-select-selection-search-input,
+.bgrid-antd-tree-select-editor.ant-select .ant-select-selection-item,
+.bgrid-antd-tree-select-editor.ant-select .ant-select-selection-search-input,
+.bgrid-antd-date-editor.ant-picker .ant-picker-input > input,
+.bgrid-antd-time-editor.ant-picker .ant-picker-input > input {
+  color: inherit !important;
+  font: inherit !important;
+}
+
+.bgrid-antd-color-editor {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0 9.5px 0 6.5px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.bgrid-antd-color-value {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.bgrid-antd-color-editor .bgrid-color-swatch {
+  margin-left: auto;
+}
+
+.bgrid-color-swatch {
+  width: 14px;
+  height: 14px;
+  border: 1px solid rgb(0 0 0 / 18%);
+  border-radius: 3px;
+  flex: 0 0 14px;
+}
+
+.bgrid-antd-editor-popup,
+.bgrid-antd-editor-popup .ant-select-item,
+.bgrid-antd-editor-popup .ant-cascader-menu,
+.bgrid-antd-editor-popup .ant-cascader-menu-item,
+.bgrid-antd-editor-popup .ant-select-tree,
+.bgrid-antd-editor-popup .ant-select-tree-node-content-wrapper,
+.bgrid-antd-editor-popup .ant-picker-content,
+.bgrid-antd-editor-popup .ant-picker-time-panel,
+.bgrid-antd-editor-popup .ant-color-picker-inner-content {
+  font-family: var(--bgrid-font-family, inherit);
+  font-size: var(--bgrid-font-size, 13px);
+}

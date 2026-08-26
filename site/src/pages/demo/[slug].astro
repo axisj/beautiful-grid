@@ -1,0 +1,41 @@
+---
+import { getCollection } from 'astro:content';
+import DemoOnlyLayout from '../../layouts/DemoOnlyLayout.astro';
+import { demoManifest } from '../../data/demoManifest';
+import DemoRenderer from '../../components/DemoRenderer';
+
+export async function getStaticPaths() {
+  const allLearn = await getCollection('learn');
+  return allLearn
+    .filter(item => {
+      const slug = item.id.replace(/\.(md|mdx)$/, '');
+      return !item.data.draft && item.data.demoId === slug && demoManifest[item.data.demoId];
+    })
+    .map(item => ({
+      params: { slug: item.id.replace(/\.(md|mdx)$/, '') },
+      props: { item },
+    }));
+}
+
+const { item } = Astro.props;
+const slug = item.id.replace(/\.(md|mdx)$/, '');
+const demoId = item.data.demoId!;
+const manifestItem = demoManifest[demoId];
+---
+
+<DemoOnlyLayout
+  title={`${item.data.title} Demo | BeautifulGrid`}
+  canonicalPath={`/learn/${slug}`}
+>
+  <div class="demo-only-surface">
+    <DemoRenderer client:only="react" sourcePath={manifestItem.componentFile} />
+  </div>
+</DemoOnlyLayout>
+
+<style>
+  .demo-only-surface {
+    width: 100%;
+    height: 100dvh;
+    min-height: 0;
+  }
+</style>

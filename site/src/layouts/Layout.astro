@@ -1,0 +1,66 @@
+---
+import '../styles/globals.css';
+import '../../../beautiful-grid/style.css';
+import { localeAlternates, localeMeta, normalizeLocale, type Locale } from '../i18n';
+import { themeBootstrapScript } from '../i18n/theme';
+
+interface Props {
+  title: string;
+  description?: string;
+  canonicalPath?: string;
+  locale?: Locale;
+  alternatePaths?: Partial<Record<Locale, string>>;
+  noIndex?: boolean;
+}
+
+const {
+  title,
+  description = 'BeautifulGrid - A React DataGrid library for business applications.',
+  canonicalPath = Astro.url.pathname,
+  locale: localeProp = 'ko',
+  alternatePaths,
+  noIndex = false,
+} = Astro.props;
+
+const locale = normalizeLocale(localeProp);
+const siteUrl = Astro.site || new URL('https://bgrid.axisj.com');
+const canonicalUrl = new URL(canonicalPath, siteUrl);
+const inferredAlternates = localeAlternates(canonicalPath);
+const koUrl = new URL(alternatePaths?.ko || inferredAlternates.ko, siteUrl);
+const enUrl = new URL(alternatePaths?.en || inferredAlternates.en, siteUrl);
+---
+<!doctype html>
+<html lang={localeMeta[locale].htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script is:inline set:html={themeBootstrapScript}></script>
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
+    <link rel="icon" type="image/png" href="/favicon_dark.png" media="(prefers-color-scheme: dark)" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple_touch_icon.png" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0b1120" media="(prefers-color-scheme: dark)" />
+    {noIndex && <meta name="robots" content="noindex, follow" />}
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="alternate" hreflang="ko" href={koUrl} />
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="x-default" href={koUrl} />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:locale" content={localeMeta[locale].ogLocale} />
+    <meta property="og:locale:alternate" content={localeMeta[locale === 'ko' ? 'en' : 'ko'].ogLocale} />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

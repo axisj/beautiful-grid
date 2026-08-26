@@ -1,0 +1,60 @@
+.editing-events-terminal {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 112px;
+  margin-top: 10px;
+  overflow: hidden;
+  border: 1px solid #263449;
+  border-radius: var(--site-radius-sm, 8px);
+  background: var(--site-code-bg, #111827);
+  color: #d7e1ef;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 4%);
+}
+
+.editing-events-terminal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 30px;
+  padding: 0 12px;
+  border-bottom: 1px solid #263449;
+  color: #8fa3bd;
+  font-family: var(--site-font-mono, monospace);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.editing-events-log {
+  min-height: 0;
+  margin: 0;
+  padding: 8px 12px 10px 32px;
+  overflow-x: auto;
+  overflow-y: scroll;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  color: #c8d4e3;
+  font-family: var(--site-font-mono, monospace);
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.editing-events-log li::marker {
+  color: #60a5fa;
+}
+
+.editing-events-log::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.editing-events-log::-webkit-scrollbar-track {
+  background: #111827;
+}
+
+.editing-events-log::-webkit-scrollbar-thumb {
+  border: 2px solid #111827;
+  border-radius: 999px;
+  background: #475569;
+}

@@ -1,0 +1,9 @@
+---
+import LegacyRedirectLayout from '../../layouts/LegacyRedirectLayout.astro';
+import { legacyDocRedirects } from '../../data/legacyRedirects';
+export function getStaticPaths() {
+  return Object.entries(legacyDocRedirects).map(([legacySlug, learnSlug]) => ({ params: { slug: legacySlug }, props: { target: `/learn/${learnSlug}` } }));
+}
+const { target } = Astro.props;
+---
+<LegacyRedirectLayout title="Learn으로 이동 | BeautifulGrid" target={target} />

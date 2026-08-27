@@ -6,10 +6,12 @@ interface Props {
   isRadio?: boolean;
   indeterminate?: boolean;
   disabled?: boolean;
+  ariaLabel?: string;
+  busy?: boolean;
   handleChange?: (checked: boolean) => void;
 }
 
-function RowSelector({ checked = false, isRadio, indeterminate, handleChange, disabled }: Props) {
+function RowSelector({ checked = false, isRadio, indeterminate, handleChange, disabled, ariaLabel, busy }: Props) {
   const itemHeight = useAppStore(s => s.itemHeight);
   const checkboxHeight = isRadio ? 15 : Math.min(15, itemHeight);
   const afterWidth = Math.max(checkboxHeight - 10, 2);
@@ -28,9 +30,12 @@ function RowSelector({ checked = false, isRadio, indeterminate, handleChange, di
     .join(' ');
 
   return (
-    <div
+    <span
       className={'bgrid-row-selector-container'}
-      onClick={() => {
+      onPointerDown={event => event.stopPropagation()}
+      onClick={event => {
+        event.preventDefault();
+        event.stopPropagation();
         if (disabled) return;
         handleChange?.(!checked);
       }}
@@ -39,6 +44,8 @@ function RowSelector({ checked = false, isRadio, indeterminate, handleChange, di
         role={isRadio ? 'radio' : 'checkbox'}
         aria-checked={indeterminate ? 'mixed' : checked}
         aria-disabled={disabled}
+        aria-label={ariaLabel}
+        aria-busy={busy || undefined}
         tabIndex={disabled ? -1 : 0}
         onKeyDown={event => {
           if (disabled || (event.key !== ' ' && event.key !== 'Enter')) return;
@@ -57,7 +64,7 @@ function RowSelector({ checked = false, isRadio, indeterminate, handleChange, di
           } as React.CSSProperties
         }
       />
-    </div>
+    </span>
   );
 }
 

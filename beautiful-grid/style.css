@@ -1663,10 +1663,27 @@
 
 .bgrid-head-column-label {
   flex: 1 1 0%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
   user-select: none;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.bgrid-head-column-label-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bgrid-checkbox-header-control {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
 }
 
 .drag-item .bgrid-column-drag-handle {
@@ -1842,9 +1859,40 @@
 /* Selector & Resizer */
 .bgrid-row-selector-container {
   position: relative;
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
   justify-content: center;
+}
+
+.bgrid-checkbox-editor {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+}
+
+.bgrid-checkbox-editor--left {
+  justify-content: flex-start;
+}
+
+.bgrid-checkbox-editor--center {
+  justify-content: center;
+}
+
+.bgrid-checkbox-editor--right {
+  justify-content: flex-end;
+}
+
+.bgrid-checkbox-editor-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bgrid-cell-checkbox > .bgrid-cell-content {
+  cursor: default;
 }
 
 .bgrid-col-resizer {

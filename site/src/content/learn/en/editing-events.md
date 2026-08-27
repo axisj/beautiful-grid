@@ -14,12 +14,12 @@ indexable: true
 draft: false
 ---
 
-Text editors, Select editors, external plugins, and lookup icons all use the same change transaction. Instead of implementing separate save logic for every editor, perform validation and related-cell updates once in the initiating column's `onChangeValue` hook.
+Text editors, checkbox editors, Select editors, external plugins, and lookup icons all use the same change transaction. Instead of implementing separate save logic for every editor, perform validation and related-cell updates once in the initiating column's `onChangeValue` hook.
 
 ## Event flow
 
 ```text
-text / plugin / editorIcon
+text / checkbox / plugin / editorIcon
         ↓
  requestCommit(changes)
         ↓

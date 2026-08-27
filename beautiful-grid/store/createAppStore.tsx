@@ -31,13 +31,18 @@ import {
   applySortToQuery,
   clearFilterFromQuery,
   createNextValues,
+  createCheckboxEditorContext,
   getCellValueByRowKey,
+  getCheckboxFalseValue,
+  getCheckboxTrueValue,
   getColumnId,
   getFrozenColumnsWidth,
   getMergedRowRange,
   findMatchingSearchResultIndex,
   resolveCellValueChanges,
   resolveLogicalCell,
+  isCheckboxEditorDisabled,
+  isCheckboxValueChecked,
 } from '../utils';
 
 const StoreContext = createContext<StoreApi<AppStore> | null>(null);
@@ -1273,6 +1278,95 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
             });
           }
           throw error;
+        }
+      },
+      commitCheckboxCell: async (rowIndex, columnIndex, checked) => {
+        const state = get();
+        const column = state.columns[columnIndex];
+        const config = column?.editor?.type === 'checkbox' ? column.editor : undefined;
+        if (!column || !config || !state.editable || column.editable === false) return;
+
+        const logicalCell = resolveLogicalCell(state.data, state.cellMergeOptions, { rowIndex, columnIndex });
+        const isDisabled = logicalCell.rowIndexes.some(visibleIndex => {
+          const item = state.data[visibleIndex];
+          if (!item || item.status === BGridDataItemStatus.remove) return true;
+          const sourceIndex = state.sourceIndexByVisibleIndex?.[visibleIndex] ?? visibleIndex;
+          return isCheckboxEditorDisabled(
+            config,
+            createCheckboxEditorContext({
+              index: visibleIndex,
+              sourceIndex,
+              columnIndex,
+              column,
+              item,
+              value: getCellValueByRowKey(column.key, item.values),
+            }),
+          );
+        });
+        if (isDisabled) return;
+
+        get().beginCellEdit({ rowIndex, columnIndex }, 'preserve');
+        const session = get().cellInteractionSession;
+        if (session?.kind !== 'editor' || session.cell.columnIndex !== columnIndex) return;
+
+        try {
+          await get().requestCellCommit({
+            sessionId: session.id,
+            source: 'checkbox',
+            changes: [
+              {
+                columnId: column.columnId,
+                value: checked ? getCheckboxTrueValue(config) : getCheckboxFalseValue(config),
+              },
+            ],
+          });
+        } catch (error) {
+          get().cancelCellInteraction(session.id);
+          throw error;
+        }
+      },
+      commitCheckboxColumn: async (columnIndex, checked) => {
+        const state = get();
+        const column = state.columns[columnIndex];
+        const config = column?.editor?.type === 'checkbox' ? column.editor : undefined;
+        if (!column || !config || !config.header || !state.editable || column.editable === false) return;
+        if (typeof config.header === 'object' && config.header.disabled) return;
+
+        const rowIndexes: number[] = [];
+        const canonicalIndexes = new Set<number>();
+        state.data.forEach((_item, visibleIndex) => {
+          const logicalCell = resolveLogicalCell(state.data, state.cellMergeOptions, {
+            rowIndex: visibleIndex,
+            columnIndex,
+          });
+          const canonicalIndex = logicalCell.cell.rowIndex;
+          if (canonicalIndexes.has(canonicalIndex)) return;
+          canonicalIndexes.add(canonicalIndex);
+
+          let needsChange = false;
+          const eligible = logicalCell.rowIndexes.every(index => {
+            const item = state.data[index];
+            if (!item || item.status === BGridDataItemStatus.remove) return false;
+            const sourceIndex = state.sourceIndexByVisibleIndex?.[index] ?? index;
+            const value = getCellValueByRowKey(column.key, item.values);
+            if (isCheckboxValueChecked(config, value) !== checked) needsChange = true;
+            return !isCheckboxEditorDisabled(
+              config,
+              createCheckboxEditorContext({
+                index,
+                sourceIndex,
+                columnIndex,
+                column,
+                item,
+                value,
+              }),
+            );
+          });
+          if (eligible && needsChange) rowIndexes.push(canonicalIndex);
+        });
+
+        for (const visibleIndex of rowIndexes) {
+          await get().commitCheckboxCell(visibleIndex, columnIndex, checked);
         }
       },
       setOnClick: onClick => set({ onClick }),

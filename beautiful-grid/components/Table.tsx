@@ -29,6 +29,7 @@ import {
   getCellValueByRowKey,
   getFrozenColumnsWidth,
   getVisibleScrollableRowRange,
+  isCheckboxValueChecked,
   markCellEdited,
   markCellValueChanged,
   resolveLogicalCell,
@@ -309,6 +310,7 @@ function Table<T>(props: Props<T>) {
     setContextMenuOptions,
     requestSearchOpen,
     openContextMenu,
+    commitCheckboxCell,
   } = useAppStore(
     useShallow(s => ({
       setRowChecked: s.setRowChecked,
@@ -326,6 +328,7 @@ function Table<T>(props: Props<T>) {
       setContextMenuOptions: s.setContextMenuOptions,
       requestSearchOpen: s.requestSearchOpen,
       openContextMenu: s.openContextMenu,
+      commitCheckboxCell: s.commitCheckboxCell,
     })),
   );
 
@@ -1925,9 +1928,11 @@ function Table<T>(props: Props<T>) {
     clearCellSelectionOnEscape,
     clearCellSelectionOnOutsideClick,
     columns,
+    commitCheckboxCell,
     commitScroll,
     copySelectedCells,
     dataLength: data.length,
+    data,
     editable,
     editItemIndex,
     endCellSelectionDrag,
@@ -1955,9 +1960,11 @@ function Table<T>(props: Props<T>) {
     clearCellSelectionOnEscape,
     clearCellSelectionOnOutsideClick,
     columns,
+    commitCheckboxCell,
     commitScroll,
     copySelectedCells,
     dataLength: data.length,
+    data,
     editable,
     editItemIndex,
     endCellSelectionDrag,
@@ -2086,8 +2093,10 @@ function Table<T>(props: Props<T>) {
         clearCellSelection,
         clearCellSelectionOnEscape,
         columns,
+        commitCheckboxCell,
         commitScroll,
         copySelectedCells,
+        data,
         dataLength,
         editable,
         editItemIndex,
@@ -2178,12 +2187,22 @@ function Table<T>(props: Props<T>) {
       const navEnabled = cellNavigationOptions?.enabled ?? true;
       if (navEnabled && dataLength > 0 && columns.length > 0) {
         const curCell = activeCell ?? { rowIndex: 0, columnIndex: 0 };
+        const toggleActiveCheckbox = () => {
+          const column = columns[curCell.columnIndex];
+          const config = column?.editor?.type === 'checkbox' ? column.editor : undefined;
+          const item = data[curCell.rowIndex];
+          if (!config || !item) return false;
+          const checked = isCheckboxValueChecked(config, getCellValueByRowKey(column.key, item.values));
+          void commitCheckboxCell(curCell.rowIndex, curCell.columnIndex, !checked);
+          return true;
+        };
 
         // F2: Start editing
         if (evt.key === 'F2') {
           const col = columns[curCell.columnIndex];
           if (editable && col?.editable !== false) {
             evt.preventDefault();
+            if (toggleActiveCheckbox()) return;
             setEditItem(curCell.rowIndex, curCell.columnIndex);
             return;
           }
@@ -2201,6 +2220,7 @@ function Table<T>(props: Props<T>) {
             (editItemIndex === undefined || editItemIndex < 0)
           ) {
             evt.preventDefault();
+            if (toggleActiveCheckbox()) return;
             setEditItem(curCell.rowIndex, curCell.columnIndex);
             return;
           }
@@ -2210,9 +2230,10 @@ function Table<T>(props: Props<T>) {
           return;
         }
 
-        // Space activates the current cell without changing focus or edit state.
+        // Space toggles a checkbox editor or activates any other current cell.
         if (evt.key === ' ' || evt.key === 'Spacebar') {
           evt.preventDefault();
+          if (editable && toggleActiveCheckbox()) return;
           handleClick(curCell.rowIndex, curCell.columnIndex);
           return;
         }

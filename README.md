@@ -765,7 +765,28 @@ const columns: BGridColumn<IListItem>[] = [
 ```
 
 The built-in text editor supports direct typing, IME composition, Enter/F2 preserve mode, Escape cancel,
-and focus return after editing. Prebuilt Select and Date plugins are available from the editor subpath:
+and focus return after editing. A checkbox editor can stay visible in each cell and optionally control all
+eligible rows from the column header:
+
+```typescript jsx
+{
+  key: 'enabled',
+  label: 'Enabled',
+  width: 140,
+  editable: true,
+  editor: {
+    type: 'checkbox',
+    header: { ariaLabel: 'Toggle all enabled rows' },
+    ariaLabel: ({ values }) => `Toggle ${values.name}`,
+    // trueValue: 'Y',
+    // falseValue: 'N',
+  },
+}
+```
+
+The header control reflects checked, unchecked, and indeterminate states. It updates the rows currently
+available to the Grid and excludes removed or disabled checkbox cells. Prebuilt Select and Date plugins are
+available from the editor subpath:
 
 ```typescript jsx
 import { createDateEditorPlugin, createSelectEditorPlugin } from 'beautiful-grid/editors';
@@ -862,7 +883,8 @@ components should mount their popup into the `getPortalContainer()` supplied to 
 | `onClick`         | `(params) => void`                           | 셀 클릭 이벤트                     |
 
 Each `BGridColumn<T>` can specify `editable` and an `editor`. Supported editor configs are the built-in
-`{ type: 'text' }` config and plugin objects created by `defineEditorPlugin()` or the prebuilt editor factories.
+`{ type: 'text' }` and `{ type: 'checkbox' }` configs, plus plugin objects created by `defineEditorPlugin()`
+or the prebuilt editor factories.
 
 Nested headers use stable column IDs and can be composed to any depth:
 

@@ -21,3 +21,4 @@ export * from './mergedCells';
 export * from './gridSearch';
 export * from './cellEditTransaction';
 export * from './rowReorder';
+export * from './checkboxEditor';

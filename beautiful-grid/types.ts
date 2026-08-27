@@ -31,6 +31,11 @@ export interface BGridTextEditorContext<T> {
   column: BGridColumn<T>;
 }
 
+export interface BGridCheckboxEditorContext<T> extends BGridTextEditorContext<T> {
+  sourceIndex: number;
+  value: unknown;
+}
+
 export type BGridCellValueChange<T> =
   | {
       key: BGridColumn<T>['key'];
@@ -52,7 +57,7 @@ export interface BGridCellCommitController<T> {
   cancel: () => void;
 }
 
-export type BGridEditSource = 'text' | 'plugin' | 'itemRender' | 'editorIcon';
+export type BGridEditSource = 'text' | 'plugin' | 'checkbox' | 'itemRender' | 'editorIcon';
 
 export interface BGridChangeValueRow<T> {
   index: number;
@@ -111,6 +116,24 @@ export interface BGridTextEditorConfig<T> {
   >;
 }
 
+export interface BGridCheckboxHeaderConfig {
+  ariaLabel?: string;
+  disabled?: boolean;
+}
+
+export interface BGridCheckboxEditorConfig<T> {
+  type: 'checkbox';
+  /** Value written when the checkbox is checked. Defaults to true. */
+  trueValue?: unknown;
+  /** Value written when the checkbox is unchecked. Defaults to false. */
+  falseValue?: unknown;
+  /** Shows a select-all control in the column header for the currently available rows. */
+  header?: boolean | BGridCheckboxHeaderConfig;
+  ariaLabel?: string | ((context: BGridCheckboxEditorContext<T>) => string);
+  label?: ReactNode | ((context: BGridCheckboxEditorContext<T>) => ReactNode);
+  disabled?: boolean | ((context: BGridCheckboxEditorContext<T>) => boolean);
+}
+
 export interface BGridEditorPluginProps<T> extends BGridTextEditorContext<T> {
   sessionId: number;
   value: unknown;
@@ -128,7 +151,10 @@ export interface BGridPluginEditorConfig<T> {
   component: React.ComponentType<BGridEditorPluginProps<T>>;
 }
 
-export type BGridCellEditorConfig<T> = BGridTextEditorConfig<T> | BGridPluginEditorConfig<T>;
+export type BGridCellEditorConfig<T> =
+  | BGridTextEditorConfig<T>
+  | BGridCheckboxEditorConfig<T>
+  | BGridPluginEditorConfig<T>;
 
 export interface BGridCellClipboardTextParams<T> {
   column: BGridColumn<T>;
@@ -985,6 +1011,8 @@ export interface AppActions<T> {
   isCellEditSessionActive: (sessionId: number) => boolean;
   isCellInteractionSessionActive: (sessionId: number) => boolean;
   requestCellCommit: (request: BGridCellCommitRequest<T>) => Promise<void>;
+  commitCheckboxCell: (rowIndex: number, columnIndex: number, checked: boolean) => Promise<void>;
+  commitCheckboxColumn: (columnIndex: number, checked: boolean) => Promise<void>;
   cancelCellInteraction: (sessionId?: number) => void;
 
   setOnClick: (onClick?: BGridProps<T>['onClick']) => void;

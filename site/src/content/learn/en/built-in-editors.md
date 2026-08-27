@@ -1,20 +1,43 @@
 ---
 title: "Built-in Editors"
-description: "Configure the built-in text editor and the provided Select and Date plugins, including value parsing, formatting, and editor icons."
+description: "Configure the built-in text and checkbox editors and the provided Select and Date plugins, including header controls, value conversion, and editor icons."
 category: "interaction"
 order: 2
 locale: "en"
 canonicalPath: "/en/learn/built-in-editors"
 demoId: "built-in-editors"
-features: ["text-editor", "select-editor", "date-editor", "parseValue", "formatValue"]
+features: ["text-editor", "checkbox-editor", "checkbox-header", "select-editor", "date-editor", "parseValue", "formatValue"]
 relatedGuides: ["editing", "editor-icons", "editor-plugins", "editing-events"]
 relatedApi: ["/en/api/props#columns", "/en/api/props#editable"]
-lastReviewedAt: "2026-08-20"
+lastReviewedAt: "2026-08-27"
 indexable: true
 draft: false
 ---
 
-Use the built-in text editor for free-form input, and the standard plugins from `beautiful-grid/editors` for selecting predefined values and dates. These plugins add no dependency on an external UI framework.
+Use the built-in text and checkbox editors for free-form input and boolean or permission toggles. Use the standard plugins from `beautiful-grid/editors` for selecting predefined values and dates. These plugins add no dependency on an external UI framework.
+
+## Checkbox and bulk header control
+
+```tsx
+{
+  key: 'approved',
+  label: 'Approval',
+  width: 150,
+  align: 'center',
+  editable: true,
+  editor: {
+    type: 'checkbox',
+    header: { ariaLabel: 'Toggle all approvals' },
+    ariaLabel: ({ values }) => `Approval for ${values.orderCode}`,
+    label: ({ value }) => (value ? 'Allowed' : 'Blocked'),
+    disabled: ({ values }) => values.locked,
+  },
+}
+```
+
+With `header` enabled, the header checkbox selects or clears every eligible row and reports an indeterminate state when only some rows are checked. It operates on the rows currently available to the Grid after filtering or paging. Disabled cells and removed rows are excluded from both the state calculation and the bulk update.
+
+The default stored values are `true` and `false`. Map another domain model with options such as `trueValue: 'Y'` and `falseValue: 'N'`. Space, Enter, or F2 toggles an active checkbox cell. Cell and header changes pass through `onChangeValue`, then call `onChangeData` for each changed row with `meta.source` set to `'checkbox'`.
 
 ## Text
 

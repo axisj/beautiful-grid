@@ -14,12 +14,12 @@ indexable: true
 draft: false
 ---
 
-text, Select, 외부 plugin, lookup 아이콘은 모두 같은 변경 트랜잭션을 사용합니다. 에디터별 저장 코드를 따로 만들지 않고 시작 컬럼의 `onChangeValue`에서 검증과 연관 셀 변경을 한 번 처리합니다.
+text, checkbox, Select, 외부 plugin, lookup 아이콘은 모두 같은 변경 트랜잭션을 사용합니다. 에디터별 저장 코드를 따로 만들지 않고 시작 컬럼의 `onChangeValue`에서 검증과 연관 셀 변경을 한 번 처리합니다.
 
 ## 이벤트 흐름
 
 ```text
-text / plugin / editorIcon
+text / checkbox / plugin / editorIcon
         ↓
  requestCommit(changes)
         ↓

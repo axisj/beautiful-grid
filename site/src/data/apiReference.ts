@@ -47,9 +47,21 @@ const typeMetadata: Record<string, { group: string; summary: string }> = {
   BGridDataItemStatus: { group: 'core', summary: '행의 신규·수정·삭제 상태를 나타냅니다.' },
   BGridItemRenderProps: { group: 'core', summary: '컬럼 itemRender에 전달되는 셀 렌더링 컨텍스트입니다.' },
   BGridTextEditorContext: { group: 'selection', summary: 'text 편집기의 값 변환 함수에 전달되는 셀 컨텍스트입니다.' },
+  BGridCheckboxEditorContext: {
+    group: 'selection',
+    summary: 'checkbox의 접근성 이름, 라벨과 비활성화 함수에 전달되는 행·셀 컨텍스트입니다.',
+  },
   BGridTextEditorConfig: {
     group: 'selection',
     summary: '내장 text 편집기의 직접 입력, blur와 값 변환 동작을 설정합니다.',
+  },
+  BGridCheckboxEditorConfig: {
+    group: 'selection',
+    summary: '내장 checkbox의 값 매핑, 행별 비활성화와 헤더 일괄 제어를 설정합니다.',
+  },
+  BGridCheckboxHeaderConfig: {
+    group: 'selection',
+    summary: 'checkbox 컬럼 헤더의 접근성 이름과 일괄 제어 비활성화를 설정합니다.',
   },
   BGridEditTrigger: { group: 'selection', summary: '셀 영역에서 편집을 시작할 클릭 또는 더블클릭 조건입니다.' },
   BGridCellValueChange: {
@@ -61,7 +73,7 @@ const typeMetadata: Record<string, { group: string; summary: string }> = {
     group: 'selection',
     summary: '변경 목록을 저장하거나 현재 편집 상호작용을 취소합니다.',
   },
-  BGridEditSource: { group: 'selection', summary: '변경 요청을 시작한 text, plugin, itemRender 또는 아이콘 경로입니다.' },
+  BGridEditSource: { group: 'selection', summary: '변경 요청을 시작한 text, checkbox, plugin, itemRender 또는 아이콘 경로입니다.' },
   BGridChangeValueRow: {
     group: 'selection',
     summary: '병합 셀 전파 대상 행과 변경 전후 값의 immutable preview입니다.',
@@ -93,7 +105,7 @@ const typeMetadata: Record<string, { group: string; summary: string }> = {
   BGridPluginEditorConfig: { group: 'selection', summary: '앱 전용 에디터 플러그인의 식별자와 component를 정의합니다.' },
   BGridCellEditorConfig: {
     group: 'selection',
-    summary: '내장 text 또는 plugin 편집기를 구분하는 컬럼 editor 설정입니다.',
+    summary: '내장 text·checkbox 또는 plugin 편집기를 구분하는 컬럼 editor 설정입니다.',
   },
   BGridCellEditSession: { group: 'selection', summary: '현재 편집 셀과 시작 모드, 원래 값을 나타내는 편집 세션입니다.' },
   BGridChangeDataMeta: {

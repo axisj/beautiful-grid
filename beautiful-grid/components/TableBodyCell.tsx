@@ -2,6 +2,7 @@ import * as React from 'react';
 import { BGridCellEditSession, BGridColumn, BGridDataItem, MoveDirection } from '../types';
 import { PluginCellEditor } from './PluginCellEditor';
 import { CellEditorIcon } from './CellEditorIcon';
+import { CheckboxCellEditor } from './CheckboxCellEditor';
 
 interface Props<T> {
   index: number;
@@ -36,7 +37,17 @@ function Cell({
 }: Props<any>): React.ReactElement {
   const isPluginEditorActive = Boolean(editable && editSession && column.editor?.type === 'plugin');
   let content: React.ReactNode;
-  if (isPluginEditorActive && editSession) {
+  if (column.editor?.type === 'checkbox') {
+    content = (
+      <CheckboxCellEditor
+        index={index}
+        columnIndex={columnIndex}
+        column={column}
+        item={item}
+        value={valueByRowKey}
+      />
+    );
+  } else if (isPluginEditorActive && editSession) {
     content = (
       <PluginCellEditor
         session={editSession}
@@ -79,7 +90,7 @@ function Cell({
       }
     >
       <div className='bgrid-cell-value'>{content}</div>
-      {column.editorIcon && cellEditable && (
+      {column.editorIcon && column.editor?.type !== 'checkbox' && cellEditable && (
         <CellEditorIcon
           hostCell={{ rowIndex: hostIndex, columnIndex }}
           index={index}

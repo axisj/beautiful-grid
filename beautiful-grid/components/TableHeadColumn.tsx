@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import { AppModelColumn, BGridSortParam } from '../types';
 import { useAppStore } from '../store';
 import { getColumnId } from '../utils';
+import { CheckboxHeaderControl } from './CheckboxHeaderControl';
 
 type TableHeadToolboxModule = typeof import('./toolbox/TableHeadToolbox');
 
@@ -41,6 +42,13 @@ function TableHeadColumn<T>({ column, columnIndex = 0 }: Props<T>) {
   const isToolboxEnabled = !!column.toolbox;
   const isToolboxOpen = activeToolboxColumnId === columnId;
   const columnIcons = typeof column.toolbox === 'object' ? column.toolbox.icons : undefined;
+  const hasCheckboxHeader = column.editor?.type === 'checkbox' && !!column.editor.header;
+  const headerLabel = (
+    <>
+      {hasCheckboxHeader && <CheckboxHeaderControl column={column} columnIndex={columnIndex} />}
+      <span className='bgrid-head-column-label-text'>{column.label}</span>
+    </>
+  );
 
   // Check sort status
   const activeSortParam: BGridSortParam | undefined =
@@ -102,7 +110,7 @@ function TableHeadColumn<T>({ column, columnIndex = 0 }: Props<T>) {
     return (
       <div className="bgrid-head-cell-wrapper">
         <span className="bgrid-head-column-label bgrid-column-drag-handle">
-          {column.label}
+          {headerLabel}
         </span>
 
         <button
@@ -166,7 +174,7 @@ function TableHeadColumn<T>({ column, columnIndex = 0 }: Props<T>) {
   if (sort && !column.sortDisable) {
     return (
       <div className={'bgrid-head-column'}>
-        <span className={'bgrid-head-column-label bgrid-column-drag-handle'}>{column.label}</span>
+        <span className={'bgrid-head-column-label bgrid-column-drag-handle'}>{headerLabel}</span>
         <span className={'bgrid-sorter'} data-sort={activeSortParam?.orderBy} />
         {activeSortParam && sortIndex && (
           <div className={'bgrid-sort-order'}>{sortIndex}</div>
@@ -177,7 +185,7 @@ function TableHeadColumn<T>({ column, columnIndex = 0 }: Props<T>) {
 
   return (
     <div className={'bgrid-head-column'}>
-      <span className={'bgrid-head-column-label bgrid-column-drag-handle'}>{column.label}</span>
+      <span className={'bgrid-head-column-label bgrid-column-drag-handle'}>{headerLabel}</span>
     </div>
   );
 }

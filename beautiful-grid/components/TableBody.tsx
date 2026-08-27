@@ -346,8 +346,9 @@ function TableBody({
 
                 const tdProps: Record<string, any> = {};
                 const cellEditable = logicalRowsEditable && editable && column.editable !== false;
+                const isCheckboxEditor = column.editor?.type === 'checkbox';
                 const resolvedEditTrigger = column.editTrigger ?? editTrigger ?? 'dblclick';
-                if (cellEditable) {
+                if (cellEditable && !isCheckboxEditor) {
                   if (resolvedEditTrigger === 'dblclick') {
                     tdProps.onDoubleClick = () => setEditItem(ri, columnIndex);
                     tdProps.onClick = () => handleClick(canonicalIndex, columnIndex);
@@ -363,7 +364,7 @@ function TableBody({
 
                 const edited = isCellEdited(canonicalItem, column);
                 const valueChanged = isCellValueChanged(canonicalItem, column);
-                const editingType = tdEditable ? column.editor?.type : undefined;
+                const editingType = isCheckboxEditor ? 'checkbox' : tdEditable ? column.editor?.type : undefined;
                 const searchToken = `${canonicalIndex}:${columnIndex}`;
                 const isSearchMatch = searchMatchTokens.has(searchToken);
                 const isCurrentSearchMatch = currentSearchToken === searchToken;
@@ -376,6 +377,7 @@ function TableBody({
                   isSearchMatch ? 'bgrid-cell-search-match' : '',
                   isCurrentSearchMatch ? 'bgrid-cell-search-current' : '',
                   editingType === 'text' ? 'bgrid-cell-editing-text' : '',
+                  isCheckboxEditor ? 'bgrid-cell-checkbox' : '',
                 ]
                   .filter(Boolean)
                   .join(' ');

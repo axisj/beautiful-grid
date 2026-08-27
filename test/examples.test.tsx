@@ -59,6 +59,22 @@ describe('demo examples render intended grid features', () => {
     expect(container).not.toHaveTextContent('2026-08-25');
   });
 
+  it('demonstrates checkbox cells and header-level bulk control in the built-in editor example', async () => {
+    const { getByRole } = await renderExample(() => import('../examples/BuiltInEditorsExample'));
+
+    const headerCheckbox = getByRole('checkbox', { name: '승인 권한 전체 선택' });
+    expect(headerCheckbox).toHaveAttribute('aria-checked', 'mixed');
+    expect(getByRole('checkbox', { name: 'ORD-2602 승인 권한' })).toHaveAttribute('aria-checked', 'false');
+
+    fireEvent.click(headerCheckbox);
+
+    await waitFor(() => {
+      expect(headerCheckbox).toHaveAttribute('aria-checked', 'true');
+      expect(getByRole('checkbox', { name: 'ORD-2602 승인 권한' })).toHaveAttribute('aria-checked', 'true');
+      expect(getByRole('checkbox', { name: 'ORD-2604 승인 권한' })).toHaveAttribute('aria-checked', 'true');
+    });
+  });
+
   it.each([
     [2, 'Ant Design 주문 상태 선택', '.bgrid-antd-select-editor'],
     [3, 'Ant Design 납기일 선택', '.bgrid-antd-date-editor'],

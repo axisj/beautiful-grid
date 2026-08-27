@@ -71,6 +71,20 @@ export default function BuiltInEditorsExample() {
         itemRender: ({ value }) => formatDate(value),
         editorIcon: { render: <CalendarIcon />, ariaLabel: '납기일 선택', visibility: 'always' },
       },
+      {
+        key: 'approved',
+        label: '승인 권한',
+        width: 150,
+        align: 'center',
+        headerAlign: 'center',
+        editable: true,
+        editor: {
+          type: 'checkbox',
+          header: { ariaLabel: '승인 권한 전체 선택' },
+          ariaLabel: ({ values }) => `${values.orderCode} 승인 권한`,
+          label: ({ value }) => (value ? '허용' : '차단'),
+        },
+      },
     ]),
     [],
   );
@@ -78,8 +92,8 @@ export default function BuiltInEditorsExample() {
   return (
     <div className='flex min-h-0 flex-col gap-3'>
       <p className='m-0 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm leading-6 text-slate-700'>
-        text 입력은 라이브러리 내장 편집기이며 Select와 Date는 <code>beautiful-grid/editors</code>가 제공하는 의존성
-        없는 plugin입니다. 화살표와 달력 아이콘을 누르거나 셀을 한 번 클릭해 선택하세요.
+        text와 checkbox는 라이브러리 내장 편집기이며 Select와 Date는 <code>beautiful-grid/editors</code>가 제공하는
+        의존성 없는 plugin입니다. 승인 권한 헤더의 checkbox로 현재 행을 한 번에 선택하거나 해제할 수 있습니다.
       </p>
       <DataGridContainer ref={containerRef} style={{ height: 340 }}>
         <BGrid<EditingOrder>

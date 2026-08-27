@@ -9,6 +9,7 @@ export interface EditingOrder {
   customerGrade: '일반' | '우수' | 'VIP';
   status: '접수' | '진행' | '완료';
   deliveryDate: string;
+  approved: boolean;
   quantity: number;
   unitPrice: number;
   amount: number;
@@ -26,6 +27,7 @@ export const editingOrders: BGridDataItem<EditingOrder>[] = [
       customerGrade: 'VIP',
       status: '접수',
       deliveryDate: '2026-08-25',
+      approved: true,
       quantity: 2,
       unitPrice: 12000,
       amount: 24000,
@@ -42,6 +44,7 @@ export const editingOrders: BGridDataItem<EditingOrder>[] = [
       customerGrade: 'VIP',
       status: '진행',
       deliveryDate: '2026-08-26',
+      approved: false,
       quantity: 3,
       unitPrice: 18000,
       amount: 54000,
@@ -58,6 +61,7 @@ export const editingOrders: BGridDataItem<EditingOrder>[] = [
       customerGrade: '우수',
       status: '완료',
       deliveryDate: '2026-08-28',
+      approved: true,
       quantity: 1,
       unitPrice: 32000,
       amount: 32000,
@@ -74,6 +78,7 @@ export const editingOrders: BGridDataItem<EditingOrder>[] = [
       customerGrade: '일반',
       status: '접수',
       deliveryDate: '2026-09-01',
+      approved: false,
       quantity: 5,
       unitPrice: 9000,
       amount: 45000,

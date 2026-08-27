@@ -1,20 +1,43 @@
 ---
 title: "내장·기본 제공 에디터 (Built-in Editors)"
-description: "내장 text와 기본 제공 Select·Date plugin의 설정, 값 변환, 아이콘 연결 방법을 설명합니다."
+description: "내장 text·checkbox와 기본 제공 Select·Date plugin의 설정, 값 변환, 헤더 제어와 아이콘 연결 방법을 설명합니다."
 category: "interaction"
 order: 2
 locale: "ko"
 canonicalPath: "/learn/built-in-editors"
 demoId: "built-in-editors"
-features: ["text-editor", "select-editor", "date-editor", "parseValue", "formatValue"]
+features: ["text-editor", "checkbox-editor", "checkbox-header", "select-editor", "date-editor", "parseValue", "formatValue"]
 relatedGuides: ["editing", "editor-icons", "editor-plugins", "editing-events"]
 relatedApi: ["/api/props#columns", "/api/props#editable"]
-lastReviewedAt: "2026-08-20"
+lastReviewedAt: "2026-08-27"
 indexable: true
 draft: false
 ---
 
-문자열 입력은 내장 text editor를, 정해진 값과 날짜 선택은 `beautiful-grid/editors`의 기본 plugin을 사용합니다. 기본 plugin은 별도 UI 프레임워크 의존성을 추가하지 않습니다.
+문자열 입력과 boolean·권한 값 토글은 내장 text·checkbox editor를, 정해진 값과 날짜 선택은 `beautiful-grid/editors`의 기본 plugin을 사용합니다. 기본 plugin은 별도 UI 프레임워크 의존성을 추가하지 않습니다.
+
+## Checkbox와 헤더 일괄 제어
+
+```tsx
+{
+  key: 'approved',
+  label: '승인 권한',
+  width: 150,
+  align: 'center',
+  editable: true,
+  editor: {
+    type: 'checkbox',
+    header: { ariaLabel: '승인 권한 전체 선택' },
+    ariaLabel: ({ values }) => `${values.orderCode} 승인 권한`,
+    label: ({ value }) => (value ? '허용' : '차단'),
+    disabled: ({ values }) => values.locked,
+  },
+}
+```
+
+`header`를 켜면 헤더 checkbox가 선택 가능 행의 전체 선택·해제를 제어하고, 일부만 선택되었을 때 `indeterminate` 상태를 표시합니다. 현재 필터나 페이지로 Grid에 들어온 행만 대상으로 하며 `disabled`가 `true`인 셀과 삭제 상태 행은 상태 계산과 변경 대상에서 제외합니다.
+
+기본 저장 값은 `true`와 `false`입니다. 서버 모델이 다른 값을 사용하면 `trueValue: 'Y'`, `falseValue: 'N'`처럼 매핑할 수 있습니다. 활성 셀에서는 Space, Enter 또는 F2로 값을 토글할 수 있습니다. 셀과 헤더 변경도 `onChangeValue` 검증을 거쳐 변경된 행마다 `onChangeData`를 호출하며, 이때 `meta.source`는 `'checkbox'`입니다.
 
 ## Text
 

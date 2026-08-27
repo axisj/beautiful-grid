@@ -6,105 +6,180 @@
 [![NPM downloads](https://img.shields.io/npm/dm/beautiful-grid.svg?style=flat)](https://npmjs.org/package/beautiful-grid)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-BeautifulGrid is a beautiful, powerful, open-source React Data Grid for data-heavy business applications. It combines polished defaults with editing, sorting, filtering, selection, merging, aggregation, pivoting, and virtual scrolling.
+BeautifulGrid is a high-performance, feature-packed, and beautifully designed open-source React Data Grid for data-heavy business applications. It combines zero-runtime-CSS styling with virtual scrolling, spreadsheet-like cell selection and clipboard operations, built-in and plugin cell editing, multi-level grouped headers, filtering & sorting toolboxes, server/client pagination, pivot table transforms, row reordering, and flexible theming.
 
-Explore the live examples and documentation at [bgrid.axisj.com](https://bgrid.axisj.com).
+Explore live interactive examples and in-depth documentation at [bgrid.axisj.com](https://bgrid.axisj.com).
+
+---
+
+## Table of Contents
+
+- [Install](#install)
+- [Quick Start](#quick-start)
+- [Core Concepts](#core-concepts)
+- [Styling & Theming](#styling--theming)
+- [Key Features & Usage](#key-features--usage)
+  - [1. Header Toolbox: Sorting & Filtering](#1-header-toolbox-sorting--filtering)
+  - [2. Multi-Level Column Groups](#2-multi-level-column-groups)
+  - [3. Cell Editing & Editor Plugins](#3-cell-editing--editor-plugins)
+  - [4. Cell Focus & Keyboard Navigation](#4-cell-focus--keyboard-navigation)
+  - [5. Cell Selection & Clipboard (Excel-compatible)](#5-cell-selection--clipboard-excel-compatible)
+  - [6. Grid Search & Context Menu](#6-grid-search--context-menu)
+  - [7. Custom Scrollbars & Bottom Bar](#7-custom-scrollbars--bottom-bar)
+  - [8. Pagination (Server / Client)](#8-pagination-server--client)
+  - [9. Frozen Columns & Frozen Rows](#9-frozen-columns--frozen-rows)
+  - [10. Row Reordering](#10-row-reordering)
+  - [11. Summary Row](#11-summary-row)
+  - [12. Cell Merging](#12-cell-merging)
+  - [13. Pivot Table](#13-pivot-table)
+- [Props Reference](#props-reference)
+  - [BGridProps](#bgridprops)
+  - [BGridColumn](#bgridcolumn)
+  - [Sub-options Reference](#sub-options-reference)
+- [Developer Workflows](#developer-workflows)
+- [License](#license)
+
+---
 
 ## Install
 
 ```bash
-npm i beautiful-grid
+npm install beautiful-grid
 ```
 
-## Development
+Or using your favorite package manager:
 
 ```bash
-npm i
-npm run dev
+# pnpm
+pnpm add beautiful-grid
+
+# yarn
+yarn add beautiful-grid
 ```
 
-Open [http://localhost:5173](http://localhost:5173) with your browser to see the demo app.
+> **Peer Dependency**: BeautifulGrid requires `react >= 19.0.0` and `react-dom >= 19.0.0`.
 
-- [BGrid component structure](docs/component-structure.md)
-- [Cell selection and clipboard](docs/cell-selection.md)
+---
 
-## Testing
+## Quick Start
 
-```bash
-# Unit tests (Vitest)
-npm test
-
-# Unit tests in watch mode
-npm run test:watch
-
-# Consumer compatibility test (install + cjs/esm/types check)
-npm run test:library:consumers
-
-# Published ESM initial bundle budget and generated homepage metrics
-npm run test:library:bundle
-
-# E2E tests (Playwright)
-npm run test:e2e
-
-# E2E tests with UI runner
-npm run test:e2e:ui
-```
-
-## Build
-
-```bash
-# Demo app bundle (Vite)
-npm run build
-
-# Publishable library bundle (CJS + ESM + types + style)
-npm run build:library
-
-# Recalculate the published-library bundle metrics used by the website
-npm run update:library:bundle-metrics
-```
-
-The published ESM build targets ES2020 and loads column reordering, the column toolbox, search, and context menus only when they are used. The CommonJS build remains downleveled to ES5. Bundle measurements model an external ESM consumer and exclude the `react` and `react-dom` peer dependencies.
-
-## Publish
-
-```bash
-# Build dist/cjs, dist/esm, dist/types and dist/package.json
-npm run build:library
-
-# Dry-run package file list from dist
-npm run pack:library
-
-# Publish a stable package manually
-npm run publish:library
-
-# Publish a prerelease without moving the latest tag
-npm publish ./dist --access public --tag next
-```
-
-### Release checks
-
-- Pushes to `main` run the GitHub Actions test workflow.
-- Build and publish `dist` manually after the pushed commit passes CI.
-- Prerelease versions must use the npm `next` tag so `latest` remains on the stable release.
-- The production website deploy runs manually from `.github/workflows/deploy-website.yml` on `main`.
-
-## License
-
-BeautifulGrid is open-source software licensed under the [Apache License 2.0](LICENSE). See [NOTICE](NOTICE) for attribution and [TRADEMARK.md](TRADEMARK.md) for use of the BeautifulGrid name and branding.
-
-## Styling
-
-Import the library stylesheet once in your app:
+Import the static stylesheet once at your application's entry point (e.g. `src/main.tsx`, `src/App.tsx`, or Next.js `app/layout.tsx`):
 
 ```typescript jsx
 import 'beautiful-grid/style.css';
 ```
 
-`beautiful-grid` ships with pure static CSS and requires no runtime CSS-in-JS engine. The grid uses CSS custom properties (`--bgrid-*`) scoped to `[role='grid']`, allowing you to easily customize the theme globally or for a specific wrapper element.
+Then create your first grid:
 
-We recommend overriding the public `--bgrid-*` CSS variables rather than targeting internal `.bgrid-*` classes directly to maintain upgrade compatibility across releases.
+```typescript jsx
+import * as React from 'react';
+import { BGrid, type BGridColumn, type BGridDataItem } from 'beautiful-grid';
 
-Default variables:
+interface OrderItem {
+  id: string;
+  customer: string;
+  product: string;
+  qty: number;
+  amount: number;
+  status: 'PENDING' | 'SHIPPED' | 'DELIVERED';
+}
+
+const columns: BGridColumn<OrderItem>[] = [
+  { id: 'id', key: 'id', label: 'Order ID', width: 120 },
+  { id: 'customer', key: 'customer', label: 'Customer', width: 160 },
+  { id: 'product', key: 'product', label: 'Product', width: 200 },
+  {
+    id: 'qty',
+    key: 'qty',
+    label: 'Qty',
+    width: 90,
+    align: 'right',
+    itemRender: ({ value }) => <>{Number(value).toLocaleString()} ea</>,
+  },
+  {
+    id: 'amount',
+    key: 'amount',
+    label: 'Amount',
+    width: 130,
+    align: 'right',
+    itemRender: ({ value }) => <strong>${Number(value).toLocaleString()}</strong>,
+  },
+  {
+    id: 'status',
+    key: 'status',
+    label: 'Status',
+    width: 120,
+    align: 'center',
+    itemRender: ({ value }) => (
+      <span style={{ color: value === 'DELIVERED' ? '#16a34a' : '#ea580c', fontWeight: 600 }}>
+        {value}
+      </span>
+    ),
+  },
+];
+
+const sampleData: BGridDataItem<OrderItem>[] = [
+  { values: { id: 'ORD-001', customer: 'Acme Corp', product: 'Sensor A1', qty: 12, amount: 1440, status: 'DELIVERED' } },
+  { values: { id: 'ORD-002', customer: 'Global Tech', product: 'Module X', qty: 5, amount: 850, status: 'PENDING' } },
+  { values: { id: 'ORD-003', customer: 'Logi Systems', product: 'Gateway V2', qty: 20, amount: 3200, status: 'SHIPPED' } },
+];
+
+export default function OrderGridPage() {
+  const [columnsState, setColumnsState] = React.useState(columns);
+  const [checkedRowKeys, setCheckedRowKeys] = React.useState<React.Key[]>([]);
+
+  return (
+    <div style={{ width: 840, height: 380 }}>
+      <BGrid<OrderItem>
+        width={840}
+        height={380}
+        data={sampleData}
+        columns={columnsState}
+        rowKey="id"
+        showLineNumber
+        rowChecked={{
+          checkedRowKeys,
+          onChange: (_indexes, keys) => setCheckedRowKeys(keys),
+        }}
+        onChangeColumns={(_colIndex, info) => setColumnsState(info.columns)}
+      />
+    </div>
+  );
+}
+```
+
+---
+
+## Core Concepts
+
+1. **Row Data Wrapper (`BGridDataItem<T>`)**:
+   - Each row item is wrapped in `{ values: T }`. Always access and supply domain models inside `item.values`.
+   - Grid internally tracks state metadata (`status`, `editedColumnIds`, `changedKeys`, `checked`).
+2. **Column Key & Nested Paths (`BGridColumn.key`)**:
+   - Flat key: `key: 'name'` accesses `item.values.name`.
+   - Nested key: `key: ['user', 'profile', 'email']` safely accesses `item.values.user.profile.email`.
+3. **Column Identifier (`BGridColumn.id`)**:
+   - Unique identifier used for multi-level `columnGroups`, toolbox sort/filter states, and column persistence.
+   - If omitted, an ID is generated automatically from `key` (e.g. `key:string:name`). Providing explicit unique IDs is recommended when multiple columns share the same key.
+4. **Dimensions & Virtualization**:
+   - `width` and `height` (in pixels) are required for viewport virtualization calculations.
+   - For responsive designs, observe the container size with `ResizeObserver` and pass the measured pixel dimensions to `<BGrid>`.
+5. **No Runtime CSS-in-JS**:
+   - High performance and zero runtime overhead using static `.bgrid-*` classes and `--bgrid-*` CSS custom properties.
+
+---
+
+## Styling & Theming
+
+Import the static stylesheet once:
+
+```typescript jsx
+import 'beautiful-grid/style.css';
+```
+
+BeautifulGrid styles are controlled via CSS custom properties scoped to `[role='grid']`. You can customize the look and feel globally or scope it to specific containers without overriding internal class names.
+
+### Default CSS Custom Properties
 
 ```css
 [role='grid'] {
@@ -201,189 +276,38 @@ Default variables:
   --bgrid-loading-bg: rgba(163, 163, 163, 0.1);
   --bgrid-loading-color: rgba(0, 0, 0, 0.1);
   --bgrid-loading-second-color: #767676;
-
-  --bgrid-page-number-active-border-radius: 4px;
 }
 ```
 
-Common customization targets:
-
-| Area            | Variables                                                                                                                                                                                                            |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Primary accents | `--bgrid-primary-color`                                                                                                                                                                                               |
-| Header          | `--bgrid-header-bg`, `--bgrid-header-color`, `--bgrid-header-font-weight`, `--bgrid-header-hover-bg`, `--bgrid-header-group-bg`, `--bgrid-header-separator-color`                                                          |
-| Borders         | `--bgrid-border-color-base`, `--bgrid-border-color-light`, `--bgrid-border-color-subtle`, `--bgrid-frozen-boundary-color`, `--bgrid-frozen-boundary-width`, `--bgrid-border-radius`                                                           |
-| Body rows       | `--bgrid-body-bg`, `--bgrid-body-odd-bg`, `--bgrid-body-hover-bg`, `--bgrid-body-hover-odd-bg`, `--bgrid-body-active-bg`, `--bgrid-body-color`                                                                             |
-| Cell selection  | `--bgrid-cell-selected-bg`, `--bgrid-cell-selected-overlay-opacity`, `--bgrid-cell-selected-border-color`, `--bgrid-cell-selected-border-width`, `--bgrid-active-cell-bg`, `--bgrid-active-cell-ring-color`, `--bgrid-active-cell-ring-width`                    |
-| Selection axes  | `--bgrid-selection-axis-bg`, `--bgrid-selection-axis-color`, `--bgrid-selection-axis-border-color`                                                                                                                      |
-| Edited cells    | `--bgrid-cell-edited-bg`, `--bgrid-cell-edited-color`, `--bgrid-cell-edited-border-color`                                                                                                                              |
-| Changed values  | `--bgrid-cell-value-changed-bg`, `--bgrid-cell-value-changed-color`, `--bgrid-cell-value-changed-border-color`                                                                                                          |
-| Summary/Footer  | `--bgrid-summary-bg`, `--bgrid-footer-bg`                                                                                                                                                                              |
-| Filter toolbox  | `--bgrid-toolbox-bg`, `--bgrid-toolbox-color`, `--bgrid-toolbox-muted-color`, `--bgrid-toolbox-control-*`, `--bgrid-toolbox-hover-bg`, `--bgrid-toolbox-active-bg`, `--bgrid-toolbox-danger-*`, `--bgrid-toolbox-button-bg`, `--bgrid-toolbox-primary-*`, `--bgrid-toolbox-notice-bg`, `--bgrid-toolbox-scroll-*`, `--bgrid-toolbox-focus-ring-color` |
-| Grid search     | `--bgrid-search-bg`, `--bgrid-search-color`, `--bgrid-search-border-color`, `--bgrid-search-control-*`, `--bgrid-search-muted-color`, `--bgrid-search-focus-ring-color`, `--bgrid-search-button-hover-bg`, `--bgrid-search-match-*`, `--bgrid-search-current-*`, `--bgrid-search-z-index`                                                           |
-| Context menu    | `--bgrid-context-menu-bg`, `--bgrid-context-menu-color`, `--bgrid-context-menu-border-color`, `--bgrid-context-menu-hover-bg`, `--bgrid-context-menu-muted-color`, `--bgrid-floating-z-*`                                                                                                                                                       |
-| Scrollbars      | `--bgrid-scroll-size`, `--bgrid-scroll-bg`, `--bgrid-scroll-track-bg`, `--bgrid-scroll-thumb-radius`, `--bgrid-scroll-thumb-bg`, `--bgrid-scroll-thumb-hover-bg`, `--bgrid-scroll-corner-bg`, `--bgrid-scroll-corner-radius` |
-| Loading overlay | `--bgrid-loading-bg`, `--bgrid-loading-color`, `--bgrid-loading-second-color`                                                                                                                                           |
-| Pagination      | `--bgrid-page-number-active-border-radius`                                                                                                                                                                            |
-
-`selectedRowKey` row highlighting uses `--bgrid-body-active-bg`. Cell selection is painted by pointer-transparent overlay rectangles rather than per-cell borders. The overlay uses `--bgrid-cell-selected-bg` for the fill, `--bgrid-cell-selected-overlay-opacity` for fill opacity, and `--bgrid-cell-selected-border-color` for the selection edge. By default, `--bgrid-cell-selected-bg` references `--bgrid-body-active-bg` so row selection and cell selection stay in the same color tone.
-
-When a range crosses frozen rows or columns, the Grid splits the overlay into the corresponding panel fragments and draws only the outside perimeter. This keeps the selection rectangular across merged cells and synchronized with horizontal and vertical scrolling.
-
-The focused cell uses `--bgrid-active-cell-bg`. A single-cell selection also uses the inset ring controlled by `--bgrid-active-cell-ring-color` and `--bgrid-active-cell-ring-width`. During multi-cell selection the focused cell has no individual ring; only the outer border of the complete selection range is rendered. Its width is controlled by `--bgrid-cell-selected-border-width`, which defaults to the single-cell ring width.
-
-The column headers and line numbers covered by the active cell or a multi-cell range receive `bgrid-column-axis-active` and `bgrid-row-axis-active`. Their fill, text, and inset axis line use the three `--bgrid-selection-axis-*` variables.
-
-Cells directly changed by a text editor, plugin editor, legacy inline editor, or clipboard paste receive `bgrid-cell-edited` and `data-bgrid-cell-edited="true"`. The row wrapper records those stable column ids in `editedColumnIds`. It separately records normalized data key tokens in `changedKeys`. Every column sharing a changed key receives `bgrid-cell-value-changed` and `data-bgrid-cell-value-changed="true"`, even when only one column instance was directly edited. Clear both arrays after a successful commit. The two states use the `--bgrid-cell-edited-*` and `--bgrid-cell-value-changed-*` palettes; the changed-value palette defaults to the edited-cell palette.
-
-The filter toolbox, editor plugins, and cell context menu share a document-level floating portal per Grid instance. The Grid copies its public `--bgrid-*` variables to that portal, so instance-level themes continue to apply outside the Grid DOM subtree.
-
-### Grid Search and Cell Context Menu
-
-Pass `searchOptions` to enable search over all currently loaded display rows. The Grid searches Store data rather than rendered DOM, highlights every matching cell, and scrolls virtual or frozen regions when moving between results.
-
-Dedicated context menu example: [`examples/ContextMenuExample.tsx`](./examples/ContextMenuExample.tsx)
-
-```tsx
-<BGrid
-  columns={columns}
-  data={data}
-  rowKey='id'
-  searchOptions={{}}
-  contextMenuOptions={{
-    items: target => [
-      {
-        id: 'inspect-row',
-        label: 'Inspect row',
-        onSelect: () => console.log(target.sourceIndex, target.values),
-      },
-    ],
-  }}
-/>
-```
-
-- `Ctrl+F` / `Cmd+F`: open search in the focused Grid.
-- `Enter` / `Shift+Enter`: next / previous match.
-- `Escape`: close search and clear highlights.
-- Right-click: activate and select the target cell before opening the body-cell context menu.
-- Selecting another cell closes the open context menu.
-- `Shift+F10`: open the context menu for the active cell.
-- Search covers only rows currently supplied to the Grid. Server-wide search and result filtering are separate concerns.
-- Searchable text defaults to the value read from `item.values`. Use column `getSearchText` when `itemRender` displays a formatted value, or `searchable: false` to exclude a column.
-
-Controlled `searchOptions.open` and `searchOptions.query` require their matching callbacks:
-
-```tsx
-searchOptions={{
-  open,
-  query,
-  onOpenChange: setOpen,
-  onQueryChange: setQuery,
-}}
-```
-
-Example: scope a custom blue selection theme to one grid wrapper.
+### Scoped Theme Example
 
 ```css
-.my-grid [role='grid'] {
-  --bgrid-primary-color: #2563eb;
-  --bgrid-body-active-bg: #e0f2fe;
-  --bgrid-cell-selected-bg: var(--bgrid-body-active-bg);
-  --bgrid-cell-selected-overlay-opacity: 0.72;
-  --bgrid-cell-selected-border-color: rgba(37, 99, 235, 0.72);
+.dark-theme [role='grid'] {
+  --bgrid-primary-color: #60a5fa;
+  --bgrid-body-bg: #1e293b;
+  --bgrid-body-odd-bg: #0f172a;
+  --bgrid-body-color: #f8fafc;
+  --bgrid-header-bg: #334155;
+  --bgrid-header-color: #f1f5f9;
+  --bgrid-border-color-base: #475569;
+  --bgrid-border-color-light: #475569;
+  --bgrid-border-color-subtle: #334155;
+  --bgrid-body-active-bg: #1e3a8a;
+  --bgrid-cell-selected-border-color: #60a5fa;
 }
 ```
 
-## Usage
+---
 
-- codesandbox DEMO : https://codesandbox.io/p/devbox/basic-example-5ch6kt?embed=1&file=%2Fsrc%2FApp.tsx
+## Key Features & Usage
 
-### Basic Example
+### 1. Header Toolbox: Sorting & Filtering
 
-```typescript jsx
-import * as React from 'react';
-import { BGrid, BGridColumn } from 'beautiful-grid';
-
-interface IListItem {
-  id: string;
-  title: string;
-  writer: string;
-  createAt: string;
-}
-
-const list = Array.from({ length: 1000 }).map((_, i) => ({
-  values: {
-    id: `ID_${i}`,
-    title: `title_${i}`,
-    writer: `writer_${i}`,
-    createAt: `2022-09-08`,
-  },
-}));
-
-function BasicExample() {
-  const [columns, setColumns] = React.useState<BGridColumn<IListItem>[]>([
-    { key: 'id', label: 'ID', width: 120 },
-    {
-      key: 'title',
-      label: '제목',
-      width: 260,
-      itemRender: ({ values }) => (
-        <>
-          {values.writer} / {values.title}
-        </>
-      ),
-    },
-    { key: 'writer', label: '작성자', width: 120 },
-    { key: 'createAt', label: '작성일', width: 140 },
-  ]);
-
-  const [checkedRowKeys, setCheckedRowKeys] = React.useState<React.Key[]>([]);
-
-  return (
-    <div style={{ fontSize: 13 }}>
-      <BGrid<IListItem>
-        width={720}
-        height={420}
-        data={list}
-        columns={columns}
-        rowKey={'id'}
-        onChangeColumns={(columnIndex, { width, columns }) => {
-          console.log('onChangeColumns', columnIndex, width, columns);
-          setColumns(columns);
-        }}
-        rowChecked={{
-          checkedRowKeys,
-          onChange: (checkedIndexes, checkedRowKeys, checkedAll) => {
-            console.log('rowChecked changed', checkedIndexes, checkedRowKeys, checkedAll);
-            setCheckedRowKeys(checkedRowKeys);
-          },
-        }}
-      />
-    </div>
-  );
-}
-
-export default BasicExample;
-```
-
-### Important Data/Column Rules
-
-- Row data type is `BGridDataItem<T>` and the real domain model is always inside `item.values`.
-- `BGridColumn.key` supports both `string` and `string[]`.
-  - `key: 'writer'`
-  - `key: ['user', 'profile', 'name']` (nested value path)
-- `itemRender` receives both:
-  - `value`: current cell value by `column.key`
-  - `values`: full row model (`T`)
-- `columns[i].left` is internal layout value computed by `BGrid`; do not manage it manually.
-
-### Header Toolbox: Sorting and Filtering
-
-Add `toolbox` to a column and control the applied sort/filter state through `dataControl.query`. Query state is controlled: `onChange` receives a new query, and the consumer must pass that query back to the Grid.
+Add `toolbox: true` (or an options object) and `filter` configs to columns. Manage query state via `dataControl`.
 
 ```typescript jsx
 import * as React from 'react';
-import { BGrid, BGridColumn, BGridDataItem, BGridDataQuery } from 'beautiful-grid';
+import { BGrid, type BGridColumn, type BGridDataItem, type BGridDataQuery } from 'beautiful-grid';
 
 interface Product {
   id: number;
@@ -396,7 +320,7 @@ const columns: BGridColumn<Product>[] = [
   {
     id: 'name',
     key: 'name',
-    label: 'Name',
+    label: 'Product Name',
     width: 220,
     toolbox: true,
     filter: { type: 'text' },
@@ -405,7 +329,7 @@ const columns: BGridColumn<Product>[] = [
     id: 'category',
     key: 'category',
     label: 'Category',
-    width: 140,
+    width: 150,
     toolbox: true,
     filter: { type: 'values' },
   },
@@ -413,13 +337,13 @@ const columns: BGridColumn<Product>[] = [
     id: 'price',
     key: 'price',
     label: 'Price',
-    width: 120,
+    width: 130,
     toolbox: { sort: true, filter: true },
     filter: { type: 'number' },
   },
 ];
 
-function ProductGrid({ data }: { data: BGridDataItem<Product>[] }) {
+function ProductTable({ data }: { data: BGridDataItem<Product>[] }) {
   const [query, setQuery] = React.useState<BGridDataQuery>({
     sortParams: [],
     filterParams: [],
@@ -427,573 +351,681 @@ function ProductGrid({ data }: { data: BGridDataItem<Product>[] }) {
 
   return (
     <BGrid<Product>
-      width={720}
-      height={420}
+      width={800}
+      height={400}
       data={data}
       columns={columns}
-      rowKey='id'
+      rowKey="id"
       dataControl={{
-        mode: 'client',
+        mode: 'client', // 'client' performs in-memory filtering & sorting; 'manual' delegates to server
         multiSort: true,
         query,
-        onChange: nextQuery => setQuery(nextQuery),
+        onChange: (nextQuery) => setQuery(nextQuery),
       }}
     />
   );
 }
 ```
 
-Toolbox configuration:
+- **Filter types**:
+  - `'values'`: Distinct value checkbox list.
+  - `'text'`: Substring match (`contains`, `equals`, `notEquals`).
+  - `'number'`: Numeric operators (`equals`, `gt`, `gte`, `lt`, `lte`, `between`).
+- **Data Control Modes**:
+  - `mode: 'client'`: Grid automatically filters and sorts the full in-memory `data` array.
+  - `mode: 'manual'`: Grid only emits queries via `onChange`. You fetch/sort on the server and pass the resulting data back.
 
-- `toolbox: true` enables the built-in sort and filter sections.
-- `toolbox: { sort, filter, extraItems, render, icons }` configures sections and custom content. Object form enables only sections explicitly set to `true`.
-- `filter.type` supports `values`, `text`, and `number`. Use `filter: false` to suppress the filter section.
-- Give every Toolbox column a stable, unique `id`, especially when multiple columns read the same `key`.
-- Grid-level `icons` supplies default Toolbox icons. A column-level `toolbox.icons` overrides them for that column.
+---
 
-Data modes:
+### 2. Multi-Level Column Groups
 
-- `mode: 'client'` filters and sorts the complete `data` array inside the Grid. Do not combine it with externally paged data as if the current page were the complete data set.
-- `mode: 'manual'` only emits the next query. Fetch, filter, sort, and paginate on the server, then pass the resulting `data` back. For a manual `values` filter, provide `filter.values` because the Grid must not infer the full server-side value domain from one page.
-- `mode` defaults to `manual`. Set it explicitly when shared configuration should make the processing location obvious.
-- `dataControl` takes precedence over the legacy `sort` prop. Existing grids can continue using `sort` when Toolbox filtering is not needed.
-
-Manual/server-controlled example:
+Use `columnGroups` with `BGridColumnGroupNode` trees to create arbitrarily nested headers. Leaf entries reference the column `id`.
 
 ```typescript jsx
+import { BGrid, type BGridColumn, type BGridColumnGroupNode } from 'beautiful-grid';
+
+const columns: BGridColumn<Order>[] = [
+  { id: 'orderNo', key: 'orderNo', label: 'Order No', width: 130 },
+  { id: 'customerName', key: 'customerName', label: 'Name', width: 140 },
+  { id: 'customerCity', key: ['customer', 'city'], label: 'City', width: 120 },
+  { id: 'productName', key: 'productName', label: 'Product', width: 160 },
+  { id: 'amount', key: 'amount', label: 'Amount', width: 120, align: 'right' },
+];
+
+const columnGroups: BGridColumnGroupNode[] = [
+  {
+    id: 'order-overview',
+    label: 'Order Overview',
+    children: [
+      'orderNo',
+      {
+        id: 'customer-info',
+        label: 'Customer Info',
+        children: ['customerName', 'customerCity'],
+      },
+      'productName',
+      'amount',
+    ],
+  },
+];
+
+<BGrid
+  width={800}
+  height={450}
+  headerHeight={64}
+  columns={columns}
+  columnGroups={columnGroups}
+  data={data}
+  rowKey="orderNo"
+/>
+```
+
+---
+
+### 3. Cell Editing & Editor Plugins
+
+Enable editing with `editable` and assign an `editor` configuration to specific columns.
+
+#### Built-in Text & Checkbox Editors
+
+```typescript jsx
+const columns: BGridColumn<Item>[] = [
+  {
+    id: 'title',
+    key: 'title',
+    label: 'Title',
+    width: 220,
+    editable: true,
+    editor: {
+      type: 'text',
+      startOnInput: true,
+      inputProps: { maxLength: 100 },
+    },
+  },
+  {
+    id: 'active',
+    key: 'active',
+    label: 'Active',
+    width: 100,
+    align: 'center',
+    editable: true,
+    editor: {
+      type: 'checkbox',
+      header: { ariaLabel: 'Toggle all active rows' },
+      trueValue: true,
+      falseValue: false,
+    },
+  },
+];
+
 <BGrid
   width={720}
-  height={420}
-  data={serverPage}
+  height={380}
+  editable
+  editTrigger="dblclick" // 'click' | 'dblclick'
   columns={columns}
-  page={page}
-  dataControl={{
-    mode: 'manual',
-    query,
-    onChange: (nextQuery, event) => {
-      setQuery(nextQuery);
-      requestPage({ page: 0, query: nextQuery, changedBy: event });
-    },
-  }}
-/>
-```
-
-Pivot mode disables the default Toolbox. Row reordering is automatically disabled while a client-side filter or sort is active because displayed row order no longer represents the source array order.
-
-### Row Reorder
-
-Enable line numbers and `reorder` to move rows. The dedicated handle supports pointer drag and keyboard operation: focus it, press `Space` or `Enter` to pick up, use `ArrowUp`/`ArrowDown`, then press `Enter` to drop or `Escape` to cancel.
-
-```typescript jsx
-<BGrid
   data={data}
-  columns={columns}
-  rowKey='id'
-  showLineNumber
-  reorder={{
-    enabled: true,
-    onReorder: nextData => {
-      setData(nextData);
-      return true;
-    },
+  rowKey="id"
+  onChangeData={(rowIndex, colIndex, item, column, meta) => {
+    console.log('Cell updated:', rowIndex, colIndex, item, meta);
   }}
 />
 ```
 
-The Grid previews the source, shifted rows, and insertion target before changing data. It commits once after the settle motion. Returning `false` from the synchronous `onReorder` callback rolls the operation back; `true` or `void` keeps it. Checked rows and the active cell follow the moved item, while an open editor blocks reordering. Virtual scrolling supports edge auto-scroll and an off-screen source preview. Merged-cell grids use a safe preview fallback instead of transforming `rowspan` geometry. Reduced-motion preferences remove both the transition and its commit delay.
+#### Plugin Editors (Select, Date, Custom)
 
-Row reordering is disabled for pivot output, frozen rows, and active client-side sort/filter queries. `onReorder` is not a Promise-based save lifecycle; applications that persist remotely should own their optimistic update and failure policy.
-
-### Cell Selection and Clipboard
-
-Cell selection is enabled by default. Cells can be selected by mouse drag, and `Ctrl+C` or `Cmd+C` copies selected cell text using tab (`\t`) between columns and carriage return (`\r`) between rows. In an editable grid, select a target cell and press `Ctrl+V` or `Cmd+V` to paste tab/newline-delimited data from that cell. Disable the feature when it is not needed:
+Prebuilt plugin factories are exported from `beautiful-grid/editors`:
 
 ```typescript jsx
-<BGrid width={700} height={400} columns={columns} data={data} cellSelectionOptions={{ enabled: false }} />
+import { createSelectEditorPlugin, createDateEditorPlugin, defineEditorPlugin } from 'beautiful-grid/editors';
+
+const statusEditor = createSelectEditorPlugin<Item>({
+  id: 'status-select',
+  options: [
+    { value: 'READY', label: 'Ready' },
+    { value: 'PROCESSING', label: 'Processing' },
+    { value: 'COMPLETED', label: 'Completed' },
+  ],
+});
+
+const deliveryDateEditor = createDateEditorPlugin<Item>({
+  id: 'delivery-date-picker',
+});
+
+const columns: BGridColumn<Item>[] = [
+  {
+    id: 'status',
+    key: 'status',
+    label: 'Status',
+    width: 160,
+    editable: true,
+    editor: statusEditor,
+  },
+  {
+    id: 'deliveryDate',
+    key: 'deliveryDate',
+    label: 'Delivery Date',
+    width: 150,
+    editable: true,
+    editor: deliveryDateEditor,
+  },
+];
 ```
 
-Cell selection is kept when the user clicks inside the grid, including empty body space or the grid scrollbar. By default, selection is cleared when `Escape` is pressed or when the user clicks outside the grid. Use `cellSelectionOptions` to change those clear rules:
+#### Editor Icons (Lookup & Quick Triggers)
+
+Add inline trigger icons beside cell values using `editorIcon`:
+
+```typescript jsx
+{
+  id: 'customer',
+  key: 'customerName',
+  label: 'Customer',
+  width: 180,
+  editorIcon: {
+    render: <span>🔍</span>,
+    ariaLabel: 'Open customer search dialog',
+    visibility: 'hover', // 'always' | 'hover' | 'active'
+    onClick: ({ commit, cancel, values }) => {
+      openCustomerLookupModal({
+        initialValue: values.customerName,
+        onSelect: (customer) => commit([
+          { key: 'customerCode', value: customer.code },
+          { key: 'customerName', value: customer.name },
+        ]),
+        onClose: cancel,
+      });
+    },
+  },
+}
+```
+
+---
+
+### 4. Cell Focus & Keyboard Navigation
+
+Configure active cell handling and keyboard behavior with `cellNavigationOptions`.
 
 ```typescript jsx
 <BGrid
-  width={700}
+  width={800}
   height={400}
   columns={columns}
   data={data}
+  rowKey="id"
+  cellNavigationOptions={{
+    enabled: true,
+    defaultActiveCell: { rowIndex: 0, columnIndex: 0 },
+    wrap: false,
+    editOnEnter: true,
+    keyRepeat: { enabled: true, interval: 16 },
+    onActiveCellChange: (cell) => {
+      console.log('Active cell moved to:', cell?.rowIndex, cell?.columnIndex);
+    },
+  }}
+/>
+```
+
+- **Navigation shortcuts**:
+  - `Arrow keys`: Move focused cell (with OS or smooth frame-synced repeat).
+  - `Shift + Arrow`: Extend range selection.
+  - `Ctrl/Cmd + Arrow`: Jump to boundary edge.
+  - `Home / End`: First / last column in current row.
+  - `Ctrl/Cmd + Home / End`: First / last cell of the entire grid.
+  - `Tab / Shift + Tab`: Next / previous cell.
+  - `F2` or `Enter` (when `editOnEnter: true`): Start editing the focused cell.
+  - `Escape`: Cancel editing or clear selection.
+
+---
+
+### 5. Cell Selection & Clipboard (Excel-compatible)
+
+Cell range selection and clipboard copy/paste are enabled by default.
+
+```typescript jsx
+<BGrid
+  width={800}
+  height={400}
+  columns={columns}
+  data={data}
+  rowKey="id"
   cellSelectionOptions={{
     enabled: true,
-    clearOnEscape: false,
-    clearOnOutsideClick: false,
+    clearOnEscape: true,
+    clearOnOutsideClick: true,
     maxClipboardCells: 100000,
     maxClipboardTextLength: 8 * 1024 * 1024,
-    onCopyError: error => {
-      console.warn(error);
-    },
-    onPasteError: error => {
-      console.warn(error);
-    },
-    createRowOnPaste: () => ({
-      values: createEmptyRow(),
+    onCopyError: (error) => console.warn('Copy skipped:', error),
+    onPasteError: (error) => console.warn('Paste failed:', error),
+    createRowOnPaste: ({ rowIndex, clipboardRow, columns }) => ({
+      values: createNewRowModel(clipboardRow),
     }),
   }}
 />
 ```
 
-Clipboard copy is skipped before building clipboard text when the selected range is too large. The default limits are
-`maxClipboardCells: 100000` and `maxClipboardTextLength: 8 * 1024 * 1024`. The same limits apply to paste. Use `onCopyError` or `onPasteError` to notify users when clipboard work is skipped, parsing fails, or the browser rejects the clipboard write.
+- `Ctrl+C` / `Cmd+C`: Copies selected cells as Tab-separated (`\t`) values and CRLF (`\r\n`) lines, directly pasteable into Excel or Google Sheets.
+- `Ctrl+V` / `Cmd+V`: Pastes clipboard matrix starting from the focused cell across editable columns.
+- Customize copied text on a per-column basis with `getClipboardText: ({ value, values }) => string`.
 
-Pasted data beyond the last row is clipped unless `createRowOnPaste` is provided. The callback creates each missing row, which is registered with `BGridDataItemStatus.new` and reported through `onChangeData(rowIndex, null, values, null)`.
+---
 
-By default, copied text is read from `column.key`:
+### 6. Grid Search & Context Menu
 
-```typescript jsx
-{ key: 'title', label: 'Title', width: 240 }
-```
-
-If a column renders a custom component or needs a different clipboard value, define `getClipboardText` on the column. `getClipboardText` is used before falling back to the `column.key` value.
+Built-in full-text search across loaded store data and right-click context menus:
 
 ```typescript jsx
-const columns: BGridColumn<IListItem>[] = [
-  {
-    key: 'title',
-    label: 'Title',
-    width: 260,
-    itemRender: ({ values }) => (
-      <>
-        {values.writer} / {values.title}
-      </>
-    ),
-    getClipboardText: ({ values }) => `${values.writer}\t${values.title}`,
-  },
-  {
-    key: ['user', 'profile', 'name'],
-    label: 'User',
-    width: 160,
-    getClipboardText: ({ value, values }) => value ?? values.writer,
-  },
-];
-```
-
-### Cell Focus and Keyboard Navigation
-
-Click a cell to make it active, then use Arrow keys, Home/End, PageUp/PageDown, or Tab to move. `Shift` + Arrow extends the cell selection. `Ctrl`/`Cmd` + Arrow moves to an edge, and `Ctrl`/`Cmd` + Home/End moves to the first or last grid cell.
-
-Use `cellNavigationOptions` when the active cell must be initialized or controlled by the application:
-
-```typescript jsx
-const [activeCell, setActiveCell] = React.useState({ rowIndex: 0, columnIndex: 1 });
-
 <BGrid
   width={800}
   height={420}
   columns={columns}
   data={data}
-  cellNavigationOptions={{
-    activeCell,
-    onActiveCellChange: cell => {
-      if (cell) setActiveCell(cell);
-    },
-    wrap: false,
-    editOnEnter: true,
-    keyRepeat: { interval: 16 },
+  rowKey="id"
+  searchOptions={{
+    enabled: true,
+    shortcut: true, // Cmd+F / Ctrl+F
   }}
-/>;
+  contextMenuOptions={{
+    enabled: true,
+    items: (target) => [
+      {
+        id: 'view-details',
+        label: 'View Row Details',
+        onSelect: () => showDetailsModal(target.values),
+      },
+      { type: 'separator', id: 'sep-1' },
+      {
+        id: 'copy-cell',
+        label: 'Copy Cell Value',
+        onSelect: () => navigator.clipboard.writeText(String(target.value)),
+      },
+    ],
+  }}
+/>
 ```
 
-`F2` starts editing the active editable cell. `Enter` also starts editing when `editable` and `editOnEnter` are enabled; otherwise `Enter` and `Space` invoke the active cell's `onClick` callback without moving focus. Holding an Arrow key switches from the operating system repeat event to a frame-synchronized repeat loop; use `keyRepeat.interval` to tune the interval in milliseconds or `keyRepeat.enabled: false` to retain native repeat timing. Interactive elements such as inputs and buttons keep their own keyboard behavior. See the runnable [cell navigation example](examples/CellNavigationExample.tsx) and the [keyboard guide](site/src/content/learn/cell-navigation.md).
+- `Ctrl+F` / `Cmd+F`: Open search popover.
+- `Enter` / `Shift+Enter`: Navigate to next / previous match (with automatic scroll to virtualized row/column).
+- `Shift+F10` or Right-click: Open context menu.
 
-### Pivot
+---
 
-Pass `pivot` to render the grid as a derived pivot table. The API follows the Excel-style field areas:
+### 7. Custom Scrollbars & Bottom Bar
 
-- `rows`: row fields
-- `columns`: column fields
-- `values`: value fields and aggregate rules
-
-When `pivot` is active, row-based grid UI is disabled internally because the rendered rows are derived summary rows. This includes frozen columns, line numbers, row check controls, sorting, column sorting, editing, pagination, summary, cell merge, reorder, and row/cell change callbacks.
+BeautifulGrid provides customizable scrollbars and unified bottom bar controls:
 
 ```typescript jsx
-import * as React from 'react';
-import { BGrid, BGridColumn, BGridProps } from 'beautiful-grid';
+<BGrid
+  width={800}
+  height={400}
+  columns={columns}
+  data={data}
+  rowKey="id"
+  bottomBarHeight={34}
+  scrollbar={{
+    variant: 'modern', // 'modern' (sleek overlay) | 'classic' (win-style) | 'native'
+    horizontal: { visible: true },
+    vertical: { visible: true },
+  }}
+  status={{
+    visible: true,
+    content: ({ visibleItems, totalItems }) => (
+      <span>Showing {visibleItems} of {totalItems} entries</span>
+    ),
+  }}
+/>
+```
 
-interface SalesItem {
-  region: string;
-  product: string;
-  quarter: string;
-  sales: number;
-  quantity: number;
-}
+---
 
-const data = [
-  { values: { region: 'North', product: 'Desk', quarter: 'Q1', sales: 1200, quantity: 12 } },
-  { values: { region: 'North', product: 'Desk', quarter: 'Q2', sales: 1400, quantity: 10 } },
-  { values: { region: 'South', product: 'Chair', quarter: 'Q1', sales: 900, quantity: 8 } },
-];
+### 8. Pagination (Server / Client)
 
-const columns: BGridColumn<SalesItem>[] = [
-  { key: 'region', label: 'Region', width: 120 },
-  { key: 'product', label: 'Product', width: 140 },
-  { key: 'quarter', label: 'Quarter', width: 100 },
-  { key: 'sales', label: 'Sales', width: 120, align: 'right' },
-  { key: 'quantity', label: 'Quantity', width: 120, align: 'right' },
-];
+Use the `page` prop to enable bottom-bar pagination:
 
-const pivot: BGridProps<SalesItem>['pivot'] = {
-  rows: [{ key: 'product', label: 'Product', width: 140 }],
-  columns: [{ key: 'region', label: 'Region' }],
-  values: [
-    {
-      key: 'sales',
-      label: 'Sales',
-      aggregate: 'sum',
-      itemRender: ({ value, columnValues, sourceItems }) => {
-        const text = `$${Number(value).toLocaleString()}`;
-        if (columnValues[0] === 'South') {
-          return <strong title={`${sourceItems.length} source rows`}>{text}</strong>;
-        }
-        return <span title={`${sourceItems.length} source rows`}>{text}</span>;
-      },
-      getClipboardText: ({ value }) => Number(value).toLocaleString(),
-    },
-    {
-      key: 'quantity',
-      label: 'Quantity',
-      aggregate: 'sum',
-      itemRender: ({ value }) => <>{Number(value).toLocaleString()} ea</>,
-    },
-  ],
-  emptyValue: 0,
-};
+```typescript jsx
+function PaginatedGrid() {
+  const [currentPage, setCurrentPage] = React.useState(1); // 1-based index
+  const pageSize = 20;
+  const totalElements = 350;
 
-function PivotExample() {
   return (
-    <BGrid<SalesItem>
-      width={900}
-      height={420}
+    <BGrid<Item>
+      width={800}
+      height={450}
       columns={columns}
-      data={data}
-      pivot={pivot}
-      variant={'vertical-bordered'}
+      data={pageData}
+      rowKey="id"
+      page={{
+        currentPage,
+        pageSize,
+        totalElements,
+        totalPages: Math.ceil(totalElements / pageSize),
+        onChange: (newPage) => setCurrentPage(newPage),
+      }}
     />
   );
 }
 ```
 
-Built-in aggregate values:
+---
 
-| Aggregate | Description                       |
-| --------- | --------------------------------- |
-| `sum`     | Numeric sum. This is the default. |
-| `count`   | Number of source values.          |
-| `avg`     | Numeric average.                  |
-| `min`     | Numeric minimum.                  |
-| `max`     | Numeric maximum.                  |
-| `first`   | First source value.               |
+### 9. Frozen Columns & Frozen Rows
 
-You can also pass a custom aggregate function:
-
-```typescript jsx
-const pivot: BGridProps<SalesItem>['pivot'] = {
-  rows: [{ key: 'product', label: 'Product' }],
-  columns: [{ key: 'quarter', label: 'Quarter' }],
-  values: [
-    {
-      key: 'sales',
-      label: 'Max online sales',
-      aggregate: ({ items }) => {
-        return Math.max(...items.filter(item => item.values.region === 'North').map(item => item.values.sales));
-      },
-    },
-  ],
-};
-```
-
-`pivot.values[].itemRender` receives the normal cell render props plus pivot context:
-
-| Prop           | Description                                     |
-| -------------- | ----------------------------------------------- |
-| `value`        | Aggregated cell value                           |
-| `values`       | Pivot result row values                         |
-| `rowValues`    | Values for the current pivot row fields         |
-| `columnValues` | Values for the current pivot column fields      |
-| `sourceItems`  | Original `BGridDataItem<T>[]` used for this cell |
-| `pivotValue`   | The current value-field definition              |
-| `aggregate`    | The current aggregate setting                   |
-
-### Common Scenarios
-
-#### 1) Frozen Columns
-
-```typescript jsx
-<BGrid width={900} height={500} frozenColumnIndex={2} columns={columns} data={data} />
-```
-
-`frozenColumnIndex` 이전 컬럼(0, 1)은 고정 영역으로 렌더링됩니다.
-
-행과 컬럼을 함께 고정할 수 있습니다. 상단 Summary Row를 사용하면 고정 행은 Summary 바로 다음 줄부터 시작합니다.
+Fix leading columns and top rows while the remaining area scrolls smoothly:
 
 ```typescript jsx
 <BGrid
   width={900}
   height={500}
-  frozenColumnIndex={2}
-  frozenRowCount={3}
-  summary={{ position: 'top', columns: summaryColumns }}
+  frozenColumnIndex={2} // Columns 0 and 1 are pinned to the left
+  frozenRowCount={3}    // First 3 data rows are pinned to the top
   columns={columns}
   data={data}
+  rowKey="id"
 />
 ```
 
-#### 2) Editable Cell
+---
+
+### 10. Row Reordering
+
+Enable drag-and-drop or keyboard row sorting:
 
 ```typescript jsx
-const columns: BGridColumn<IListItem>[] = [
-  {
-    key: 'title',
-    label: '제목',
-    width: 240,
-    editable: true,
-    editor: {
-      type: 'text',
-      startOnInput: true,
-      inputProps: { maxLength: 100, autoComplete: 'off' },
+<BGrid
+  width={750}
+  height={400}
+  columns={columns}
+  data={data}
+  rowKey="id"
+  showLineNumber // Line number handle hosts the reorder grip
+  reorder={{
+    enabled: true,
+    onReorder: (nextData) => {
+      setData(nextData);
+      return true; // Return false to roll back
     },
-  },
-];
-
-<BGrid editable editTrigger={'dblclick'} columns={columns} data={data} width={700} height={400} />;
+  }}
+/>
 ```
 
-The built-in text editor supports direct typing, IME composition, Enter/F2 preserve mode, Escape cancel,
-and focus return after editing. A checkbox editor can stay visible in each cell and optionally control all
-eligible rows from the column header:
+- Keyboard reordering: Focus the handle, press `Space` or `Enter` to pick up, `ArrowUp`/`ArrowDown` to move, `Enter` to commit, or `Escape` to cancel.
+
+---
+
+### 11. Summary Row
+
+Add top or bottom summary/aggregation rows:
 
 ```typescript jsx
-{
-  key: 'enabled',
-  label: 'Enabled',
-  width: 140,
-  editable: true,
-  editor: {
-    type: 'checkbox',
-    header: { ariaLabel: 'Toggle all enabled rows' },
-    ariaLabel: ({ values }) => `Toggle ${values.name}`,
-    // trueValue: 'Y',
-    // falseValue: 'N',
-  },
+<BGrid
+  width={800}
+  height={400}
+  columns={columns}
+  data={data}
+  rowKey="id"
+  summary={{
+    position: 'bottom', // 'top' | 'bottom'
+    columns: [
+      { columnIndex: 0, colSpan: 2, itemRender: () => <strong>Total Summary</strong> },
+      {
+        columnIndex: 3,
+        align: 'right',
+        itemRender: ({ data }) => (
+          <strong>
+            ${data.reduce((sum, item) => sum + (item.values.amount || 0), 0).toLocaleString()}
+          </strong>
+        ),
+      },
+    ],
+  }}
+/>
+```
+
+---
+
+### 12. Cell Merging
+
+Merge consecutive identical cells vertically:
+
+```typescript jsx
+<BGrid
+  width={800}
+  height={400}
+  columns={columns}
+  data={data}
+  rowKey="id"
+  cellMergeOptions={{
+    columnsMap: {
+      0: { mergeBy: 'department' }, // Column index 0 merges based on department field
+      1: { mergeBy: ['department', 'team'] },
+    },
+  }}
+/>
+```
+
+---
+
+### 13. Pivot Table
+
+Transform flat tabular data into an interactive multidimensional pivot matrix:
+
+```typescript jsx
+import { BGrid, type BGridColumn, type BGridProps } from 'beautiful-grid';
+
+const pivotConfig: BGridProps<SalesRecord>['pivot'] = {
+  rows: [{ key: 'product', label: 'Product', width: 140 }],
+  columns: [{ key: 'region', label: 'Region' }],
+  values: [
+    {
+      key: 'sales',
+      label: 'Total Sales',
+      aggregate: 'sum', // 'sum' | 'count' | 'avg' | 'min' | 'max' | 'first' | custom function
+      itemRender: ({ value }) => <>${Number(value).toLocaleString()}</>,
+    },
+    {
+      key: 'qty',
+      label: 'Units',
+      aggregate: 'sum',
+      itemRender: ({ value }) => <>{Number(value).toLocaleString()} ea</>,
+    },
+  ],
+  emptyValue: '-',
+};
+
+<BGrid<SalesRecord>
+  width={900}
+  height={420}
+  columns={baseColumns}
+  data={salesData}
+  pivot={pivotConfig}
+  variant="vertical-bordered"
+/>
+```
+
+---
+
+## Props Reference
+
+### BGridProps
+
+Below is a categorized reference of `<BGrid>` props. For exact TypeScript types, refer to `beautiful-grid/types.ts`.
+
+#### Required Props
+
+| Prop | Type | Description |
+|---|---|---|
+| `width` | `number` | Total pixel width of the grid container (required for virtualization). |
+| `height` | `number` | Total pixel height of the grid container (required for virtualization). |
+| `columns` | `BGridColumn<T>[]` | Array of column definitions (`width` defaults to 100 if omitted). |
+
+#### Data & Selection
+
+| Prop | Type | Description |
+|---|---|---|
+| `data` | `BGridDataItem<T>[]` | Array of row data wrapped in `{ values: T }`. |
+| `rowKey` | `React.Key \| React.Key[]` | Unique identifier field in `item.values` (string or array path). |
+| `selectedRowKey` | `React.Key \| React.Key[]` | Key of the currently focused/highlighted row. |
+| `rowChecked` | `BGridRowChecked<T>` | Checkbox / radio row selection configuration. |
+| `getRowClassName` | `(ri: number, item: BGridDataItem<T>) => string \| undefined` | Custom row class name generator. |
+
+#### Layout & Sizing
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `headerHeight` | `number` | `30` | Header row height in pixels. |
+| `bottomBarHeight` | `number` | `30` | Bottom bar (pagination / status) height in pixels. |
+| `summaryHeight` | `number` | `30` | Summary row height in pixels. |
+| `itemHeight` | `number` | `15` | Body row content height. |
+| `itemPadding` | `number` | `7` | Body row top/bottom padding (total row height = `itemHeight + itemPadding * 2`). |
+| `frozenColumnIndex` | `number` | `0` | Pinned column boundary index (columns `< frozenColumnIndex` are fixed). |
+| `frozenRowCount` | `number` | `0` | Number of leading rows pinned below the top summary row. |
+| `showLineNumber` | `boolean` | `false` | Shows row index numbers and reorder handles on the left. |
+| `variant` | `'default' \| 'vertical-bordered'` | `'default'` | Visual border styling variant. |
+
+#### Columns & Headers
+
+| Prop | Type | Description |
+|---|---|---|
+| `columnGroups` | `BGridColumnGroupNode[]` | Tree-based multi-level grouped header configuration. |
+| `columnSortable` | `boolean` | Enables dragging header columns to reorder. |
+| `onChangeColumns` | `(columnIndex: number \| null, info: BGridChangeColumnsInfo<T>) => void` | Callback fired when column widths or orders change. |
+
+#### Editing & Interactivity
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `editable` | `boolean` | `false` | Master switch for cell editing. |
+| `editTrigger` | `'click' \| 'dblclick'` | `'dblclick'` | User event that activates inline editors. |
+| `onChangeData` | `(index, columnIndex, item, column, meta) => void` | - | Callback fired after a cell edit commits. |
+| `onClick` | `(params: BGridClickParams<T>) => void` | - | Cell click callback. |
+| `cellNavigationOptions` | `BGridCellNavigationOptions` | - | Active cell focus, arrow key navigation, and repeat options. |
+| `cellSelectionOptions` | `BGridCellSelectionOptions` | - | Range drag selection and clipboard copy/paste options. |
+
+#### Additional Features & Overlays
+
+| Prop | Type | Description |
+|---|---|---|
+| `dataControl` | `BGridDataControl` | Controlled sort & filter state (`mode: 'client' \| 'manual'`). |
+| `sort` | `BGridSortInfo` | Simple sorting state and callback (superseded by `dataControl` when present). |
+| `page` | `BGridPage` | Pagination state, totals, and page change callback. |
+| `scrollbar` | `BGridScrollbarOptions` | Scrollbar variant (`'modern' \| 'classic' \| 'native'`) and visibility. |
+| `status` | `BGridStatusOptions` | Bottom bar status text / custom render function. |
+| `pagination` | `BGridPaginationViewOptions` | Bottom bar pagination element visibility. |
+| `searchOptions` | `BGridSearchOptions<T>` | Grid in-memory search UI, shortcuts (`Cmd+F`), and highlights. |
+| `contextMenuOptions` | `BGridContextMenuOptions<T>` | Right-click and `Shift+F10` cell context menu items. |
+| `reorder` | `BGridReorderInfo<T>` | Drag and keyboard row reordering configuration. |
+| `summary` | `{ position: 'top' \| 'bottom'; columns: BGridSummaryColumn<T>[] }` | Static summary row configuration. |
+| `cellMergeOptions` | `{ columnsMap: Record<number, BGridCellMergeColumn> }` | Vertical cell merge rules. |
+| `pivot` | `BGridPivotOptions<T>` | Pivot table dimensions, aggregation rules, and metrics. |
+| `loading` | `boolean` | Displays full-grid loading overlay. |
+| `spinning` | `boolean` | Displays body-area spinner. |
+| `msg` | `{ emptyList?: string }` | Custom empty state text. |
+
+---
+
+### BGridColumn
+
+| Property | Type | Description |
+|---|---|---|
+| `id` | `string` | Unique column identifier (recommended for `columnGroups`, toolboxes, and persistence). |
+| `key` | `string \| string[]` | Field key or nested path array to read from `item.values`. |
+| `label` | `ReactNode` | Header label content. |
+| `width` | `number` | Column width in pixels (defaults to `100` if omitted). |
+| `align` | `'left' \| 'center' \| 'right'` | Body cell horizontal text alignment. |
+| `headerAlign` | `'left' \| 'center' \| 'right'` | Header cell horizontal text alignment. |
+| `sortDisable` | `boolean` | Disables sorting on this column. |
+| `className` | `string` | Static class name applied to body cells. |
+| `getClassName` | `(item: BGridDataItem<T>) => string` | Dynamic class name generator for body cells. |
+| `headerClassName` | `string` | Custom class name for the column header. |
+| `headerStyle` | `React.CSSProperties` | Custom CSS style for the column header. |
+| `itemRender` | `React.FC<BGridItemRenderProps<T>>` | Custom cell content render function. |
+| `editable` | `boolean` | Enables editing on this specific column. |
+| `editor` | `BGridCellEditorConfig<T>` | Editor configuration (`type: 'text' \| 'checkbox' \| 'plugin'`). |
+| `editTrigger` | `'click' \| 'dblclick'` | Overrides grid-level edit trigger for this column. |
+| `editorIcon` | `BGridEditorIconConfig<T>` | Inline icon trigger for dropdowns, popups, or lookup dialogs. |
+| `onChangeValue` | `(params: BGridChangeValueParams<T>) => void \| Promise<void>` | Column-level change interceptor with commit/cancel controller. |
+| `getClipboardText` | `(params: BGridCellClipboardTextParams<T>) => any` | Custom string serializer for clipboard copy. |
+| `searchable` | `boolean` | Whether this column participates in grid search (defaults to `true`). |
+| `getSearchText` | `(params: BGridSearchCellParams<T>) => unknown` | Custom string extractor for grid search matching. |
+| `toolbox` | `boolean \| BGridToolboxConfig<T>` | Enables header sort/filter toolbox popup. |
+| `filter` | `false \| BGridColumnFilterConfig<T>` | Column filter configuration (`type: 'values' \| 'text' \| 'number'`). |
+| `sortComparator` | `(a, b, params) => number` | Custom comparator function for sorting. |
+
+---
+
+### Sub-options Reference
+
+#### `BGridRowChecked<T>`
+
+```typescript
+interface BGridRowChecked<T> {
+  isRadio?: boolean;
+  checkedIndexes?: number[];
+  checkedRowKeys?: React.Key[];
+  disabled?: (index: number, item: BGridDataItem<T>) => boolean;
+  onChange: (checkedIndexes: number[], checkedRowKeys: React.Key[], checkedAll?: CheckedAll) => void;
 }
 ```
 
-The header control reflects checked, unchecked, and indeterminate states. It updates the rows currently
-available to the Grid and excludes removed or disabled checkbox cells. Prebuilt Select and Date plugins are
-available from the editor subpath:
-
-```typescript jsx
-import { createDateEditorPlugin, createSelectEditorPlugin } from 'beautiful-grid/editors';
-
-const statusEditor = createSelectEditorPlugin<IListItem>({
-  id: 'status',
-  options: [
-    { value: 'ready', label: 'Ready' },
-    { value: 'done', label: 'Done' },
-  ],
-});
-
-const dateEditor = createDateEditorPlugin<IListItem>({ id: 'delivery-date' });
-```
-
-Use `defineEditorPlugin()` from the same subpath to connect application-specific editors. Portal-based UI
-components should mount their popup into the `getPortalContainer()` supplied to the plugin component.
-
-#### 3) Sort + Page
-
-```typescript jsx
-<BGrid
-  width={900}
-  height={560}
-  columns={columns}
-  data={rows}
-  sort={{
-    sortParams,
-    onChange: next => setSortParams(next),
-  }}
-  page={{
-    currentPage,
-    pageSize,
-    totalPages,
-    totalElements,
-    onChange: (nextPage, nextSize) => {
-      setCurrentPage(nextPage);
-      if (nextSize) setPageSize(nextSize);
-    },
-  }}
-/>
-```
-
-### Props Reference (BGrid)
-
-아래는 자주 사용하는 Props 중심 정리입니다. 타입의 최종 기준은 `beautiful-grid/types.ts`의 `BGridProps<T>`입니다.
-
-#### Required
-
-| Prop      | Type                                 | Description      |
-| --------- | ------------------------------------ | ---------------- |
-| `width`   | `number`                             | 그리드 전체 너비 |
-| `height`  | `number`                             | 그리드 전체 높이 |
-| `columns` | `BGridColumn<T>[]` (`width` optional) | 컬럼 정의        |
-
-#### Data / Selection / Row Focus
-
-| Prop              | Type                                | Description                                 |
-| ----------------- | ----------------------------------- | ------------------------------------------- |
-| `data`            | `BGridDataItem<T>[]`                 | 행 데이터 (`values` 래핑 필수)              |
-| `rowKey`          | `React.Key \| React.Key[]`          | 행 고유 키 필드                             |
-| `selectedRowKey`  | `React.Key \| React.Key[]`          | 포커스된 행 키                              |
-| `rowChecked`      | `BGridRowChecked<T>`                 | 체크박스/라디오 선택 제어 (`onChange` 필수) |
-| `getRowClassName` | `(ri, item) => string \| undefined` | 행 단위 className 지정                      |
-
-> `rowSelection` / `selectedIds`는 현재 API가 아닙니다. `rowChecked`를 사용해야 합니다.
-
-#### Layout / Rendering
-
-| Prop                | Type                               | Description                      |
-| ------------------- | ---------------------------------- | -------------------------------- |
-| `headerHeight`      | `number`                           | 헤더 높이 (기본 30)              |
-| `footerHeight`      | `number`                           | 페이지네이션 푸터 높이 (기본 30) |
-| `summaryHeight`     | `number`                           | summary 높이 (기본 30)           |
-| `itemHeight`        | `number`                           | 본문 행 컨텐츠 높이 (기본 15)    |
-| `itemPadding`       | `number`                           | 행 내부 패딩 (기본 7)            |
-| `frozenColumnIndex` | `number`                           | 고정 컬럼 경계 인덱스            |
-| `frozenRowCount`    | `number`                           | 상단에 고정할 선행 데이터 행 수  |
-| `showLineNumber`    | `boolean`                          | 좌측 라인 번호 표시              |
-| `variant`           | `'default' \| 'vertical-bordered'` | 스킨 변형                        |
-| `loading`           | `boolean`                          | 전체 오버레이 로딩               |
-| `spinning`          | `boolean`                          | 바디 스피너 로딩                 |
-
-#### Column / Editing / Events
-
-| Prop              | Type                                         | Description                        |
-| ----------------- | -------------------------------------------- | ---------------------------------- |
-| `columnGroups`    | `BGridColumnGroupNode[]`                      | 컬럼 ID 기반 임의 깊이 헤더 그룹   |
-| `columnsGroup`    | `BGridColumnGroup[]`                          | 레거시 2단 헤더 그룹 (deprecated)  |
-| `onChangeColumns` | `(columnIndex, info) => void`                | 컬럼 폭/순서/그룹 변경 콜백        |
-| `onChangeData`    | `(index, columnIndex, item, column) => void` | 셀 편집 데이터 변경 콜백           |
-| `editable`        | `boolean`                                    | 편집 모드 활성화                   |
-| `editTrigger`     | `'click' \| 'dblclick'`                      | 편집 진입 트리거 (기본 `dblclick`) |
-| `onClick`         | `(params) => void`                           | 셀 클릭 이벤트                     |
-
-Each `BGridColumn<T>` can specify `editable` and an `editor`. Supported editor configs are the built-in
-`{ type: 'text' }` and `{ type: 'checkbox' }` configs, plus plugin objects created by `defineEditorPlugin()`
-or the prebuilt editor factories.
-
-Nested headers use stable column IDs and can be composed to any depth:
-
-```tsx
-<BGrid
-  columns={[
-    { id: 'customer', key: 'customer', label: 'Customer', width: 160 },
-    { id: 'region', key: 'region', label: 'Region', width: 120 },
-  ]}
-  columnGroups={[
-    {
-      id: 'sales',
-      label: 'Sales',
-      children: [{ id: 'customer-info', label: 'Customer info', children: ['customer', 'region'] }],
-    },
-  ]}
-  {...props}
-/>
-```
-
-Leaf headers can be styled with `BGridColumn.headerClassName` or `BGridColumn.headerStyle`. Nested group
-headers support `BGridColumnGroupNode.className` and `BGridColumnGroupNode.headerStyle`; the same styling is
-preserved when a header is rendered in the frozen region.
-
-#### Extra Features
-
-| Prop                    | Type                                                                                                                                                                        | Description                                 |
-| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
-| `sort`                  | `BGridSortInfo`                                                                                                                                                              | 정렬 상태/변경 콜백                         |
-| `columnSortable`        | `boolean`                                                                                                                                                                   | 컬럼 drag sort 제어                         |
-| `page`                  | `BGridPage`                                                                                                                                                                  | 페이지네이션 상태/콜백                      |
-| `summary`               | `{ columns, position }`                                                                                                                                                     | 상/하단 summary 행                          |
-| `cellMergeOptions`      | `{ columnsMap }`                                                                                                                                                            | 셀 병합 옵션                                |
-| `cellSelectionOptions`  | `{ enabled?: boolean; clearOnEscape?: boolean; clearOnOutsideClick?: boolean; maxClipboardCells?: number; maxClipboardTextLength?: number; onCopyError?: (error) => void; onPasteError?: (error) => void; createRowOnPaste?: (context) => BGridDataItem<T> }` | 셀 선택 활성화 및 클립보드 룰 (기본 활성화) |
-| `cellNavigationOptions` | `BGridCellNavigationOptions`                                                                                                                                                 | 활성 셀과 키보드 이동·편집 진입 정책        |
-| `reorder`               | `BGridReorderInfo<T>`                                                                                                                                                        | 행 reorder 설정                             |
-| `pivot`                 | `BGridPivotOptions<T>`                                                                                                                                                       | 피벗 테이블 렌더링 설정                     |
-| `msg`                   | `{ emptyList?: string }`                                                                                                                                                    | 커스텀 메시지                               |
-| `searchOptions`         | `BGridSearchOptions<T>`                                                                                                                                                                                                                                       | 검색 UI, 단축키, 문자열 getter와 제어형 상태 |
-| `contextMenuOptions`    | `BGridContextMenuOptions<T>`                                                                                                                                                                                                                                  | 본문 셀 우클릭/키보드 메뉴 항목              |
-
-## Update Note
-
-### v1.5
-
-- rowChecked 속성 추가 (rowChecked > isRadio, rowChecked > disabled)
+#### `BGridPage`
 
 ```typescript
-<BGrid<IListItem>
-  width={containerWidth}
-  height={containerHeight}
-  headerHeight={35}
-  data={sortedList}
-  columns={columns}
-  onChangeColumns={(columnIndex, { width, columns }) => {
-    console.log('onChangeColumnWidths', columnIndex, width, columns);
-    setColumns(columns);
-  }}
-  rowChecked={{
-    disabled: (ri, item) => ri === 0,
-    isRadio: true,
-    checkedRowKeys: checkedKeys,
-    onChange: (ids, keys, selectedAll) => {
-      console.log('onChange rowSelection', ids, keys, selectedAll);
-      setCheckedKeys(keys);
-    },
-  }}
-  sort={{
-    sortParams,
-    onChange: sortParams => {
-      console.log('onChange: sortParams', sortParams);
-      setSortParams(sortParams);
-    },
-  }}
-  showLineNumber
-  rowKey={'nation'}
-/>
+interface BGridPage {
+  currentPage?: number; // 1-based
+  pageSize?: number;
+  totalPages?: number;
+  totalElements?: number;
+  loading?: boolean;
+  onChange?: (currentPage: number, pageSize?: number) => void;
+}
 ```
 
-### V1.4
+#### `BGridDataControl`
 
-- columnsGroup 타입변경
-  기존 columnsIndex: []에서 start, end 지정 형태로 변경되었습니다.
-
-```typescript jsx
-[{ label: '묶음', groupStartIndex: 2, groupEndIndex: 4, align: 'center' }];
+```typescript
+interface BGridDataControl {
+  mode?: 'manual' | 'client';
+  multiSort?: boolean;
+  query: BGridDataQuery;
+  onChange: (query: BGridDataQuery, event: BGridDataQueryChangeEvent) => void;
+}
 ```
 
-- onChangeColumns 속성 변경
+---
 
-```typescript jsx
-// onChangeColumns Type
-onChangeColumns?: (
-  columnIndex: number | null,
-  info: {
-    width?: number;
-    columns: BGridColumn<T>[];
-    columnsGroup?: BGridColumnGroup[];
-    columnGroups?: BGridColumnGroupNode[];
-  },
-) => void;
+## Developer Workflows
 
-// onChangeColumns에서 변경된 컬럼과 컬럼 그룹을 받을 수 있습니다
-<BGrid
-  /*...*/
-  onChangeColumns={(columnIndex, { columns, columnsGroup }) => {
-    console.log('onChangeColumnWidths', columnIndex, columns, columnsGroup);
-    setColumns(columns);
-    setColumnsGroup(columnsGroup);
-  }}
-/>
+```bash
+# Start Vite development server (demo app & docs)
+npm run dev
+
+# Run unit tests with Vitest
+npm test
+
+# Run unit tests in watch mode
+npm run test:watch
+
+# Run library consumer compatibility tests (CJS, ESM, Types)
+npm run test:library:consumers
+
+# Run E2E tests with Playwright
+npm run test:e2e
+npm run test:e2e:ui
+
+# Lint codebase
+npm run lint
+
+# Build publishable library bundle (dist/cjs, dist/esm, dist/types, dist/style.css, dist/package.json)
+npm run build:library
+
+# Build Vite demo application
+npm run build
+npm run preview
 ```
+
+---
+
+## License
+
+BeautifulGrid is open-source software licensed under the [Apache License 2.0](LICENSE). See [NOTICE](NOTICE) for attribution and [TRADEMARK.md](TRADEMARK.md) for brand usage guidelines.

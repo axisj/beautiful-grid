@@ -36,11 +36,16 @@ describe('site theme and locale contracts', () => {
 
   it('keeps theme and locale controls accessible in both desktop and mobile navigation', () => {
     const header = read('src/components/layout/Header.astro');
+    const drawer = read('src/components/layout/MobileNavigationDrawer.astro');
     const preferences = read('src/components/layout/SitePreferences.astro');
 
-    expect(header.match(/<SitePreferences/g)).toHaveLength(2);
+    expect(header).toContain('<SitePreferences');
+    expect(drawer).toContain('<SitePreferences');
     expect(header).toContain('aria-expanded="false"');
     expect(header).toContain('aria-controls="mobile-nav"');
+    expect(drawer).toContain('role="dialog"');
+    expect(drawer).toContain('aria-modal="true"');
+    expect(drawer).toContain('aria-labelledby="mobile-drawer-title"');
     expect(preferences).toContain('role="menuitemradio"');
     expect(preferences).toContain('aria-checked="false"');
     expect(preferences).toContain('data-locale-switch');

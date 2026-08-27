@@ -1,5 +1,6 @@
 :root {
   color-scheme: light;
+  --site-header-offset: 68px;
   --site-font-sans: Inter, Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --site-font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
   --site-page-bg: #ffffff;
@@ -76,6 +77,26 @@
 
 *, *::before, *::after {
   box-sizing: border-box;
+}
+
+body {
+  overflow-x: clip;
+}
+
+html.mobile-drawer-scroll-locked,
+body.mobile-drawer-scroll-locked {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body.mobile-drawer-scroll-locked {
+  position: fixed;
+  inset-inline: 0;
+  width: 100%;
+}
+
+html[data-site-header-hidden='true'] {
+  --site-header-offset: 0px;
 }
 
 body {

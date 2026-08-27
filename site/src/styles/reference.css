@@ -44,5 +44,5 @@
 :root[data-theme='dark'] .api-required { background: #450a0a; color: #fca5a5; }
 :root[data-theme='dark'] .api-optional { background: #1e293b; color: #cbd5e1; }
 :root[data-theme='dark'] .api-deprecated { background: #422006; color: #fcd34d; }
-@media (min-width: 980px) { .reference-container { grid-template-columns: 250px minmax(0, 1fr); } .api-sidebar { position: sticky; top: 5.25rem; } }
+@media (min-width: 980px) { .reference-container { grid-template-columns: 250px minmax(0, 1fr); } .api-sidebar { position: sticky; top: calc(var(--site-header-offset, 68px) + 1rem); transition: top 180ms ease; } }
 @media (max-width: 640px) { .reference-container { gap: 2rem; padding-top: 1.5rem; } .api-type-nav { max-height: 17rem; } .api-entry-header { padding: 1rem; } .api-entry-heading-row { align-items: flex-start; } }

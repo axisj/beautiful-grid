@@ -1,0 +1,528 @@
+---
+import { ArrowRight, X } from 'lucide-react';
+import { getCollection } from 'astro:content';
+import { productFacts } from '../../data/productFacts';
+import { commonMessages, localizePath, normalizeLocale, type Locale } from '../../i18n';
+import SitePreferences from './SitePreferences.astro';
+import { groupLearnArticles, learnPath } from '../learn/learnLocale';
+
+interface Props {
+  locale?: Locale;
+  adaptiveLocale?: boolean;
+  currentSlug?: string;
+}
+
+const locale = normalizeLocale(Astro.props.locale);
+const adaptiveLocale = Astro.props.adaptiveLocale ?? false;
+const messages = commonMessages[locale];
+
+const pathname = Astro.url.pathname;
+const isLearnRoute =
+  pathname === '/learn' ||
+  pathname.startsWith('/learn/') ||
+  pathname === '/en/learn' ||
+  pathname.startsWith('/en/learn/');
+
+// Slug computation
+let currentSlug = Astro.props.currentSlug;
+if (!currentSlug && isLearnRoute) {
+  const cleaned = pathname.replace(/^\/(?:en\/)?learn\/?/, '').replace(/\/$/, '');
+  if (cleaned && cleaned !== 'en') {
+    currentSlug = cleaned;
+  }
+}
+
+const allLearn = isLearnRoute ? await getCollection('learn') : [];
+const groupedLearn = isLearnRoute ? groupLearnArticles(allLearn, locale) : [];
+
+const navItems = [
+  {
+    label: messages.guideExamples,
+    koLabel: commonMessages.ko.guideExamples,
+    enLabel: commonMessages.en.guideExamples,
+    href: localizePath('/learn', locale),
+    route: '/learn',
+    isLearn: true,
+  },
+  {
+    label: 'API',
+    koLabel: 'API',
+    enLabel: 'API',
+    href: localizePath('/api/props', locale),
+    route: '/api/props',
+    isLearn: false,
+  },
+  {
+    label: messages.adoptionGuide,
+    koLabel: commonMessages.ko.adoptionGuide,
+    enLabel: commonMessages.en.adoptionGuide,
+    href: localizePath('/product-facts', locale),
+    route: '/product-facts',
+    isLearn: false,
+  },
+  {
+    label: messages.openSource,
+    koLabel: commonMessages.ko.openSource,
+    enLabel: commonMessages.en.openSource,
+    href: localizePath('/open-source', locale),
+    route: '/open-source',
+    isLearn: false,
+  },
+  {
+    label: 'Playground',
+    koLabel: 'Playground',
+    enLabel: 'Playground',
+    href: localizePath('/playground', locale),
+    route: '/playground',
+    isLearn: false,
+  },
+];
+
+const checkActive = (route: string) => {
+  const localized = localizePath(route, locale);
+  if (route === '/learn') {
+    return isLearnRoute;
+  }
+  return pathname === localized || pathname.startsWith(`${localized}/`);
+};
+---
+
+<div
+  id="mobile-drawer-root"
+  class="mobile-drawer-root"
+  data-mobile-drawer
+  aria-hidden="true"
+  hidden
+>
+  <div class="mobile-drawer-backdrop" data-drawer-backdrop tabindex="-1"></div>
+
+  <aside
+    id="mobile-nav"
+    class="mobile-drawer-panel"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="mobile-drawer-title"
+    tabindex="-1"
+  >
+    <header class="mobile-drawer-header">
+      <a
+        id="mobile-drawer-title"
+        href={localizePath('/', locale)}
+        class="drawer-brand"
+        aria-label={`BeautifulGrid ${messages.home}`}
+        data-shell-home
+      >
+        <span class="drawer-brand-lockup" aria-hidden="true">
+          <svg
+            class="drawer-brand-symbol"
+            xmlns="http://www.w3.org/2000/svg"
+            width="32"
+            height="22"
+            viewBox="0 0 36 24"
+            focusable="false"
+          >
+            <path d="M18.7 20.8c-.9 0-1.6-.7-1.6-1.6s.7-1.6 1.6-1.6c3.1 0 5.6-2.5 5.6-5.6s-2.5-5.6-5.6-5.6c-.9 0-1.6-.7-1.6-1.6s.7-1.6 1.6-1.6c4.8 0 8.8 3.9 8.8 8.8s-4 8.8-8.8 8.8" fill="#78b9f3" />
+            <path d="M18.7 20.8h-7.8c-.9 0-1.6-.7-1.6-1.6s.7-1.6 1.6-1.6h7.8c.9 0 1.6.7 1.6 1.6s-.8 1.6-1.6 1.6" fill="#78b9f3" />
+            <linearGradient id="drawer-logo-symbol-gradient" x1="20.415" x2="1.355" y1="12" y2="12" gradientUnits="userSpaceOnUse">
+              <stop offset="0.511" stop-color="#78b9f3" />
+              <stop offset="1" stop-color="#3256de" />
+            </linearGradient>
+            <path d="M3 20.8c-.3 0-.5-.1-.7-.2-.8-.4-1.1-1.4-.7-2.2L9 4.1c.3-.5.8-.8 1.4-.9.6 0 1.1.3 1.4.8l8.3 14.4c.4.8.2 1.7-.6 2.2-.8.4-1.7.2-2.2-.6L10.5 8.1 4.4 19.9c-.3.6-.9.9-1.4.9" fill="url(#drawer-logo-symbol-gradient)" />
+            <path d="M33 20.8c-4.8 0-8.8-3.9-8.8-8.8s3.9-8.8 8.8-8.8c.9 0 1.6.7 1.6 1.6s-.7 1.6-1.6 1.6c-3.1 0-5.6 2.5-5.6 5.6s2.5 5.6 5.6 5.6c.9 0 1.6.7 1.6 1.6s-.7 1.6-1.6 1.6" fill="#3256de" />
+          </svg>
+          <span class="drawer-brand-name">Beautiful<span>Grid</span></span>
+        </span>
+        <span class="drawer-version-badge">v{productFacts.version}</span>
+      </a>
+      <button
+        type="button"
+        class="mobile-drawer-close-btn"
+        data-drawer-close
+        aria-label={messages.closeMenu}
+      >
+        <X size={20} strokeWidth={2.2} aria-hidden="true" />
+      </button>
+    </header>
+
+    <div class="mobile-drawer-scroll-body" data-drawer-scroll-body>
+      <nav
+        class="mobile-drawer-nav"
+        aria-label={messages.mobileNavigation}
+        data-shell-navigation="mobile"
+      >
+        {navItems.map((item) => {
+          const isActive = checkActive(item.route);
+          return (
+            <div class:list={['mobile-nav-group', { 'is-active-group': isActive }]}>
+              <a
+                href={item.href}
+                class:list={['mobile-nav-link', { active: isActive && (!item.isLearn || !currentSlug) }]}
+                data-shell-route={item.route}
+                aria-current={isActive && (!item.isLearn || !currentSlug) ? 'page' : undefined}
+              >
+                <span class="mobile-nav-label" data-shell-label data-ko={item.koLabel} data-en={item.enLabel}>
+                  {item.label}
+                </span>
+                <ArrowRight className="mobile-nav-arrow" size={16} strokeWidth={2} aria-hidden="true" />
+              </a>
+
+              {item.isLearn && isLearnRoute && groupedLearn.length > 0 && (
+                <div class="mobile-learn-catalog" data-mobile-learn-catalog>
+                  {groupedLearn.map((group) => {
+                    const hasActiveItem = group.items.some((it) => it.slug === currentSlug);
+                    return (
+                      <div class:list={['mobile-learn-section', { 'has-active': hasActiveItem }]}>
+                        <div class="mobile-learn-category-title">{group.label}</div>
+                        <ul class="mobile-learn-list">
+                          {group.items.map((subItem) => {
+                            const isCurrentItem = currentSlug === subItem.slug;
+                            return (
+                              <li>
+                                <a
+                                  href={learnPath(subItem.slug, locale)}
+                                  class:list={['mobile-learn-link', { active: isCurrentItem }]}
+                                  aria-current={isCurrentItem ? 'page' : undefined}
+                                  aria-label={subItem.titleKo ? `${subItem.titleEn} / ${subItem.titleKo}` : subItem.titleEn}
+                                >
+                                  {subItem.titleEn && (
+                                    <span class="mobile-learn-title-en" lang="en">
+                                      {subItem.titleEn}
+                                    </span>
+                                  )}
+                                  {subItem.titleKo && (
+                                    <span class="mobile-learn-title-ko" lang="ko">
+                                      {subItem.titleKo}
+                                    </span>
+                                  )}
+                                </a>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </nav>
+    </div>
+
+    <footer class="mobile-drawer-footer">
+      <SitePreferences
+        locale={locale}
+        idPrefix="drawer"
+        drawerBottom
+        adaptiveLocale={adaptiveLocale}
+      />
+    </footer>
+  </aside>
+</div>
+
+<style>
+  .mobile-drawer-root {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: block;
+    overflow: hidden;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  .mobile-drawer-root:not([hidden]) {
+    visibility: visible;
+  }
+
+  .mobile-drawer-root[hidden] {
+    display: none !important;
+  }
+
+  .mobile-drawer-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    transition: opacity 220ms ease;
+    cursor: pointer;
+  }
+
+  .mobile-drawer-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(88vw, 380px);
+    max-width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    background: var(--site-surface-elevated, #ffffff);
+    border-left: 1px solid var(--site-border);
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    transform: translate3d(100%, 0, 0);
+    will-change: transform;
+    transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 280ms ease;
+    outline: none;
+    overflow-x: hidden;
+  }
+
+  .mobile-drawer-root.is-open {
+    pointer-events: auto;
+    visibility: visible;
+  }
+
+  .mobile-drawer-root.is-open .mobile-drawer-backdrop {
+    opacity: 1;
+  }
+
+  .mobile-drawer-root.is-open .mobile-drawer-panel {
+    transform: translate3d(0, 0, 0);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.25);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-drawer-backdrop {
+      transition: none;
+    }
+    .mobile-drawer-panel {
+      transition: none;
+    }
+  }
+
+  .mobile-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 60px;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--site-border);
+    background: var(--site-page-bg);
+    flex: 0 0 auto;
+  }
+
+  .drawer-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--site-text-primary);
+    text-decoration: none;
+  }
+
+  .drawer-brand:hover {
+    text-decoration: none;
+  }
+
+  .drawer-brand-lockup {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .drawer-brand-symbol {
+    display: block;
+    width: 32px;
+    height: 22px;
+    flex: 0 0 auto;
+  }
+
+  .drawer-brand-name {
+    color: var(--site-text-primary);
+    font-size: 17px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .drawer-brand-name span {
+    color: var(--site-accent-strong);
+  }
+
+  .drawer-version-badge {
+    border: 1px solid var(--site-border);
+    border-radius: 999px;
+    padding: 2px 6px;
+    background: var(--site-surface);
+    color: var(--site-text-muted);
+    font-family: var(--site-font-mono);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .mobile-drawer-close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--site-border);
+    border-radius: 10px;
+    background: var(--site-control-bg);
+    color: var(--site-text-primary);
+    cursor: pointer;
+    transition: background-color 150ms ease, border-color 150ms ease;
+  }
+
+  .mobile-drawer-close-btn:hover,
+  .mobile-drawer-close-btn:focus-visible {
+    border-color: var(--site-border-strong);
+    background: var(--site-control-hover-bg);
+  }
+
+  .mobile-drawer-scroll-body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px 14px;
+  }
+
+  .mobile-drawer-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .mobile-nav-group {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid var(--site-border);
+    padding-bottom: 4px;
+  }
+
+  .mobile-nav-group:last-child {
+    border-bottom: none;
+  }
+
+  .mobile-nav-link {
+    display: flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    border-radius: var(--site-radius-sm, 8px);
+    color: var(--site-text-primary);
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 150ms ease, color 150ms ease;
+  }
+
+  .mobile-nav-link:hover {
+    background: var(--site-control-hover-bg);
+    color: var(--site-accent-strong);
+    text-decoration: none;
+  }
+
+  .mobile-nav-link.active {
+    color: var(--site-accent-strong);
+    background: var(--site-accent-soft);
+  }
+
+  .mobile-nav-arrow {
+    color: var(--site-text-muted);
+    transition: transform 150ms ease, color 150ms ease;
+  }
+
+  .mobile-nav-link:hover .mobile-nav-arrow,
+  .mobile-nav-link.active .mobile-nav-arrow {
+    color: var(--site-accent-strong);
+    transform: translateX(2px);
+  }
+
+  /* Learn Catalog in Drawer */
+  .mobile-learn-catalog {
+    margin-top: 4px;
+    margin-bottom: 8px;
+    padding-left: 12px;
+    border-left: 2px solid var(--site-border);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .mobile-learn-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .mobile-learn-category-title {
+    font-size: 13px;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--site-text-muted);
+    padding: 4px 8px 2px;
+  }
+
+  .mobile-learn-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .mobile-learn-link {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: 44px;
+    justify-content: center;
+    padding: 6px 10px;
+    border-radius: var(--site-radius-sm, 6px);
+    color: var(--site-text-secondary);
+    text-decoration: none;
+    line-height: 1.3;
+    transition: background-color 150ms ease, color 150ms ease;
+  }
+
+  .mobile-learn-title-en {
+    font-size: 13px;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+    color: inherit;
+  }
+
+  .mobile-learn-title-ko {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--site-text-muted);
+  }
+
+  .mobile-learn-link:hover {
+    color: var(--site-text-primary);
+    background: var(--site-control-hover-bg);
+    text-decoration: none;
+  }
+
+  .mobile-learn-link.active {
+    color: var(--site-accent-strong, #2563eb);
+    background: var(--site-accent-soft, rgba(37, 99, 235, 0.08));
+    font-weight: 600;
+  }
+
+  .mobile-learn-link:hover .mobile-learn-title-ko,
+  .mobile-learn-link.active .mobile-learn-title-ko {
+    color: inherit;
+  }
+
+  .mobile-drawer-footer {
+    flex: 0 0 auto;
+    padding: 12px 14px;
+    border-top: 1px solid var(--site-border);
+    background: var(--site-page-bg);
+  }
+
+  @media (min-width: 961px) {
+    .mobile-drawer-root {
+      display: none !important;
+    }
+  }
+</style>

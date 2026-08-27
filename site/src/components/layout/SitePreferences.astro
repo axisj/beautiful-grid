@@ -1,10 +1,23 @@
 ---
-import { ChevronDown, Languages, Monitor, Moon, Sun } from 'lucide-react';
+import { ChevronDown, GitFork, Languages, Monitor, Moon, Sun } from 'lucide-react';
+import { productFacts } from '../../data/productFacts';
 import { commonMessages, localeMeta, localizePath, type Locale } from '../../i18n';
 
-interface Props { locale?: Locale; idPrefix?: string; compact?: boolean; adaptiveLocale?: boolean; }
+interface Props {
+  locale?: Locale;
+  idPrefix?: string;
+  compact?: boolean;
+  drawerBottom?: boolean;
+  adaptiveLocale?: boolean;
+}
 
-const { locale = 'ko', idPrefix = 'header', compact = false, adaptiveLocale = false } = Astro.props;
+const {
+  locale = 'ko',
+  idPrefix = 'header',
+  compact = false,
+  drawerBottom = false,
+  adaptiveLocale = false,
+} = Astro.props;
 const messages = commonMessages[locale];
 const targetLocale: Locale = locale === 'ko' ? 'en' : 'ko';
 const targetPath = localizePath(`${Astro.url.pathname}${Astro.url.search}${Astro.url.hash}`, targetLocale);
@@ -16,15 +29,37 @@ const themeOptions = [
 ] as const;
 ---
 
-<div class:list={['site-preferences', { 'site-preferences-compact': compact }]} data-site-preferences data-adaptive-locale={adaptiveLocale ? 'true' : undefined}>
-  <a class="preference-button language-button" href={targetPath} hreflang={targetLocale} lang={targetLocale}
-    aria-label={messages.changeLanguage} data-locale-switch data-target-locale={targetLocale} title={messages.changeLanguage}>
+<div
+  class:list={[
+    'site-preferences',
+    { 'site-preferences-compact': compact, 'site-preferences-drawer-bottom': drawerBottom },
+  ]}
+  data-site-preferences
+  data-adaptive-locale={adaptiveLocale ? 'true' : undefined}
+>
+  <a
+    class="preference-button language-button"
+    href={targetPath}
+    hreflang={targetLocale}
+    lang={targetLocale}
+    aria-label={messages.changeLanguage}
+    data-locale-switch
+    data-target-locale={targetLocale}
+    title={messages.changeLanguage}
+  >
     <Languages size={16} strokeWidth={2} aria-hidden="true" />
     <span data-locale-switch-label>{localeMeta[targetLocale].shortLabel}</span>
   </a>
+
   <div class="theme-picker" data-theme-picker>
-    <button class="preference-button theme-trigger" type="button" aria-label={messages.themeMenu}
-      aria-expanded="false" aria-controls={menuId} data-theme-trigger>
+    <button
+      class="preference-button theme-trigger"
+      type="button"
+      aria-label={messages.themeMenu}
+      aria-expanded="false"
+      aria-controls={menuId}
+      data-theme-trigger
+    >
       <span class="theme-trigger-icons" aria-hidden="true">
         <Sun className="theme-icon theme-icon-light" size={16} strokeWidth={2} />
         <Moon className="theme-icon theme-icon-dark" size={16} strokeWidth={2} />
@@ -35,14 +70,36 @@ const themeOptions = [
     </button>
     <div id={menuId} class="theme-menu" role="menu" aria-label={messages.themeMenu} hidden data-theme-menu>
       {themeOptions.map(({ value, label, Icon }) => (
-        <button type="button" role="menuitemradio" aria-checked="false" data-theme-option={value} data-theme-label={label}
+        <button
+          type="button"
+          role="menuitemradio"
+          aria-checked="false"
+          data-theme-option={value}
+          data-theme-label={label}
           data-label-ko={value === 'light' ? commonMessages.ko.themeLight : value === 'dark' ? commonMessages.ko.themeDark : commonMessages.ko.themeSystem}
-          data-label-en={value === 'light' ? commonMessages.en.themeLight : value === 'dark' ? commonMessages.en.themeDark : commonMessages.en.themeSystem}>
-          <Icon size={16} strokeWidth={2} aria-hidden="true" /><span>{label}</span><span class="theme-option-check" aria-hidden="true">✓</span>
+          data-label-en={value === 'light' ? commonMessages.en.themeLight : value === 'dark' ? commonMessages.en.themeDark : commonMessages.en.themeSystem}
+        >
+          <Icon size={16} strokeWidth={2} aria-hidden="true" />
+          <span>{label}</span>
+          <span class="theme-option-check" aria-hidden="true">✓</span>
         </button>
       ))}
     </div>
   </div>
+
+  {drawerBottom && (
+    <a
+      class="preference-button github-preference-button"
+      href={productFacts.repositoryUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={messages.github}
+      title={messages.github}
+    >
+      <GitFork className="github-icon" size={15} strokeWidth={2.2} aria-hidden="true" />
+      <span>GitHub</span>
+    </a>
+  )}
 </div>
 
 <script>
@@ -174,5 +231,16 @@ const themeOptions = [
   .site-preferences-compact .preference-button { min-height: 44px; }
   .site-preferences-compact .language-button, .site-preferences-compact .theme-picker, .site-preferences-compact .theme-trigger { flex: 1; }
   .site-preferences-compact .theme-menu { right: 0; left: 0; width: auto; }
-  @media (max-width: 420px) { .theme-trigger-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); } .theme-trigger { padding-inline: 9px; } }
+  .site-preferences-drawer-bottom { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; gap: 6px; }
+  .site-preferences-drawer-bottom .preference-button { width: 100%; min-height: 44px; padding: 0 6px; gap: 5px; font-size: 13px; justify-content: center; }
+  .site-preferences-drawer-bottom .theme-picker { width: 100%; }
+  .site-preferences-drawer-bottom .theme-trigger { width: 100%; }
+  .site-preferences-drawer-bottom .theme-menu { top: auto; bottom: calc(100% + 8px); right: 0; left: auto; width: 164px; z-index: 210; }
+  .site-preferences-drawer-bottom .github-preference-button { display: inline-flex; align-items: center; justify-content: center; }
+  @media (max-width: 420px) {
+    .site-preferences:not(.site-preferences-drawer-bottom) .theme-trigger-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    .site-preferences:not(.site-preferences-drawer-bottom) .theme-trigger { padding-inline: 9px; }
+    .site-preferences-drawer-bottom .preference-button { padding: 0 4px; font-size: 13px; gap: 4px; }
+    .site-preferences-drawer-bottom .theme-menu { width: 150px; right: 0; }
+  }
 </style>

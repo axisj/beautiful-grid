@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import { localeFromPath, type Locale } from '../../i18n';
-import { categoryLabel, learnCategoryOrder, learnIndexPath, learnMessages, learnPath, learnSlug } from './learnLocale';
+import { groupLearnArticles, learnIndexPath, learnMessages, learnPath } from './learnLocale';
 
 interface Props {
   locale?: Locale;
@@ -13,24 +13,7 @@ const locale = localeProp || localeFromPath(Astro.url.pathname);
 const messages = learnMessages[locale];
 const allLearn = await getCollection('learn');
 
-const grouped = learnCategoryOrder.map(cat => {
-  const items = allLearn
-    .filter(item => item.data.locale === locale && item.data.category === cat && !item.data.draft)
-    .sort((a, b) => a.data.order - b.data.order);
-  return {
-    category: cat,
-    label: categoryLabel(cat, locale),
-    items,
-  };
-}).filter(g => g.items.length > 0);
-
-const splitLocalizedTitle = (title: string) => {
-  const match = title.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
-
-  return match
-    ? { korean: match[1].trim(), english: match[2].trim() }
-    : { korean: title, english: '' };
-};
+const grouped = groupLearnArticles(allLearn, locale);
 ---
 
 <nav aria-label={messages.navigation} class="learn-sidebar" data-learn-sidebar>
@@ -50,21 +33,17 @@ const splitLocalizedTitle = (title: string) => {
       <div class="sidebar-category-title">{group.label}</div>
       <ul class="sidebar-nav-list">
         {group.items.map(item => {
-          const slug = learnSlug(item.id);
-          const isCurrent = currentSlug === slug;
-          const title = locale === 'ko'
-            ? splitLocalizedTitle(item.data.title)
-            : { korean: '', english: item.data.title };
+          const isCurrent = currentSlug === item.slug;
           return (
             <li>
               <a
-                href={learnPath(slug, locale)}
+                href={learnPath(item.slug, locale)}
                 class:list={['sidebar-item-link', { active: isCurrent }]}
                 aria-current={isCurrent ? 'page' : undefined}
-                aria-label={title.korean ? `${title.english} / ${title.korean}` : title.english}
+                aria-label={item.titleKo ? `${item.titleEn} / ${item.titleKo}` : item.titleEn}
               >
-                {title.english && <span class="sidebar-item-title-en" lang="en">{title.english}</span>}
-                {title.korean && <span class="sidebar-item-title-ko" lang="ko">{title.korean}</span>}
+                {item.titleEn && <span class="sidebar-item-title-en" lang="en">{item.titleEn}</span>}
+                {item.titleKo && <span class="sidebar-item-title-ko" lang="ko">{item.titleKo}</span>}
               </a>
             </li>
           );
@@ -101,12 +80,13 @@ const splitLocalizedTitle = (title: string) => {
 <style>
   .learn-sidebar {
     position: sticky;
-    top: 5rem;
-    max-height: calc(100vh - 6rem);
+    top: calc(var(--site-header-offset, 68px) + 0.75rem);
+    max-height: calc(100dvh - var(--site-header-offset, 68px) - 1.5rem);
     overflow-y: auto;
     padding-right: 0.75rem;
     scrollbar-width: thin;
     scrollbar-color: var(--site-border-strong, #cbd5e1) var(--site-surface, #f7f9fc);
+    transition: top 180ms ease, max-height 180ms ease;
   }
   .learn-sidebar::-webkit-scrollbar {
     width: 10px;

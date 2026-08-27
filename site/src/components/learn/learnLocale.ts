@@ -126,3 +126,61 @@ export function learnDemoPath(slug: string, _locale: Locale): string {
 export function categoryLabel(category: string, locale: Locale): string {
   return learnMessages[locale].categories[category as keyof typeof learnMessages.ko.categories] || category;
 }
+
+export const splitLocalizedTitle = (title: string) => {
+  const match = title.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
+
+  return match
+    ? { korean: match[1].trim(), english: match[2].trim() }
+    : { korean: title, english: '' };
+};
+
+export interface GroupedLearnItem {
+  slug: string;
+  id: string;
+  order: number;
+  title: string;
+  titleEn: string;
+  titleKo: string;
+}
+
+export interface GroupedLearnCategory {
+  category: string;
+  label: string;
+  items: GroupedLearnItem[];
+}
+
+export function groupLearnArticles(
+  allLearn: Array<{ id: string; data: { locale: string; category: string; draft?: boolean; order: number; title: string } }>,
+  locale: Locale,
+): GroupedLearnCategory[] {
+  return learnCategoryOrder
+    .map((cat) => {
+      const filtered = allLearn
+        .filter((item) => item.data.locale === locale && item.data.category === cat && !item.data.draft)
+        .sort((a, b) => a.data.order - b.data.order);
+
+      const items: GroupedLearnItem[] = filtered.map((item) => {
+        const slug = learnSlug(item.id);
+        const titleData = locale === 'ko'
+          ? splitLocalizedTitle(item.data.title)
+          : { korean: '', english: item.data.title };
+
+        return {
+          slug,
+          id: item.id,
+          order: item.data.order,
+          title: item.data.title,
+          titleEn: titleData.english,
+          titleKo: titleData.korean,
+        };
+      });
+
+      return {
+        category: cat,
+        label: categoryLabel(cat, locale),
+        items,
+      };
+    })
+    .filter((g) => g.items.length > 0);
+}

@@ -3,6 +3,7 @@ import { GitFork } from 'lucide-react';
 import { productFacts } from '../../data/productFacts';
 import { commonMessages, localizePath, normalizeLocale, type Locale } from '../../i18n';
 import SitePreferences from './SitePreferences.astro';
+import MobileNavigationDrawer from './MobileNavigationDrawer.astro';
 
 interface Props { locale?: Locale; adaptiveLocale?: boolean; }
 
@@ -63,29 +64,17 @@ const navigation = [
       </button>
     </div>
   </div>
-
-   <nav id="mobile-nav" class="mobile-nav" aria-label={messages.mobileNavigation} data-shell-navigation="mobile" hidden>
-    <div class="container mobile-nav-inner">
-       <div class="mobile-preferences"><SitePreferences locale={locale} idPrefix="mobile" compact adaptiveLocale={adaptiveLocale} /></div>
-      {navigation.map(item => (
-         <a href={item.href} data-shell-route={item.route || undefined} target={item.external ? '_blank' : undefined} rel={item.external ? 'noopener noreferrer' : undefined}>
-          <span class="nav-label">
-            {item.external && <GitFork className="github-icon" size={15} strokeWidth={2.2} aria-hidden="true" />}
-             <span data-shell-label data-ko={item.koLabel} data-en={item.enLabel}>{item.label}</span>
-          </span>
-          <span aria-hidden="true">{item.external ? '↗' : '→'}</span>
-        </a>
-      ))}
-    </div>
-  </nav>
 </header>
 
+<MobileNavigationDrawer locale={locale} adaptiveLocale={adaptiveLocale} />
+
 <style>
-  .site-header { position: sticky; top: 0; z-index: 100; border-bottom: 1px solid color-mix(in srgb, var(--site-border) 84%, transparent); background: color-mix(in srgb, var(--site-page-bg) 88%, transparent); box-shadow: 0 10px 30px -32px rgba(15, 23, 42, 0.75); backdrop-filter: saturate(160%) blur(16px); }
+  .site-header { position: sticky; top: 0; z-index: 100; border-bottom: 1px solid color-mix(in srgb, var(--site-border) 84%, transparent); background: color-mix(in srgb, var(--site-page-bg) 88%, transparent); box-shadow: 0 10px 30px -32px rgba(15, 23, 42, 0.75); backdrop-filter: saturate(160%) blur(16px); transition: transform 180ms ease; will-change: transform; }
+  .site-header.is-scroll-hidden { transform: translateY(calc(-100% - 1px)); }
   .header-inner { display: grid; grid-template-columns: 1fr auto 1fr; min-height: 68px; align-items: center; gap: 22px; }
   .brand { display: inline-flex; width: max-content; align-items: center; gap: 10px; color: var(--site-text-primary); text-decoration: none; }
   .brand-lockup { display: inline-flex; align-items: center; gap: 9px; }
-  .brand:hover, .primary-nav a:hover, .mobile-nav a:hover { text-decoration: none; }
+  .brand:hover, .primary-nav a:hover { text-decoration: none; }
   .brand-symbol { display: block; width: 36px; height: 24px; flex: 0 0 auto; }
   .brand-name { color: var(--site-text-primary); font-size: 19px; font-weight: 800; line-height: 1; letter-spacing: -0.03em; }
   .brand-name span { color: var(--site-accent-strong); }
@@ -101,13 +90,10 @@ const navigation = [
   .mobile-menu-btn[aria-expanded='true'] span:first-child { transform: translateY(5px) rotate(45deg); }
   .mobile-menu-btn[aria-expanded='true'] span:nth-child(2) { opacity: 0; }
   .mobile-menu-btn[aria-expanded='true'] span:last-child { transform: translateY(-5px) rotate(-45deg); }
-  .mobile-nav { border-top: 1px solid var(--site-border); background: var(--site-overlay-bg); }
-  .mobile-nav-inner { display: grid; padding-top: 10px; padding-bottom: 14px; }
-  .mobile-preferences { margin-bottom: 8px; padding-bottom: 10px; border-bottom: 1px solid var(--site-border); }
-  .mobile-nav a:not(.preference-button) { display: flex; min-height: 44px; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--site-border); color: var(--site-text-secondary); font-size: 14px; font-weight: 700; }
   @media (max-width: 1080px) { .primary-nav { gap: 15px; } .header-inner { gap: 14px; } }
   @media (max-width: 960px) { .header-inner { display: flex; justify-content: space-between; } .desktop-only, .desktop-preferences { display: none; } .mobile-menu-btn { display: block; } }
   @media (max-width: 420px) { .brand { gap: 7px; } .brand-lockup { gap: 7px; } .brand-symbol { width: 36px; height: 24px; } .brand-name { font-size: 17px; } .version-badge { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .site-header { transition: none; } }
 </style>
 
 <script is:inline define:vars={{
@@ -135,26 +121,177 @@ const navigation = [
     document.querySelector('[data-shell-navigation="primary"]')?.setAttribute('aria-label', shellLocale === 'en' ? enPrimaryNavigation : koPrimaryNavigation);
     document.querySelector('[data-shell-navigation="mobile"]')?.setAttribute('aria-label', shellLocale === 'en' ? enMobileNavigation : koMobileNavigation);
   }
+
   const button = document.querySelector('.mobile-menu-btn');
-  const navigation = document.getElementById('mobile-nav');
+  const siteHeader = document.querySelector('.site-header');
+  const drawerRoot = document.querySelector('[data-mobile-drawer]');
+  const drawerPanel = drawerRoot?.querySelector('.mobile-drawer-panel');
+  const drawerBackdrop = drawerRoot?.querySelector('[data-drawer-backdrop]');
+  const drawerCloseBtn = drawerRoot?.querySelector('[data-drawer-close]');
+
+  let isTransitioning = false;
+  let lockedScrollY = 0;
+  let pageScrollLocked = false;
+  let lastHeaderScrollY = Math.max(window.scrollY, 0);
+  let headerScrollFrame = 0;
+
+  const setHeaderHidden = (hidden) => {
+    const drawerOpen = drawerRoot?.classList.contains('is-open');
+    const shouldHide = hidden && !drawerOpen;
+    siteHeader?.classList.toggle('is-scroll-hidden', shouldHide);
+    if (shouldHide) {
+      document.documentElement.setAttribute('data-site-header-hidden', 'true');
+    } else {
+      document.documentElement.removeAttribute('data-site-header-hidden');
+    }
+  };
+
+  const lockPageScroll = () => {
+    if (pageScrollLocked) return;
+    lockedScrollY = Math.max(window.scrollY, 0);
+    pageScrollLocked = true;
+    document.documentElement.classList.add('mobile-drawer-scroll-locked');
+    document.body.classList.add('mobile-drawer-scroll-locked');
+    document.body.style.top = `-${lockedScrollY}px`;
+  };
+
+  const unlockPageScroll = () => {
+    if (!pageScrollLocked) return;
+    document.documentElement.classList.remove('mobile-drawer-scroll-locked');
+    document.body.classList.remove('mobile-drawer-scroll-locked');
+    document.body.style.top = '';
+    pageScrollLocked = false;
+    window.scrollTo(0, lockedScrollY);
+    lastHeaderScrollY = lockedScrollY;
+  };
+
+  const updateHeaderFromScroll = () => {
+    headerScrollFrame = 0;
+    const nextScrollY = Math.max(window.scrollY, 0);
+    const delta = nextScrollY - lastHeaderScrollY;
+
+    if (nextScrollY <= 16) {
+      setHeaderHidden(false);
+      lastHeaderScrollY = nextScrollY;
+      return;
+    }
+
+    if (Math.abs(delta) < 6) return;
+    setHeaderHidden(delta > 0);
+    lastHeaderScrollY = nextScrollY;
+  };
+
+  window.addEventListener('scroll', () => {
+    if (pageScrollLocked || headerScrollFrame) return;
+    headerScrollFrame = requestAnimationFrame(updateHeaderFromScroll);
+  }, { passive: true });
+
+  const openNavigation = () => {
+    if (!button || !drawerRoot || isTransitioning) return;
+    isTransitioning = true;
+    button.setAttribute('aria-expanded', 'true');
+    button.setAttribute('aria-label', adaptiveLocale ? activeCloseLabel : closeLabel);
+    drawerRoot.hidden = false;
+    drawerRoot.setAttribute('aria-hidden', 'false');
+    setHeaderHidden(false);
+    lockPageScroll();
+
+    // Force reflow so initial translate3d(100%, 0, 0) is committed by the renderer
+    void drawerPanel?.offsetHeight;
+
+    requestAnimationFrame(() => {
+      drawerRoot.classList.add('is-open');
+      isTransitioning = false;
+    });
+
+    const handleOpened = (e) => {
+      if (e && e.target !== drawerPanel) return;
+      drawerPanel?.removeEventListener('transitionend', handleOpened);
+      const firstFocusable = drawerPanel?.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      firstFocusable?.focus({ preventScroll: true });
+    };
+
+    drawerPanel?.addEventListener('transitionend', handleOpened);
+    setTimeout(handleOpened, 320);
+  };
+
   const closeNavigation = (returnFocus = false) => {
-    if (!button || !navigation) return;
+    if (!button || !drawerRoot) return;
     button.setAttribute('aria-expanded', 'false');
     button.setAttribute('aria-label', adaptiveLocale ? activeOpenLabel : openLabel);
-    navigation.hidden = true;
+    drawerRoot.classList.remove('is-open');
+    unlockPageScroll();
+
+    const handleTransitionEnd = (e) => {
+      if (e.target !== drawerPanel) return;
+      drawerPanel?.removeEventListener('transitionend', handleTransitionEnd);
+      if (!drawerRoot.classList.contains('is-open')) {
+        drawerRoot.hidden = true;
+        drawerRoot.setAttribute('aria-hidden', 'true');
+      }
+    };
+
+    drawerPanel?.addEventListener('transitionend', handleTransitionEnd);
+    // Fallback if transition doesn't fire
+    setTimeout(() => {
+      if (!drawerRoot.classList.contains('is-open')) {
+        drawerRoot.hidden = true;
+        drawerRoot.setAttribute('aria-hidden', 'true');
+      }
+    }, 300);
+
     if (returnFocus) button.focus();
   };
+
   button?.addEventListener('click', () => {
-    if (!navigation) return;
-    const expanded = button.getAttribute('aria-expanded') === 'true';
-    button.setAttribute('aria-expanded', String(!expanded));
-    button.setAttribute('aria-label', expanded ? (adaptiveLocale ? activeOpenLabel : openLabel) : (adaptiveLocale ? activeCloseLabel : closeLabel));
-    navigation.hidden = expanded;
+    const isExpanded = button.getAttribute('aria-expanded') === 'true';
+    if (isExpanded) {
+      closeNavigation(false);
+    } else {
+      openNavigation();
+    }
   });
-  navigation?.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') closeNavigation(true);
+
+  drawerCloseBtn?.addEventListener('click', () => closeNavigation(true));
+  drawerBackdrop?.addEventListener('click', () => closeNavigation(true));
+
+  drawerRoot?.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeNavigation(true);
+      return;
+    }
+
+    if (event.key === 'Tab' && drawerPanel) {
+      const focusableEls = Array.from(
+        drawerPanel.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])')
+      ).filter(el => !el.hidden && getComputedStyle(el).display !== 'none');
+
+      if (focusableEls.length === 0) return;
+      const firstEl = focusableEls[0];
+      const lastEl = focusableEls[focusableEls.length - 1];
+
+      if (event.shiftKey) {
+        if (document.activeElement === firstEl) {
+          event.preventDefault();
+          lastEl.focus();
+        }
+      } else {
+        if (document.activeElement === lastEl) {
+          event.preventDefault();
+          firstEl.focus();
+        }
+      }
+    }
   });
+
+  drawerPanel?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => {
+      closeNavigation(false);
+    });
+  });
+
   window.matchMedia('(min-width: 961px)').addEventListener('change', (event) => {
-    if (event.matches) closeNavigation();
+    if (event.matches) closeNavigation(false);
   });
 </script>

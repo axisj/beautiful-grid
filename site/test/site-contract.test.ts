@@ -39,6 +39,47 @@ describe('site product and navigation contracts', () => {
     expect(header).not.toContain('class="header-actions desktop-only"');
   });
 
+  it('structures the mobile navigation drawer with 5 primary items, shared Learn catalog, and 1-row bottom controls', () => {
+    const drawer = readSiteFile('src/components/layout/MobileNavigationDrawer.astro');
+    const header = readSiteFile('src/components/layout/Header.astro');
+    const learnLocale = readSiteFile('src/components/learn/learnLocale.ts');
+
+    expect(header).toContain('<MobileNavigationDrawer');
+    expect(drawer).toContain('role="dialog"');
+    expect(drawer).toContain('aria-modal="true"');
+    expect(drawer).toContain('aria-labelledby="mobile-drawer-title"');
+    expect(drawer).toContain('data-drawer-backdrop');
+    expect(drawer).toContain('data-drawer-close');
+    expect(drawer).toContain("groupLearnArticles(allLearn, locale)");
+    expect(drawer).toContain("route: '/learn'");
+    expect(drawer).toContain("route: '/api/props'");
+    expect(drawer).toContain("route: '/product-facts'");
+    expect(drawer).toContain("route: '/open-source'");
+    expect(drawer).toContain("route: '/playground'");
+    expect(drawer).toContain('drawerBottom');
+    expect(learnLocale).toContain('export function groupLearnArticles');
+  });
+
+  it('keeps sticky navigation working with scroll-aware header and a locked mobile drawer', () => {
+    const globals = readSiteFile('src/styles/globals.css');
+    const header = readSiteFile('src/components/layout/Header.astro');
+    const sidebar = readSiteFile('src/components/learn/LearnSidebar.astro');
+    const learnIndex = readSiteFile('src/components/learn/LearnIndexPage.astro');
+    const reference = readSiteFile('src/styles/reference.css');
+
+    expect(globals).toContain('overflow-x: clip');
+    expect(globals).not.toMatch(/html,\s*\nbody\s*\{\s*\n\s*overflow-x:\s*hidden/);
+    expect(globals).toContain('html.mobile-drawer-scroll-locked');
+    expect(globals).toContain('body.mobile-drawer-scroll-locked');
+    expect(header).toContain("siteHeader?.classList.toggle('is-scroll-hidden', shouldHide)");
+    expect(header).toContain("window.addEventListener('scroll'");
+    expect(header).toContain("document.documentElement.classList.add('mobile-drawer-scroll-locked')");
+    expect(header).toContain('window.scrollTo(0, lockedScrollY)');
+    expect(sidebar).toContain('top: calc(var(--site-header-offset, 68px) + 0.75rem)');
+    expect(learnIndex).toContain('top: var(--site-header-offset, 68px)');
+    expect(reference).toContain('top: calc(var(--site-header-offset, 68px) + 1rem)');
+  });
+
   it('keeps the displayed package version aligned with the publishable package', () => {
     const packageJson = JSON.parse(readFileSync(resolve(repositoryRoot, 'package.json'), 'utf8')) as {
       version: string;

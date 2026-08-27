@@ -1844,7 +1844,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   }
 
   .quick-start-section {
-    border-block: 1px solid #e8eef6;
+    border-block: 1px solid var(--site-border);
     background:
       radial-gradient(circle at 84% 6%, rgba(37, 99, 235, 0.08), transparent 31%),
       linear-gradient(180deg, #f8fbff 0%, #ffffff 72%);
@@ -2181,7 +2181,20 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   :global(html[data-theme='dark']) .insight-bars span:nth-child(2) { background: #277866; }
   :global(html[data-theme='dark']) .strengths-section,
   :global(html[data-theme='dark']) .examples-section,
-  :global(html[data-theme='dark']) .quick-start-section { background: var(--site-page-bg); }
+  :global(html[data-theme='dark']) .quick-start-section {
+    border-color: var(--site-border);
+    background: var(--site-page-bg);
+  }
+  :global(html[data-theme='dark']) .example-arrow {
+    border-color: var(--site-border);
+    background: var(--site-control-bg);
+    color: var(--site-accent);
+  }
+  :global(html[data-theme='dark']) .example-card:hover .example-arrow {
+    border-color: var(--site-accent);
+    background: var(--site-accent-soft);
+    color: var(--site-accent-strong);
+  }
   :global(html[data-theme='dark']) .decision-card {
     border-color: var(--site-border);
     background: linear-gradient(135deg, #111b2d, #131d2b 52%, #102322);

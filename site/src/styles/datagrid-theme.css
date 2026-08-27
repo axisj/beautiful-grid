@@ -341,3 +341,197 @@
 :root[data-theme='dark'] .site-demo-renderer [style*='color: blue'] {
   color: var(--site-accent) !important;
 }
+
+/* Ant Design & demo UI controls in dark theme */
+:root[data-theme='dark'] .site-demo-renderer .ant-btn-default {
+  border-color: var(--site-border-strong) !important;
+  background-color: var(--site-control-bg) !important;
+  color: var(--site-text-primary) !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer .ant-btn-default:hover {
+  border-color: var(--site-accent) !important;
+  background-color: var(--site-control-hover-bg) !important;
+  color: var(--site-accent-strong) !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer .ant-segmented {
+  background-color: var(--site-surface-subtle) !important;
+  color: var(--site-text-secondary) !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer .ant-segmented .ant-segmented-item {
+  color: var(--site-text-secondary) !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer .ant-segmented .ant-segmented-item:hover:not(.ant-segmented-item-selected) {
+  color: var(--site-text-primary) !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer .ant-segmented .ant-segmented-item-selected {
+  background-color: var(--site-surface-elevated) !important;
+  color: var(--site-text-primary) !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer .ant-segmented .ant-segmented-thumb {
+  background-color: var(--site-surface-elevated) !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer :is(
+  .ant-select:not(.ant-select-customize-input) .ant-select-selector,
+  select,
+  .ant-input,
+  .ant-input-affix-wrapper
+) {
+  border-color: var(--site-border-strong) !important;
+  background-color: var(--site-control-bg) !important;
+  color: var(--site-text-primary) !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer :is(.ant-select-selection-item, .ant-select-selection-placeholder) {
+  color: var(--site-text-primary) !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer .ant-select-arrow {
+  color: var(--site-text-muted) !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer .ant-card {
+  border-color: var(--site-border) !important;
+  background-color: var(--site-surface) !important;
+  color: var(--site-text-primary) !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer :is(.ant-card-body, .ant-card-head) {
+  color: var(--site-text-primary) !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer :is(.ant-radio-wrapper, .ant-checkbox-wrapper, label) {
+  color: var(--site-text-primary) !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer .ant-radio-wrapper span:not(.ant-radio) {
+  color: var(--site-text-primary) !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer .ant-radio-inner {
+  border-color: var(--site-border-strong) !important;
+  background-color: var(--site-control-bg) !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer .ant-radio-checked .ant-radio-inner {
+  border-color: var(--site-accent) !important;
+  background-color: var(--site-accent) !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer .ant-tag {
+  border-color: var(--site-border-strong) !important;
+  background-color: var(--site-surface-subtle) !important;
+  color: var(--site-text-secondary) !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer .ant-switch {
+  background-color: var(--site-surface-subtle) !important;
+}
+
+:root[data-theme='dark'] .site-demo-renderer .ant-switch.ant-switch-checked {
+  background-color: var(--site-accent) !important;
+}
+
+/* Portaled Ant Design popups, dropdowns, pickers, colorpicker and modals */
+:root[data-theme='dark'] :is(
+  .ant-select-dropdown,
+  .ant-picker-dropdown,
+  .ant-cascader-dropdown,
+  .ant-color-picker-panel,
+  .ant-dropdown,
+  .ant-popover-inner,
+  .bgrid-antd-editor-popup
+) {
+  border: 1px solid var(--site-border) !important;
+  background-color: var(--site-surface-elevated) !important;
+  color: var(--site-text-primary) !important;
+  box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.7) !important;
+}
+
+:root[data-theme='dark'] :is(
+  .ant-select-item,
+  .ant-cascader-menu-item,
+  .ant-select-tree-node-content-wrapper
+) {
+  color: var(--site-text-secondary) !important;
+}
+
+:root[data-theme='dark'] :is(
+  .ant-select-item-option-active,
+  .ant-select-item-option-selected,
+  .ant-cascader-menu-item-active,
+  .ant-cascader-menu-item-expand,
+  .ant-select-tree-node-selected
+) {
+  background-color: var(--site-surface-subtle) !important;
+  color: var(--site-accent-strong) !important;
+}
+
+:root[data-theme='dark'] .ant-cascader-menu {
+  border-right: 1px solid var(--site-border) !important;
+  background-color: var(--site-surface-elevated) !important;
+}
+
+:root[data-theme='dark'] :is(.ant-picker-panel-container, .ant-picker-panel) {
+  background-color: var(--site-surface-elevated) !important;
+  color: var(--site-text-primary) !important;
+}
+
+:root[data-theme='dark'] .ant-picker-header {
+  border-bottom: 1px solid var(--site-border) !important;
+  color: var(--site-text-primary) !important;
+}
+
+:root[data-theme='dark'] .ant-picker-header button {
+  color: var(--site-text-secondary) !important;
+}
+
+:root[data-theme='dark'] .ant-picker-content th {
+  color: var(--site-text-muted) !important;
+}
+
+:root[data-theme='dark'] .ant-picker-cell {
+  color: var(--site-text-secondary) !important;
+}
+
+:root[data-theme='dark'] .ant-picker-cell-in-view {
+  color: var(--site-text-primary) !important;
+}
+
+:root[data-theme='dark'] .ant-picker-cell:hover:not(.ant-picker-cell-selected) .ant-picker-cell-inner {
+  background-color: var(--site-surface-subtle) !important;
+}
+
+:root[data-theme='dark'] .ant-picker-cell-selected .ant-picker-cell-inner {
+  background-color: var(--site-accent) !important;
+  color: #08111f !important;
+}
+
+:root[data-theme='dark'] .ant-color-picker-inner-content {
+  background-color: var(--site-surface-elevated) !important;
+  color: var(--site-text-primary) !important;
+}
+
+:root[data-theme='dark'] :is(.ant-modal-content, .ant-modal-header) {
+  border-color: var(--site-border) !important;
+  background-color: var(--site-surface-elevated) !important;
+  color: var(--site-text-primary) !important;
+}
+
+:root[data-theme='dark'] .ant-modal-title {
+  color: var(--site-text-primary) !important;
+}
+
+:root[data-theme='dark'] .ant-modal-close {
+  color: var(--site-text-muted) !important;
+}
+
+:root[data-theme='dark'] .ant-modal-footer {
+  border-top-color: var(--site-border) !important;
+}

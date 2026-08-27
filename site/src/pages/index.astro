@@ -2084,12 +2084,16 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   :global(html[data-theme='dark']) .install-command,
   :global(html[data-theme='dark']) .capability-item,
   :global(html[data-theme='dark']) .strength-card,
+  :global(html[data-theme='dark']) .example-grid,
   :global(html[data-theme='dark']) .example-card,
   :global(html[data-theme='dark']) .quick-start-step,
   :global(html[data-theme='dark']) .decision-item {
     border-color: var(--site-border);
     background: var(--site-surface-elevated);
     box-shadow: none;
+  }
+  :global(html[data-theme='dark']) .example-grid {
+    background: transparent;
   }
   :global(html[data-theme='dark']) .install-command code,
   :global(html[data-theme='dark']) .capability-item h2,

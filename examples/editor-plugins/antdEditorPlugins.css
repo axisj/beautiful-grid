@@ -90,3 +90,16 @@
   font-family: var(--bgrid-font-family, inherit);
   font-size: var(--bgrid-font-size, 13px);
 }
+
+:root[data-theme='dark'] .bgrid-antd-editor-popup,
+:root[data-theme='dark'] .bgrid-antd-editor-popup.ant-select-dropdown,
+:root[data-theme='dark'] .bgrid-antd-editor-popup.ant-cascader-dropdown,
+:root[data-theme='dark'] .bgrid-antd-editor-popup.ant-picker-dropdown {
+  border-color: var(--site-border, #26344c);
+  background-color: var(--site-surface-elevated, #151f33);
+  color: var(--site-text-primary, #f2f6fc);
+}
+
+:root[data-theme='dark'] .bgrid-color-swatch {
+  border-color: rgb(255 255 255 / 22%);
+}

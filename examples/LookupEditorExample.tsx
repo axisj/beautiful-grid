@@ -137,7 +137,7 @@ function CustomerLookupModal({ lookup }: CustomerLookupModalProps) {
       open
       title='고객 선택'
       width={720}
-      className='lookup-editor-modal'
+      className='lookup-editor-modal site-grid-theme'
       okText='확인'
       cancelText='취소'
       okButtonProps={{ disabled: !selectedCode }}
@@ -154,7 +154,7 @@ function CustomerLookupModal({ lookup }: CustomerLookupModalProps) {
           value={query}
           onChange={event => setQuery(event.currentTarget.value)}
         />
-        <DataGridContainer ref={containerRef} className='lookup-editor-grid' style={{ height: 280 }}>
+        <DataGridContainer ref={containerRef} className='lookup-editor-grid site-grid-theme' style={{ height: 280 }}>
           <BGrid<Customer>
             width={width}
             height={height}

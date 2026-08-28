@@ -180,7 +180,7 @@ describe('site product and navigation contracts', () => {
     const environmentGuide = readSiteFile('src/pages/product-facts.astro');
 
     expect(environmentGuide).toContain('실행 환경 및 도입 안내 | BeautifulGrid');
-    expect(environmentGuide).toContain('권장 브라우저');
+    expect(environmentGuide).toContain('지원 브라우저');
     expect(environmentGuide).toContain('Node.js');
     expect(environmentGuide).toContain('22.12 이상');
     expect(environmentGuide).toContain('React');
@@ -428,7 +428,7 @@ describe('site product and navigation contracts', () => {
     const virtualScrollExample = readFileSync(resolve(repositoryRoot, 'examples/ScrollExample.tsx'), 'utf8');
 
     expect(homepage).toContain('현재 화면에 필요한 셀만 렌더링');
-    expect(homepage).toContain('가상 스크롤의 원리');
+    expect(homepage).toContain('렌더링 최적화');
     expect(homepage).toContain('55만 행 × 24열이면 셀은 모두 1,320만 개입니다.');
     expect(homepage).toContain("<strong>13,200,000<small>{t('셀', 'cells')}</small></strong>");
     expect(homepage).toContain("<strong>≈ 240<small>{t('셀', 'cells')}</small></strong>");
@@ -463,11 +463,11 @@ describe('site product and navigation contracts', () => {
     expect(homepage).toContain("t('오픈소스 · Apache-2.0', 'Open Source · Apache-2.0')");
     expect(homepage).toContain("t('아름답게, 강력하게.', 'Beautiful. Powerful.')");
     expect(homepage).toContain("t('React로 자연스럽게.', 'Naturally React.')");
-    expect(homepage).toContain('아름다운 기본 디자인으로 바로 시작하고');
+    expect(homepage).toContain('복잡한 업무 데이터도 깔끔하게. 검증된 기본 디자인 위에');
     expect(homepage).toContain("t('5분 만에 시작하기', 'Get started in 5 minutes')");
     expect(homepage).toContain("t('라이브 데모 보기', 'View live demos')");
-    expect(homepage).toContain("t('도입 기준은 분명하게,', 'Clear adoption baseline,')");
-    expect(homepage).toContain("t('사용과 확장은 자유롭게.', 'open use and extension.')");
+    expect(homepage).toContain("t('도입 전 체크포인트', 'Evaluation Checklist')");
+    expect(homepage).toContain("t('지원 환경 및 라이선스', 'Supported Environments & License')");
     expect(homepage).toContain("t('최신 안정 브라우저 지원', 'Current stable browsers')");
     expect(homepage).toContain("t('오픈소스', 'open source')");
     expect(homepage).not.toContain('React 생태계에 자연스럽게,');

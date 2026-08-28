@@ -17,6 +17,15 @@ const canonicalUrl = canonicalPath ? new URL(canonicalPath, Astro.site || 'https
 <!doctype html>
 <html lang={localeMeta[locale].htmlLang}>
   <head>
+    <!-- Google tag (gtag.js) -->
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-3H72NFVZT7"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-3H72NFVZT7');
+    </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script is:inline set:html={themeBootstrapScript}></script>

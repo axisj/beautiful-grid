@@ -219,7 +219,7 @@ const localizedFeaturedExamples = localize(featuredExamples);
             <span>{t('React로 자연스럽게.', 'Naturally React.')}</span>
           </h1>
           <p class="hero-description">
-            {t('아름다운 기본 디자인으로 바로 시작하고, 편집·정렬·필터·병합·집계·피벗까지 업무에 필요한 데이터 기능을 React 방식으로 유연하게 확장하세요.', 'Start with a beautiful default and scale to advanced editing, sorting, filtering, merging, aggregation, and pivoting—all designed to fit naturally into React.')}
+            {t('복잡한 업무 데이터도 깔끔하게. 검증된 기본 디자인 위에 편집, 조회, 집계 기능을 프로젝트에 맞춰 유연하게 연결하세요.', 'Clean handling for complex business data. Seamlessly connect editing, querying, and aggregation on top of proven defaults.')}
           </p>
           <div class="hero-actions">
             <a href={localizePath('/learn/getting-started', locale)} class="btn btn-primary btn-large">{t('5분 만에 시작하기', 'Get started in 5 minutes')} <span aria-hidden="true">→</span></a>
@@ -302,8 +302,8 @@ const localizedFeaturedExamples = localize(featuredExamples);
       <div class="container">
         <div class="section-heading section-heading-split">
           <div>
-            <p class="eyebrow">{t('업무 흐름별 핵심 기능', 'Core capabilities by workflow')}</p>
-            <h2>{t('기능을 나열하지 않고,', 'More than a feature list—')}<br />{t('일을 끝내는 흐름으로 연결했습니다.', 'a connected path to finished work.')}</h2>
+            <p class="eyebrow">{t('핵심 기능 및 특징', 'Core Features & Highlights')}</p>
+            <h2>{t('4가지 핵심 경험', 'Four Core Experiences')}</h2>
           </div>
           <p>
             {t('그리드에서 자주 마주치는 문제를 대용량 탐색, 셀 편집, 조회와 선택, 구조화와 집계의 네 가지 흐름으로 나눠 실제 예제와 함께 정리했습니다.', 'Common grid problems are organized into four workflows—large-scale exploration, cell editing, query and selection, and structured aggregation—with runnable examples.')}
@@ -367,7 +367,7 @@ const localizedFeaturedExamples = localize(featuredExamples);
     <section class="section performance-section">
       <div class="container performance-layout">
         <div class="performance-copy">
-          <p class="eyebrow eyebrow-dark">{t('가상 스크롤의 원리', 'How virtual scrolling works')}</p>
+          <p class="eyebrow eyebrow-dark">{t('렌더링 최적화', 'Rendering Optimization')}</p>
           <h2>{t('55만 행을 열어도,', 'Even with 550K rows,')}<br />{t('화면에는 필요한 셀만 그립니다.', 'only needed cells reach the screen.')}</h2>
           <p>
             {t('55만 행 × 24열이면 셀은 모두 1,320만 개입니다. BeautifulGrid는 이를 한꺼번에 그리지 않고, 지금 보이는 약 20행 × 12열만 화면에 표시합니다.', 'A 550,000 × 24 dataset contains 13.2 million cells. BeautifulGrid does not render them at once; it displays roughly the 20 × 12 cells currently visible.')}
@@ -407,7 +407,7 @@ const localizedFeaturedExamples = localize(featuredExamples);
         <div class="section-heading section-heading-split">
           <div>
             <p class="eyebrow">{t('직접 확인하는 기능', 'Features you can run')}</p>
-            <h2>{t('기능은 설명보다,', 'Features are clearest')}<br />{t('움직일 때 더 분명해집니다.', 'when you can use them.')}</h2>
+            <h2>{t('실행 가이드 & 예제', 'Interactive Guides & Examples')}</h2>
           </div>
           <div class="examples-heading-aside">
             <p>{t('실제 그리드를 조작하고 구현 소스를 나란히 확인하세요. 필요한 업무 흐름부터 골라 프로젝트에 바로 연결할 수 있습니다.', 'Operate the real grid and inspect its source side by side. Start with the workflow you need and connect it directly to your project.')}</p>
@@ -436,8 +436,8 @@ const localizedFeaturedExamples = localize(featuredExamples);
       <div class="container">
         <div class="quick-start-intro">
           <div>
-            <p class="eyebrow">{t('3단계 빠른 시작', 'Three-step quick start')}</p>
-            <h2>{t('설치부터 첫 그리드까지,', 'From install to first grid,')}<br />{t('세 단계로 시작합니다.', 'start in three steps.')}</h2>
+            <p class="eyebrow">{t('3단계 가이드', '3-Step Guide')}</p>
+            <h2>{t('설치 및 빠른 시작', 'Installation & Quick Start')}</h2>
           </div>
           <div class="quick-start-summary">
             <p>{t('패키지를 설치하고 기본 CSS를 불러온 뒤, 열과 행 데이터만 연결하면 첫 그리드가 완성됩니다.', 'Install the package, import the base CSS, and connect columns and row data to complete your first grid.')}</p>
@@ -584,8 +584,8 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
       <div class="container">
         <div class="decision-card">
           <div class="decision-copy">
-            <p class="eyebrow">{t('지원 환경 · 오픈소스', 'Runtime support · Open source')}</p>
-            <h2>{t('도입 기준은 분명하게,', 'Clear adoption baseline,')}<br />{t('사용과 확장은 자유롭게.', 'open use and extension.')}</h2>
+            <p class="eyebrow">{t('도입 전 체크포인트', 'Evaluation Checklist')}</p>
+            <h2>{t('지원 환경 및 라이선스', 'Supported Environments & License')}</h2>
             <p>
               {t('BeautifulGrid가 동작하는 React·Node.js·브라우저 기준을 공개하고, Apache-2.0 라이선스와 전체 소스를 통해 도입 이후의 운영과 확장까지 직접 확인할 수 있습니다.', 'BeautifulGrid publishes its React, Node.js, and browser baseline. The Apache-2.0 license and complete source let you verify how the grid can be operated and extended after adoption.')}
             </p>
@@ -619,8 +619,8 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     <section class="final-cta">
       <div class="container final-cta-inner">
         <div>
-          <p class="eyebrow eyebrow-dark">{t('프로젝트에 연결하기', 'Connect it to your project')}</p>
-          <h2>{t('당신의 React 화면에서,', 'Start directly')}<br />{t('바로 시작해 보세요.', 'in your React screen.')}</h2>
+          <p class="eyebrow eyebrow-dark">{t('프로젝트에 연결하기', 'Connect to your project')}</p>
+          <h2>{t('Playground에서 직접 체험하기', 'Try It in the Playground')}</h2>
           <p>{t('Playground에서 열 구성과 스타일을 먼저 맞춰 보고, 실행 예제의 코드를 실제 프로젝트 흐름에 연결하세요.', 'Tune columns and styles in the Playground, then connect runnable example code to your project workflow.')}</p>
         </div>
         <div class="final-cta-actions">

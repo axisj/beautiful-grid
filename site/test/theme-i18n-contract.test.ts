@@ -24,6 +24,8 @@ describe('site theme and locale contracts', () => {
     const layout = read('src/layouts/Layout.astro');
     const theme = read('src/i18n/theme.ts');
 
+    expect(layout).toContain('https://www.googletagmanager.com/gtag/js?id=G-3H72NFVZT7');
+    expect(layout).toContain("gtag('config', 'G-3H72NFVZT7');");
     expect(layout.indexOf('themeBootstrapScript')).toBeLessThan(layout.indexOf('<slot />'));
     expect(layout).toContain('hreflang="ko"');
     expect(layout).toContain('hreflang="en"');

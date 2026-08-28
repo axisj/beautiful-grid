@@ -47,7 +47,7 @@ const deploymentChecks = [
       <div class="environment-hero-grid">
         <div class="hero-copy">
           <p class="eyebrow"><span></span> Runtime baseline · v{productFacts.version}</p>
-          <h1>{t('도입 전에,', 'Before adoption,')}<br />{t('실행 환경부터 맞추세요.', 'align the runtime baseline.')}</h1>
+          <h1>{t('지원 환경 안내', 'System Requirements')}</h1>
           <p class="hero-description">{t('BeautifulGrid는 React 업무 화면을 위한 클라이언트 렌더링 컴포넌트입니다. 런타임부터 브라우저, 배포 조건까지 실제 프로젝트에 필요한 기준만 정리했습니다.', 'BeautifulGrid is a client-rendered component for React business applications. This page focuses on the runtime, browser, and deployment conditions a real project needs.')}</p>
           <div class="hero-actions">
             <a href={localizePath('/learn/getting-started', locale)} class="btn btn-primary">{t('시작 가이드 보기', 'Open getting started')} <ArrowRight size={16} aria-hidden="true" /></a>
@@ -76,7 +76,7 @@ const deploymentChecks = [
 
   <section class="section container environment-section browser-section">
     <div class="section-heading-row">
-      <div class="section-heading"><p class="eyebrow">{t('권장 브라우저 · Browser strategy', 'Recommended browsers · Strategy')}</p><h2>{t('최신 브라우저를 기준으로,', 'Use current browsers,')}<br />{t('화면별로 검증합니다.', 'then validate each screen.')}</h2></div>
+      <div class="section-heading"><p class="eyebrow">{t('지원 브라우저', 'Supported Browsers')}</p><h2>{t('브라우저 지원 및 호환성', 'Browser Support & Compatibility')}</h2></div>
       <p class="section-intro">{t('가상 스크롤과 셀 상호작용에는 표준 DOM·CSS 기능이 사용됩니다. 오래된 버전을 폭넓게 보장하기보다 실제 사용 환경의 최신 안정판을 기준으로 확인하세요.', 'Virtual scrolling and cell interactions use standard DOM and CSS capabilities. Target the latest stable release in the real environment instead of broadly promising old versions.')}</p>
     </div>
 
@@ -96,8 +96,8 @@ const deploymentChecks = [
   <section class="environment-band">
     <div class="container environment-band-grid">
       <div class="deployment-copy">
-        <p class="eyebrow">Development & deployment</p>
-        <h2>{t('React 프로젝트에', 'Connect cleanly to')}<br />{t('가볍게 연결합니다.', 'a React project.')}</h2>
+        <p class="eyebrow">{t('배포 가이드', 'Deployment Guide')}</p>
+        <h2>{t('개발 및 프로덕션 환경', 'Development & Production')}</h2>
         <p>{t('TypeScript 타입, ESM·CommonJS 모듈, 별도 스타일시트를 제공합니다. 타입 안전한 열과 행 구성을 위해 TypeScript 사용을 권장합니다.', 'The package provides TypeScript types, ESM and CommonJS modules, and a separate stylesheet. TypeScript is recommended for type-safe columns and rows.')}</p>
         <div class="install-command" aria-label={t('npm 설치 명령', 'npm installation command')}><span aria-hidden="true">$</span><code>npm install {productFacts.packageName}</code><span class="command-ready"><span></span> npm</span></div>
       </div>
@@ -112,7 +112,7 @@ const deploymentChecks = [
 
   <section class="section container environment-section product-section">
     <div class="section-heading-row product-heading-row">
-      <div class="section-heading compact"><p class="eyebrow">Product scope</p><h2>{t('잘하는 일과,', 'Separate strengths')}<br />{t('확인할 경계를 나눴습니다.', 'from boundaries to review.')}</h2></div>
+      <div class="section-heading compact"><p class="eyebrow">{t('제품 범위', 'Product Scope')}</p><h2>{t('제품 기능 및 지원 범위', 'Product Scope & Baseline')}</h2></div>
       <p class="section-intro">{t('편집·탐색·집계가 이어지는 React 업무 흐름에 집중합니다. 아래 범위와 제약을 프로젝트 요구사항에 맞춰 확인하세요.', 'BeautifulGrid focuses on React workflows that connect editing, exploration, and aggregation. Review the scope and limitations against your project requirements.')}</p>
     </div>
 
@@ -142,7 +142,7 @@ const deploymentChecks = [
     </div>
 
     <div class="decision-cta">
-      <div><p class="eyebrow">Ready to validate?</p><h2>{t('실제 데이터로', 'Validate adoption')}<br />{t('도입 가능성을 확인하세요.', 'with real data.')}</h2></div>
+      <div><p class="eyebrow">{t('도입 전 테스트', 'Pre-adoption Test')}</p><h2>{t('Playground에서 직접 검증하기', 'Test in Playground')}</h2></div>
       <div><p>{t('기능을 추측하는 대신 Playground와 실행 예제에서 목표 데이터, 편집기, 브라우저 조합을 직접 검증할 수 있습니다.', 'Instead of guessing, validate your target data, editor, and browser combination in the Playground and runnable examples.')}</p><div class="hero-actions"><a href={localizePath('/playground', locale)} class="btn btn-primary">{t('Playground 열기', 'Open Playground')} <ArrowRight size={16} aria-hidden="true" /></a><a href={localizePath('/learn', locale)} class="btn btn-outline">{t('실행 예제 보기', 'View runnable examples')}</a></div></div>
     </div>
   </section>

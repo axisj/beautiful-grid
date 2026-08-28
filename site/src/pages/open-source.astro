@@ -11,7 +11,7 @@ const verificationResources = [
   {
     index: '01',
     label: 'SOURCE',
-    title: t('구현을 직접 읽을 수 있습니다', 'Read the implementation'),
+    title: t('구현 코드 직접 확인하기', 'Inspect Implementation Directly'),
     description: t('배포되는 그리드의 React·TypeScript 소스를 저장소에서 그대로 확인합니다.', 'Inspect the React and TypeScript source that ships in the package.'),
     path: 'beautiful-grid/',
     href: productFacts.openSourceResources.source,
@@ -47,7 +47,7 @@ const principles = [
   {
     index: '01',
     label: t('검증 가능한 신뢰', 'Verifiable trust'),
-    title: t('믿어 달라고 요구하지 않습니다.', 'Trust does not require a leap.'),
+    title: t('말보다 코드로 증명합니다.', 'Proven by code, not words.'),
     description: t('구현과 테스트, 지원 범위를 공개합니다. 도입 판단은 설명이 아니라 직접 확인한 사실에 기반할 수 있습니다.', 'Implementation, tests, and support boundaries are public, so adoption can be based on evidence rather than claims.'),
     href: productFacts.openSourceResources.tests,
     linkLabel: t('테스트 절차 확인', 'Review test workflow'),
@@ -63,7 +63,7 @@ const principles = [
   {
     index: '03',
     label: t('정직한 제품 경계', 'Honest boundaries'),
-    title: t('현재보다 크게 말하지 않습니다.', 'We do not claim more than exists.'),
+    title: t('과장 없이 있는 그대로 설명합니다.', 'Honest about capabilities and limits.'),
     description: t('커뮤니티 규모나 미래 계획을 과장하지 않습니다. 현재 버전에서 확인 가능한 기능과 한계를 기준으로 설명합니다.', 'We do not inflate community size or future plans. We describe what can be verified in the current release.'),
     href: localizePath('/product-facts', locale),
     linkLabel: t('지원 환경과 한계 보기', 'Review product facts'),
@@ -144,7 +144,7 @@ const licenseGroups = [
               : <>Start <span>free.</span><br />Build with <span>freedom.</span></>}
           </h1>
           <p class="hero-promise">{t('도입 전에는 검증 가능하게.\n도입 후에도 선택권이 남게.', 'Verify before adoption.\nStay in control after.')}</p>
-          <p class="hero-description">{t('BeautifulGrid는 코드뿐 아니라 테스트와 배포 절차를 공개합니다. 설명을 믿는 대신 직접 확인하고, Apache-2.0 아래 프로젝트에 맞게 수정하고 운영할 수 있습니다.', 'BeautifulGrid publishes not only its source, but also its tests and release workflow. Inspect the evidence, then modify and operate it for your project under Apache-2.0.')}</p>
+          <p class="hero-description">{t('전체 소스 코드와 테스트, 자동화된 배포 절차를 모두 투명하게 공개합니다. Apache-2.0 라이선스 아래 누구나 자유롭게 사용, 수정, 운영할 수 있습니다.', 'All source code, tests, and automated release workflows are transparently open. Build, modify, and operate freely under the Apache-2.0 license.')}</p>
           <div class="hero-actions">
             <a class="btn btn-primary btn-large" href={productFacts.repositoryUrl} target="_blank" rel="noopener noreferrer">{t('GitHub에서 소스 보기', 'View source on GitHub')} <span aria-hidden="true">↗</span></a>
             <a class="btn btn-secondary btn-large" href={productFacts.openSourceResources.license} target="_blank" rel="noopener noreferrer">{t('라이선스 확인', 'Read the license')}</a>

@@ -4,7 +4,7 @@ const externalBaseURL = process.env.SITE_BASE_URL;
 const baseURL = externalBaseURL ?? 'http://localhost:4321';
 
 export default defineConfig({
-  testDir: './e2e',
+  testDir: './e2e-site',
   outputDir: '.playwright-results/site',
   timeout: 30_000,
   expect: {

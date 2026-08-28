@@ -77,6 +77,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "test:e2e:site": "playwright test -c playwright.site.config.ts",
     "site:dev": "npm --prefix site run dev",
     "site:check": "npm --prefix site run check",
     "site:build": "npm --prefix site run build",

@@ -1532,7 +1532,7 @@
   box-sizing: border-box;
   width: 100%;
   overflow: auto;
-  overscroll-behavior: contain;
+  overscroll-behavior: auto;
   -webkit-overflow-scrolling: touch;
 }
 

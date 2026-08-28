@@ -851,8 +851,11 @@ function Table<T>(props: Props<T>) {
     const didScrollTop = nextScrollTop !== scrollContainer.scrollTop;
     const didScrollLeft = nextScrollLeft !== scrollContainer.scrollLeft;
 
-    if (!didScrollTop && !didScrollLeft) {
-      return;
+    const isVertical = Math.abs(delta.y) > Math.abs(delta.x);
+    if (isVertical) {
+      if (!didScrollTop) return;
+    } else {
+      if (!didScrollLeft) return;
     }
 
     evt.preventDefault();
@@ -1831,8 +1834,8 @@ function Table<T>(props: Props<T>) {
     if (scrollContainerRefCurrent) {
       scrollContainerRefCurrent.removeEventListener('scroll', onScroll);
       scrollContainerRefCurrent.addEventListener('scroll', onScroll, { passive: true, capture: true });
-      scrollContainerRefCurrent.removeEventListener('wheel', onWheel);
-      scrollContainerRefCurrent.addEventListener('wheel', onWheel, { passive: false, capture: true });
+      // scrollContainerRefCurrent.removeEventListener('wheel', onWheel);
+      // scrollContainerRefCurrent.addEventListener('wheel', onWheel, { passive: false, capture: true });
     }
 
     return () => {
@@ -1846,7 +1849,6 @@ function Table<T>(props: Props<T>) {
       }
       containerRefCurrent?.removeAttribute('data-bgrid-scrolling');
       scrollContainerRefCurrent?.removeEventListener('scroll', onScroll);
-      scrollContainerRefCurrent?.removeEventListener('wheel', onWheel);
     };
   }, [onScroll, onWheel, setInitialized]);
 

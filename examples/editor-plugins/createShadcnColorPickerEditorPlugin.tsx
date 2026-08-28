@@ -7,6 +7,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '../../components/ui/popover';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import './shadcnEditorPlugins.css';
 
 interface Options {
   id: string;
@@ -75,7 +78,7 @@ export function createShadcnColorPickerEditorPlugin<T>(
         <PopoverTrigger asChild>
           <button
             type="button"
-            className="flex h-full w-full items-center justify-between border-none bg-transparent px-2 text-left text-sm outline-none cursor-pointer"
+            className="bgrid-shadcn-trigger"
             aria-label={options.ariaLabel}
             autoFocus
             onKeyDown={event => {
@@ -87,21 +90,21 @@ export function createShadcnColorPickerEditorPlugin<T>(
           >
             <div className="flex items-center gap-2">
               <span
-                className="h-4 w-4 rounded-full border border-slate-300 shadow-sm"
+                className="h-4 w-4 rounded-full border border-slate-300 shadow-sm dark:border-slate-700"
                 style={{ backgroundColor: selectedColor }}
               />
-              <span className="font-mono text-xs text-slate-700">{selectedColor}</span>
+              <span className="font-mono text-xs text-slate-700 dark:text-slate-300">{selectedColor}</span>
             </div>
             <Palette className="h-4 w-4 opacity-50 shrink-0" />
           </button>
         </PopoverTrigger>
         <PopoverContent
           container={getPortalContainer()}
-          className="w-64 p-3 shadow-lg border border-slate-200 bg-white"
+          className="w-64 p-3"
           align="start"
         >
           <div className="flex flex-col gap-3">
-            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider dark:text-slate-400">
               색상 팔레트
             </div>
 
@@ -115,7 +118,7 @@ export function createShadcnColorPickerEditorPlugin<T>(
                     type="button"
                     onClick={() => handleSelectColor(color)}
                     style={{ backgroundColor: color }}
-                    className="relative flex h-8 w-full items-center justify-center rounded-md border border-black/10 shadow-sm transition-transform hover:scale-105 active:scale-95"
+                    className="relative flex h-8 w-full items-center justify-center rounded-md border border-black/10 shadow-sm transition-transform hover:scale-105 active:scale-95 cursor-pointer dark:border-white/10"
                     aria-label={`색상 ${color}`}
                   >
                     {isSelected && (
@@ -130,22 +133,23 @@ export function createShadcnColorPickerEditorPlugin<T>(
             </div>
 
             {/* Custom HEX Input */}
-            <form onSubmit={handleApplyCustom} className="flex flex-col gap-1.5 border-t border-slate-100 pt-2">
-              <span className="text-xs text-slate-500 font-medium">직접 입력 (HEX)</span>
+            <form onSubmit={handleApplyCustom} className="flex flex-col gap-1.5 border-t border-slate-100 pt-2 dark:border-slate-800">
+              <span className="text-xs text-slate-500 font-medium dark:text-slate-400">직접 입력 (HEX)</span>
               <div className="flex items-center gap-1.5">
-                <input
+                <Input
                   type="text"
                   value={customHex}
                   onChange={e => setCustomHex(e.target.value)}
                   placeholder="#000000"
-                  className="flex h-8 w-full rounded-md border border-slate-200 bg-transparent px-2 text-xs font-mono shadow-sm focus:outline-none focus:ring-1 focus:ring-slate-900"
+                  className="font-mono"
                 />
-                <button
+                <Button
                   type="submit"
-                  className="flex h-8 shrink-0 items-center justify-center rounded-md bg-slate-900 px-3 text-xs font-medium text-white hover:bg-slate-800"
+                  size="sm"
+                  className="shrink-0"
                 >
                   적용
-                </button>
+                </Button>
               </div>
             </form>
           </div>

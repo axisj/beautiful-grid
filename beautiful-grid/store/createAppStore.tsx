@@ -753,6 +753,9 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
         set({ checkedIndexesMap, checkedAll });
       },
       setColumnWidth: (columnIndex, options) => {
+        if (get().cellInteractionSession) {
+          get().endCellEdit();
+        }
         const currentColumns = get().columns;
         const columnsGroup = get().columnsGroup;
         const columnGroups = get().columnGroups;
@@ -820,7 +823,12 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
           }
         }
       },
-      setColumnResizing: columnResizing => set({ columnResizing }),
+      setColumnResizing: columnResizing => {
+        if (columnResizing && get().cellInteractionSession) {
+          get().endCellEdit();
+        }
+        set({ columnResizing });
+      },
       toggleColumnSort: columnIndex => {
         const columns = get().columns;
         const column = columns[columnIndex];

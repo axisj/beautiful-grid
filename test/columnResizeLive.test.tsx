@@ -160,4 +160,40 @@ describe('BGrid live column resize', () => {
       window.dispatchEvent(createPointerEvent('pointerup', 16, 280, 14));
     });
   });
+
+  it('cancels an active cell editor when column resize handle is pressed', async () => {
+    const editableColumns: BGridColumn<Row>[] = [
+      { key: 'id', label: 'ID', width: 100 },
+      { key: 'name', label: 'Name', width: 100, editable: true, editor: { type: 'text' } },
+    ];
+
+    const { container } = render(
+      <BGrid<Row>
+        width={300}
+        height={160}
+        columns={editableColumns}
+        data={data}
+        editable
+        cellNavigationOptions={{ defaultActiveCell: { rowIndex: 0, columnIndex: 1 } }}
+      />,
+    );
+
+    const cell = container.querySelector('td[data-row-index="0"][data-column-index="1"]') as HTMLElement;
+    fireEvent.doubleClick(cell);
+
+    const gateway = container.querySelector('[data-bgrid-text-editor-gateway="true"]') as HTMLInputElement;
+    await waitFor(() => expect(gateway).toHaveClass('bgrid-text-editor-active'));
+
+    const resizeHandle = container.querySelector(
+      "[role='rfdg-head'] [data-column-index='1'] .bgrid-col-resizer-handle",
+    ) as HTMLDivElement;
+    expect(resizeHandle).toBeTruthy();
+
+    fireEvent.pointerDown(resizeHandle, { pointerId: 17, clientX: 200, clientY: 14 });
+
+    await waitFor(() => {
+      expect(gateway).not.toHaveClass('bgrid-text-editor-active');
+    });
+  });
 });
+

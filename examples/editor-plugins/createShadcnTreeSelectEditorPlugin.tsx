@@ -7,6 +7,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '../../components/ui/popover';
+import './shadcnEditorPlugins.css';
 
 export interface TreeNode {
   title: string;
@@ -83,7 +84,7 @@ export function createShadcnTreeSelectEditorPlugin<T>(
         <PopoverTrigger asChild>
           <button
             type="button"
-            className="flex h-full w-full items-center justify-between border-none bg-transparent px-2 text-left text-sm outline-none cursor-pointer"
+            className="bgrid-shadcn-trigger"
             aria-label={options.ariaLabel}
             autoFocus
             onKeyDown={event => {
@@ -99,28 +100,28 @@ export function createShadcnTreeSelectEditorPlugin<T>(
         </PopoverTrigger>
         <PopoverContent
           container={getPortalContainer()}
-          className="w-64 p-3 shadow-lg border border-slate-200 bg-white"
+          className="w-64 p-3"
           align="start"
         >
           <div className="flex flex-col gap-2">
-            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider dark:text-slate-400">
               조직도 선택
             </div>
 
             {/* Search filter */}
-            <div className="flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2 py-1">
-              <Search className="h-3.5 w-3.5 text-slate-400" />
+            <div className="flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2 py-1 dark:border-slate-800 dark:bg-slate-900/70">
+              <Search className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="조직 검색..."
-                className="w-full bg-transparent text-xs outline-none placeholder:text-slate-400"
+                className="w-full bg-transparent text-xs outline-none border-0 p-0 text-slate-900 placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500"
               />
             </div>
 
             {/* Tree nodes list */}
-            <div className="flex max-h-52 flex-col overflow-y-auto pt-1">
+            <div className="bgrid-shadcn-scroll flex max-h-52 flex-col overflow-y-auto pt-1">
               {filteredTree.map(group => {
                 const isExpanded = expandedGroups[group.title] ?? true;
                 const hasChildren = Boolean(group.children?.length);
@@ -131,7 +132,7 @@ export function createShadcnTreeSelectEditorPlugin<T>(
                     <button
                       type="button"
                       onClick={() => toggleGroup(group.title)}
-                      className="flex items-center gap-1 rounded px-1.5 py-1 text-left text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                      className="flex items-center gap-1.5 rounded-sm px-1.5 py-1.5 text-left text-xs font-semibold text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors cursor-pointer border-0 bg-transparent"
                     >
                       {hasChildren ? (
                         isExpanded ? (
@@ -142,13 +143,13 @@ export function createShadcnTreeSelectEditorPlugin<T>(
                       ) : (
                         <span className="w-3.5" />
                       )}
-                      <Folder className="h-3.5 w-3.5 text-slate-400" />
+                      <Folder className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
                       <span>{group.title}</span>
                     </button>
 
                     {/* Children */}
                     {hasChildren && isExpanded && (
-                      <div className="ml-4 flex flex-col border-l border-slate-100 pl-1">
+                      <div className="ml-4 flex flex-col border-l border-slate-100 pl-1 dark:border-slate-800">
                         {group.children?.map(child => {
                           const childVal = child.value || child.title;
                           const isSelected = currentValue === childVal;
@@ -158,10 +159,10 @@ export function createShadcnTreeSelectEditorPlugin<T>(
                               key={childVal}
                               type="button"
                               onClick={() => handleSelectNode(childVal)}
-                              className={`flex items-center justify-between rounded px-2 py-1 text-left text-xs transition-colors ${
+                              className={`flex items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs transition-colors cursor-pointer border-0 bg-transparent ${
                                 isSelected
-                                  ? 'bg-slate-900 font-semibold text-white'
-                                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                                  ? 'bg-slate-900 font-semibold text-white dark:bg-slate-50 dark:text-slate-900'
+                                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100'
                               }`}
                             >
                               <span className="truncate">{child.title}</span>

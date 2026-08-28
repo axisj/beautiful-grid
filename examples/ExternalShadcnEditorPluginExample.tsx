@@ -15,6 +15,7 @@ import {
   type EditingOrder,
   withEditingCellClasses,
 } from './editing/shared';
+import './editor-plugins/shadcnEditorPlugins.css';
 
 type ExternalShadcnOrder = EditingOrder & {
   labelColor: string;
@@ -190,9 +191,9 @@ export default function ExternalShadcnEditorPluginExample() {
 
   return (
     <div className='flex min-h-0 flex-col gap-3'>
-      <p className='m-0 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm leading-6 text-slate-700'>
+      <p className='m-0 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm leading-6 text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300'>
         Shadcn UI (Radix UI) 기반의 Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect 컴포넌트를{' '}
-        <code>defineEditorPlugin()</code>으로 연결했습니다. 각 컴포넌트의 Portal 컨테이너로 <code>getPortalContainer()</code>를
+        <code className="dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">defineEditorPlugin()</code>으로 연결했습니다. 각 컴포넌트의 Portal 컨테이너로 <code className="dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">getPortalContainer()</code>를
         전달하여 Grid의 가상 스크롤, 위치 계산, 바깥 클릭 판정 및 라이프사이클과 완벽히 동기화됩니다.
       </p>
       <DataGridContainer ref={containerRef} style={{ height: 340 }}>

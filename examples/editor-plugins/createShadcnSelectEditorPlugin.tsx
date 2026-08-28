@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../components/ui/select';
+import './shadcnEditorPlugins.css';
 
 interface Option<Value extends string | number> {
   value: Value;
@@ -37,7 +38,7 @@ export function createShadcnSelectEditorPlugin<T, Value extends string | number>
         onValueChange={nextValue => void commit([{ key: column.key, value: nextValue as Value }])}
       >
         <SelectTrigger
-          className="h-full w-full border-none focus:ring-0 focus:ring-offset-0 rounded-none bg-transparent"
+          className="bgrid-shadcn-trigger border-0 focus:ring-0 rounded-none bg-transparent"
           aria-label={options.ariaLabel}
           autoFocus
           onKeyDown={event => {

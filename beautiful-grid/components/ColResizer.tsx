@@ -16,12 +16,14 @@ interface Props extends StyledProps {
 function ColResizer({ container, columnIndex, hideHandle, bordered, frozenBoundary }: Props) {
   const setColumnWidth = useAppStore(s => s.setColumnWidth);
   const setColumnResizing = useAppStore(s => s.setColumnResizing);
+  const endCellEdit = useAppStore(s => s.endCellEdit);
   const columnsGroup = useAppStore(s => s.columnsGroup);
 
   const onPointerDownResizerHandle = React.useCallback(
     (evt: React.PointerEvent<HTMLDivElement>, columnIndex: number) => {
       evt.preventDefault();
       evt.stopPropagation();
+      endCellEdit();
 
       const columnNode = container.current?.querySelector(
         `.bgrid-head-cell[data-column-index="${columnIndex}"]`,
@@ -47,13 +49,14 @@ function ColResizer({ container, columnIndex, hideHandle, bordered, frozenBounda
         },
       );
     },
-    [container, setColumnResizing, setColumnWidth],
+    [container, endCellEdit, setColumnResizing, setColumnWidth],
   );
 
   const onMouseDoubleClick = React.useCallback(
     async (evt: React.MouseEvent<HTMLDivElement, MouseEvent>, columnIndex: number) => {
       evt.preventDefault();
       evt.stopPropagation();
+      endCellEdit();
 
       if (container.current) {
         const headFrozenHTML = container.current.querySelector('[role="rfdg-head-frozen"]')?.innerHTML;
@@ -82,7 +85,7 @@ function ColResizer({ container, columnIndex, hideHandle, bordered, frozenBounda
         targetDiv.remove();
       }
     },
-    [container, setColumnWidth],
+    [container, endCellEdit, setColumnWidth],
   );
 
   return (

@@ -8,6 +8,7 @@ const editingExamples: Array<[string, () => Promise<ExampleModule>]> = [
   ['basic editing', () => import('../examples/BasicEditingExample')],
   ['built-in editors', () => import('../examples/BuiltInEditorsExample')],
   ['external editor plugin', () => import('../examples/ExternalEditorPluginExample')],
+  ['external shadcn editor plugin', () => import('../examples/ExternalShadcnEditorPluginExample')],
   ['editor icons', () => import('../examples/EditorIconExample')],
   ['lookup editor', () => import('../examples/LookupEditorExample')],
   ['editing events', () => import('../examples/EditingEventsExample')],
@@ -119,6 +120,28 @@ describe('demo examples render intended grid features', () => {
       expect(container.querySelector('.bgrid-antd-color-editor')).toBeInTheDocument();
     });
   });
+
+  it.each([
+    [2, 'Shadcn UI 주문 상태 선택'],
+    [3, 'Shadcn UI 납기일 선택'],
+    [4, 'Shadcn UI 라벨 색상 선택'],
+    [5, 'Shadcn UI 분류 경로 선택'],
+    [6, 'Shadcn UI 배송 시간 선택'],
+    [7, 'Shadcn UI 담당 조직 선택'],
+  ])('opens the Shadcn UI editor plugin in column %s', async (columnIndex, ariaLabel) => {
+    const { container } = await renderExample(() => import('../examples/ExternalShadcnEditorPluginExample'));
+    const cell = container.querySelector(
+      `td[data-row-index="0"][data-column-index="${columnIndex}"]`,
+    ) as HTMLElement;
+
+    fireEvent.doubleClick(cell);
+
+    await waitFor(() => {
+      const trigger = container.querySelector(`button[aria-label="${ariaLabel}"]`);
+      expect(trigger).toBeInTheDocument();
+      expect(trigger?.closest('.bgrid-cell-content')).toHaveClass('bgrid-cell-content-plugin-editor');
+    });
+  }, 15_000);
 
   it('uses Ant Design autocomplete and confirms a radio-selected lookup row from the modal', async () => {
     const { container, getByLabelText } = await renderExample(() => import('../examples/LookupEditorExample'));

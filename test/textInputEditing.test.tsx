@@ -20,12 +20,12 @@ function createData() {
 }
 
 describe('built-in text and plugin cell editors', () => {
-  it('keeps a single-row text editor centered inside a merged cell', () => {
-    expect(resolveTextEditorVerticalBox(90, 3)).toEqual({ height: 30, offset: 30 });
+  it('fills the full height of a merged cell with the text editor box', () => {
+    expect(resolveTextEditorVerticalBox(90, 3)).toEqual({ height: 90, offset: 0 });
     expect(resolveTextEditorVerticalBox(30, 1)).toEqual({ height: 30, offset: 0 });
   });
 
-  it('keeps the merged-cell editor inside the visible body viewport', () => {
+  it('keeps the merged-cell editor inside the visible body viewport while filling visible height', () => {
     expect(
       resolveVisibleTextEditorVerticalBox({
         targetTop: 100,
@@ -34,7 +34,7 @@ describe('built-in text and plugin cell editors', () => {
         viewportTop: 100,
         viewportBottom: 400,
       }),
-    ).toEqual({ height: 30, top: 130 });
+    ).toEqual({ height: 90, top: 100 });
     expect(
       resolveVisibleTextEditorVerticalBox({
         targetTop: 100,
@@ -43,13 +43,13 @@ describe('built-in text and plugin cell editors', () => {
         viewportTop: 145,
         viewportBottom: 400,
       }),
-    ).toEqual({ height: 30, top: 145 });
+    ).toEqual({ height: 45, top: 145 });
     expect(
       resolveVisibleTextEditorVerticalBox({
         targetTop: 100,
         targetHeight: 90,
         rowSpan: 3,
-        viewportTop: 175,
+        viewportTop: 190,
         viewportBottom: 400,
       }),
     ).toBeUndefined();
@@ -655,4 +655,66 @@ describe('built-in text and plugin cell editors', () => {
     await waitFor(() => expect(onChangeData).toHaveBeenCalledTimes(1));
     expect(onChangeData.mock.calls[0][2]).toMatchObject({ status: 'done' });
   });
+
+  it('sizes the text editor gateway to the merged cell height and sets column alignment', async () => {
+    interface MergedRow {
+      group: string;
+      name: string;
+    }
+    const data = [
+      { values: { group: 'G1', name: 'Alpha' } },
+      { values: { group: 'G1', name: 'Alpha' } },
+      { values: { group: 'G1', name: 'Alpha' } },
+    ];
+    const columns: BGridColumn<MergedRow>[] = [
+      {
+        key: 'name',
+        label: 'Name',
+        width: 160,
+        align: 'center',
+        editable: true,
+        editor: { type: 'text' },
+      },
+    ];
+
+    const { container, getByLabelText } = render(
+      <BGrid<MergedRow>
+        width={300}
+        height={200}
+        columns={columns}
+        data={data}
+        editable
+        cellMergeOptions={{ columnsMap: { 0: { mergeBy: 'group' } } }}
+        cellNavigationOptions={{ defaultActiveCell: { rowIndex: 0, columnIndex: 0 } }}
+      />,
+    );
+
+    const mergedCell = container.querySelector('td[data-row-index="0"][data-column-index="0"]') as HTMLTableCellElement;
+    expect(mergedCell).toHaveAttribute('rowspan', '3');
+
+    // Mock getBoundingClientRect for JSDOM
+    vi.spyOn(mergedCell, 'getBoundingClientRect').mockReturnValue({
+      top: 50,
+      left: 10,
+      width: 160,
+      height: 90,
+      bottom: 140,
+      right: 170,
+      x: 10,
+      y: 50,
+      toJSON: () => {},
+    });
+
+    const grid = container.querySelector('[role="grid"]') as HTMLElement;
+    grid.focus();
+    const gateway = getByLabelText('행 1, 열 1 텍스트 편집') as HTMLInputElement;
+
+    fireEvent.keyDown(gateway, { key: 'F2' });
+    await waitFor(() => expect(gateway).toHaveClass('bgrid-text-editor-active'));
+
+    expect(gateway.style.width).toBe('160px');
+    expect(gateway.style.height).toBe('90px');
+    expect(gateway.style.textAlign).toBe('center');
+  });
 });
+

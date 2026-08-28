@@ -12,13 +12,10 @@ function isComposing(event: React.KeyboardEvent<HTMLInputElement>) {
   return event.nativeEvent.isComposing || event.keyCode === 229;
 }
 
-export function resolveTextEditorVerticalBox(targetHeight: number, rowSpan: number) {
-  const normalizedRowSpan = Math.max(rowSpan, 1);
-  const height = targetHeight / normalizedRowSpan;
-
+export function resolveTextEditorVerticalBox(targetHeight: number, _rowSpan?: number) {
   return {
-    height,
-    offset: (targetHeight - height) / 2,
+    height: targetHeight,
+    offset: 0,
   };
 }
 
@@ -31,21 +28,27 @@ export function resolveVisibleTextEditorVerticalBox({
 }: {
   targetTop: number;
   targetHeight: number;
-  rowSpan: number;
+  rowSpan?: number;
   viewportTop: number;
   viewportBottom: number;
 }) {
   const { height, offset } = resolveTextEditorVerticalBox(targetHeight, rowSpan);
-  const visibleTop = Math.max(targetTop, viewportTop);
-  const visibleBottom = Math.min(targetTop + targetHeight, viewportBottom);
 
-  // Keep the editor at its normal single-row height. When less than one row
-  // remains visible, hiding it avoids drawing across the header or footer.
-  if (visibleBottom - visibleTop < height) return undefined;
+  if (viewportBottom <= viewportTop) {
+    return {
+      height,
+      top: targetTop + offset,
+    };
+  }
+
+  const visibleTop = Math.max(targetTop + offset, viewportTop);
+  const visibleBottom = Math.min(targetTop + offset + height, viewportBottom);
+
+  if (visibleBottom <= visibleTop) return undefined;
 
   return {
-    height,
-    top: Math.min(Math.max(targetTop + offset, visibleTop), visibleBottom - height),
+    height: visibleBottom - visibleTop,
+    top: visibleTop,
   };
 }
 
@@ -135,6 +138,7 @@ export function CellTextEditorGateway({ containerRef }: Props) {
       input.style.removeProperty('width');
       input.style.removeProperty('height');
       input.style.removeProperty('visibility');
+      input.style.removeProperty('text-align');
       return;
     }
 
@@ -169,8 +173,13 @@ export function CellTextEditorGateway({ containerRef }: Props) {
     }px)`;
     input.style.width = `${targetRect.width}px`;
     input.style.height = `${editorBox.height}px`;
+    if (column?.align) {
+      input.style.textAlign = column.align;
+    } else {
+      input.style.removeProperty('text-align');
+    }
     input.style.visibility = 'visible';
-  }, [cell, cellEditSession, containerRef, height, isTextEditing, scrollLeft, scrollTop, width]);
+  }, [cell, cellEditSession, column?.align, containerRef, height, isTextEditing, scrollLeft, scrollTop, width]);
 
   React.useLayoutEffect(() => {
     const input = inputRef.current;

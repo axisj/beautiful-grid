@@ -7,6 +7,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '../../components/ui/popover';
+import { Button } from '../../components/ui/button';
+import './shadcnEditorPlugins.css';
 
 interface Options {
   id: string;
@@ -121,7 +123,7 @@ export function createShadcnDatePickerEditorPlugin<T>(
         <PopoverTrigger asChild>
           <button
             type="button"
-            className="flex h-full w-full items-center justify-between border-none bg-transparent px-2 text-left text-sm outline-none cursor-pointer"
+            className="bgrid-shadcn-trigger"
             aria-label={options.ariaLabel}
             autoFocus
             onKeyDown={event => {
@@ -137,44 +139,48 @@ export function createShadcnDatePickerEditorPlugin<T>(
         </PopoverTrigger>
         <PopoverContent
           container={getPortalContainer()}
-          className="w-auto p-3 shadow-lg border border-slate-200 bg-white"
+          className="w-auto p-3"
           align="start"
         >
           <div className="flex flex-col gap-3">
             {/* Header */}
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-slate-800">
+            <div className="flex items-center justify-between px-1">
+              <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                 {currentMonth.getFullYear()}년 {currentMonth.getMonth() + 1}월
               </span>
               <div className="flex items-center gap-1">
-                <button
+                <Button
                   type="button"
+                  variant="outline"
+                  size="icon"
                   onClick={handlePrevMonth}
-                  className="flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                  className="h-7 w-7 bg-transparent opacity-70 hover:opacity-100 dark:border-slate-800"
                   aria-label="이전 달"
                 >
                   <ChevronLeft className="h-4 w-4" />
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="outline"
+                  size="icon"
                   onClick={handleNextMonth}
-                  className="flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                  className="h-7 w-7 bg-transparent opacity-70 hover:opacity-100 dark:border-slate-800"
                   aria-label="다음 달"
                 >
                   <ChevronRight className="h-4 w-4" />
-                </button>
+                </Button>
               </div>
             </div>
 
             {/* Weekdays */}
-            <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-slate-400">
-              <span>일</span>
-              <span>월</span>
-              <span>화</span>
-              <span>수</span>
-              <span>목</span>
-              <span>금</span>
-              <span>토</span>
+            <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-slate-400 dark:text-slate-500">
+              <span className="w-8">일</span>
+              <span className="w-8">월</span>
+              <span className="w-8">화</span>
+              <span className="w-8">수</span>
+              <span className="w-8">목</span>
+              <span className="w-8">금</span>
+              <span className="w-8">토</span>
             </div>
 
             {/* Days Grid */}
@@ -188,14 +194,14 @@ export function createShadcnDatePickerEditorPlugin<T>(
                     key={dateStr}
                     type="button"
                     onClick={() => handleSelectDate(date)}
-                    className={`flex h-8 w-8 items-center justify-center rounded-md text-xs font-medium transition-colors ${
+                    className={`flex h-8 w-8 items-center justify-center rounded-md text-xs transition-colors cursor-pointer border-0 bg-transparent ${
                       isSelected
-                        ? 'bg-slate-900 text-white font-bold'
+                        ? 'bg-slate-900 font-bold text-white shadow-sm dark:bg-slate-50 dark:text-slate-900'
                         : isToday
-                        ? 'border border-slate-900 text-slate-900 font-bold'
+                        ? 'border border-slate-900 font-bold text-slate-900 dark:border-slate-100 dark:text-slate-100'
                         : isCurrentMonth
-                        ? 'text-slate-800 hover:bg-slate-100'
-                        : 'text-slate-300 hover:bg-slate-50'
+                        ? 'font-medium text-slate-800 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
+                        : 'font-normal text-slate-400 opacity-40 hover:bg-slate-50 dark:text-slate-600 dark:hover:bg-slate-900'
                     }`}
                   >
                     {date.getDate()}
@@ -205,28 +211,34 @@ export function createShadcnDatePickerEditorPlugin<T>(
             </div>
 
             {/* Quick Presets */}
-            <div className="flex items-center justify-between border-t border-slate-100 pt-2 text-xs">
-              <button
+            <div className="flex items-center justify-between border-t border-slate-100 pt-2 text-xs dark:border-slate-800">
+              <Button
                 type="button"
+                variant="ghost"
+                size="sm"
                 onClick={() => handleQuickPreset(0)}
-                className="rounded px-2 py-1 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                className="h-7 px-2 text-xs text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
               >
                 오늘
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="ghost"
+                size="sm"
                 onClick={() => handleQuickPreset(1)}
-                className="rounded px-2 py-1 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                className="h-7 px-2 text-xs text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
               >
                 내일
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="ghost"
+                size="sm"
                 onClick={() => handleQuickPreset(7)}
-                className="rounded px-2 py-1 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                className="h-7 px-2 text-xs text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
               >
                 1주일 후
-              </button>
+              </Button>
             </div>
           </div>
         </PopoverContent>

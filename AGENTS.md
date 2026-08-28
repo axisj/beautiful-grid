@@ -27,7 +27,7 @@ Columns with index `< frozenColumnIndex` get `left: -1` (sentinel value) and are
 ## Developer Workflows
 
 ```bash
-# Dev server (Vite demo app)
+# Dev server (Astro docs & demo site; npm i automatically installs site deps via postinstall)
 npm run dev
 
 # Lint
@@ -45,8 +45,8 @@ npm run build:library   # = clean + style + cjs + esm + types + manifest
 npm run pack:library    # npm pack ./dist
 npm run publish:library # npm publish ./dist --access public
 
-# Build/preview the demo app bundle
-npm run build           # alias of build:demo → .demo-dist/
+# Build/preview the docs & demo site
+npm run build           # alias of site:build
 npm run preview
 ```
 

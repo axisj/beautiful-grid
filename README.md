@@ -997,7 +997,7 @@ interface BGridDataControl {
 ## Developer Workflows
 
 ```bash
-# Start Vite development server (demo app & docs)
+# Start development server (docs & demo site)
 npm run dev
 
 # Run unit tests with Vitest
@@ -1019,7 +1019,7 @@ npm run lint
 # Build publishable library bundle (dist/cjs, dist/esm, dist/types, dist/style.css, dist/package.json)
 npm run build:library
 
-# Build Vite demo application
+# Build docs & demo site
 npm run build
 npm run preview
 ```

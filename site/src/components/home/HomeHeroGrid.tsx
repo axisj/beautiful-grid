@@ -2,6 +2,7 @@ import * as React from 'react';
 import { ConfigProvider, theme as antdTheme } from 'antd';
 import { BGrid } from 'beautiful-grid';
 import type { BGridColumn, BGridDataControl, BGridDataItem, BGridDataQuery } from 'beautiful-grid';
+import { createAntdCascaderEditorPlugin } from '../../../../examples/editor-plugins/createAntdCascaderEditorPlugin';
 import { createAntdDatePickerEditorPlugin } from '../../../../examples/editor-plugins/createAntdDatePickerEditorPlugin';
 import { createAntdSelectEditorPlugin } from '../../../../examples/editor-plugins/createAntdSelectEditorPlugin';
 import { CalendarIcon, ChevronDownIcon } from '../../../../examples/editing/editorIcons';
@@ -14,18 +15,28 @@ import { useSiteDarkTheme } from '../useSiteDarkTheme';
 interface OrderRow {
   orderNo: string;
   customer: string;
+  companySize: string;
+  industry: string;
   product: string;
   status: 'Ready' | 'Shipping' | 'Complete';
   quantity: number;
   amount: number;
   salesRep: string;
-  region: string;
+  contactNumber: string;
+  email: string;
+  region: string[];
   deliveryDate: string;
   priority: 'High' | 'Normal' | 'Low';
   channel: string;
   paymentStatus: string;
   updatedAt: string;
 }
+
+
+const companySizes = ['대기업', '중견기업', '중소기업', '스타트업'];
+const industries = ['IT/통신', '금융', '제조', '유통', '서비스'];
+const englishCompanySizes = ['Enterprise', 'Mid-market', 'SMB', 'Startup'];
+const englishIndustries = ['IT/Telecom', 'Finance', 'Manufacturing', 'Retail', 'Service'];
 
 const customers = [
   'AxisJ Studio',
@@ -44,7 +55,14 @@ const customers = [
 const products = ['Workspace Pro', 'Analytics Seat', 'Design System', 'Automation Pack'];
 const statuses: OrderRow['status'][] = ['Complete', 'Shipping', 'Ready'];
 const salesReps = ['김하늘', '박민준', '이서연', '최도윤', '정유진', '한지민'];
-const regions = ['서울', '경기', '인천', '부산', '대전', '광주'];
+const regions = [
+  ['수도권', '서울'],
+  ['수도권', '경기'],
+  ['수도권', '인천'],
+  ['지방', '부산'],
+  ['지방', '대전'],
+  ['지방', '광주'],
+];
 const priorities: OrderRow['priority'][] = ['High', 'Normal', 'Low'];
 const channels = ['직접 영업', '파트너', '온라인', '리퍼럴'];
 const paymentStatuses = ['결제 완료', '청구 예정', '입금 확인'];
@@ -59,10 +77,14 @@ const statusEditor = createAntdSelectEditorPlugin<OrderRow, OrderRow['status']>(
   ],
 });
 
-const regionEditor = createAntdSelectEditorPlugin<OrderRow, OrderRow['region']>({
+const cascaderRegions = [
+  { value: '수도권', label: '수도권', children: [{ value: '서울', label: '서울' }, { value: '경기', label: '경기' }, { value: '인천', label: '인천' }] },
+  { value: '지방', label: '지방', children: [{ value: '부산', label: '부산' }, { value: '대전', label: '대전' }, { value: '광주', label: '광주' }] },
+];
+const regionEditor = createAntdCascaderEditorPlugin<OrderRow>({
   id: 'home-region',
   ariaLabel: '권역 편집',
-  options: regions.map(value => ({ value, label: value })),
+  options: cascaderRegions,
 });
 
 const deliveryDateEditor = createAntdDatePickerEditorPlugin<OrderRow>({
@@ -90,7 +112,14 @@ const paymentStatusEditor = createAntdSelectEditorPlugin<OrderRow, OrderRow['pay
   options: paymentStatuses.map(value => ({ value, label: value })),
 });
 
-const englishRegions = ['Seoul', 'Gyeonggi', 'Incheon', 'Busan', 'Daejeon', 'Gwangju'];
+const englishRegions = [
+  ['Metro', 'Seoul'],
+  ['Metro', 'Gyeonggi'],
+  ['Metro', 'Incheon'],
+  ['Provincial', 'Busan'],
+  ['Provincial', 'Daejeon'],
+  ['Provincial', 'Gwangju'],
+];
 const englishChannels = ['Direct', 'Partner', 'Online', 'Referral'];
 const englishPaymentStatuses = ['Paid', 'Invoice scheduled', 'Payment confirmed'];
 const englishStatusEditor = createAntdSelectEditorPlugin<OrderRow, OrderRow['status']>({
@@ -102,8 +131,14 @@ const englishStatusEditor = createAntdSelectEditorPlugin<OrderRow, OrderRow['sta
     { value: 'Complete', label: 'Complete' },
   ],
 });
-const englishRegionEditor = createAntdSelectEditorPlugin<OrderRow, OrderRow['region']>({
-  id: 'home-region-en', ariaLabel: 'Edit region', options: englishRegions.map(value => ({ value, label: value })),
+const englishCascaderRegions = [
+  { value: 'Metro', label: 'Metro', children: [{ value: 'Seoul', label: 'Seoul' }, { value: 'Gyeonggi', label: 'Gyeonggi' }, { value: 'Incheon', label: 'Incheon' }] },
+  { value: 'Provincial', label: 'Provincial', children: [{ value: 'Busan', label: 'Busan' }, { value: 'Daejeon', label: 'Daejeon' }, { value: 'Gwangju', label: 'Gwangju' }] },
+];
+const englishRegionEditor = createAntdCascaderEditorPlugin<OrderRow>({
+  id: 'home-region-en',
+  ariaLabel: 'Edit region',
+  options: englishCascaderRegions,
 });
 const englishPriorityEditor = createAntdSelectEditorPlugin<OrderRow, OrderRow['priority']>({
   id: 'home-priority-en', ariaLabel: 'Edit priority', options: priorities.map(value => ({ value, label: value })),
@@ -139,6 +174,24 @@ const columns: BGridColumn<OrderRow>[] = (
       },
       toolbox: true,
       filter: { type: 'text' },
+    },
+    {
+      id: 'companySize',
+      key: 'companySize',
+      label: '기업 규모',
+      width: 100,
+      editable: false,
+      toolbox: true,
+      filter: { type: 'values' },
+    },
+    {
+      id: 'industry',
+      key: 'industry',
+      label: '산업군',
+      width: 100,
+      editable: false,
+      toolbox: true,
+      filter: { type: 'values' },
     },
     {
       id: 'product',
@@ -214,15 +267,34 @@ const columns: BGridColumn<OrderRow>[] = (
       filter: { type: 'text' },
     },
     {
+      id: 'contactNumber',
+      key: 'contactNumber',
+      label: '연락처',
+      width: 130,
+      editable: false,
+      toolbox: true,
+      filter: { type: 'text' },
+    },
+    {
+      id: 'email',
+      key: 'email',
+      label: '이메일',
+      width: 180,
+      editable: false,
+      toolbox: true,
+      filter: { type: 'text' },
+    },
+    {
       id: 'region',
       key: 'region',
       label: '권역',
-      width: 112,
+      width: 130,
       editable: true,
       editor: regionEditor,
       editorIcon: { render: <ChevronDownIcon />, ariaLabel: '권역 선택', visibility: 'always' },
       toolbox: true,
       filter: { type: 'values' },
+      itemRender: ({ value }) => (value as string[]).join(' / '),
     },
     {
       id: 'deliveryDate',
@@ -284,8 +356,8 @@ const columns: BGridColumn<OrderRow>[] = (
 }));
 
 const englishColumnLabels: Record<string, string> = {
-  orderNo: 'Order no.', customer: 'Customer', product: 'Product', status: 'Status', quantity: 'Quantity',
-  amount: 'Amount', salesRep: 'Sales rep', region: 'Region', deliveryDate: 'Delivery date', priority: 'Priority',
+  orderNo: 'Order no.', customer: 'Customer', companySize: 'Company Size', industry: 'Industry', product: 'Product', status: 'Status', quantity: 'Quantity',
+  amount: 'Amount', salesRep: 'Sales rep', contactNumber: 'Contact Number', email: 'Email', region: 'Region', deliveryDate: 'Delivery date', priority: 'Priority',
   channel: 'Channel', paymentStatus: 'Payment status', updatedAt: 'Last updated',
 };
 
@@ -309,7 +381,7 @@ const englishColumns: BGridColumn<OrderRow>[] = columns.map(column => {
   };
   if (id === 'amount') localized.itemRender = ({ value }) => `${Number(value).toLocaleString('en-US')} KRW`;
   if (id === 'salesRep') localized.editor = { type: 'text', ariaLabel: 'Edit sales representative', inputProps: { maxLength: 30, autoComplete: 'off' } };
-  if (id === 'region') { localized.editor = englishRegionEditor; localized.editorIcon = { render: <ChevronDownIcon />, ariaLabel: 'Select region', visibility: 'always' }; }
+  if (id === 'region') { localized.editor = englishRegionEditor; localized.editorIcon = { render: <ChevronDownIcon />, ariaLabel: 'Select region', visibility: 'always' }; localized.itemRender = ({ value }) => (value as string[]).join(' / '); }
   if (id === 'deliveryDate') localized.editorIcon = { render: <CalendarIcon />, ariaLabel: 'Select delivery date', visibility: 'always' };
   if (id === 'priority') { localized.editor = englishPriorityEditor; localized.editorIcon = { render: <ChevronDownIcon />, ariaLabel: 'Select priority', visibility: 'always' }; }
   if (id === 'channel') { localized.editor = englishChannelEditor; localized.editorIcon = { render: <ChevronDownIcon />, ariaLabel: 'Select channel', visibility: 'always' }; }
@@ -317,40 +389,63 @@ const englishColumns: BGridColumn<OrderRow>[] = columns.map(column => {
   return localized;
 });
 
-const initialData: BGridDataItem<OrderRow>[] = Array.from({ length: 72 }, (_, index) => {
+const initialData: BGridDataItem<OrderRow>[] = Array.from({ length: 500 }, (_, index) => {
+  const cycle = Math.floor(index / 7);
+  const remainder = index % 7;
+  const groupId = cycle * 2 + (remainder < 3 ? 0 : 1);
+
   const day = String((index % 28) + 1).padStart(2, '0');
   const month = String((index % 8) + 1).padStart(2, '0');
   const quantity = ((index * 7) % 15) + 1;
+  
+  const customer = customers[groupId % customers.length];
+  const customerDomain = customer.toLowerCase().replace(/[^a-z0-9]/g, '') || 'company';
+  const region = regions[groupId % regions.length];
 
   return {
     values: {
       orderNo: `A-${2401 + index}`,
-      customer: customers[index % customers.length],
+      customer,
+      companySize: companySizes[(groupId + 1) % companySizes.length],
+      industry: industries[(groupId + 2) % industries.length],
       product: products[index % products.length],
       status: statuses[index % statuses.length],
       quantity,
       amount: quantity * (98000 + (index % 5) * 49000),
-      salesRep: salesReps[index % salesReps.length],
-      region: regions[index % regions.length],
+      salesRep: salesReps[groupId % salesReps.length],
+      contactNumber: `010-${String(1000 + (groupId % 9000))}-${String(1000 + ((groupId * 3) % 9000))}`,
+      email: `contact@${customerDomain}.com`,
+      region,
       deliveryDate: `2026-${month}-${day}`,
       priority: priorities[index % priorities.length],
-      channel: channels[index % channels.length],
+      channel: channels[groupId % channels.length],
       paymentStatus: paymentStatuses[index % paymentStatuses.length],
       updatedAt: `2026-08-${day} ${String(9 + (index % 9)).padStart(2, '0')}:30`,
     },
   };
 });
 
-const englishInitialData: BGridDataItem<OrderRow>[] = initialData.map((item, index) => ({
-  ...item,
-  values: {
-    ...item.values,
-    salesRep: ['Alex Kim', 'Morgan Park', 'Jamie Lee', 'Taylor Choi', 'Robin Jung', 'Casey Han'][index % 6],
-    region: englishRegions[index % englishRegions.length],
-    channel: englishChannels[index % englishChannels.length],
-    paymentStatus: englishPaymentStatuses[index % englishPaymentStatuses.length],
-  },
-}));
+const englishInitialData: BGridDataItem<OrderRow>[] = initialData.map((item) => {
+  const regionIndex = regions.indexOf(item.values.region);
+  const channelIndex = channels.indexOf(item.values.channel);
+  const paymentStatusIndex = paymentStatuses.indexOf(item.values.paymentStatus);
+  const salesRepIndex = salesReps.indexOf(item.values.salesRep);
+  const companySizeIndex = companySizes.indexOf(item.values.companySize);
+  const industryIndex = industries.indexOf(item.values.industry);
+
+  return {
+    ...item,
+    values: {
+      ...item.values,
+      salesRep: ['Alex Kim', 'Morgan Park', 'Jamie Lee', 'Taylor Choi', 'Robin Jung', 'Casey Han'][salesRepIndex],
+      region: englishRegions[regionIndex],
+      channel: englishChannels[channelIndex],
+      paymentStatus: englishPaymentStatuses[paymentStatusIndex],
+      companySize: englishCompanySizes[companySizeIndex],
+      industry: englishIndustries[industryIndex],
+    },
+  };
+});
 
 export default function HomeHeroGrid({ locale = 'ko' }: { locale?: Locale }) {
   const isDark = useSiteDarkTheme();
@@ -432,6 +527,12 @@ export default function HomeHeroGrid({ locale = 'ko' }: { locale?: Locale }) {
               rowKey='orderNo'
               status={{
                 content: ({ totalItems }) => locale === 'en' ? `${totalItems} rows` : `총 ${totalItems}개 행`,
+              }}
+              cellMergeOptions={{
+                columnsMap: {
+                  11: { mergeBy: 'region' },
+                  1: { mergeBy: 'customer' },
+                }
               }}
               pagination={{ visible: false }}
               scrollbar={{

@@ -13,7 +13,7 @@ import {
   useBodyData,
 } from '../utils';
 import { TableBodyCell } from './TableBodyCell';
-import { BGridDataItemStatus, BGridProps, BGridSearchMatch } from '../types';
+import { AppModelColumn, BGridDataItemStatus, BGridProps, BGridSearchMatch } from '../types';
 import RowSelector from './RowSelector';
 import { GripVertical } from './GripVertical';
 
@@ -22,6 +22,77 @@ export type BGridBodyRegion = 'left' | 'main';
 export interface BGridBodyRowRange {
   startRowIndex: number;
   endRowIndex: number;
+}
+
+export interface BGridVisibleColumnRange {
+  startColumnIndex: number;
+  endColumnIndex: number;
+}
+
+export function getVisibleColumnRange(
+  columns: Pick<AppModelColumn<any>, 'left' | 'width'>[],
+  firstScrollableColumnIndex: number,
+  scrollLeft: number,
+  viewportWidth: number,
+): BGridVisibleColumnRange {
+  const lastColumnIndex = columns.length - 1;
+  if (firstScrollableColumnIndex > lastColumnIndex) {
+    return {
+      startColumnIndex: firstScrollableColumnIndex,
+      endColumnIndex: lastColumnIndex,
+    };
+  }
+
+  const viewportStart = Math.max(scrollLeft, 0);
+  const viewportEnd = viewportStart + Math.max(viewportWidth, 0);
+
+  let low = firstScrollableColumnIndex;
+  let high = lastColumnIndex;
+  let firstVisibleColumnIndex = lastColumnIndex + 1;
+
+  while (low <= high) {
+    const middle = Math.floor((low + high) / 2);
+    const column = columns[middle];
+    const columnLeft = column.left ?? 0;
+    const columnRight = columnLeft + (column.width ?? 100);
+
+    if (columnRight >= viewportStart) {
+      firstVisibleColumnIndex = middle;
+      high = middle - 1;
+    } else {
+      low = middle + 1;
+    }
+  }
+
+  low = firstScrollableColumnIndex;
+  high = lastColumnIndex;
+  let lastVisibleColumnIndex = firstScrollableColumnIndex - 1;
+
+  while (low <= high) {
+    const middle = Math.floor((low + high) / 2);
+    const columnLeft = columns[middle].left ?? 0;
+
+    if (columnLeft < viewportEnd) {
+      lastVisibleColumnIndex = middle;
+      low = middle + 1;
+    } else {
+      high = middle - 1;
+    }
+  }
+
+  if (firstVisibleColumnIndex > lastVisibleColumnIndex) {
+    const nearestColumnIndex = Math.min(
+      Math.max(firstVisibleColumnIndex, firstScrollableColumnIndex),
+      lastColumnIndex,
+    );
+    firstVisibleColumnIndex = nearestColumnIndex;
+    lastVisibleColumnIndex = nearestColumnIndex;
+  }
+
+  return {
+    startColumnIndex: Math.max(firstScrollableColumnIndex, firstVisibleColumnIndex - 1),
+    endColumnIndex: Math.min(lastColumnIndex, lastVisibleColumnIndex + 1),
+  };
 }
 
 const searchMatchTokenCache = new WeakMap<BGridSearchMatch[], ReadonlySet<string>>();
@@ -47,7 +118,6 @@ interface Props {
 }
 
 function TableBody({
-  scrollContainerRef,
   region = 'main',
   rowRange,
   style,
@@ -159,43 +229,18 @@ function TableBody({
         endCIdx: frozenColumnIndex - 1,
       };
     }
-    if (!scrollContainerRef.current)
-      return {
-        startCIdx: frozenColumnIndex,
-        endCIdx: columns.length - 1,
-      };
-    const start = Math.max(scrollLeft, 0),
-      end = start + width - (frozenColumnsWidth ?? 0);
 
-    let startCIdx, endCIdx;
-    // columns.
-    for (let i = frozenColumnIndex; i < columns.length; i++) {
-      const { left, width = 100 } = columns[i];
-      if (left + width >= start && left < end) {
-        if (startCIdx === undefined) {
-          startCIdx = i;
-        } else {
-          endCIdx = i;
-        }
-      }
-    }
-
-    startCIdx = startCIdx ?? frozenColumnIndex;
-    endCIdx = endCIdx ?? columns.length - 1;
-
-    if (startCIdx > frozenColumnIndex) {
-      startCIdx -= 1;
-    }
-
-    if (endCIdx < columns.length - 1) {
-      endCIdx += 1;
-    }
+    const { startColumnIndex, endColumnIndex } = getVisibleColumnRange(
+      columns,
+      frozenColumnIndex,
+      scrollLeft,
+      width - (frozenColumnsWidth ?? 0),
+    );
 
     return {
-      startCIdx: startCIdx ?? 0,
-      endCIdx: endCIdx ?? columns.length - 1,
+      startCIdx: startColumnIndex,
+      endCIdx: endColumnIndex,
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scrollLeft, width, frozenColumnsWidth, columns, frozenColumnIndex, isLeftRegion]);
   const hasOnClick = !!onClick;
   const hasRowChecked = !!rowChecked;

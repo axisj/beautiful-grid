@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { BGrid } from '../beautiful-grid';
 import type { BGridColumn } from '../beautiful-grid/types';
@@ -23,6 +23,65 @@ const data = [
 ];
 
 describe('shared body grid renderer', () => {
+  it('bounds rendered body columns to the horizontal viewport from the first render', () => {
+    const wideData = Array.from({ length: 12 }, (_, rowIndex) => ({
+      values: Object.fromEntries(Array.from({ length: 200 }, (_, columnIndex) => [`column-${columnIndex}`, `${rowIndex}:${columnIndex}`])),
+    }));
+    const createColumns = (count: number): BGridColumn<Record<string, string>>[] =>
+      Array.from({ length: count }, (_, columnIndex) => ({
+        id: `column-${columnIndex}`,
+        key: `column-${columnIndex}`,
+        label: `Column ${columnIndex}`,
+        width: 100,
+      }));
+
+    const countRenderedCells = (columnCount: number) => {
+      const view = render(
+        <BGrid<Record<string, string>>
+          width={420}
+          height={240}
+          columns={createColumns(columnCount)}
+          data={wideData}
+        />,
+      );
+      const firstRow = view.container.querySelector('[role="rfdg-body"] tr[data-ri="0"]')!;
+      const renderedCells = firstRow.querySelectorAll('td[data-bgrid-cell="true"]').length;
+      view.unmount();
+      return renderedCells;
+    };
+
+    expect(countRenderedCells(40)).toBe(6);
+    expect(countRenderedCells(200)).toBe(6);
+  });
+
+  it('updates a bounded body-column window after horizontal scrolling', async () => {
+    const wideColumns: BGridColumn<Record<string, string>>[] = Array.from({ length: 40 }, (_, columnIndex) => ({
+      id: `column-${columnIndex}`,
+      key: `column-${columnIndex}`,
+      label: `Column ${columnIndex}`,
+      width: 100,
+    }));
+    const wideData = Array.from({ length: 12 }, (_, rowIndex) => ({
+      values: Object.fromEntries(wideColumns.map((column, columnIndex) => [column.key, `${rowIndex}:${columnIndex}`])),
+    }));
+    const { container } = render(
+      <BGrid<Record<string, string>> width={420} height={240} columns={wideColumns} data={wideData} />,
+    );
+    const scrollContainer = container.querySelector('[role="rfdg-scroll-container"]') as HTMLDivElement;
+
+    scrollContainer.scrollLeft = 1200;
+    fireEvent.scroll(scrollContainer);
+
+    await waitFor(() => {
+      const cells = container.querySelectorAll(
+        '[role="rfdg-body"] tr[data-ri="0"] td[data-bgrid-cell="true"]',
+      );
+      expect(cells).toHaveLength(8);
+      expect(cells[0]).toHaveAttribute('data-column-index', '10');
+      expect(cells[cells.length - 1]).toHaveAttribute('data-column-index', '17');
+    });
+  });
+
   it('keeps row state and row headers aligned across left and main regions', () => {
     const { container } = render(
       <BGrid<Row>

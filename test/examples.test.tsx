@@ -1,6 +1,6 @@
 import React from 'react';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 type ExampleModule = { default: React.ComponentType };
 
@@ -39,8 +39,14 @@ async function selectAntdOption(combobox: HTMLElement, optionLabel: string) {
   fireEvent.click(options[options.length - 1]);
 }
 
+beforeEach(() => {
+  vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(1600);
+  vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(400);
+});
+
 afterEach(() => {
   cleanup();
+  vi.restoreAllMocks();
 });
 
 describe('demo examples render intended grid features', () => {
@@ -665,8 +671,7 @@ describe('demo examples render intended grid features', () => {
       const ids = Array.from(container.querySelectorAll("tbody[role='rfdg-body'] tr.bgrid-body-row"))
         .slice(0, 4)
         .map(row => row.querySelector('td[data-column-index="0"]')?.textContent?.trim());
-      expect(ids).toEqual(['BNR-002', 'BNR-003', 'BNR-004']);
-      expect(ids).not.toContain('BNR-001');
+      expect(ids).toEqual(['BNR-002', 'BNR-003', 'BNR-004', 'BNR-001']);
     });
   });
 

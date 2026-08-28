@@ -27,4 +27,4 @@ function TableColGroupFrozen(props: Props) {
   );
 }
 
-export default TableColGroupFrozen;
+export default React.memo(TableColGroupFrozen);

@@ -15,4 +15,4 @@ function TableColGroup() {
   );
 }
 
-export default TableColGroup;
+export default React.memo(TableColGroup);

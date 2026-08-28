@@ -199,6 +199,11 @@ itemRender?: (params: {
 
 ## 5. Practical tips and caveats
 
+> [!WARNING]
+> **Responsive frozen columns on mobile screens**:
+> On narrow viewports such as mobile devices, freezing multiple columns can occupy most of the visible width, making it appear that **horizontal scrolling is broken**.
+> Consider adjusting `frozenColumnIndex` responsively based on container width (e.g. `containerWidth < 640 ? 1 : 3`) to preserve sufficient scrollable area.
+
 > [!TIP]
 > **Check horizontal-scroll performance with frozen columns**:
 > BeautifulGrid renders the frozen and scrollable regions as separate components. If cell renderers are complex or the grid has many columns, verify scroll synchronization in the target browsers and with a realistic data volume.

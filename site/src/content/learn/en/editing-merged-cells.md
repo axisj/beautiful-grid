@@ -56,3 +56,7 @@ onChangeValue: async ({ changes, rows, commit }) => {
 Only the merge rule of the originating column determines the row range. Adding another merged column to the change list does not expand the range transitively, and changing the merge key itself does not cause the range to be recalculated during the save. If any target row is invalid, the entire transaction is canceled.
 
 For display-only merge configuration, see [Cell Merging](/en/learn/cell-merge). For frozen layout settings, see [Frozen Rows and Columns](/en/learn/frozen-columns).
+
+> [!TIP]
+> **Frozen columns and merged cells on mobile**:
+> Increasing the number of frozen columns on mobile screens reduces the visible editable area. Set `frozenColumnIndex` to 1 or 0 based on screen width to ensure sufficient editing space on narrow devices.

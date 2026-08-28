@@ -125,3 +125,7 @@ interface BGridCellMergeColumn {
 > [!IMPORTANT]
 > **Sort the data before merging**:
 > Cells merge only when **consecutive adjacent rows** have the same value. If a row with `mainCategory: 'Furniture'` appears between rows whose `mainCategory` is `'Electronics'`, the merge is interrupted. Sort the data by the merge keys before passing it to the grid so that each group remains contiguous.
+
+> [!TIP]
+> **Frozen merged columns on mobile screens**:
+> Freezing multiple merged columns (`frozenColumnIndex`) on narrow mobile screens can obscure the horizontal scrollable area. Consider reducing or removing frozen columns on mobile viewports.

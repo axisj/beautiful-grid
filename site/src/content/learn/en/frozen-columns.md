@@ -62,3 +62,25 @@ A top Summary Row occupies a separate region from frozen data rows. When you use
 ```
 
 If `frozenRowCount` exceeds the current displayed row count, it is automatically clamped to that count. Frozen rows are disabled in Pivot mode under the initial release policy.
+
+---
+
+## 3. Responsive and Mobile Considerations
+
+> [!WARNING]
+> **Avoid freezing too many columns on mobile screens**:
+> On small mobile viewports (e.g., under 640px wide), setting `frozenColumnIndex` to 2 or more can cause frozen columns to occupy most of the available width. This leaves little or no room for the scrollable region, leading users to **mistakenly believe horizontal scrolling is broken**.
+> 
+> In production applications, use responsive logic (such as `useContainerSize` or viewport queries) to reduce `frozenColumnIndex` to `1` or `0` on mobile devices.
+
+```tsx
+const { width: containerWidth } = useContainerSize(containerRef);
+const isMobile = containerWidth > 0 && containerWidth < 640;
+
+<BGrid
+  columns={columns}
+  data={data}
+  frozenColumnIndex={isMobile ? 1 : 3} // 1 column on mobile, 3 columns on desktop
+/>
+```
+

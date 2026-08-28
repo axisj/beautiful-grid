@@ -130,7 +130,7 @@ function ShadcnColorPickerEditor({
       <PopoverTrigger asChild>
         <button className="flex h-full w-full items-center gap-2 px-2 text-sm">
           <span className="h-4 w-4 rounded-full border" style={{ backgroundColor: String(value) }} />
-          <span className="font-mono text-xs">{String(value)}</span>
+          <span className="font-mono text-[13px]">{String(value)}</span>
         </button>
       </PopoverTrigger>
       <PopoverContent container={getPortalContainer()} className="w-64 p-3" align="start">

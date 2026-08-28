@@ -62,3 +62,25 @@ BeautifulGrid는 `frozenColumnIndex`로 왼쪽에 고정할 컬럼 수를, `froz
 ```
 
 `frozenRowCount`가 현재 표시 행 수보다 크면 자동으로 행 수에 맞춰 줄어듭니다. 피벗 모드에서는 첫 릴리스 정책상 행 틀고정이 비활성화됩니다.
+
+---
+
+## 3. 모바일·반응형 화면에서의 틀고정 주의사항
+
+> [!WARNING]
+> **모바일 화면에서의 틀고정 컬럼 수 주의**:
+> 모바일 기기(너비 600px 미만)에서는 화면 폭이 좁기 때문에 고정 컬럼(`frozenColumnIndex`)을 2개 이상 설정하면 고정 영역이 화면 너비의 대부분을 차지하게 됩니다. 이 경우 스크롤 가능한 본문 영역이 극히 좁아져 **"가로 스크롤이 작동하지 않는다"고 사용자가 오해**할 수 있습니다.
+> 
+> 실무에서는 `useContainerSize`나 `window.innerWidth`를 활용하여 모바일 화면에서는 고정 컬럼을 1개로 줄이거나 고정을 해제(`0`)하는 반응형 구성을 권장합니다.
+
+```tsx
+const { width: containerWidth } = useContainerSize(containerRef);
+const isMobile = containerWidth > 0 && containerWidth < 640;
+
+<BGrid
+  columns={columns}
+  data={data}
+  frozenColumnIndex={isMobile ? 1 : 3} // 모바일에서는 1개, 데스크톱에서는 3개 고정
+/>
+```
+

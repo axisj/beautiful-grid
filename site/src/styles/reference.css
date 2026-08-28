@@ -137,7 +137,7 @@
 }
 .api-kind-badge {
   color: var(--site-text-muted);
-  font-size: 0.75rem;
+  font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;

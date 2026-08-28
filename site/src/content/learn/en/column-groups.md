@@ -139,6 +139,10 @@ The deepest group determines the number of header rows. A leaf column that ends 
 
 No additional configuration is required when a group crosses the `frozenColumnIndex` boundary. The same group label is rendered in both the frozen and scrollable areas, and each area's `colSpan` is calculated from the leaf columns it actually contains. The live demo above includes a group that crosses the frozen boundary.
 
+> [!TIP]
+> **Mobile screens and frozen width**:
+> On narrow mobile screens, freezing multiple grouped columns may restrict the horizontal scrollable area. Consider reducing `frozenColumnIndex` on mobile devices to preserve ample scroll space.
+
 ## Validate the configuration
 
 The following configurations emit a development warning and fall back to a safe single-row header:

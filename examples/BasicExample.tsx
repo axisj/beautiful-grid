@@ -309,7 +309,7 @@ function BasicExample() {
           data={sortedOrders}
           columns={columns}
           rowKey='orderNo'
-          frozenColumnIndex={3}
+          frozenColumnIndex={containerWidth > 0 && containerWidth < 640 ? 1 : 3}
           showLineNumber
           rowChecked={{
             checkedRowKeys,

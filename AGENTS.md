@@ -48,7 +48,17 @@ npm run publish:library # npm publish ./dist --access public
 # Build/preview the docs & demo site
 npm run build           # alias of site:build
 npm run preview
+
+# Pre-push verification (MANDATORY before every git push)
+npm run verify:library  # runs lint, test, css check, consumers check, and bundle budget check
+npm run verify:site     # runs site font size check, site unit test, astro check, and site build
 ```
+
+### Pre-Push Verification Requirement
+**MANDATORY**: Before pushing any changes to remote git:
+1. Always run `npm run verify:library` (or ensure `.git/hooks/pre-push` passes).
+2. If library bundle size changed, run `npm run update:library:bundle-metrics` and commit `site/src/data/bundleMetrics.ts`.
+3. Never push without passing all tests and bundle budget checks.
 
 Library tsconfigs live in `tsconfigs/tsconfig.library.cjs.json`, `tsconfigs/tsconfig.library.esm.json`, and `tsconfigs/tsconfig.library.types.json`. The Vite demo app uses the root `tsconfig.json` and `vite.config.ts` (`vite.config.mjs` is also present).
 

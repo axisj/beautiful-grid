@@ -5,8 +5,8 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY site/package.json site/package-lock.json ./site/
 
-RUN npm ci \
-  && npm --prefix site ci
+RUN npm ci --ignore-scripts \
+  && npm --prefix site ci --ignore-scripts
 
 COPY . .
 

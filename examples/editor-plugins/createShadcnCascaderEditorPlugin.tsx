@@ -1,0 +1,185 @@
+import * as React from 'react';
+import type { BGridEditorPluginProps, BGridPluginEditorConfig } from 'beautiful-grid';
+import { defineEditorPlugin } from 'beautiful-grid/editors';
+import { ChevronRight, Layers } from 'lucide-react';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '../../components/ui/popover';
+
+export interface CascaderOption {
+  value: string;
+  label: React.ReactNode;
+  children?: CascaderOption[];
+}
+
+interface Options {
+  id: string;
+  ariaLabel: string;
+  options: CascaderOption[];
+}
+
+export function createShadcnCascaderEditorPlugin<T>(
+  options: Options,
+): BGridPluginEditorConfig<T> {
+  function ShadcnCascaderEditor({
+    value,
+    column,
+    commit,
+    cancel,
+    getPortalContainer,
+  }: BGridEditorPluginProps<T>) {
+    const [open, setOpen] = React.useState(true);
+    const initialPath = Array.isArray(value) ? (value as string[]) : [];
+    const [selectedPath, setSelectedPath] = React.useState<string[]>(initialPath);
+
+    // Get current options at each level
+    const level1Options = options.options;
+    const level1Selected = level1Options.find(o => o.value === selectedPath[0]);
+    const level2Options = level1Selected?.children || [];
+    const level2Selected = level2Options.find(o => o.value === selectedPath[1]);
+    const level3Options = level2Selected?.children || [];
+
+    const handleSelectLevel = (levelIndex: number, option: CascaderOption) => {
+      const nextPath = selectedPath.slice(0, levelIndex);
+      nextPath[levelIndex] = option.value;
+      setSelectedPath(nextPath);
+
+      // If leaf node (no children), commit immediately
+      if (!option.children || option.children.length === 0) {
+        void commit([{ key: column.key, value: nextPath }]);
+      }
+    };
+
+    const displayText = initialPath.length > 0 ? initialPath.join(' / ') : '';
+
+    return (
+      <Popover
+        open={open}
+        onOpenChange={nextOpen => {
+          setOpen(nextOpen);
+          if (!nextOpen) cancel();
+        }}
+      >
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className="flex h-full w-full items-center justify-between border-none bg-transparent px-2 text-left text-sm outline-none cursor-pointer"
+            aria-label={options.ariaLabel}
+            autoFocus
+            onKeyDown={event => {
+              if (event.key === 'Escape' || event.key === 'Esc') {
+                event.preventDefault();
+                cancel();
+              }
+            }}
+          >
+            <span className="truncate">{displayText || '분류 선택'}</span>
+            <Layers className="h-4 w-4 opacity-50 shrink-0" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent
+          container={getPortalContainer()}
+          className="w-auto p-2 shadow-lg border border-slate-200 bg-white"
+          align="start"
+        >
+          <div className="flex flex-col gap-2">
+            <div className="text-xs font-semibold text-slate-500 px-2 pt-1 uppercase tracking-wider">
+              계층 분류 선택
+            </div>
+
+            <div className="flex divide-x divide-slate-100 rounded-md border border-slate-100 bg-slate-50/50">
+              {/* Level 1 Panel */}
+              <div className="flex max-h-56 w-32 flex-col overflow-y-auto p-1">
+                {level1Options.map(opt => {
+                  const isSelected = selectedPath[0] === opt.value;
+                  const hasChildren = Boolean(opt.children?.length);
+                  return (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => handleSelectLevel(0, opt)}
+                      className={`flex w-full items-center justify-between rounded px-2 py-1.5 text-xs transition-colors ${
+                        isSelected
+                          ? 'bg-slate-900 font-semibold text-white'
+                          : 'text-slate-700 hover:bg-slate-200/60'
+                      }`}
+                    >
+                      <span className="truncate">{opt.label}</span>
+                      {hasChildren && (
+                        <ChevronRight className={`h-3.5 w-3.5 shrink-0 ${isSelected ? 'text-white' : 'text-slate-400'}`} />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Level 2 Panel */}
+              {level2Options.length > 0 && (
+                <div className="flex max-h-56 w-32 flex-col overflow-y-auto p-1 bg-white">
+                  {level2Options.map(opt => {
+                    const isSelected = selectedPath[1] === opt.value;
+                    const hasChildren = Boolean(opt.children?.length);
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => handleSelectLevel(1, opt)}
+                        className={`flex w-full items-center justify-between rounded px-2 py-1.5 text-xs transition-colors ${
+                          isSelected
+                            ? 'bg-slate-900 font-semibold text-white'
+                            : 'text-slate-700 hover:bg-slate-100'
+                        }`}
+                      >
+                        <span className="truncate">{opt.label}</span>
+                        {hasChildren && (
+                          <ChevronRight className={`h-3.5 w-3.5 shrink-0 ${isSelected ? 'text-white' : 'text-slate-400'}`} />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Level 3 Panel if exists */}
+              {level3Options.length > 0 && (
+                <div className="flex max-h-56 w-32 flex-col overflow-y-auto p-1 bg-white">
+                  {level3Options.map(opt => {
+                    const isSelected = selectedPath[2] === opt.value;
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => handleSelectLevel(2, opt)}
+                        className={`flex w-full items-center justify-between rounded px-2 py-1.5 text-xs transition-colors ${
+                          isSelected
+                            ? 'bg-slate-900 font-semibold text-white'
+                            : 'text-slate-700 hover:bg-slate-100'
+                        }`}
+                      >
+                        <span className="truncate">{opt.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {selectedPath.length > 0 && (
+              <div className="flex items-center justify-between border-t border-slate-100 px-2 pt-2 text-xs text-slate-500">
+                <span>선택 경로: <strong className="text-slate-900">{selectedPath.join(' > ')}</strong></span>
+              </div>
+            )}
+          </div>
+        </PopoverContent>
+      </Popover>
+    );
+  }
+
+  ShadcnCascaderEditor.displayName = `ShadcnCascaderEditor(${options.id})`;
+  return defineEditorPlugin<T>({
+    id: options.id,
+    component: ShadcnCascaderEditor,
+  });
+}

@@ -2,7 +2,7 @@
 title: "Merged Cell Editing"
 description: "Learn how editing works for merged cells in normal layouts and across frozen row and column boundaries, including atomic updates to every underlying row."
 category: "interaction"
-order: 7
+order: 8
 locale: "en"
 canonicalPath: "/en/learn/editing-merged-cells"
 demoId: "editing-merged-cells"

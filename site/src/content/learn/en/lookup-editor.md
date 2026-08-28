@@ -2,7 +2,7 @@
 title: "Autocomplete and Lookup"
 description: "Combine autocomplete input and a lookup-modal icon in one cell, then commit values to multiple columns atomically."
 category: "interaction"
-order: 5
+order: 6
 locale: "en"
 canonicalPath: "/en/learn/lookup-editor"
 demoId: "lookup-editor"

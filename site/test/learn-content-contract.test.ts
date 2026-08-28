@@ -38,7 +38,7 @@ describe('Learn Content Architecture Contracts', () => {
     expect(editingGuide).toContain('title: "셀 편집 시작하기 (Cell Editing)"');
     expect(editingGuide).toContain('demoId: "editing"');
     expect(editingGuide).toContain('](/learn/editor-plugins)');
-    expect(pluginGuide).toContain('title: "외부 에디터 플러그인 (Editor Plugins)"');
+    expect(pluginGuide).toContain('title: "외부 에디터 플러그인 (AntD) (Editor Plugins (AntD))"');
     expect(pluginGuide).toContain('demoId: "editor-plugins"');
     expect(pluginGuide).toContain('defineEditorPlugin');
     expect(pluginGuide).toContain('getPortalContainer');

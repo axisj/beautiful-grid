@@ -2,7 +2,7 @@
 title: "에디터 아이콘 (Editor Icons)"
 description: "셀 값 옆에 드롭다운·달력·검색 아이콘을 표시하고 editor 시작 또는 독립 callback을 연결하는 방법을 설명합니다."
 category: "interaction"
-order: 4
+order: 5
 locale: "ko"
 canonicalPath: "/learn/editor-icons"
 demoId: "editor-icons"

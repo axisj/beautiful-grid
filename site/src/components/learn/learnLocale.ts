@@ -128,11 +128,38 @@ export function categoryLabel(category: string, locale: Locale): string {
 }
 
 export const splitLocalizedTitle = (title: string) => {
-  const match = title.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
+  const trimmed = title.trim();
+  if (!trimmed.endsWith(')')) {
+    return { korean: trimmed, english: '' };
+  }
 
-  return match
-    ? { korean: match[1].trim(), english: match[2].trim() }
-    : { korean: title, english: '' };
+  let depth = 0;
+  let splitIndex = -1;
+
+  for (let i = trimmed.length - 1; i >= 0; i--) {
+    if (trimmed[i] === ')') {
+      depth++;
+    } else if (trimmed[i] === '(') {
+      depth--;
+      if (depth === 0) {
+        splitIndex = i;
+        break;
+      }
+    }
+  }
+
+  if (splitIndex <= 0) {
+    return { korean: trimmed, english: '' };
+  }
+
+  const korean = trimmed.slice(0, splitIndex).trim();
+  const english = trimmed.slice(splitIndex + 1, -1).trim();
+
+  if (!korean) {
+    return { korean: trimmed, english: '' };
+  }
+
+  return { korean, english };
 };
 
 export interface GroupedLearnItem {

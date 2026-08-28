@@ -1,5 +1,5 @@
 ---
-title: "External Editor Plugins"
+title: "External Editor Plugins (AntD)"
 description: "Connect Ant Design or application-specific inputs as editor plugins and manage popup portals, multi-value commits, and the editor lifecycle."
 category: "interaction"
 order: 3
@@ -7,7 +7,7 @@ locale: "en"
 canonicalPath: "/en/learn/editor-plugins"
 demoId: "editor-plugins"
 features: ["editor-plugin", "defineEditorPlugin", "portal", "commit", "lifecycle"]
-relatedGuides: ["built-in-editors", "editor-icons", "lookup-editor", "editing-events"]
+relatedGuides: ["built-in-editors", "editor-plugins-shadcn", "editor-icons", "lookup-editor", "editing-events"]
 relatedApi: ["/en/api/props#columns", "/en/api/props#editable"]
 lastReviewedAt: "2026-08-21"
 indexable: true

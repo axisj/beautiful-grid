@@ -2,7 +2,7 @@
 title: "편집 이벤트와 트랜잭션 (Editing Events)"
 description: "editor 요청에서 onChangeValue 검증·보정, 다중 컬럼 commit, onChangeData 통지까지의 이벤트 흐름을 설명합니다."
 category: "interaction"
-order: 6
+order: 7
 locale: "ko"
 canonicalPath: "/learn/editing-events"
 demoId: "editing-events"

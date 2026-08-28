@@ -2,7 +2,7 @@
 title: "Autocomplete와 Lookup (Lookup Editor)"
 description: "같은 셀에서 자동완성 입력과 lookup 모달 아이콘을 함께 제공하고 여러 컬럼 값을 원자적으로 저장하는 방법을 설명합니다."
 category: "interaction"
-order: 5
+order: 6
 locale: "ko"
 canonicalPath: "/learn/lookup-editor"
 demoId: "lookup-editor"

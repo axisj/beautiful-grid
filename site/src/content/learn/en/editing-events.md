@@ -2,7 +2,7 @@
 title: "Editing Events and Transactions"
 description: "Understand the editing event flow from an editor request through onChangeValue validation and normalization, multi-column commits, and onChangeData notifications."
 category: "interaction"
-order: 6
+order: 7
 locale: "en"
 canonicalPath: "/en/learn/editing-events"
 demoId: "editing-events"

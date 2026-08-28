@@ -1,5 +1,5 @@
 ---
-title: "외부 에디터 플러그인 (Editor Plugins)"
+title: "외부 에디터 플러그인 (AntD) (Editor Plugins (AntD))"
 description: "Ant Design과 앱 전용 입력 컴포넌트를 plugin으로 연결하고 popup portal, 다중 변경 commit, 종료 수명주기를 관리하는 방법을 설명합니다."
 category: "interaction"
 order: 3
@@ -7,7 +7,7 @@ locale: "ko"
 canonicalPath: "/learn/editor-plugins"
 demoId: "editor-plugins"
 features: ["editor-plugin", "defineEditorPlugin", "portal", "commit", "lifecycle"]
-relatedGuides: ["built-in-editors", "editor-icons", "lookup-editor", "editing-events"]
+relatedGuides: ["built-in-editors", "editor-plugins-shadcn", "editor-icons", "lookup-editor", "editing-events"]
 relatedApi: ["/api/props#columns", "/api/props#editable"]
 lastReviewedAt: "2026-08-21"
 indexable: true

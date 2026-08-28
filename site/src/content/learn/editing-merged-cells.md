@@ -2,7 +2,7 @@
 title: "병합 셀 편집 (Merged Cell Editing)"
 description: "틀고정 없는 병합 셀과 frozen row·column 경계의 병합 셀을 편집하고 모든 실제 행을 함께 변경하는 규칙을 설명합니다."
 category: "interaction"
-order: 7
+order: 8
 locale: "ko"
 canonicalPath: "/learn/editing-merged-cells"
 demoId: "editing-merged-cells"

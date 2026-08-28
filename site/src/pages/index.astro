@@ -54,6 +54,27 @@ const englishCopy: Record<string, string> = {
   '집계': 'Aggregation',
   'Pivot과 Summary': 'Pivot and Summary',
   '반복되는 행을 그룹화하고 사용자 집계 결과를 읽기 좋은 구조로 만듭니다.': 'Group repeated rows and present custom aggregates in a readable structure.',
+  'AI 친화적 설계': 'AI-ready by design',
+  'AI가 이해하기 쉬운 그리드.': 'A grid AI can understand.',
+  '요구사항에서 구현까지, 맥락이 끊기지 않도록.': 'From intent to implementation, without losing context.',
+  '명확한 TypeScript API와 목적별 실행 예제, 공개된 문서가 같은 개념과 이름을 사용합니다. 특정 도구에 기대지 않아도 코딩 에이전트가 필요한 맥락을 찾고 검토 가능한 코드로 이어갈 수 있습니다.': 'A clear TypeScript API, task-focused runnable examples, and public documentation all share the same concepts and names. Coding agents can find the context they need and produce reviewable code without depending on a particular tool.',
+  '코딩 에이전트가 읽는 구현 브리프': 'Implementation brief for coding agents',
+  '맥락 연결됨': 'Context matched',
+  '요구사항': 'Request',
+  '부서별로 셀을 병합하고, 맨 아래에 합계 행을 추가해줘.': 'Merge cells by department and add a total row at the bottom.',
+  '타입 계약': 'Typed contract',
+  '가능한 속성과 데이터 구조를 타입으로 좁힙니다.': 'Types narrow the available props and data shape.',
+  '실행 예제': 'Runnable examples',
+  '비슷한 업무 흐름을 동작하는 코드에서 찾습니다.': 'Find a similar workflow in code that already runs.',
+  '공개 문서': 'Public context',
+  'API와 사용법을 같은 용어로 연결합니다.': 'Connect the API and usage through shared terminology.',
+  '검토 가능한 결과': 'Reviewable result',
+  '타입 확인': 'Type checked',
+  '예제 추적': 'Example traced',
+  '정확도는 마법이 아니라, 잘 정리된 맥락에서 나옵니다.': 'Accuracy comes from well-structured context, not magic.',
+  '타입·예제·문서를 함께 제공해 사람이 결과를 확인하고 다음 수정까지 이어갈 수 있는 기반을 만듭니다.': 'Types, examples, and documentation give people a clear basis to review the result and continue refining it.',
+  'AI용 프로젝트 컨텍스트 열기': 'Open project context for AI',
+  'API 문서 보기': 'View API reference',
 };
 
 const t = (ko: string, en?: string) => locale === 'en' ? (en ?? englishCopy[ko] ?? ko) : ko;
@@ -463,6 +484,98 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
 &lt;<span class="code-blue">BGrid</span> width=&#123;<span class="code-number">640</span>&#125; height=&#123;<span class="code-number">360</span>&#125; columns=&#123;columns&#125; data=&#123;rows&#125; rowKey=<span class="code-green">"id"</span> /&gt;</code></pre>
             </div>
           </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section ai-friendly-section" id="ai-friendly">
+      <div class="ai-orbit ai-orbit-one" aria-hidden="true"></div>
+      <div class="ai-orbit ai-orbit-two" aria-hidden="true"></div>
+      <div class="container ai-friendly-inner">
+        <div class="ai-heading">
+          <div>
+            <p class="eyebrow eyebrow-dark">{t('AI 친화적 설계', 'AI-ready by design')}</p>
+            <h2>{t('AI가 이해하기 쉬운 그리드.', 'A grid AI can understand.')}</h2>
+          </div>
+          <div class="ai-heading-copy">
+            <strong>{t('요구사항에서 구현까지, 맥락이 끊기지 않도록.', 'From intent to implementation, without losing context.')}</strong>
+            <p>{t('명확한 TypeScript API와 목적별 실행 예제, 공개된 문서가 같은 개념과 이름을 사용합니다. 특정 도구에 기대지 않아도 코딩 에이전트가 필요한 맥락을 찾고 검토 가능한 코드로 이어갈 수 있습니다.', 'A clear TypeScript API, task-focused runnable examples, and public documentation all share the same concepts and names. Coding agents can find the context they need and produce reviewable code without depending on a particular tool.')}</p>
+          </div>
+        </div>
+
+        <div class="ai-workbench">
+          <aside class="ai-context-panel" aria-label={t('AI 구현을 돕는 세 가지 맥락', 'Three context layers for AI implementation')}>
+            <div class="ai-context-head">
+              <span>CONTEXT / 03</span>
+              <i aria-hidden="true"></i>
+            </div>
+            <ol class="ai-context-list">
+              <li>
+                <span>01</span>
+                <div><strong>{t('타입 계약', 'Typed contract')}</strong><p>{t('가능한 속성과 데이터 구조를 타입으로 좁힙니다.', 'Types narrow the available props and data shape.')}</p></div>
+              </li>
+              <li>
+                <span>02</span>
+                <div><strong>{t('실행 예제', 'Runnable examples')}</strong><p>{t('비슷한 업무 흐름을 동작하는 코드에서 찾습니다.', 'Find a similar workflow in code that already runs.')}</p></div>
+              </li>
+              <li>
+                <span>03</span>
+                <div><strong>{t('공개 문서', 'Public context')}</strong><p>{t('API와 사용법을 같은 용어로 연결합니다.', 'Connect the API and usage through shared terminology.')}</p></div>
+              </li>
+            </ol>
+            <div class="ai-context-files" aria-label={t('AI가 참조할 수 있는 프로젝트 파일', 'Project files available as AI context')}>
+              <code>types.ts</code><code>examples/</code><code>llms.txt</code>
+            </div>
+          </aside>
+
+          <div class="ai-brief-window">
+            <header class="ai-window-bar">
+              <div class="ai-window-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+              <span>{t('코딩 에이전트가 읽는 구현 브리프', 'Implementation brief for coding agents')}</span>
+              <em><i aria-hidden="true"></i>{t('맥락 연결됨', 'Context matched')}</em>
+            </header>
+            <div class="ai-brief-body">
+              <div class="ai-request">
+                <span>{t('요구사항', 'Request')}</span>
+                <p>{t('부서별로 셀을 병합하고, 맨 아래에 합계 행을 추가해줘.', 'Merge cells by department and add a total row at the bottom.')}</p>
+              </div>
+
+              <div class="ai-context-route" aria-label={t('요구사항에 연결된 구현 맥락', 'Implementation context connected to the request')}>
+                <span><i aria-hidden="true">T</i><strong>BGridColumn&lt;Order&gt;</strong><small>{t('타입 계약', 'Typed contract')}</small></span>
+                <b aria-hidden="true">→</b>
+                <span><i aria-hidden="true">E</i><strong>cellMergeOptions</strong><small>{t('실행 예제', 'Runnable examples')}</small></span>
+                <b aria-hidden="true">→</b>
+                <span><i aria-hidden="true">D</i><strong>Summary</strong><small>{t('공개 문서', 'Public context')}</small></span>
+              </div>
+
+              <div class="ai-result">
+                <div class="ai-result-head">
+                  <span>{t('검토 가능한 결과', 'Reviewable result')}</span>
+                  <div><em>✓ {t('타입 확인', 'Type checked')}</em><em>✓ {t('예제 추적', 'Example traced')}</em></div>
+                </div>
+                <pre><code><span class="code-violet">const</span> merge = &#123;
+  columnsMap: &#123;
+    <span class="code-number">0</span>: &#123; mergeBy: <span class="code-green">'department'</span> &#125;,
+  &#125;,
+&#125;;
+
+&lt;<span class="code-blue">BGrid</span>
+  columns=&#123;columns&#125;
+  data=&#123;rows&#125;
+  cellMergeOptions=&#123;merge&#125;
+  summary=&#123;summary&#125;
+/&gt;</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ai-footer-note">
+          <div><strong>{t('정확도는 마법이 아니라, 잘 정리된 맥락에서 나옵니다.', 'Accuracy comes from well-structured context, not magic.')}</strong><p>{t('타입·예제·문서를 함께 제공해 사람이 결과를 확인하고 다음 수정까지 이어갈 수 있는 기반을 만듭니다.', 'Types, examples, and documentation give people a clear basis to review the result and continue refining it.')}</p></div>
+          <nav aria-label={t('AI 친화적 프로젝트 자료', 'AI-ready project resources')}>
+            <a href="/llms.txt">{t('AI용 프로젝트 컨텍스트 열기', 'Open project context for AI')} <span aria-hidden="true">↗</span></a>
+            <a href={localizePath('/api/props', locale)}>{t('API 문서 보기', 'View API reference')} <span aria-hidden="true">→</span></a>
+          </nav>
         </div>
       </div>
     </section>
@@ -1954,6 +2067,374 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   .code-number { color: #fbbf24; }
   .code-comment { color: #60728c; }
 
+  .ai-friendly-section {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 14% 16%, rgba(67, 97, 238, 0.22), transparent 29%),
+      radial-gradient(circle at 86% 80%, rgba(8, 145, 178, 0.16), transparent 28%),
+      #07101f;
+    color: #f8fbff;
+  }
+
+  .ai-friendly-section::before {
+    position: absolute;
+    z-index: -2;
+    inset: 0;
+    opacity: 0.28;
+    background-image:
+      linear-gradient(rgba(148, 163, 184, 0.09) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148, 163, 184, 0.09) 1px, transparent 1px);
+    background-size: 52px 52px;
+    content: '';
+    mask-image: linear-gradient(90deg, transparent 0, #000 24%, #000 76%, transparent 100%);
+    pointer-events: none;
+  }
+
+  .ai-friendly-section::after {
+    position: absolute;
+    z-index: -1;
+    right: 8%;
+    top: -170px;
+    width: 420px;
+    height: 420px;
+    border: 1px solid rgba(103, 232, 249, 0.12);
+    border-radius: 50%;
+    content: '';
+    box-shadow: 0 0 0 80px rgba(103, 232, 249, 0.018), 0 0 0 160px rgba(103, 232, 249, 0.012);
+  }
+
+  .ai-orbit {
+    position: absolute;
+    z-index: -1;
+    border: 1px solid rgba(96, 165, 250, 0.11);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .ai-orbit-one { right: -190px; bottom: -280px; width: 560px; height: 560px; }
+  .ai-orbit-two { left: -120px; top: 47%; width: 240px; height: 240px; }
+  .ai-friendly-inner { position: relative; }
+
+  .ai-heading {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 0.75fr);
+    align-items: end;
+    gap: clamp(48px, 8vw, 112px);
+    margin-bottom: clamp(42px, 5vw, 64px);
+  }
+
+  .ai-heading h2 {
+    max-width: 720px;
+    margin: 12px 0 0;
+    color: #f8fbff;
+    font-size: clamp(40px, 5vw, 64px);
+    font-weight: 850;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    word-break: keep-all;
+  }
+
+  .ai-heading-copy strong {
+    display: block;
+    color: #dce9f8;
+    font-size: 16px;
+    font-weight: 760;
+    line-height: 1.55;
+    word-break: keep-all;
+  }
+
+  .ai-heading-copy p {
+    margin: 12px 0 0;
+    color: #8fa1b8;
+    font-size: 14px;
+    line-height: 1.8;
+    word-break: keep-all;
+  }
+
+  .ai-workbench {
+    display: grid;
+    grid-template-columns: minmax(280px, 0.68fr) minmax(0, 1.32fr);
+    overflow: hidden;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 28px;
+    background: rgba(7, 17, 32, 0.76);
+    box-shadow:
+      0 48px 110px -66px rgba(38, 132, 255, 0.7),
+      inset 0 1px 0 rgba(255, 255, 255, 0.035);
+    backdrop-filter: blur(18px);
+  }
+
+  .ai-context-panel {
+    min-width: 0;
+    border-right: 1px solid rgba(148, 163, 184, 0.17);
+    padding: clamp(28px, 3.5vw, 44px);
+    background:
+      linear-gradient(180deg, rgba(44, 76, 138, 0.15), transparent 46%),
+      rgba(11, 23, 42, 0.82);
+  }
+
+  .ai-context-head,
+  .ai-window-bar,
+  .ai-result-head,
+  .ai-footer-note,
+  .ai-footer-note nav {
+    display: flex;
+    align-items: center;
+  }
+
+  .ai-context-head {
+    justify-content: space-between;
+    color: #7589a4;
+    font-family: var(--site-font-mono);
+    font-size: 13px;
+    font-weight: 760;
+    letter-spacing: 0.12em;
+  }
+
+  .ai-context-head i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #34d399;
+    box-shadow: 0 0 0 5px rgba(52, 211, 153, 0.1), 0 0 18px rgba(52, 211, 153, 0.6);
+  }
+
+  .ai-context-list {
+    display: grid;
+    gap: 0;
+    margin: 32px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ai-context-list li {
+    position: relative;
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 14px;
+    padding-bottom: 30px;
+  }
+
+  .ai-context-list li:not(:last-child)::after {
+    position: absolute;
+    left: 16px;
+    top: 37px;
+    width: 1px;
+    height: calc(100% - 40px);
+    background: linear-gradient(#345376, #1e3552);
+    content: '';
+  }
+
+  .ai-context-list li > span {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border: 1px solid #35577f;
+    border-radius: 10px;
+    background: #10243d;
+    color: #81b5f5;
+    font-family: var(--site-font-mono);
+    font-size: 13px;
+    font-weight: 820;
+  }
+
+  .ai-context-list strong { color: #dce7f5; font-size: 14px; }
+  .ai-context-list p { margin: 6px 0 0; color: #8294aa; font-size: 13px; line-height: 1.62; word-break: keep-all; }
+
+  .ai-context-files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    border-top: 1px solid rgba(148, 163, 184, 0.14);
+    padding-top: 22px;
+  }
+
+  .ai-context-files code {
+    border: 1px solid rgba(125, 211, 252, 0.16);
+    border-radius: 999px;
+    padding: 6px 9px;
+    background: rgba(14, 116, 144, 0.08);
+    color: #8cc7e8;
+    font-size: 13px;
+  }
+
+  .ai-brief-window {
+    min-width: 0;
+    margin: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 18px;
+    background: #0c1728;
+    box-shadow: 0 28px 64px -46px rgba(0, 0, 0, 0.9);
+  }
+
+  .ai-window-bar {
+    min-height: 46px;
+    gap: 14px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+    padding: 0 16px;
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  .ai-window-dots { display: flex; gap: 5px; }
+  .ai-window-dots i { width: 7px; height: 7px; border-radius: 50%; background: #40506a; }
+  .ai-window-dots i:nth-child(2) { background: #53627b; }
+  .ai-window-dots i:nth-child(3) { background: #2f6a67; }
+
+  .ai-window-bar > span {
+    min-width: 0;
+    overflow: hidden;
+    color: #8999ad;
+    font-family: var(--site-font-mono);
+    font-size: 13px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ai-window-bar > em {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 7px;
+    margin-left: auto;
+    color: #72d8b6;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 700;
+  }
+
+  .ai-window-bar > em i { width: 6px; height: 6px; border-radius: 50%; background: #34d399; }
+
+  .ai-brief-body { display: grid; gap: 18px; padding: clamp(22px, 3vw, 34px); }
+
+  .ai-request {
+    position: relative;
+    border: 1px solid rgba(96, 165, 250, 0.22);
+    border-radius: 14px 14px 14px 4px;
+    padding: 16px 18px;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.14), rgba(14, 165, 233, 0.06));
+  }
+
+  .ai-request > span,
+  .ai-result-head > span {
+    color: #7caee8;
+    font-family: var(--site-font-mono);
+    font-size: 13px;
+    font-weight: 780;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+
+  .ai-request p { margin: 8px 0 0; color: #e4edf8; font-size: 15px; font-weight: 680; line-height: 1.55; word-break: keep-all; }
+
+  .ai-context-route {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 9px;
+  }
+
+  .ai-context-route > span {
+    display: grid;
+    min-width: 0;
+    min-height: 78px;
+    grid-template-columns: 28px minmax(0, 1fr);
+    align-content: center;
+    gap: 3px 9px;
+    border: 1px solid rgba(148, 163, 184, 0.17);
+    border-radius: 12px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  .ai-context-route i {
+    display: grid;
+    width: 28px;
+    height: 28px;
+    grid-row: 1 / 3;
+    place-items: center;
+    border-radius: 8px;
+    background: #142b48;
+    color: #78b5ff;
+    font-family: var(--site-font-mono);
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 850;
+  }
+
+  .ai-context-route strong {
+    min-width: 0;
+    overflow: hidden;
+    color: #cbd8e8;
+    font-family: var(--site-font-mono);
+    font-size: 13px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ai-context-route small { color: #697d96; font-size: 13px; }
+  .ai-context-route > b { color: #3c5878; font-size: 13px; font-weight: 500; }
+
+  .ai-result {
+    overflow: hidden;
+    border: 1px solid rgba(52, 211, 153, 0.19);
+    border-radius: 14px;
+    background: #091421;
+  }
+
+  .ai-result-head {
+    min-height: 42px;
+    justify-content: space-between;
+    gap: 14px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+    padding: 0 14px;
+  }
+
+  .ai-result-head > span { color: #74d5b5; }
+  .ai-result-head > div { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+  .ai-result-head em {
+    border-radius: 999px;
+    padding: 4px 7px;
+    background: rgba(5, 150, 105, 0.09);
+    color: #7bcfb3;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 650;
+  }
+
+  .ai-result pre {
+    margin: 0;
+    overflow-x: auto;
+    border: 0;
+    border-radius: 0;
+    padding: 18px 20px 20px;
+    background: transparent !important;
+    color: #d2deec;
+    font-size: 13px;
+    line-height: 1.75;
+  }
+
+  .ai-footer-note {
+    justify-content: space-between;
+    gap: 40px;
+    margin-top: 28px;
+    border-top: 1px solid rgba(148, 163, 184, 0.14);
+    padding-top: 26px;
+  }
+
+  .ai-footer-note > div { max-width: 670px; }
+  .ai-footer-note strong { color: #dce7f5; font-size: 14px; }
+  .ai-footer-note p { margin: 7px 0 0; color: #7588a1; font-size: 13px; line-height: 1.65; word-break: keep-all; }
+  .ai-footer-note nav { flex-wrap: wrap; justify-content: flex-end; gap: 10px 20px; }
+  .ai-footer-note a { color: #9bd9f3; font-size: 13px; font-weight: 760; text-decoration: none; white-space: nowrap; }
+  .ai-footer-note a:last-child { color: #8fa7c3; }
+  .ai-footer-note a:hover { color: #ffffff; }
+
   .decision-card {
     position: relative;
     display: grid;
@@ -2233,6 +2714,11 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     .strength-card:nth-child(n) { grid-column: span 6; }
     .performance-layout { grid-template-columns: 1fr; }
     .performance-copy { max-width: 720px; }
+    .ai-heading { grid-template-columns: minmax(0, 0.9fr) minmax(340px, 0.8fr); gap: 48px; }
+    .ai-workbench { grid-template-columns: minmax(250px, 0.58fr) minmax(0, 1.42fr); }
+    .ai-context-panel { padding: 30px 26px; }
+    .ai-context-route { gap: 6px; }
+    .ai-context-route > span { padding: 10px; }
     .decision-card { grid-template-columns: 1fr; }
   }
 
@@ -2250,6 +2736,16 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     .quick-start-summary { max-width: 650px; }
     .quick-start-item { grid-template-columns: minmax(190px, 0.28fr) minmax(0, 1fr); }
     .quick-start-step { height: 96px; padding: 16px; }
+    .ai-heading { grid-template-columns: 1fr; align-items: start; gap: 22px; }
+    .ai-heading-copy { max-width: 680px; }
+    .ai-workbench { grid-template-columns: 1fr; }
+    .ai-context-panel { border-right: 0; border-bottom: 1px solid rgba(148, 163, 184, 0.17); }
+    .ai-context-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .ai-context-list li { grid-template-columns: 1fr; gap: 10px; padding: 0; }
+    .ai-context-list li:not(:last-child)::after { display: none; }
+    .ai-context-files { margin-top: 28px; }
+    .ai-footer-note { align-items: flex-start; flex-direction: column; gap: 18px; }
+    .ai-footer-note nav { justify-content: flex-start; }
     .final-cta-inner { align-items: flex-start; flex-direction: column; }
   }
 
@@ -2298,6 +2794,26 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     .quick-start-step strong { font-size: 13px; line-height: 1.35; }
     .quick-start-code-block pre { padding: var(--home-space-5) var(--home-space-4); font-size: 13px; }
     .quick-start-code-block-install pre { font-size: 14px; }
+    .ai-heading h2 { font-size: 38px; }
+    .ai-heading-copy strong { font-size: 15px; }
+    .ai-workbench { border-radius: 20px; }
+    .ai-context-panel { padding: 26px 20px; }
+    .ai-context-list { grid-template-columns: 1fr; gap: 0; }
+    .ai-context-list li { grid-template-columns: 34px minmax(0, 1fr); gap: 14px; padding-bottom: 24px; }
+    .ai-context-list li:not(:last-child)::after { display: block; }
+    .ai-context-files { margin-top: 0; }
+    .ai-brief-window { margin: 8px; border-radius: 15px; }
+    .ai-window-bar { padding-inline: 12px; }
+    .ai-window-bar > span { display: none; }
+    .ai-brief-body { gap: 14px; padding: 14px; }
+    .ai-request { padding: 14px; }
+    .ai-context-route { grid-template-columns: 1fr; gap: 7px; }
+    .ai-context-route > span { min-height: 68px; }
+    .ai-context-route > b { justify-self: center; transform: rotate(90deg); }
+    .ai-result-head { align-items: flex-start; flex-direction: column; padding-block: 12px; }
+    .ai-result-head > div { justify-content: flex-start; }
+    .ai-result pre { padding-inline: 14px; font-size: 13px; }
+    .ai-footer-note nav { align-items: flex-start; flex-direction: column; }
     .decision-card { padding: var(--home-space-5); }
     .decision-list { grid-template-columns: 1fr; }
     .decision-actions,

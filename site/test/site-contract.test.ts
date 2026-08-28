@@ -473,17 +473,56 @@ describe('site product and navigation contracts', () => {
     expect(homepage).not.toContain('complete the workflow in one screen.');
   });
 
-  it('explains the Apache-2.0 open-source promise without overstating community size', () => {
+  it('presents open source as verifiable adopter control without centering contribution', () => {
     const openSourcePage = readSiteFile('src/pages/open-source.astro');
 
     expect(productFacts.licenseName).toBe('Apache-2.0');
     expect(productFacts.openSource).toBe(true);
     expect(productFacts.commercialUse).toBe(true);
     expect(openSourcePage).toContain('OPEN SOURCE · APACHE-2.0');
-    expect(openSourcePage).toContain('상업적으로 사용하세요');
-    expect(openSourcePage).toContain('LICENSE RESPONSIBILITIES');
-    expect(openSourcePage).toContain('커뮤니티 규모를 과장하지 않습니다.');
-    expect(openSourcePage).toContain("productFacts.repositoryUrl + '/issues'");
+    expect(openSourcePage).toContain('<span>무료</span>로 시작하고,');
+    expect(openSourcePage).toContain('<span>자유</span>롭게 사용하세요.');
+    expect(openSourcePage).toContain('도입 전에는');
+    expect(openSourcePage).toContain('검증 가능하게.');
+    expect(openSourcePage).toContain('도입 후에도');
+    expect(openSourcePage).toContain('선택권이 남게.');
+    expect(openSourcePage).toContain('OPEN BY EVIDENCE');
+    expect(openSourcePage).toContain("t('보이는 신뢰.', 'Visible trust.')");
+    expect(openSourcePage).toContain('OUR POSITION');
+    expect(openSourcePage).toContain("t('열린 원칙.', 'Open principles.')");
+    expect(openSourcePage).toContain('FREEDOM WITHOUT DEPENDENCY');
+    expect(openSourcePage).toContain("t('계속되는 자유.', 'Freedom that lasts.')");
+    expect(openSourcePage).toContain('PRACTICAL LICENSE GUIDE');
+    expect(openSourcePage).toContain("t('자유의 경계.', 'Freedom, defined.')");
+    expect(openSourcePage).toContain('BUILT IN PUBLIC');
+    expect(openSourcePage).toContain("t('열린 과정.', 'An open process.')");
+    expect(openSourcePage).toContain("t('선택은 당신의 것.', 'The choice is yours.')");
+    expect(openSourcePage).toContain('공개는 참여를 요구하기 위한 장치가 아니라 제품을 검증할 수 있게 하는 약속입니다.');
+    expect(openSourcePage).not.toContain('class="open-contract"');
+    expect(openSourcePage.match(/기여 안내/g)).toHaveLength(1);
+    expect(openSourcePage.indexOf('기여 안내')).toBeGreaterThan(openSourcePage.indexOf('project-resources'));
+    expect(openSourcePage).not.toContain('<main class="open-source-page">');
+    expect(openSourcePage).toContain('<article class="open-source-page">');
+  });
+
+  it('links every open-source claim to a real project resource and keeps security reporting private', () => {
+    const openSourcePage = readSiteFile('src/pages/open-source.astro');
+
+    expect(productFacts.openSourceResources.source).toContain('/tree/main/beautiful-grid');
+    expect(productFacts.openSourceResources.tests).toContain('/blob/main/.github/workflows/tests.yml');
+    expect(productFacts.openSourceResources.releases).toContain('/blob/main/.github/workflows/publish-npm.yml');
+    expect(productFacts.openSourceResources.license).toContain('/blob/main/LICENSE');
+    expect(productFacts.openSourceResources.notice).toContain('/blob/main/NOTICE');
+    expect(productFacts.openSourceResources.trademark).toContain('/blob/main/TRADEMARK.md');
+    expect(productFacts.openSourceResources.security).toContain('/blob/main/SECURITY.md');
+    expect(openSourcePage).toContain('productFacts.openSourceResources.source');
+    expect(openSourcePage).toContain('productFacts.openSourceResources.tests');
+    expect(openSourcePage).toContain('productFacts.openSourceResources.releases');
+    expect(openSourcePage).toContain('productFacts.openSourceResources.license');
+    expect(openSourcePage).toContain('productFacts.openSourceResources.notice');
+    expect(openSourcePage).toContain('productFacts.openSourceResources.trademark');
+    expect(openSourcePage).toContain('productFacts.openSourceResources.security');
+    expect(openSourcePage).toContain('보안 취약점은 공개 이슈가 아닌 보안 정책의 비공개 절차로 알려주세요.');
   });
 
   it('curates example-backed homepage proof without an autoplay billboard', () => {

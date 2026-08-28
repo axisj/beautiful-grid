@@ -36,6 +36,9 @@ describe('site product and navigation contracts', () => {
     expect(header).toContain("href: productFacts.repositoryUrl, route: '', external: true");
     expect(header).toContain("import { GitFork } from 'lucide-react'");
     expect(header).toContain('<GitFork className="github-icon"');
+    expect(header).toContain("class:list={['nav-item', { active: isActive }]}");
+    expect(header).toContain("aria-current={isActive ? 'page' : undefined}");
+    expect(header).toContain(".primary-nav a.active");
     expect(header).not.toContain('class="header-actions desktop-only"');
   });
 

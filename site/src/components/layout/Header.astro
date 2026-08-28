@@ -10,6 +10,32 @@ interface Props { locale?: Locale; adaptiveLocale?: boolean; }
 const locale = normalizeLocale(Astro.props.locale);
 const adaptiveLocale = Astro.props.adaptiveLocale ?? false;
 const messages = commonMessages[locale];
+const pathname = Astro.url.pathname;
+const checkActive = (route: string) => {
+  if (!route) return false;
+  if (route === '/learn') {
+    return (
+      pathname === '/learn' ||
+      pathname.startsWith('/learn/') ||
+      pathname === '/en/learn' ||
+      pathname.startsWith('/en/learn/') ||
+      pathname.startsWith('/examples/') ||
+      pathname.startsWith('/demo/') ||
+      pathname.startsWith('/docs/')
+    );
+  }
+  if (route === '/api/props') {
+    return (
+      pathname === '/api/props' ||
+      pathname.startsWith('/api/') ||
+      pathname === '/en/api/props' ||
+      pathname.startsWith('/en/api/')
+    );
+  }
+  const localized = localizePath(route, locale);
+  return pathname === localized || pathname.startsWith(`${localized}/`);
+};
+
 const navigation = [
   { label: messages.guideExamples, koLabel: commonMessages.ko.guideExamples, enLabel: commonMessages.en.guideExamples, href: localizePath('/learn', locale), route: '/learn', external: false },
   { label: 'API', koLabel: 'API', enLabel: 'API', href: localizePath('/api/props', locale), route: '/api/props', external: false },
@@ -46,15 +72,25 @@ const navigation = [
     </a>
 
     <nav class="primary-nav desktop-only" aria-label={messages.primaryNavigation} data-shell-navigation="primary">
-      {navigation.map(item => (
-        <a href={item.href} data-shell-route={item.route || undefined} target={item.external ? '_blank' : undefined} rel={item.external ? 'noopener noreferrer' : undefined}>
-          <span class="nav-label">
-            {item.external && <GitFork className="github-icon" size={15} strokeWidth={2.2} aria-hidden="true" />}
-            <span data-shell-label data-ko={item.koLabel} data-en={item.enLabel}>{item.label}</span>
-          </span>
-          {item.external && <span aria-hidden="true">↗</span>}
-        </a>
-      ))}
+      {navigation.map(item => {
+        const isActive = !item.external && checkActive(item.route);
+        return (
+          <a
+            href={item.href}
+            class:list={['nav-item', { active: isActive }]}
+            data-shell-route={item.route || undefined}
+            aria-current={isActive ? 'page' : undefined}
+            target={item.external ? '_blank' : undefined}
+            rel={item.external ? 'noopener noreferrer' : undefined}
+          >
+            <span class="nav-label">
+              {item.external && <GitFork className="github-icon" size={15} strokeWidth={2.2} aria-hidden="true" />}
+              <span data-shell-label data-ko={item.koLabel} data-en={item.enLabel}>{item.label}</span>
+            </span>
+            {item.external && <span aria-hidden="true">↗</span>}
+          </a>
+        );
+      })}
     </nav>
 
     <div class="header-actions">
@@ -79,18 +115,19 @@ const navigation = [
   .brand-name { color: var(--site-text-primary); font-size: 19px; font-weight: 800; line-height: 1; letter-spacing: -0.03em; }
   .brand-name span { color: var(--site-accent-strong); }
   .version-badge { border: 1px solid var(--site-border); border-radius: 999px; padding: 2px 6px; background: var(--site-surface); color: var(--site-text-muted); font-family: var(--site-font-mono); font-size: 13px; font-weight: 700; }
-  .primary-nav { display: flex; align-items: center; gap: 21px; }
-  .primary-nav a { display: inline-flex; align-items: center; gap: 4px; color: var(--site-text-secondary); font-size: 13px; font-weight: 700; transition: color 150ms ease; white-space: nowrap; }
+  .primary-nav { display: flex; align-items: center; gap: 6px; }
+  .primary-nav a { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: var(--site-radius-sm, 8px); color: var(--site-text-secondary); font-size: 13px; font-weight: 700; line-height: 1.4; transition: color 150ms ease, background-color 150ms ease; white-space: nowrap; }
   .nav-label { display: inline-flex; align-items: center; gap: 6px; }
   :global(.github-icon) { display: block; width: 15px; height: 15px; flex: 0 0 auto; }
-  .primary-nav a:hover { color: var(--site-accent-strong); }
+  .primary-nav a:hover { color: var(--site-text-primary); background-color: var(--site-control-hover-bg, rgba(15, 23, 42, 0.05)); }
+  .primary-nav a.active { color: var(--site-accent-strong); background-color: var(--site-accent-soft); font-weight: 750; }
   .header-actions { display: flex; align-items: center; justify-content: flex-end; }
   .mobile-menu-btn { display: none; width: 40px; height: 40px; border: 1px solid var(--site-border); border-radius: 10px; padding: 9px; background: var(--site-control-bg); color: var(--site-text-primary); cursor: pointer; }
   .mobile-menu-btn span { display: block; width: 100%; height: 2px; margin: 3px 0; border-radius: 2px; background: currentColor; transition: transform 150ms ease, opacity 150ms ease; }
   .mobile-menu-btn[aria-expanded='true'] span:first-child { transform: translateY(5px) rotate(45deg); }
   .mobile-menu-btn[aria-expanded='true'] span:nth-child(2) { opacity: 0; }
   .mobile-menu-btn[aria-expanded='true'] span:last-child { transform: translateY(-5px) rotate(-45deg); }
-  @media (max-width: 1080px) { .primary-nav { gap: 15px; } .header-inner { gap: 14px; } }
+  @media (max-width: 1080px) { .primary-nav { gap: 4px; } .header-inner { gap: 14px; } }
   @media (max-width: 960px) { .header-inner { display: flex; justify-content: space-between; } .desktop-only, .desktop-preferences { display: none; } .mobile-menu-btn { display: block; } }
   @media (max-width: 420px) { .brand { gap: 7px; } .brand-lockup { gap: 7px; } .brand-symbol { width: 36px; height: 24px; } .brand-name { font-size: 17px; } .version-badge { display: none; } }
   @media (prefers-reduced-motion: reduce) { .site-header { transition: none; } }
@@ -121,6 +158,29 @@ const navigation = [
     document.querySelector('[data-shell-navigation="primary"]')?.setAttribute('aria-label', shellLocale === 'en' ? enPrimaryNavigation : koPrimaryNavigation);
     document.querySelector('[data-shell-navigation="mobile"]')?.setAttribute('aria-label', shellLocale === 'en' ? enMobileNavigation : koMobileNavigation);
   }
+
+  const updateActiveNav = () => {
+    const path = window.location.pathname;
+    document.querySelectorAll('.primary-nav [data-shell-route]').forEach((link) => {
+      const route = link.dataset.shellRoute;
+      if (!route) return;
+      let isActive = false;
+      if (route === '/learn') {
+        isActive = path === '/learn' || path.startsWith('/learn/') || path === '/en/learn' || path.startsWith('/en/learn/') || path.startsWith('/examples/') || path.startsWith('/demo/') || path.startsWith('/docs/');
+      } else if (route === '/api/props') {
+        isActive = path === '/api/props' || path.startsWith('/api/') || path === '/en/api/props' || path.startsWith('/en/api/');
+      } else {
+        isActive = path === route || path === `/en${route}` || path.startsWith(`${route}/`) || path.startsWith(`/en${route}/`);
+      }
+      link.classList.toggle('active', isActive);
+      if (isActive) {
+        link.setAttribute('aria-current', 'page');
+      } else {
+        link.removeAttribute('aria-current');
+      }
+    });
+  };
+  updateActiveNav();
 
   const button = document.querySelector('.mobile-menu-btn');
   const siteHeader = document.querySelector('.site-header');

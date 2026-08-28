@@ -10,28 +10,38 @@ const groupLabels: Record<string, string> = {
 };
 ---
 
-<aside class="api-sidebar" aria-label={isEn ? 'TypeScript API menu' : 'TypeScript API 메뉴'}>
-  <div class="api-sidebar-heading">
-    <a href={localizePath('/api/props', locale)}>TypeScript API</a>
-    <span>Public types</span>
+<aside class="api-sidebar" aria-label={isEn ? 'TypeScript API menu' : 'TypeScript API 메뉴'} data-api-sidebar>
+  <div class="sidebar-top-title">
+    <a href={localizePath('/api/props', locale)} class="overview-link">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+        <path d="M6 6h10"/>
+        <path d="M6 10h10"/>
+      </svg>
+      <span>TypeScript API</span>
+    </a>
   </div>
-  <label class="api-filter-label" for="api-type-filter">{isEn ? 'Find a type' : '타입 찾기'}</label>
-  <input id="api-type-filter" class="api-type-filter" type="search" placeholder={isEn ? 'e.g. BGridColumn' : '예: BGridColumn'} autocomplete="off" />
+
+  <div class="api-filter-container">
+    <label class="api-filter-label" for="api-type-filter">{isEn ? 'Find a type' : '타입 찾기'}</label>
+    <input id="api-type-filter" class="api-type-filter" type="search" placeholder={isEn ? 'e.g. BGridColumn' : '예: BGridColumn'} autocomplete="off" />
+  </div>
+
   <nav class="api-type-nav">
     {apiReferenceGroups.map(group => (
-      <section class="api-nav-group">
-        <h2>{isEn ? (groupLabels[group.id] ?? group.label) : group.label}</h2>
-        <ul>
+      <div class="sidebar-section api-nav-group">
+        <div class="sidebar-category-title">{isEn ? (groupLabels[group.id] ?? group.label) : group.label}</div>
+        <ul class="sidebar-nav-list">
           {group.entries.map(entry => (
             <li data-api-nav-item data-api-name={entry.name.toLowerCase()}>
-              <a href={`#${apiTypeId(entry.name)}`}>
-                <code>{entry.name}</code>
-                <span>{entry.kind}</span>
+              <a href={`#${apiTypeId(entry.name)}`} class="sidebar-item-link api-item-link">
+                <code class="sidebar-item-title-en">{entry.name}</code>
+                <span class="api-kind-badge">{entry.kind}</span>
               </a>
             </li>
           ))}
         </ul>
-      </section>
+      </div>
     ))}
   </nav>
 </aside>
@@ -49,4 +59,15 @@ const groupLabels: Record<string, string> = {
       group.hidden = Boolean(query) && !group.querySelector('[data-api-nav-item]:not([hidden])');
     });
   });
+
+  const updateActiveItem = () => {
+    const hash = window.location.hash.slice(1);
+    document.querySelectorAll<HTMLElement>('.api-item-link').forEach(link => {
+      const href = link.getAttribute('href') || '';
+      const isActive = hash && href === `#${hash}`;
+      link.classList.toggle('active', Boolean(isActive));
+    });
+  };
+  window.addEventListener('hashchange', updateActiveItem);
+  updateActiveItem();
 </script>

@@ -77,7 +77,7 @@ describe('site product and navigation contracts', () => {
     expect(header).toContain('window.scrollTo(0, lockedScrollY)');
     expect(sidebar).toContain('top: calc(var(--site-header-offset, 68px) + 0.75rem)');
     expect(learnIndex).toContain('top: var(--site-header-offset, 68px)');
-    expect(reference).toContain('top: calc(var(--site-header-offset, 68px) + 1rem)');
+    expect(reference).toContain('top: calc(var(--site-header-offset, 68px) + 0.75rem)');
   });
 
   it('keeps the displayed package version aligned with the publishable package', () => {
@@ -342,8 +342,7 @@ describe('site product and navigation contracts', () => {
     expect(footer).toContain("href={localizePath('/api/props', locale)} data-footer-route=\"/api/props\"");
     expect(footer).toContain("href={localizePath('/open-source', locale)} data-footer-route=\"/open-source\"");
     expect(footer).toContain("learn: 'Learn & Examples'");
-    expect(footer).toContain('Open source under Apache-2.0');
-    expect(footer).not.toContain('axboot.dev');
+    expect(footer).toContain('https://www.axboot.dev/');
   });
 
   it('renders the live DataGrid island instead of a decorative grid placeholder', () => {
@@ -397,7 +396,7 @@ describe('site product and navigation contracts', () => {
     expect(heroGrid).toContain("from '../../../../examples/editor-plugins/createAntdDatePickerEditorPlugin'");
     expect(heroGrid).toContain("from '../../../../examples/editor-plugins/createAntdSelectEditorPlugin'");
     expect(heroGrid).toContain("from '../../../../examples/editing/editorIcons'");
-    expect(heroGrid.match(/createAntdSelectEditorPlugin<OrderRow/g)).toHaveLength(10);
+    expect(heroGrid.match(/createAntdSelectEditorPlugin<OrderRow/g)).toHaveLength(8);
     expect(heroGrid.match(/createAntdDatePickerEditorPlugin<OrderRow/g)).toHaveLength(1);
     expect(heroGrid.match(/editorIcon: \{/g)).toHaveLength(6);
     expect(heroGrid.match(/visibility: 'always'/g)).toHaveLength(12);

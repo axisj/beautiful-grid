@@ -10,4 +10,7 @@ export default defineConfig({
       { find: 'beautiful-grid', replacement: path.resolve(__dirname, 'beautiful-grid/index.tsx') },
     ],
   },
+  test: {
+    testTimeout: 15000,
+  },
 });

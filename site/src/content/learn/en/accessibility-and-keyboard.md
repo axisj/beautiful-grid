@@ -8,7 +8,7 @@ canonicalPath: "/en/learn/accessibility-and-keyboard"
 features: ["accessibility", "keyboard", "cell-navigation", "row-selection", "cell-selection", "focus", "search", "context-menu", "row-reorder"]
 relatedGuides: ["cell-navigation", "editing", "search", "context-menu", "row-selection", "row-reorder", "focus"]
 relatedApi: ["/en/api/props#cellnavigationoptions", "/en/api/props#cellselectionoptions", "/en/api/props#searchoptions", "/en/api/props#contextmenuoptions", "/en/api/props#reorder", "/en/api/props#selectedrowkey"]
-lastReviewedAt: "2026-08-24"
+lastReviewedAt: "2026-08-29"
 indexable: true
 draft: false
 ---
@@ -65,9 +65,11 @@ If a custom `itemRender` or external editor plugin renders its own input, its im
 | Ctrl/Cmd + C | Copy selected cells as tab- and newline-delimited text | Multiple ranges are sorted into row and column order. Per-column `getClipboardText` and copy limits apply. |
 | Ctrl/Cmd + V | Paste tabular text starting at the active cell | Cell selection and editing must both be enabled. Read-only columns and deleted rows are skipped; column `parseClipboardText`, text-editor `parseValue`, `createRowOnPaste`, and paste limits apply. |
 
-Paste is handled through the browser's `paste` event rather than a separate `keydown` shortcut, so it follows the paste behavior allowed by the user's browser and operating system.
+Paste is handled through the browser's `paste` event rather than a separate `keydown` shortcut. The Grid accepts `text/plain`. Clipboard payloads that contain only images or files do not clear or otherwise mutate the active cell; the Grid ignores them and reports `unsupportedClipboardData` through `cellSelectionOptions.onPasteError`. An explicitly declared empty `text/plain` value can still clear a cell.
 
-The clipboard always carries `text/plain`, so it cannot automatically restore the original JavaScript type of arrays, objects, numbers, booleans, or dates. Use `getClipboardText` to define the copied representation and `parseClipboardText` to restore that text to the stored type. Without `parseClipboardText`, the Grid falls back to a text editor's `parseValue`; without either converter, it stores the pasted string as-is.
+`text/plain` cannot automatically restore the original JavaScript type of arrays, objects, numbers, booleans, or dates. Use `getClipboardText` to define the copied representation and `parseClipboardText` to restore that text to the stored type. Without `parseClipboardText`, the Grid falls back to a text editor's `parseValue`; without either converter, it stores the pasted string as-is.
+
+A merged cell is also one logical cell on the clipboard. Copying only that merged cell writes its anchor value once. When a selection also contains neighboring ordinary cells, merged continuation positions become empty TSV slots so the remaining row and column coordinates stay aligned. Pasting one value into a merged target applies the same value instance to every backing row. If multiple clipboard rows map to that target, identical strings are parsed once; conflicting strings report `mergedCellConflict` and leave the whole merged cell unchanged.
 
 ## 6. Search and context menu
 

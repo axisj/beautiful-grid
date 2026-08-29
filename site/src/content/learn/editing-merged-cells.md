@@ -9,7 +9,7 @@ demoId: "editing-merged-cells"
 features: ["cell-merge", "editing", "virtual-scroll", "frozen-row", "frozen-column", "atomic-commit"]
 relatedGuides: ["editing-events", "cell-merge", "frozen-columns"]
 relatedApi: ["/api/props#cellmergeoptions", "/api/props#frozenrowcount", "/api/props#frozencolumnindex"]
-lastReviewedAt: "2026-08-22"
+lastReviewedAt: "2026-08-29"
 indexable: true
 draft: false
 ---
@@ -54,6 +54,12 @@ onChangeValue: async ({ changes, rows, commit }) => {
 ```
 
 origin 컬럼의 병합 규칙만 행 범위를 결정합니다. 변경 목록에 다른 병합 컬럼이 포함되어도 범위를 연쇄 확장하지 않으며, 병합 key 자체를 바꾸더라도 저장 도중 범위를 다시 계산하지 않습니다. 대상 행 중 하나라도 유효하지 않으면 전체를 취소합니다.
+
+## 병합 셀 복사와 붙여넣기
+
+병합 셀 선택은 화면 높이 때문에 여러 실제 행을 포함하지만, 복사 결과에서는 하나의 논리 셀로 취급합니다. 병합 셀만 복사하면 canonical anchor의 `getClipboardText` 결과를 한 번만 기록합니다. 옆의 일반 셀까지 함께 선택한 경우에는 각 행의 열 위치를 보존해야 하므로 병합 셀의 두 번째 행부터 빈 TSV 칸을 기록합니다.
+
+붙여넣기도 병합 그룹 단위로 원자적으로 처리합니다. 하나의 클립보드 값을 병합 셀에 붙이면 `parseClipboardText`를 한 번만 실행하고 그 결과를 모든 실제 행에 적용합니다. 과거 방식처럼 행마다 배열을 새로 파싱하지 않으므로 배열·객체가 `mergeBy` 값일 때도 병합이 깨지지 않습니다. 여러 클립보드 행이 같은 병합 셀을 가리킬 때 문자열이 모두 같으면 중복을 접고, 하나라도 다르면 `onPasteError`의 `mergedCellConflict`로 보고하며 해당 병합 셀은 전혀 변경하지 않습니다.
 
 표시 목적의 일반 셀 병합 구성은 [셀 병합 가이드](/learn/cell-merge), frozen 레이아웃 설정은 [고정 컬럼과 행](/learn/frozen-columns)에서 확인하세요.
 

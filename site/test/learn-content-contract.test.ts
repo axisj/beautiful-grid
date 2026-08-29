@@ -69,6 +69,37 @@ describe('Learn Content Architecture Contracts', () => {
     expect(demoManifest['editor-plugins-shadcn'].sourceFiles).toContain('examples/editor-plugins/cascaderValue.ts');
   });
 
+  it('documents merged clipboard atomicity and unsupported payload handling in both locales', () => {
+    const accessibilityGuides = [
+      'accessibility-and-keyboard.md',
+      'en/accessibility-and-keyboard.md',
+    ].map(file => fs.readFileSync(path.join(learnDir, file), 'utf8'));
+    const mergedGuides = [
+      'editing-merged-cells.md',
+      'en/editing-merged-cells.md',
+    ].map(file => fs.readFileSync(path.join(learnDir, file), 'utf8'));
+    const publicTypes = fs.readFileSync(path.join(repositoryRoot, 'beautiful-grid/types.ts'), 'utf8');
+    const table = fs.readFileSync(path.join(repositoryRoot, 'beautiful-grid/components/Table.tsx'), 'utf8');
+    const homeGrid = fs.readFileSync(path.join(repositoryRoot, 'site/src/components/home/HomeHeroGrid.tsx'), 'utf8');
+
+    accessibilityGuides.forEach(guide => {
+      expect(guide).toContain('text/plain');
+      expect(guide).toContain('unsupportedClipboardData');
+      expect(guide).toContain('mergedCellConflict');
+    });
+    mergedGuides.forEach(guide => {
+      expect(guide).toContain('getClipboardText');
+      expect(guide).toContain('parseClipboardText');
+      expect(guide).toContain('mergedCellConflict');
+    });
+    expect(publicTypes).toContain("| 'unsupportedClipboardData'");
+    expect(publicTypes).toContain("| 'mergedCellConflict'");
+    expect(table).toContain('copiedLogicalCells');
+    expect(table).toContain('logicalResolutionData');
+    expect(homeGrid).toContain('getClipboardText: ({ value }) => formatCascaderClipboardText(value)');
+    expect(homeGrid).toContain('parseClipboardText: parseCascaderClipboardText');
+  });
+
   it('documents itemRender as a component and Canvas extension point', () => {
     const guide = fs.readFileSync(path.join(learnDir, 'item-render.md'), 'utf8');
     const example = fs.readFileSync(path.join(examplesDir, 'ItemRenderExample.tsx'), 'utf8');
@@ -134,7 +165,7 @@ describe('Learn Content Architecture Contracts', () => {
       'utf8',
     );
 
-    expect(guide).toContain('lastReviewedAt: "2026-08-24"');
+    expect(guide).toContain('lastReviewedAt: "2026-08-29"');
     expect(guide).toContain('Ctrl/Cmd + Home / End');
     expect(guide).toContain('Ctrl/Cmd + V');
     expect(guide).toContain('Context Menu 키 / Shift + F10');

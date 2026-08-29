@@ -9,7 +9,7 @@ demoId: "editing-merged-cells"
 features: ["cell-merge", "editing", "virtual-scroll", "frozen-row", "frozen-column", "atomic-commit"]
 relatedGuides: ["editing-events", "cell-merge", "frozen-columns"]
 relatedApi: ["/en/api/props#cellmergeoptions", "/en/api/props#frozenrowcount", "/en/api/props#frozencolumnindex"]
-lastReviewedAt: "2026-08-22"
+lastReviewedAt: "2026-08-29"
 indexable: true
 draft: false
 ---
@@ -54,6 +54,12 @@ onChangeValue: async ({ changes, rows, commit }) => {
 ```
 
 Only the merge rule of the originating column determines the row range. Adding another merged column to the change list does not expand the range transitively, and changing the merge key itself does not cause the range to be recalculated during the save. If any target row is invalid, the entire transaction is canceled.
+
+## Copying and pasting merged cells
+
+A merged-cell selection spans several backing rows for layout purposes, but copy treats it as one logical cell. Copying only that cell writes the canonical anchor's `getClipboardText` result once. If the selection also includes ordinary neighboring cells, continuation rows contain an empty TSV slot for the merged column so every other row and column stays aligned.
+
+Paste is atomic at the merge-group level. Pasting one clipboard value runs `parseClipboardText` once and assigns that same result to every backing row. This prevents arrays or objects used as `mergeBy` values from splitting because each row received a different parsed instance. If several clipboard rows map to the same merged target, identical strings collapse to one value. Any conflict reports `mergedCellConflict` through `onPasteError` and leaves the entire logical cell unchanged.
 
 For display-only merge configuration, see [Cell Merging](/en/learn/cell-merge). For frozen layout settings, see [Frozen Rows and Columns](/en/learn/frozen-columns).
 

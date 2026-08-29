@@ -5,6 +5,7 @@ import type { BGridColumn, BGridDataControl, BGridDataItem, BGridDataQuery } fro
 import { createAntdCascaderEditorPlugin } from '../../../../examples/editor-plugins/createAntdCascaderEditorPlugin';
 import { createAntdDatePickerEditorPlugin } from '../../../../examples/editor-plugins/createAntdDatePickerEditorPlugin';
 import { createAntdSelectEditorPlugin } from '../../../../examples/editor-plugins/createAntdSelectEditorPlugin';
+import { formatCascaderClipboardText, parseCascaderClipboardText } from '../../../../examples/editor-plugins/cascaderValue';
 import { CalendarIcon, ChevronDownIcon } from '../../../../examples/editing/editorIcons';
 import 'beautiful-grid/style.css';
 import '../../styles/datagrid-theme.css';
@@ -295,6 +296,8 @@ const columns: BGridColumn<OrderRow>[] = (
       toolbox: true,
       filter: { type: 'values' },
       itemRender: ({ value }) => (value as string[]).join(' / '),
+      getClipboardText: ({ value }) => formatCascaderClipboardText(value),
+      parseClipboardText: parseCascaderClipboardText,
     },
     {
       id: 'deliveryDate',

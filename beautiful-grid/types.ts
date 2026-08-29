@@ -688,7 +688,9 @@ export type BGridCellSelectionPasteErrorReason =
   | 'maxClipboardCells'
   | 'maxClipboardTextLength'
   | 'parseValueFailed'
-  | 'createRowFailed';
+  | 'createRowFailed'
+  | 'unsupportedClipboardData'
+  | 'mergedCellConflict';
 
 export interface BGridCellSelectionPasteError {
   reason: BGridCellSelectionPasteErrorReason;
@@ -696,6 +698,7 @@ export interface BGridCellSelectionPasteError {
   limit?: number;
   rowIndex?: number;
   columnIndex?: number;
+  clipboardTypes?: string[];
   clipboardTextLength: number;
   clipboardCellCount: number;
   maxClipboardCells: number;

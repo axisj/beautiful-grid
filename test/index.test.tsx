@@ -1123,6 +1123,44 @@ describe('BGrid cell selection', () => {
     expect(onChangeData).toHaveBeenLastCalledWith(1, 2, pasteData[1].values, expect.objectContaining({ key: 'status' }));
   });
 
+  it('clipboard payload types ignore image-only data while explicit plain text still pastes', async () => {
+    const pasteData = [{ values: { id: 1, name: 'one', status: 'ready' } }];
+    const onPasteError = vi.fn();
+    const { container } = render(
+      <BGrid<Row>
+        width={400}
+        height={140}
+        columns={columns}
+        data={pasteData}
+        editable
+        cellSelectionOptions={{ onPasteError }}
+      />,
+    );
+
+    dragSelect(getCell(container, 0, 1), getCell(container, 0, 1));
+    const imageGetData = vi.fn().mockReturnValue('');
+    fireEvent.paste(document, {
+      clipboardData: { types: ['Files', 'image/png'], getData: imageGetData },
+    });
+
+    expect(imageGetData).not.toHaveBeenCalled();
+    expect(pasteData[0].values.name).toBe('one');
+    expect(onPasteError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        reason: 'unsupportedClipboardData',
+        clipboardTypes: ['Files', 'image/png'],
+        clipboardCellCount: 0,
+      }),
+    );
+
+    fireEvent.paste(document, {
+      clipboardData: { types: ['text/plain'], getData: vi.fn().mockReturnValue('alpha') },
+    });
+
+    await waitFor(() => expect(getCell(container, 0, 1)).toHaveTextContent('alpha'));
+    expect(pasteData[0].values.name).toBe('alpha');
+  });
+
   it('skips read-only columns and removed rows while preserving new row status during paste', async () => {
     const pasteColumns: BGridColumn<Row>[] = [
       { key: 'id', label: 'ID', width: 100, editable: false },
@@ -1535,7 +1573,7 @@ describe('BGrid cell selection', () => {
     });
   });
 
-  it('includes the full row span when selecting a merged cell', async () => {
+  it('merged cell clipboard copy emits one logical value instead of one value per backing row', async () => {
     const writeText = mockClipboard();
 
     const mergeData = [
@@ -1562,7 +1600,32 @@ describe('BGrid cell selection', () => {
     fireEvent.keyDown(document, { key: 'c', metaKey: true });
 
     await waitFor(() => {
-      expect(writeText).toHaveBeenCalledWith('1\r2');
+      expect(writeText).toHaveBeenCalledWith('1');
+    });
+  });
+
+  it('merged cell clipboard copy preserves neighboring TSV rows with empty continuation slots', async () => {
+    const writeText = mockClipboard();
+    const mergeData = [
+      { values: { id: 1, name: 'group-a', status: 'ready' } },
+      { values: { id: 2, name: 'group-a', status: 'done' } },
+      { values: { id: 3, name: 'group-a', status: 'closed' } },
+    ];
+    const { container } = render(
+      <BGrid<Row>
+        width={400}
+        height={160}
+        columns={columns}
+        data={mergeData}
+        cellMergeOptions={{ columnsMap: { 0: { mergeBy: 'name' } } }}
+      />,
+    );
+
+    dragSelect(getCell(container, 0, 0), getCell(container, 2, 2));
+    fireEvent.keyDown(document, { key: 'c', ctrlKey: true });
+
+    await waitFor(() => {
+      expect(writeText).toHaveBeenCalledWith('1\tgroup-a\tready\r\tgroup-a\tdone\r\tgroup-a\tclosed');
     });
   });
 
@@ -1588,8 +1651,122 @@ describe('BGrid cell selection', () => {
     fireEvent.keyDown(document, { key: 'c', ctrlKey: true });
 
     await waitFor(() => {
-      expect(writeText).toHaveBeenCalledWith('1\r2\r3');
+      expect(writeText).toHaveBeenCalledWith('1\r3');
     });
+  });
+
+  it('merged cell clipboard paste deduplicates repeated source rows and updates the whole logical group', async () => {
+    interface MergedClipboardRow {
+      group: string;
+      path: string[];
+    }
+
+    const originalPath = ['metro', 'gyeonggi'];
+    const mergedData = Array.from({ length: 3 }, () => ({
+      values: { group: 'group-a', path: originalPath },
+    }));
+    const parseClipboardText = vi.fn((text: string) => JSON.parse(text) as string[]);
+    const mergedColumns: BGridColumn<MergedClipboardRow>[] = [
+      {
+        key: 'path',
+        label: 'Path',
+        width: 180,
+        editable: true,
+        itemRender: ({ value }) => <>{(value as string[]).join(' / ')}</>,
+        getClipboardText: ({ value }) => JSON.stringify(value),
+        parseClipboardText,
+      },
+    ];
+    const onChangeData = vi.fn();
+    const { container } = render(
+      <BGrid<MergedClipboardRow>
+        width={260}
+        height={160}
+        columns={mergedColumns}
+        data={mergedData}
+        editable
+        onChangeData={onChangeData}
+        cellMergeOptions={{ columnsMap: { 0: { mergeBy: 'path' } } }}
+      />,
+    );
+
+    const mergedCell = getCell(container, 0, 0);
+    expect(mergedCell.rowSpan).toBe(3);
+    dragSelect(mergedCell, mergedCell);
+    fireEvent.paste(document, {
+      clipboardData: {
+        types: ['text/plain'],
+        getData: vi.fn().mockReturnValue(
+          '["metro","seoul"]\r["metro","seoul"]\r["metro","seoul"]',
+        ),
+      },
+    });
+
+    await waitFor(() => expect(getCell(container, 0, 0)).toHaveTextContent('metro / seoul'));
+    expect(parseClipboardText).toHaveBeenCalledTimes(1);
+    expect(mergedData.map(item => item.values.path)).toEqual([
+      ['metro', 'seoul'],
+      ['metro', 'seoul'],
+      ['metro', 'seoul'],
+    ]);
+    expect(mergedData[1].values.path).toBe(mergedData[0].values.path);
+    expect(mergedData[2].values.path).toBe(mergedData[0].values.path);
+    expect(getCell(container, 0, 0).rowSpan).toBe(3);
+    expect(onChangeData).toHaveBeenCalledTimes(3);
+  });
+
+  it('merged cell clipboard paste rejects conflicting source values without a partial update', () => {
+    interface MergedClipboardRow {
+      group: string;
+      path: string[];
+    }
+
+    const originalPath = ['metro', 'gyeonggi'];
+    const mergedData = Array.from({ length: 3 }, () => ({
+      values: { group: 'group-a', path: originalPath },
+    }));
+    const parseClipboardText = vi.fn((text: string) => JSON.parse(text) as string[]);
+    const onPasteError = vi.fn();
+    const onChangeData = vi.fn();
+    const mergedColumns: BGridColumn<MergedClipboardRow>[] = [
+      {
+        key: 'path',
+        label: 'Path',
+        width: 180,
+        editable: true,
+        itemRender: ({ value }) => <>{(value as string[]).join(' / ')}</>,
+        parseClipboardText,
+      },
+    ];
+    const { container } = render(
+      <BGrid<MergedClipboardRow>
+        width={260}
+        height={160}
+        columns={mergedColumns}
+        data={mergedData}
+        editable
+        onChangeData={onChangeData}
+        cellSelectionOptions={{ onPasteError }}
+        cellMergeOptions={{ columnsMap: { 0: { mergeBy: 'path' } } }}
+      />,
+    );
+
+    const mergedCell = getCell(container, 0, 0);
+    dragSelect(mergedCell, mergedCell);
+    fireEvent.paste(document, {
+      clipboardData: {
+        types: ['text/plain'],
+        getData: vi.fn().mockReturnValue('["metro","seoul"]\r["metro","busan"]'),
+      },
+    });
+
+    expect(mergedData.every(item => item.values.path === originalPath)).toBe(true);
+    expect(parseClipboardText).not.toHaveBeenCalled();
+    expect(onChangeData).not.toHaveBeenCalled();
+    expect(onPasteError).toHaveBeenCalledWith(
+      expect.objectContaining({ reason: 'mergedCellConflict', rowIndex: 0, columnIndex: 0 }),
+    );
+    expect(getCell(container, 0, 0).rowSpan).toBe(3);
   });
 });
 

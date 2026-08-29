@@ -1274,6 +1274,7 @@ function Table<T>(props: Props<T>) {
       }
 
       const selectedCells = getSelectedCellMap(cellSelectionRanges, data.length, columns.length);
+      const copiedLogicalCells = new Set<string>();
       const rows: string[] = [];
       let textLength = 0;
       let copiedRowCount = 0;
@@ -1283,23 +1284,38 @@ function Table<T>(props: Props<T>) {
         if (!item) continue;
 
         const values: string[] = [];
+        let rowHasNewLogicalCell = false;
         const columnIndexes = Array.from(selectedCells.get(ri) ?? []).sort((a, b) => a - b);
         columnIndexes.forEach(ci => {
           const column = columns[ci];
           if (!column) return;
-          const value = getCellValueByRowKey(column.key, item.values);
+          const logicalCell = resolveLogicalCell(data, props.cellMergeOptions, { rowIndex: ri, columnIndex: ci });
+          const logicalCellKey = `${logicalCell.cell.rowIndex}:${ci}`;
+          if (copiedLogicalCells.has(logicalCellKey)) {
+            values.push('');
+            return;
+          }
+
+          copiedLogicalCells.add(logicalCellKey);
+          rowHasNewLogicalCell = true;
+          const logicalItem = data[logicalCell.cell.rowIndex] ?? item;
+          const value = getCellValueByRowKey(column.key, logicalItem.values);
           const clipboardValue = column.getClipboardText
             ? column.getClipboardText({
                 column,
-                index: ri,
+                index: logicalCell.cell.rowIndex,
                 columnIndex: ci,
-                item,
-                values: item.values,
+                item: logicalItem,
+                values: logicalItem.values,
                 value,
               })
             : value;
           values.push(toClipboardText(clipboardValue));
         });
+
+        // A selection expands to every backing row of a merged cell. Rows that
+        // contain only continuation slots do not represent another logical cell.
+        if (!rowHasNewLogicalCell) continue;
 
         const rowText = values.join('\t');
         const nextTextLength = textLength + rowText.length + (copiedRowCount > 0 ? 1 : 0);
@@ -1350,6 +1366,7 @@ function Table<T>(props: Props<T>) {
       cellSelectionRanges,
       columns,
       data,
+      props.cellMergeOptions,
       cellSelectionOptions?.maxClipboardCells,
       cellSelectionOptions?.maxClipboardTextLength,
       cellSelectionOptions?.onCopyError,
@@ -1357,7 +1374,7 @@ function Table<T>(props: Props<T>) {
   );
 
   const pasteClipboardText = useCallback(
-    (text: string) => {
+    (text: string, clipboardTypes: readonly string[] = []) => {
       if (!cellSelectionEnabled || !editable || !activeCell || data.length === 0 || columns.length === 0) {
         return false;
       }
@@ -1365,15 +1382,25 @@ function Table<T>(props: Props<T>) {
       const maxClipboardCells = cellSelectionOptions?.maxClipboardCells ?? DEFAULT_MAX_CLIPBOARD_CELLS;
       const maxClipboardTextLength =
         cellSelectionOptions?.maxClipboardTextLength ?? DEFAULT_MAX_CLIPBOARD_TEXT_LENGTH;
-      const matrix = parseClipboardText(text);
+      const normalizedClipboardTypes = clipboardTypes.map(type => type.toLowerCase());
+      const unsupportedClipboardData =
+        normalizedClipboardTypes.length > 0 && !normalizedClipboardTypes.includes('text/plain');
+      const matrix = unsupportedClipboardData ? [] : parseClipboardText(text);
       const clipboardCellCount = matrix.reduce((count, row) => count + row.length, 0);
       const onPasteError = cellSelectionOptions?.onPasteError;
       const notifyPasteError = (params: {
-        reason: 'maxClipboardCells' | 'maxClipboardTextLength' | 'parseValueFailed' | 'createRowFailed';
+        reason:
+          | 'maxClipboardCells'
+          | 'maxClipboardTextLength'
+          | 'parseValueFailed'
+          | 'createRowFailed'
+          | 'unsupportedClipboardData'
+          | 'mergedCellConflict';
         actual?: number;
         limit?: number;
         rowIndex?: number;
         columnIndex?: number;
+        clipboardTypes?: string[];
         error?: unknown;
       }) => {
         warnClipboardPasteFailed(params.reason, params.actual, params.limit);
@@ -1385,6 +1412,14 @@ function Table<T>(props: Props<T>) {
           maxClipboardTextLength,
         });
       };
+
+      if (unsupportedClipboardData) {
+        notifyPasteError({
+          reason: 'unsupportedClipboardData',
+          clipboardTypes: [...clipboardTypes],
+        });
+        return true;
+      }
 
       if (text.length > maxClipboardTextLength) {
         notifyPasteError({
@@ -1432,9 +1467,21 @@ function Table<T>(props: Props<T>) {
         }
       }
 
+      const logicalResolutionData = [...nextData];
+      const pasteTargets = new Map<
+        string,
+        {
+          canonicalRowIndex: number;
+          rowIndexes: number[];
+          columnIndex: number;
+          clipboardValue: string;
+          conflicted: boolean;
+        }
+      >();
+
       matrix.forEach((clipboardRow, rowOffset) => {
         const rowIndex = startRowIndex + rowOffset;
-        const item = nextData[rowIndex];
+        const item = logicalResolutionData[rowIndex];
         if (!item || item.status === BGridDataItemStatus.remove) return;
 
         clipboardRow.forEach((clipboardValue, columnOffset) => {
@@ -1442,58 +1489,119 @@ function Table<T>(props: Props<T>) {
           const column = columns[columnIndex];
           if (!column || column.editable === false) return;
 
-          const currentValue = getCellValueByRowKey(column.key, item.values);
-          let nextValue: unknown = clipboardValue;
-          const textEditorParser = column.editor?.type === 'text' ? column.editor.parseValue : undefined;
-          if (column.parseClipboardText || textEditorParser) {
-            try {
-              const context = {
-                index: rowIndex,
-                columnIndex,
-                item,
-                values: item.values,
-                column,
-                value: currentValue,
-                text: clipboardValue,
-              };
-              nextValue = column.parseClipboardText
-                ? column.parseClipboardText(clipboardValue, context)
-                : textEditorParser!(clipboardValue, context);
-            } catch (error) {
+          const logicalCell = resolveLogicalCell(logicalResolutionData, props.cellMergeOptions, {
+            rowIndex,
+            columnIndex,
+          });
+          if (
+            logicalCell.rowIndexes.some(
+              targetRowIndex =>
+                !logicalResolutionData[targetRowIndex] ||
+                logicalResolutionData[targetRowIndex].status === BGridDataItemStatus.remove,
+            )
+          ) {
+            return;
+          }
+
+          const targetKey = `${logicalCell.cell.rowIndex}:${columnIndex}`;
+          const existingTarget = pasteTargets.get(targetKey);
+          if (existingTarget) {
+            if (existingTarget.clipboardValue !== clipboardValue && !existingTarget.conflicted) {
+              existingTarget.conflicted = true;
               notifyPasteError({
-                reason: 'parseValueFailed',
-                rowIndex,
+                reason: 'mergedCellConflict',
+                rowIndex: logicalCell.cell.rowIndex,
                 columnIndex,
-                error,
               });
-              return;
             }
+            return;
           }
 
-          if (Object.is(currentValue, nextValue)) return;
-
-          setCellValueByRowKey(column.key, item.values, nextValue);
-          markCellEdited(item, column);
-          markCellValueChanged(item, column);
-          if (item.status !== BGridDataItemStatus.new) {
-            item.status = BGridDataItemStatus.edit;
-          }
-          changes.push({ rowIndex, columnIndex, item });
+          pasteTargets.set(targetKey, {
+            canonicalRowIndex: logicalCell.cell.rowIndex,
+            rowIndexes: logicalCell.rowIndexes,
+            columnIndex,
+            clipboardValue,
+            conflicted: false,
+          });
         });
       });
 
-      const pastedRowCount = Math.min(matrix.length, Math.max(nextData.length - startRowIndex, 0));
-      const pastedColumnCount = Math.min(
-        matrix.reduce((max, row) => Math.max(max, row.length), 0),
-        Math.max(columns.length - startColumnIndex, 0),
-      );
-      if (pastedRowCount > 0 && pastedColumnCount > 0) {
+      let selectionStartRowIndex = Number.POSITIVE_INFINITY;
+      let selectionEndRowIndex = Number.NEGATIVE_INFINITY;
+      let selectionStartColumnIndex = Number.POSITIVE_INFINITY;
+      let selectionEndColumnIndex = Number.NEGATIVE_INFINITY;
+
+      pasteTargets.forEach(target => {
+        if (target.conflicted) return;
+
+        const column = columns[target.columnIndex];
+        const item = nextData[target.canonicalRowIndex];
+        if (!column || !item) return;
+
+        const currentValue = getCellValueByRowKey(column.key, item.values);
+        let nextValue: unknown = target.clipboardValue;
+        const textEditorParser = column.editor?.type === 'text' ? column.editor.parseValue : undefined;
+        if (column.parseClipboardText || textEditorParser) {
+          try {
+            const context = {
+              index: target.canonicalRowIndex,
+              columnIndex: target.columnIndex,
+              item,
+              values: item.values,
+              column,
+              value: currentValue,
+              text: target.clipboardValue,
+            };
+            nextValue = column.parseClipboardText
+              ? column.parseClipboardText(target.clipboardValue, context)
+              : textEditorParser!(target.clipboardValue, context);
+          } catch (error) {
+            notifyPasteError({
+              reason: 'parseValueFailed',
+              rowIndex: target.canonicalRowIndex,
+              columnIndex: target.columnIndex,
+              error,
+            });
+            return;
+          }
+        }
+
+        selectionStartRowIndex = Math.min(selectionStartRowIndex, target.rowIndexes[0]);
+        selectionEndRowIndex = Math.max(selectionEndRowIndex, target.rowIndexes[target.rowIndexes.length - 1]);
+        selectionStartColumnIndex = Math.min(selectionStartColumnIndex, target.columnIndex);
+        selectionEndColumnIndex = Math.max(selectionEndColumnIndex, target.columnIndex);
+
+        // A merged target is one logical cell. Parse once, then assign the same
+        // value instance to every backing row so the merge remains intact.
+        target.rowIndexes.forEach(rowIndex => {
+          const targetItem = nextData[rowIndex];
+          if (!targetItem) return;
+          const targetCurrentValue = getCellValueByRowKey(column.key, targetItem.values);
+          if (Object.is(targetCurrentValue, nextValue)) return;
+
+          setCellValueByRowKey(column.key, targetItem.values, nextValue);
+          markCellEdited(targetItem, column);
+          markCellValueChanged(targetItem, column);
+          if (targetItem.status !== BGridDataItemStatus.new) {
+            targetItem.status = BGridDataItemStatus.edit;
+          }
+          changes.push({ rowIndex, columnIndex: target.columnIndex, item: targetItem });
+        });
+      });
+
+      if (
+        Number.isFinite(selectionStartRowIndex) &&
+        Number.isFinite(selectionEndRowIndex) &&
+        Number.isFinite(selectionStartColumnIndex) &&
+        Number.isFinite(selectionEndColumnIndex)
+      ) {
         setCellSelectionRanges([
           {
-            startRowIndex,
-            startColumnIndex,
-            endRowIndex: startRowIndex + pastedRowCount - 1,
-            endColumnIndex: startColumnIndex + pastedColumnCount - 1,
+            startRowIndex: selectionStartRowIndex,
+            startColumnIndex: selectionStartColumnIndex,
+            endRowIndex: selectionEndRowIndex,
+            endColumnIndex: selectionEndColumnIndex,
           },
         ]);
       }
@@ -1517,6 +1625,7 @@ function Table<T>(props: Props<T>) {
       columns,
       data,
       editable,
+      props.cellMergeOptions,
       cellSelectionOptions?.maxClipboardCells,
       cellSelectionOptions?.maxClipboardTextLength,
       cellSelectionOptions?.onPasteError,
@@ -2375,9 +2484,12 @@ function Table<T>(props: Props<T>) {
       }
       if (isInteractiveTarget(evt.target)) return;
 
-      const text = evt.clipboardData?.getData('text/plain');
-      if (text === undefined) return;
-      if (keyboardRuntimeRef.current.pasteClipboardText(text)) {
+      const clipboardData = evt.clipboardData;
+      if (!clipboardData) return;
+      const clipboardTypes = Array.from(clipboardData.types ?? []);
+      const hasDeclaredPlainText = clipboardTypes.some(type => type.toLowerCase() === 'text/plain');
+      const text = clipboardTypes.length > 0 && !hasDeclaredPlainText ? '' : clipboardData.getData('text/plain');
+      if (keyboardRuntimeRef.current.pasteClipboardText(text, clipboardTypes)) {
         evt.preventDefault();
       }
     };

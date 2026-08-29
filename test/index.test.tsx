@@ -1299,6 +1299,94 @@ describe('BGrid cell selection', () => {
     });
   });
 
+  it('round-trips structured values with column clipboard converters', async () => {
+    interface StructuredRow {
+      id: number;
+      path: string[];
+    }
+
+    const parseClipboardText = vi.fn((text: string) => JSON.parse(text) as string[]);
+    const structuredColumns: BGridColumn<StructuredRow>[] = [
+      { key: 'id', label: 'ID', width: 100, editable: false },
+      {
+        key: 'path',
+        label: 'Path',
+        width: 180,
+        editable: true,
+        itemRender: ({ value }) => <>{Array.isArray(value) ? value.join(' / ') : ''}</>,
+        getClipboardText: ({ value }) => JSON.stringify(value),
+        parseClipboardText,
+      },
+    ];
+    const structuredData = [
+      { values: { id: 1, path: ['domestic', 'seoul'] } },
+      { values: { id: 2, path: ['overseas', 'paris'] } },
+    ];
+    const { container } = render(
+      <BGrid<StructuredRow>
+        width={360}
+        height={140}
+        columns={structuredColumns}
+        data={structuredData}
+        editable
+      />,
+    );
+    const clipboardData = { setData: vi.fn() };
+
+    dragSelect(getCell(container, 0, 1), getCell(container, 0, 1));
+    fireEvent.copy(document, { clipboardData });
+    expect(clipboardData.setData).toHaveBeenCalledWith('text/plain', '["domestic","seoul"]');
+
+    dragSelect(getCell(container, 1, 1), getCell(container, 1, 1));
+    fireEvent.paste(document, {
+      clipboardData: { getData: vi.fn().mockReturnValue('["domestic","seoul"]') },
+    });
+
+    await waitFor(() => expect(getCell(container, 1, 1)).toHaveTextContent('domestic / seoul'));
+    expect(structuredData[1].values.path).toEqual(['domestic', 'seoul']);
+    expect(parseClipboardText).toHaveBeenCalledWith(
+      '["domestic","seoul"]',
+      expect.objectContaining({
+        text: '["domestic","seoul"]',
+        value: ['overseas', 'paris'],
+        index: 1,
+        columnIndex: 1,
+      }),
+    );
+  });
+
+  it('keeps the current value and reports an error when a column clipboard parser rejects text', async () => {
+    const parseClipboardText = vi.fn(() => {
+      throw new TypeError('invalid path');
+    });
+    const onPasteError = vi.fn();
+    const pasteData = [{ values: { id: 1, name: 'one', status: 'ready' } }];
+    const pasteColumns: BGridColumn<Row>[] = [
+      { key: 'id', label: 'ID', width: 100 },
+      { key: 'name', label: 'Name', width: 100, editable: true, parseClipboardText },
+    ];
+    const { container } = render(
+      <BGrid<Row>
+        width={300}
+        height={140}
+        columns={pasteColumns}
+        data={pasteData}
+        editable
+        cellSelectionOptions={{ onPasteError }}
+      />,
+    );
+
+    dragSelect(getCell(container, 0, 1), getCell(container, 0, 1));
+    fireEvent.paste(document, {
+      clipboardData: { getData: vi.fn().mockReturnValue('invalid') },
+    });
+
+    expect(pasteData[0].values.name).toBe('one');
+    expect(onPasteError).toHaveBeenCalledWith(
+      expect.objectContaining({ reason: 'parseValueFailed', rowIndex: 0, columnIndex: 1 }),
+    );
+  });
+
   it('auto-scrolls vertically and expands selection while dragging beyond the body edge', async () => {
     const writeText = mockClipboard();
     const largeData = Array.from({ length: 40 }, (_, idx) => ({

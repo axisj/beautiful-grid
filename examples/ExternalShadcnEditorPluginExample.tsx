@@ -8,6 +8,7 @@ import { createShadcnColorPickerEditorPlugin } from './editor-plugins/createShad
 import { createShadcnCascaderEditorPlugin } from './editor-plugins/createShadcnCascaderEditorPlugin';
 import { createShadcnTimePickerEditorPlugin } from './editor-plugins/createShadcnTimePickerEditorPlugin';
 import { createShadcnTreeSelectEditorPlugin } from './editor-plugins/createShadcnTreeSelectEditorPlugin';
+import { formatCascaderClipboardText, parseCascaderClipboardText } from './editor-plugins/cascaderValue';
 import { CalendarIcon, ChevronDownIcon, ClockIcon } from './editing/editorIcons';
 import {
   applyEditingDataChange,
@@ -167,6 +168,8 @@ export default function ExternalShadcnEditorPluginExample() {
         editable: true,
         editor: shadcnCategoryEditor,
         itemRender: ({ value }) => <>{Array.isArray(value) ? value.join(' / ') : ''}</>,
+        getClipboardText: ({ value }) => formatCascaderClipboardText(value),
+        parseClipboardText: parseCascaderClipboardText,
         editorIcon: { render: <ChevronDownIcon />, ariaLabel: 'Shadcn UI 분류 경로 선택' },
       },
       {

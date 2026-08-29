@@ -73,6 +73,7 @@ export const demoManifest: Record<string, DemoManifestItem> = {
       ...withContainerSources('ExternalEditorPluginExample.tsx'),
       ...editingIconSources,
       'examples/editor-plugins/antdEditorPlugins.css',
+      'examples/editor-plugins/cascaderValue.ts',
       'examples/editor-plugins/createAntdCascaderEditorPlugin.tsx',
       'examples/editor-plugins/createAntdColorPickerEditorPlugin.tsx',
       'examples/editor-plugins/createAntdDatePickerEditorPlugin.tsx',
@@ -88,6 +89,7 @@ export const demoManifest: Record<string, DemoManifestItem> = {
     sourceFiles: [
       ...withContainerSources('ExternalShadcnEditorPluginExample.tsx'),
       ...editingIconSources,
+      'examples/editor-plugins/cascaderValue.ts',
       'examples/editor-plugins/createShadcnSelectEditorPlugin.tsx',
       'examples/editor-plugins/createShadcnDatePickerEditorPlugin.tsx',
       'examples/editor-plugins/createShadcnColorPickerEditorPlugin.tsx',

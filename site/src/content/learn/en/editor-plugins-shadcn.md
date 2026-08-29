@@ -9,7 +9,7 @@ demoId: "editor-plugins-shadcn"
 features: ["editor-plugin", "defineEditorPlugin", "portal", "shadcn-ui", "popover", "radix-ui"]
 relatedGuides: ["editor-plugins", "built-in-editors", "editing-events", "editor-icons"]
 relatedApi: ["/en/api/props#columns", "/en/api/props#editable"]
-lastReviewedAt: "2026-08-28"
+lastReviewedAt: "2026-08-29"
 indexable: true
 draft: false
 ---
@@ -34,7 +34,7 @@ function ShadcnSelectEditor({
 
   return (
     <Select
-      defaultValue={value as string}
+      value={value == null ? undefined : String(value)}
       open={open}
       onOpenChange={nextOpen => {
         setOpen(nextOpen);
@@ -166,6 +166,28 @@ function ShadcnCascaderEditor({ value, column, commit, cancel, getPortalContaine
   );
 }
 ```
+
+### Cascader copy and paste
+
+Even though the Shadcn UI Cascader commits a `string[]`, the Grid clipboard carries only `text/plain`. The `Domestic / Seoul` output from `itemRender` is display-only. If paste does not restore the string to an array, the selected path disappears the next time the editor opens. The live example defines the following column contract:
+
+```tsx
+{
+  key: 'categoryPath',
+  editor: shadcnCategoryEditor,
+  itemRender: ({ value }) => <>{Array.isArray(value) ? value.join(' / ') : ''}</>,
+  getClipboardText: ({ value }) => JSON.stringify(value),
+  parseClipboardText: text => {
+    const parsed: unknown = JSON.parse(text);
+    if (!Array.isArray(parsed) || !parsed.every(segment => typeof segment === 'string')) {
+      throw new TypeError('Category path must be a JSON string array.');
+    }
+    return parsed;
+  },
+}
+```
+
+The copied `["Domestic","Seoul"]` becomes a `string[]` again on paste, so both the idle cell and Shadcn trigger display `Domestic / Seoul`. See [copy/paste value conversion in the AntD guide](/en/learn/editor-plugins#convert-values-for-copy-and-paste) for conversion precedence and validation rules across value types. Keep the three responsibilities separate: `itemRender` controls display, `getClipboardText` serializes, and `parseClipboardText` restores the stored type.
 
 ### TimePicker (Hour & Minute Selector)
 

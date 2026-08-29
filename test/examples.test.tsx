@@ -143,6 +143,59 @@ describe('demo examples render intended grid features', () => {
     });
   }, 15_000);
 
+  it('commits a Shadcn UI Select option before its popup closes', async () => {
+    const { container } = await renderExample(() => import('../examples/ExternalShadcnEditorPluginExample'));
+    const statusCell = container.querySelector(
+      'td[data-row-index="0"][data-column-index="2"]',
+    ) as HTMLTableCellElement;
+
+    expect(statusCell).toHaveTextContent('접수');
+    fireEvent.doubleClick(statusCell);
+
+    const option = await screen.findByRole('option', { name: '진행' });
+    fireEvent.pointerDown(option, { pointerType: 'mouse' });
+    fireEvent.pointerUp(option, { pointerType: 'mouse' });
+
+    await waitFor(() => {
+      expect(statusCell).toHaveTextContent('진행');
+      expect(container.querySelector('.bgrid-plugin-editor-host')).not.toBeInTheDocument();
+    });
+  }, 15_000);
+
+  it.each([
+    ['Ant Design', () => import('../examples/ExternalEditorPluginExample'), 'Ant Design 분류 경로 선택'],
+    ['Shadcn UI', () => import('../examples/ExternalShadcnEditorPluginExample'), 'Shadcn UI 분류 경로 선택'],
+  ])('%s Cascader preserves its array value after copying and pasting', async (_name, load, ariaLabel) => {
+    const { container } = await renderExample(load);
+    const sourceCell = container.querySelector(
+      'td[data-row-index="0"][data-column-index="5"]',
+    ) as HTMLTableCellElement;
+    const targetCell = container.querySelector(
+      'td[data-row-index="1"][data-column-index="5"]',
+    ) as HTMLTableCellElement;
+    const clipboardData = { setData: vi.fn() };
+
+    fireEvent.pointerDown(sourceCell, { button: 0 });
+    fireEvent.pointerUp(sourceCell);
+    fireEvent.copy(document, { clipboardData });
+    expect(clipboardData.setData).toHaveBeenCalledWith('text/plain', '["국내","서울"]');
+
+    fireEvent.pointerDown(targetCell, { button: 0 });
+    fireEvent.pointerUp(targetCell);
+    fireEvent.paste(document, {
+      clipboardData: { getData: vi.fn().mockReturnValue('["국내","서울"]') },
+    });
+
+    await waitFor(() => expect(targetCell).toHaveTextContent('국내 / 서울'));
+    fireEvent.doubleClick(targetCell);
+
+    await waitFor(() => {
+      const editor = container.querySelector(`[aria-label="${ariaLabel}"]`);
+      expect(editor).toBeInTheDocument();
+      expect(editor?.closest('.bgrid-cell-content')).toHaveTextContent('국내 / 서울');
+    });
+  }, 15_000);
+
   it('uses Ant Design autocomplete and confirms a radio-selected lookup row from the modal', async () => {
     const { container, getByLabelText } = await renderExample(() => import('../examples/LookupEditorExample'));
     const customerNameCell = container.querySelector(

@@ -63,9 +63,11 @@ If a custom `itemRender` or external editor plugin renders its own input, its im
 | Key | Action | Conditions and notes |
 |---|---|---|
 | Ctrl/Cmd + C | Copy selected cells as tab- and newline-delimited text | Multiple ranges are sorted into row and column order. Per-column `getClipboardText` and copy limits apply. |
-| Ctrl/Cmd + V | Paste tabular text starting at the active cell | Cell selection and editing must both be enabled. Read-only columns and deleted rows are skipped; `parseValue`, `createRowOnPaste`, and paste limits apply. |
+| Ctrl/Cmd + V | Paste tabular text starting at the active cell | Cell selection and editing must both be enabled. Read-only columns and deleted rows are skipped; column `parseClipboardText`, text-editor `parseValue`, `createRowOnPaste`, and paste limits apply. |
 
 Paste is handled through the browser's `paste` event rather than a separate `keydown` shortcut, so it follows the paste behavior allowed by the user's browser and operating system.
+
+The clipboard always carries `text/plain`, so it cannot automatically restore the original JavaScript type of arrays, objects, numbers, booleans, or dates. Use `getClipboardText` to define the copied representation and `parseClipboardText` to restore that text to the stored type. Without `parseClipboardText`, the Grid falls back to a text editor's `parseValue`; without either converter, it stores the pasted string as-is.
 
 ## 6. Search and context menu
 

@@ -1442,16 +1442,23 @@ function Table<T>(props: Props<T>) {
           const column = columns[columnIndex];
           if (!column || column.editable === false) return;
 
+          const currentValue = getCellValueByRowKey(column.key, item.values);
           let nextValue: unknown = clipboardValue;
-          if (column.editor?.type === 'text' && column.editor.parseValue) {
+          const textEditorParser = column.editor?.type === 'text' ? column.editor.parseValue : undefined;
+          if (column.parseClipboardText || textEditorParser) {
             try {
-              nextValue = column.editor.parseValue(clipboardValue, {
+              const context = {
                 index: rowIndex,
                 columnIndex,
                 item,
                 values: item.values,
                 column,
-              });
+                value: currentValue,
+                text: clipboardValue,
+              };
+              nextValue = column.parseClipboardText
+                ? column.parseClipboardText(clipboardValue, context)
+                : textEditorParser!(clipboardValue, context);
             } catch (error) {
               notifyPasteError({
                 reason: 'parseValueFailed',
@@ -1463,7 +1470,6 @@ function Table<T>(props: Props<T>) {
             }
           }
 
-          const currentValue = getCellValueByRowKey(column.key, item.values);
           if (Object.is(currentValue, nextValue)) return;
 
           setCellValueByRowKey(column.key, item.values, nextValue);

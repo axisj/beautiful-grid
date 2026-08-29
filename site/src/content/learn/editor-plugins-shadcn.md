@@ -9,7 +9,7 @@ demoId: "editor-plugins-shadcn"
 features: ["editor-plugin", "defineEditorPlugin", "portal", "shadcn-ui", "popover", "radix-ui"]
 relatedGuides: ["editor-plugins", "built-in-editors", "editing-events", "editor-icons"]
 relatedApi: ["/api/props#columns", "/api/props#editable"]
-lastReviewedAt: "2026-08-28"
+lastReviewedAt: "2026-08-29"
 indexable: true
 draft: false
 ---
@@ -34,7 +34,7 @@ function ShadcnSelectEditor({
 
   return (
     <Select
-      defaultValue={value as string}
+      value={value == null ? undefined : String(value)}
       open={open}
       onOpenChange={nextOpen => {
         setOpen(nextOpen);
@@ -166,6 +166,28 @@ function ShadcnCascaderEditor({ value, column, commit, cancel, getPortalContaine
   );
 }
 ```
+
+### Cascader 복사·붙여넣기
+
+Shadcn UI Cascader가 `string[]`을 commit하더라도 Grid 클립보드는 `text/plain`만 전달합니다. `itemRender`의 `국내 / 서울` 표시는 화면 전용이므로, 붙여넣기 문자열을 배열로 되돌리지 않으면 다음 editor 진입 때 선택 경로가 사라집니다. 라이브 예제는 컬럼에 다음 계약을 둡니다.
+
+```tsx
+{
+  key: 'categoryPath',
+  editor: shadcnCategoryEditor,
+  itemRender: ({ value }) => <>{Array.isArray(value) ? value.join(' / ') : ''}</>,
+  getClipboardText: ({ value }) => JSON.stringify(value),
+  parseClipboardText: text => {
+    const parsed: unknown = JSON.parse(text);
+    if (!Array.isArray(parsed) || !parsed.every(segment => typeof segment === 'string')) {
+      throw new TypeError('분류 경로는 JSON 문자열 배열이어야 합니다.');
+    }
+    return parsed;
+  },
+}
+```
+
+이렇게 하면 복사된 `["국내","서울"]`이 붙여넣기 시 다시 `string[]`가 되고, idle 셀과 Shadcn trigger가 모두 `국내 / 서울`을 표시합니다. 일반적인 값 타입별 변환 우선순위와 검증 규칙은 [AntD 예제의 복사·붙여넣기 값 변환](/learn/editor-plugins#복사붙여넣기-값-변환)을 참고하세요. 핵심은 `itemRender`는 화면 표시, `getClipboardText`는 직렬화, `parseClipboardText`는 타입 복원이라는 세 책임을 분리하는 것입니다.
 
 ### TimePicker (시간·분 선택)
 

@@ -26,16 +26,20 @@ export function createShadcnSelectEditorPlugin<T, Value extends string | number>
 ): BGridPluginEditorConfig<T> {
   function ShadcnSelectEditor({ value, column, commit, cancel, getPortalContainer }: BGridEditorPluginProps<T>) {
     const [open, setOpen] = React.useState(true);
+    const selectedValue = value == null ? undefined : String(value);
 
     return (
       <Select
-        defaultValue={value as string}
+        value={selectedValue}
         open={open}
         onOpenChange={nextOpen => {
           setOpen(nextOpen);
           if (!nextOpen) cancel();
         }}
-        onValueChange={nextValue => void commit([{ key: column.key, value: nextValue as Value }])}
+        onValueChange={nextValue => {
+          const selectedOption = options.options.find(option => String(option.value) === nextValue);
+          if (selectedOption) void commit([{ key: column.key, value: selectedOption.value }]);
+        }}
       >
         <SelectTrigger
           className="bgrid-shadcn-trigger border-0 focus:ring-0 rounded-none bg-transparent"
@@ -52,7 +56,7 @@ export function createShadcnSelectEditorPlugin<T, Value extends string | number>
         </SelectTrigger>
         <SelectContent container={getPortalContainer()}>
           {options.options.map(opt => (
-            <SelectItem key={opt.value} value={opt.value as string}>
+            <SelectItem key={opt.value} value={String(opt.value)}>
               {opt.label}
             </SelectItem>
           ))}

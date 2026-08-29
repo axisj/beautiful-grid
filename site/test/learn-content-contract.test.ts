@@ -45,6 +45,30 @@ describe('Learn Content Architecture Contracts', () => {
     expect(pluginGuide).toContain('](/learn/built-in-editors)');
   });
 
+  it('documents clipboard value conversion for plugin editors in both locales', () => {
+    const guides = [
+      'editor-plugins.md',
+      'en/editor-plugins.md',
+      'editor-plugins-shadcn.md',
+      'en/editor-plugins-shadcn.md',
+    ].map(file => fs.readFileSync(path.join(learnDir, file), 'utf8'));
+    const publicTypes = fs.readFileSync(path.join(repositoryRoot, 'beautiful-grid/types.ts'), 'utf8');
+    const antdExample = fs.readFileSync(path.join(examplesDir, 'ExternalEditorPluginExample.tsx'), 'utf8');
+    const shadcnExample = fs.readFileSync(path.join(examplesDir, 'ExternalShadcnEditorPluginExample.tsx'), 'utf8');
+
+    guides.forEach(guide => {
+      expect(guide).toContain('getClipboardText');
+      expect(guide).toContain('parseClipboardText');
+      expect(guide).toContain('JSON.parse');
+      expect(guide).toContain('itemRender');
+    });
+    expect(publicTypes).toContain('parseClipboardText?:');
+    expect(antdExample).toContain('parseClipboardText: parseCascaderClipboardText');
+    expect(shadcnExample).toContain('parseClipboardText: parseCascaderClipboardText');
+    expect(demoManifest['editor-plugins'].sourceFiles).toContain('examples/editor-plugins/cascaderValue.ts');
+    expect(demoManifest['editor-plugins-shadcn'].sourceFiles).toContain('examples/editor-plugins/cascaderValue.ts');
+  });
+
   it('documents itemRender as a component and Canvas extension point', () => {
     const guide = fs.readFileSync(path.join(learnDir, 'item-render.md'), 'utf8');
     const example = fs.readFileSync(path.join(examplesDir, 'ItemRenderExample.tsx'), 'utf8');

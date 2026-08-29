@@ -8,6 +8,7 @@ import { createAntdDatePickerEditorPlugin } from './editor-plugins/createAntdDat
 import { createAntdSelectEditorPlugin } from './editor-plugins/createAntdSelectEditorPlugin';
 import { createAntdTimePickerEditorPlugin } from './editor-plugins/createAntdTimePickerEditorPlugin';
 import { createAntdTreeSelectEditorPlugin } from './editor-plugins/createAntdTreeSelectEditorPlugin';
+import { formatCascaderClipboardText, parseCascaderClipboardText } from './editor-plugins/cascaderValue';
 import { CalendarIcon, ChevronDownIcon, ClockIcon } from './editing/editorIcons';
 import {
   applyEditingDataChange,
@@ -166,6 +167,8 @@ export default function ExternalEditorPluginExample() {
         editable: true,
         editor: antdCategoryEditor,
         itemRender: ({ value }) => <>{Array.isArray(value) ? value.join(' / ') : ''}</>,
+        getClipboardText: ({ value }) => formatCascaderClipboardText(value),
+        parseClipboardText: parseCascaderClipboardText,
         editorIcon: { render: <ChevronDownIcon />, ariaLabel: 'Ant Design 분류 경로 선택' },
       },
       {

@@ -165,6 +165,11 @@ export interface BGridCellClipboardTextParams<T> {
   value: any;
 }
 
+export interface BGridCellClipboardParseParams<T> extends BGridCellClipboardTextParams<T> {
+  /** Original text/plain value read from the clipboard for this cell. */
+  text: string;
+}
+
 export interface BGridSearchCellParams<T> {
   cell: BGridCellAddress;
   visibleIndex: number;
@@ -196,6 +201,12 @@ export interface BGridColumn<T> {
   editorIcon?: BGridEditorIconConfig<T>;
   onChangeValue?: (params: BGridChangeValueParams<T>) => void | Promise<void>;
   getClipboardText?: (params: BGridCellClipboardTextParams<T>) => any;
+  /**
+   * Restores text/plain clipboard input to the column's stored value type.
+   * Takes precedence over a built-in text editor's parseValue during multi-cell paste.
+   * Throw to keep the current cell value and report parseValueFailed through onPasteError.
+   */
+  parseClipboardText?: (text: string, params: BGridCellClipboardParseParams<T>) => unknown;
   searchable?: boolean;
   getSearchText?: (params: BGridSearchCellParams<T>) => unknown;
   editable?: boolean;

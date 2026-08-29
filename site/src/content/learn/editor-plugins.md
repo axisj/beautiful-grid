@@ -9,7 +9,7 @@ demoId: "editor-plugins"
 features: ["editor-plugin", "defineEditorPlugin", "portal", "commit", "lifecycle"]
 relatedGuides: ["built-in-editors", "editor-plugins-shadcn", "editor-icons", "lookup-editor", "editing-events"]
 relatedApi: ["/api/props#columns", "/api/props#editable"]
-lastReviewedAt: "2026-08-21"
+lastReviewedAt: "2026-08-29"
 indexable: true
 draft: false
 ---
@@ -138,6 +138,42 @@ Cascader는 마지막 항목만 저장하지 않고 선택된 전체 경로를 `
 ```
 
 라이브 예제의 여섯 어댑터는 셀의 `font`, `color`, 높이를 상속합니다. 외부 UI 라이브러리가 자체 글꼴 크기를 지정한다면 editor root와 선택 값 요소에 `font: inherit`을 적용하고, popup에도 `--bgrid-font-family`와 `--bgrid-font-size`를 전달하면 활성화 전후의 셀 스타일이 일관됩니다.
+
+## 복사·붙여넣기 값 변환
+
+클립보드는 editor의 React 값이 아니라 탭과 줄바꿈으로 구분된 `text/plain`만 전달합니다. 화면의 `itemRender`와 editor의 `defaultValue`는 클립보드 변환에 관여하지 않습니다. 따라서 `string[]`을 저장하는 Cascader처럼 문자열이 아닌 셀은 컬럼에서 복사와 붙여넣기의 양방향 계약을 정의해야 합니다.
+
+```tsx
+const categoryColumn: BGridColumn<Order> = {
+  key: 'categoryPath',
+  label: '분류',
+  width: 200,
+  editable: true,
+  editor: categoryEditor,
+  itemRender: ({ value }) => (
+    <>{Array.isArray(value) ? value.join(' / ') : ''}</>
+  ),
+  getClipboardText: ({ value }) => JSON.stringify(value),
+  parseClipboardText: text => {
+    const parsed: unknown = JSON.parse(text);
+    if (!Array.isArray(parsed) || !parsed.every(segment => typeof segment === 'string')) {
+      throw new TypeError('분류 경로는 JSON 문자열 배열이어야 합니다.');
+    }
+    return parsed;
+  },
+};
+```
+
+이 예제에서는 셀 표시만 `국내 / 서울`로 포맷하고, 클립보드에는 손실 없는 `["국내","서울"]`을 기록합니다. 붙여넣을 때 다시 `string[]`로 복원하므로 Ant Design Cascader의 `defaultValue`에도 같은 경로가 표시됩니다. 사람이 읽는 `국내 / 서울`을 복사 형식으로 사용하려면 경로 값에 `/`가 들어오는 경우까지 처리하는 escape 규칙과 유효성 검사를 직접 정의해야 합니다.
+
+변환 우선순위는 다음과 같습니다.
+
+1. 복사는 컬럼의 `getClipboardText`를 사용합니다. 없으면 문자열은 그대로, 숫자·불리언은 문자열, `Date`는 ISO 문자열, 배열·객체는 JSON으로 직렬화합니다.
+2. 붙여넣기는 컬럼의 `parseClipboardText`를 먼저 사용합니다. 이 API는 text·checkbox·plugin 여부와 관계없이 모든 editable 컬럼에 적용됩니다.
+3. 컬럼 parser가 없고 내장 text editor에 `parseValue`가 있으면 기존 parser를 사용합니다.
+4. 둘 다 없으면 클립보드 문자열을 그대로 저장합니다. 이 경우 구조화 값은 문자열로 바뀌어 editor 선택 표시가 사라질 수 있습니다.
+
+숫자는 `Number.isFinite(Number(text))`, 불리언은 허용할 토큰(`true`/`false`, `Y`/`N`)의 명시적 매핑, 날짜는 앱의 저장 포맷, enum은 option 목록 포함 여부를 각각 검증하세요. 배열·객체에는 JSON과 shape 검증을 권장합니다. parser가 예외를 던지면 해당 셀은 변경하지 않고 `cellSelectionOptions.onPasteError`에 `parseValueFailed`를 전달합니다. `parseClipboardText`의 두 번째 인자에서는 현재 `value`, 행 `values`, `item`, `index`, `columnIndex`, `column`, 원본 `text`를 확인할 수 있습니다.
 
 ## 여러 컬럼을 한 번에 저장
 

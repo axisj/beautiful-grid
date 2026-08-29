@@ -9,7 +9,7 @@ demoId: "editor-plugins"
 features: ["editor-plugin", "defineEditorPlugin", "portal", "commit", "lifecycle"]
 relatedGuides: ["built-in-editors", "editor-plugins-shadcn", "editor-icons", "lookup-editor", "editing-events"]
 relatedApi: ["/en/api/props#columns", "/en/api/props#editable"]
-lastReviewedAt: "2026-08-21"
+lastReviewedAt: "2026-08-29"
 indexable: true
 draft: false
 ---
@@ -138,6 +138,42 @@ Cascader commits the entire selected path as `string[]`, not just the last item.
 ```
 
 All six adapters in the live example inherit the cell's `font`, `color`, and height. If an external UI library specifies its own font size, apply `font: inherit` to the editor root and selected-value element. Also pass `--bgrid-font-family` and `--bgrid-font-size` to the popup so the cell remains visually consistent before and after activation.
+
+## Convert values for copy and paste
+
+The clipboard carries tab- and newline-delimited `text/plain`, not the editor's React value. Neither the cell's `itemRender` nor the editor's `defaultValue` participates in clipboard conversion. A non-string cell such as a Cascader that stores `string[]` must therefore define both directions of the column's clipboard contract.
+
+```tsx
+const categoryColumn: BGridColumn<Order> = {
+  key: 'categoryPath',
+  label: 'Category',
+  width: 200,
+  editable: true,
+  editor: categoryEditor,
+  itemRender: ({ value }) => (
+    <>{Array.isArray(value) ? value.join(' / ') : ''}</>
+  ),
+  getClipboardText: ({ value }) => JSON.stringify(value),
+  parseClipboardText: text => {
+    const parsed: unknown = JSON.parse(text);
+    if (!Array.isArray(parsed) || !parsed.every(segment => typeof segment === 'string')) {
+      throw new TypeError('Category path must be a JSON string array.');
+    }
+    return parsed;
+  },
+};
+```
+
+The example formats the cell as `Domestic / Seoul` but copies a lossless `["Domestic","Seoul"]`. Paste restores a `string[]`, so Ant Design Cascader receives the same path through `defaultValue`. If you prefer a human-readable path such as `Domestic / Seoul` on the clipboard, define escaping and validation for path values that may themselves contain `/`.
+
+Conversion follows this order:
+
+1. Copy uses the column's `getClipboardText`. Without it, strings remain unchanged, numbers and booleans become strings, `Date` becomes an ISO string, and arrays or objects are JSON-serialized.
+2. Paste first uses the column's `parseClipboardText`. It applies to every editable column, regardless of whether the editor is text, checkbox, or plugin based.
+3. If the column has no parser and its built-in text editor defines `parseValue`, the Grid uses that existing parser.
+4. Without either parser, the Grid stores the clipboard string as-is. A structured value can then become a string and disappear from the editor's selected-value display.
+
+Validate each domain explicitly: finite numbers with `Number.isFinite(Number(text))`, booleans through an allowed token map (`true`/`false` or `Y`/`N`), dates in the application's storage format, and enums against the option list. JSON plus shape validation is recommended for arrays and objects. If the parser throws, that cell remains unchanged and `cellSelectionOptions.onPasteError` receives `parseValueFailed`. The second `parseClipboardText` argument exposes the current `value`, row `values`, `item`, `index`, `columnIndex`, `column`, and original `text`.
 
 ## Save multiple columns at once
 

@@ -63,9 +63,11 @@ BeautifulGrid는 Canvas가 아니라 DOM 기반 테이블 요소로 셀을 렌�
 | 키 | 동작 | 조건·비고 |
 |---|---|---|
 | Ctrl/Cmd + C | 선택된 셀을 탭과 줄바꿈으로 구분한 텍스트로 복사 | 여러 선택 범위도 행·열 순서로 정렬해 복사합니다. 열별 `getClipboardText`와 복사 제한 옵션이 적용됩니다. |
-| Ctrl/Cmd + V | 활성 셀부터 표 형태 텍스트 붙여넣기 | 셀 선택과 편집이 모두 활성화되어야 합니다. 읽기 전용 열과 삭제 상태 행은 건너뛰며 `parseValue`, `createRowOnPaste`, 붙여넣기 제한 옵션을 적용합니다. |
+| Ctrl/Cmd + V | 활성 셀부터 표 형태 텍스트 붙여넣기 | 셀 선택과 편집이 모두 활성화되어야 합니다. 읽기 전용 열과 삭제 상태 행은 건너뛰며 컬럼의 `parseClipboardText`, text editor의 `parseValue`, `createRowOnPaste`, 붙여넣기 제한 옵션을 적용합니다. |
 
 붙여넣기는 별도 `keydown` 단축키가 아니라 브라우저의 `paste` 이벤트를 처리합니다. 따라서 사용자의 브라우저·운영체제가 허용한 붙여넣기 동작을 그대로 사용합니다.
+
+클립보드는 항상 `text/plain`이므로 배열·객체·숫자·불리언·날짜의 원래 JavaScript 타입을 자동으로 복원할 수 없습니다. `getClipboardText`로 복사 문자열을 정하고 `parseClipboardText`로 그 문자열을 저장 타입으로 되돌리세요. `parseClipboardText`가 없으면 text editor의 `parseValue`를 사용하고, 둘 다 없으면 붙여넣은 문자열을 그대로 저장합니다.
 
 ## 6. 검색과 컨텍스트 메뉴
 

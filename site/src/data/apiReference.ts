@@ -116,6 +116,10 @@ const typeMetadata: Record<string, { group: string; summary: string }> = {
     group: 'core',
     summary: 'getClipboardText에서 복사 문자열을 만들 때 사용하는 셀 컨텍스트입니다.',
   },
+  BGridCellClipboardParseParams: {
+    group: 'core',
+    summary: 'parseClipboardText에서 붙여넣기 문자열을 셀 값으로 복원할 때 사용하는 컨텍스트입니다.',
+  },
   AlignDirection: { group: 'core', summary: '셀 또는 헤더 콘텐츠의 가로 정렬 방향입니다.' },
   MoveDirection: { group: 'core', summary: '편집 중 다음 셀로 이동할 방향입니다.' },
   BGridProcessedRow: { group: 'data', summary: '정렬·필터 처리 후 원본 인덱스를 보존하는 처리 행입니다.' },
@@ -269,6 +273,7 @@ const memberDescriptions: Record<string, string> = {
   headerStyle: '헤더 셀에 적용할 React 인라인 스타일입니다.',
   itemRender: '셀 콘텐츠를 렌더링하는 React 컴포넌트입니다.',
   getClipboardText: '클립보드에 복사할 값을 반환합니다.',
+  parseClipboardText: '클립보드 문자열을 해당 컬럼에 저장할 셀 값으로 변환합니다.',
   searchable: '해당 컬럼을 Grid 검색 대상에 포함할지 설정합니다.',
   getSearchText: '렌더링된 DOM 대신 검색에 사용할 동기 문자열 값을 반환합니다.',
   editor: '내장 text 또는 plugin 셀 편집기를 연결합니다.',

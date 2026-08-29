@@ -1,28 +1,34 @@
 name: Publish npm Package
 
 on:
-  push:
-    tags:
-      - 'v*'
-
-permissions:
-  contents: read
-  id-token: write
+  workflow_dispatch:
 
 concurrency:
-  group: publish-npm-${{ github.ref }}
+  group: publish-npm
   cancel-in-progress: false
 
 jobs:
-  publish:
-    name: Verify and publish
+  prepare:
+    name: Verify release
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    environment: npm
+    permissions:
+      contents: read
+    outputs:
+      package_name: ${{ steps.release_meta.outputs.package_name }}
+      version: ${{ steps.release_meta.outputs.version }}
+      tag: ${{ steps.release_meta.outputs.tag }}
+      dist_tag: ${{ steps.release_meta.outputs.dist_tag }}
 
     steps:
-      - name: Check out release tag
+      - name: Check out selected revision
         uses: actions/checkout@v6
+
+      - name: Require the main branch
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "::error::Run this workflow from the main branch. Selected ref: ${GITHUB_REF}"
+          exit 1
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
@@ -31,18 +37,46 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           package-manager-cache: false
 
-      - name: Use an OIDC-compatible npm CLI
-        run: npm install --global npm@11
-
-      - name: Validate release tag
+      - name: Validate release metadata
+        id: release_meta
         run: |
           set -Eeuo pipefail
+
+          package_name="$(node -p "require('./package.json').name")"
           package_version="$(node -p "require('./package.json').version")"
-          tag_version="${GITHUB_REF_NAME#v}"
-          if [ "$package_version" != "$tag_version" ]; then
-            echo "::error::Tag ${GITHUB_REF_NAME} does not match package version ${package_version}."
+          release_tag="v${package_version}"
+
+          if git ls-remote --exit-code --tags origin "refs/tags/${release_tag}" >/dev/null 2>&1; then
+            echo "::error::Git tag ${release_tag} already exists. Bump package.json before starting a new release."
             exit 1
           fi
+
+          set +e
+          npm_view_output="$(npm view "${package_name}@${package_version}" version 2>&1)"
+          npm_view_status=$?
+          set -e
+
+          if [ "$npm_view_status" -eq 0 ]; then
+            echo "::error::${package_name}@${package_version} is already published. Bump package.json before starting a new release."
+            exit 1
+          fi
+
+          if ! grep -q "E404" <<< "$npm_view_output"; then
+            echo "::error::Unable to confirm that ${package_name}@${package_version} is unpublished."
+            echo "$npm_view_output"
+            exit 1
+          fi
+
+          if [[ "$package_version" == *-* ]]; then
+            npm_dist_tag="next"
+          else
+            npm_dist_tag="latest"
+          fi
+
+          echo "package_name=${package_name}" >> "$GITHUB_OUTPUT"
+          echo "version=${package_version}" >> "$GITHUB_OUTPUT"
+          echo "tag=${release_tag}" >> "$GITHUB_OUTPUT"
+          echo "dist_tag=${npm_dist_tag}" >> "$GITHUB_OUTPUT"
 
       - name: Install dependencies
         run: npm ci
@@ -53,16 +87,85 @@ jobs:
       - name: Build publishable package
         run: npm run build:library
 
-      - name: Select npm distribution tag
-        id: dist_tag
+      - name: Upload publishable package
+        uses: actions/upload-artifact@v6
+        with:
+          name: npm-package-${{ steps.release_meta.outputs.version }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  release:
+    name: Create GitHub Release
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+
+    steps:
+      - name: Create GitHub Release and version tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.prepare.outputs.tag }}
+          RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
         run: |
           set -Eeuo pipefail
-          package_version="$(node -p "require('./package.json').version")"
-          if [[ "$package_version" == *-* ]]; then
-            echo "name=next" >> "$GITHUB_OUTPUT"
-          else
-            echo "name=latest" >> "$GITHUB_OUTPUT"
+
+          release_args=(
+            --repo "$GITHUB_REPOSITORY"
+            --target "$GITHUB_SHA"
+            --generate-notes
+          )
+
+          if [[ "$RELEASE_VERSION" == *-* ]]; then
+            release_args+=(--prerelease --latest=false)
           fi
 
+          gh release create "$RELEASE_TAG" "${release_args[@]}"
+
+  publish:
+    name: Publish to npm
+    needs:
+      - prepare
+      - release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false
+
+      - name: Use an OIDC-compatible npm CLI
+        run: npm install --global npm@11
+
+      - name: Download publishable package
+        uses: actions/download-artifact@v7
+        with:
+          name: npm-package-${{ needs.prepare.outputs.version }}
+          path: dist
+
       - name: Publish with npm Trusted Publishing
-        run: npm publish ./dist --access public --tag "${{ steps.dist_tag.outputs.name }}"
+        run: npm publish ./dist --access public --tag "${{ needs.prepare.outputs.dist_tag }}"
+
+      - name: Verify published package and distribution tag
+        env:
+          PACKAGE_NAME: ${{ needs.prepare.outputs.package_name }}
+          PACKAGE_VERSION: ${{ needs.prepare.outputs.version }}
+          NPM_DIST_TAG: ${{ needs.prepare.outputs.dist_tag }}
+        run: |
+          set -Eeuo pipefail
+
+          published_version="$(npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version)"
+          dist_tag_version="$(npm view "$PACKAGE_NAME" "dist-tags.${NPM_DIST_TAG}")"
+
+          test "$published_version" = "$PACKAGE_VERSION"
+          test "$dist_tag_version" = "$PACKAGE_VERSION"

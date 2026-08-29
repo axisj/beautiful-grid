@@ -64,7 +64,7 @@ Library tsconfigs live in `tsconfigs/tsconfig.library.cjs.json`, `tsconfigs/tsco
 
 `npm run build:library` runs `scripts/create-dist-package-json.mjs` (`build:library:manifest`) to generate dist package metadata (`dist/package.json`) and copy `README.md`, `LICENSE`, `NOTICE`, and `TRADEMARK.md` into `dist/`.
 
-Auto publish is configured in `.github/workflows/publish-npm.yml`: push a `v*` tag whose version matches `package.json`. The workflow uses npm Trusted Publishing (OIDC), so configure `axisj/beautiful-grid` and `publish-npm.yml` as the package's trusted publisher before using it. Prereleases publish under the `next` dist-tag; stable versions publish under `latest`.
+Manual release publishing is configured in `.github/workflows/publish-npm.yml`. Update the version on `main` with `npm run release:rc` or `npm run release:set -- <version>`, commit and push the version files, then run **Publish npm Package** from the GitHub Actions UI on the `main` branch. The workflow verifies and builds the selected commit, creates the GitHub Release and version tag, and then publishes the same artifact to npm. It uses npm Trusted Publishing (OIDC), so configure `axisj/beautiful-grid`, `publish-npm.yml`, and the `npm` GitHub environment as the package's trusted publisher before using it. Prereleases publish under the `next` dist-tag; stable versions publish under `latest`. Do not create release tags locally.
 
 ## Key Conventions
 

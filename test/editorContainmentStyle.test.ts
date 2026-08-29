@@ -81,6 +81,12 @@ describe('Cell editor containment styles', () => {
 });
 
 describe('Editing example style contracts', () => {
+  it('keeps the lookup editor text and icon inset aligned with the idle cell', () => {
+    expect(lookupEditorCss).toMatch(
+      /td\.lookup-editor-customer-cell\.bgrid-cell-editing\s*>\s*\.bgrid-cell-content-plugin-editor\s*\{[^}]*padding:\s*0 6\.5px;/s,
+    );
+  });
+
   it('keeps Ant Design autocomplete typography and inset aligned with the idle cell', () => {
     expect(lookupEditorCss).toMatch(
       /\.ant-select-selector\s*\{[^}]*padding:\s*0 !important;[^}]*background:\s*transparent;[^}]*font:\s*inherit;/s,

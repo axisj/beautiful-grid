@@ -8,6 +8,14 @@
   line-height: inherit;
 }
 
+.bgrid-body-table
+  > tbody
+  > tr
+  > td.lookup-editor-customer-cell.bgrid-cell-editing
+  > .bgrid-cell-content-plugin-editor {
+  padding: 0 6.5px;
+}
+
 .lookup-editor-autocomplete.ant-select .ant-select-selector {
   height: 100% !important;
   min-height: 0 !important;

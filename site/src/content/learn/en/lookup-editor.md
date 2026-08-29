@@ -9,18 +9,18 @@ demoId: "lookup-editor"
 features: ["autocomplete", "lookup", "editorIcon", "multi-cell-commit"]
 relatedGuides: ["editor-plugins", "editor-icons", "editing-events"]
 relatedApi: ["/en/api/props#columns", "/en/api/props#onchangedata"]
-lastReviewedAt: "2026-08-21"
+lastReviewedAt: "2026-08-29"
 indexable: true
 draft: false
 ---
 
-FACEDM-style customer input can provide two entry paths in a single column. The cell area opens an Ant Design `AutoComplete` plugin, while the search icon in the same cell opens an Ant Design `Modal` containing a search bar and a single-selection DataGrid.
+FACEDM-style customer input can provide two entry paths in a single column. Double-clicking the cell label area opens an Ant Design `AutoComplete` plugin, while a single click on the search icon opens an Ant Design `Modal` containing a search bar and a single-selection DataGrid. A single click on the label only selects the cell, preventing an accidental autocomplete session when the user intends to use the lookup icon.
 
 ```tsx
 {
   key: 'customerName',
   editable: true,
-  editTrigger: 'click',
+  editTrigger: 'dblclick',
   editor: customerAutocompleteEditor,
   editorIcon: {
     render: <SearchIcon />,
@@ -44,6 +44,7 @@ FACEDM-style customer input can provide two entry paths in a single column. The 
 
 - `editor`: Handles text input, candidate lookup, and keyboard selection.
 - `editorIcon`: Opens the lookup modal and manages its lifecycle.
+- `editTrigger: 'dblclick'`: Keeps a single click on the label for cell selection and starts autocomplete editing on a double-click.
 - `commit(changes[])`: Sends either selection path through the same save transaction.
 - `onChangeValue`: Applies shared validation and normalization to values proposed by either path.
 

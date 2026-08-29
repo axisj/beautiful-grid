@@ -195,7 +195,8 @@ export default function LookupEditorExample() {
         label: '고객명 · 자동완성/lookup',
         width: 240,
         editable: true,
-        editTrigger: 'click',
+        className: 'lookup-editor-customer-cell',
+        editTrigger: 'dblclick',
         editor: customerAutocompleteEditor,
         editorIcon: {
           render: <SearchIcon />,
@@ -218,8 +219,9 @@ export default function LookupEditorExample() {
   return (
     <div className='relative flex min-h-0 flex-col gap-3'>
       <p className='m-0 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm leading-6 text-slate-700'>
-        고객명 셀을 클릭하면 Ant Design AutoComplete가 열리고, 같은 셀의 검색 아이콘은 검색과 단일 선택 그리드를 갖춘
-        Ant Design Modal을 엽니다. 고객을 확정하면 코드·이름·등급을 하나의 변경 목록으로 원자적으로 저장합니다.
+        고객명 라벨 영역을 더블클릭하면 Ant Design AutoComplete가 열리고, 같은 셀의 검색 아이콘을 한 번 클릭하면 검색과
+        단일 선택 그리드를 갖춘 Ant Design Modal을 엽니다. 고객을 확정하면 코드·이름·등급을 하나의 변경 목록으로
+        원자적으로 저장합니다.
       </p>
       <DataGridContainer ref={containerRef} style={{ height: 340 }}>
         <BGrid<EditingOrder>

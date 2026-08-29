@@ -204,6 +204,11 @@ describe('demo examples render intended grid features', () => {
 
     fireEvent.click(customerNameCell);
 
+    expect(container.querySelector('.lookup-editor-autocomplete.ant-select')).not.toBeInTheDocument();
+    expect(document.querySelector('.lookup-editor-autocomplete-popup.ant-select-dropdown')).not.toBeInTheDocument();
+
+    fireEvent.doubleClick(customerNameCell);
+
     await waitFor(() => {
       expect(container.querySelector('.lookup-editor-autocomplete.ant-select')).toBeInTheDocument();
       expect(document.querySelector('.lookup-editor-autocomplete-popup.ant-select-dropdown')).toBeInTheDocument();

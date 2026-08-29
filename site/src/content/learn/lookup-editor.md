@@ -9,18 +9,18 @@ demoId: "lookup-editor"
 features: ["autocomplete", "lookup", "editorIcon", "multi-cell-commit"]
 relatedGuides: ["editor-plugins", "editor-icons", "editing-events"]
 relatedApi: ["/api/props#columns", "/api/props#onchangedata"]
-lastReviewedAt: "2026-08-21"
+lastReviewedAt: "2026-08-29"
 indexable: true
 draft: false
 ---
 
-FACEDM 형태의 고객 입력은 두 진입 경로를 한 컬럼에 함께 구성할 수 있습니다. 셀 영역은 Ant Design `AutoComplete` plugin을 열고, 같은 셀의 검색 아이콘은 검색바와 단일 선택 DataGrid를 포함한 Ant Design `Modal`을 엽니다.
+FACEDM 형태의 고객 입력은 두 진입 경로를 한 컬럼에 함께 구성할 수 있습니다. 셀 라벨 영역을 더블클릭하면 Ant Design `AutoComplete` plugin을 열고, 같은 셀의 검색 아이콘을 한 번 클릭하면 검색바와 단일 선택 DataGrid를 포함한 Ant Design `Modal`을 엽니다. 단일 클릭은 셀 선택만 변경하므로 사용자가 lookup 아이콘을 누르려다 의도치 않게 자동완성 편집을 여는 일을 방지합니다.
 
 ```tsx
 {
   key: 'customerName',
   editable: true,
-  editTrigger: 'click',
+  editTrigger: 'dblclick',
   editor: customerAutocompleteEditor,
   editorIcon: {
     render: <SearchIcon />,
@@ -44,6 +44,7 @@ FACEDM 형태의 고객 입력은 두 진입 경로를 한 컬럼에 함께 구�
 
 - `editor`: 입력 문자열, 후보 조회, 키보드 선택을 담당합니다.
 - `editorIcon`: lookup 모달의 열기와 수명주기를 담당합니다.
+- `editTrigger: 'dblclick'`: 라벨 영역의 단일 클릭은 셀 선택에만 사용하고 더블클릭에서 자동완성 편집을 시작합니다.
 - `commit(changes[])`: 어느 경로에서 선택하든 동일한 저장 트랜잭션으로 보냅니다.
 - `onChangeValue`: 두 경로가 제안한 값을 공통으로 검증·보정합니다.
 

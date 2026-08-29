@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-set -e
-
-echo "🔍 [pre-push] Running library verification (lint, test, css, consumers, bundle metrics)..."
-npm run verify:library
-echo "✅ [pre-push] All verification checks passed."

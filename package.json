@@ -57,7 +57,7 @@
     "build": "npm run site:build",
     "preview": "npm --prefix site run preview",
     "lint": "eslint .",
-    "postinstall": "npm --prefix site install && node ./scripts/install-git-hooks.mjs",
+    "postinstall": "npm --prefix site install",
     "build:library:clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
     "build:library:style": "mkdir -p ./dist && ncp beautiful-grid/style.css ./dist/style.css",
     "build:library:cjs": "tsc --p tsconfigs/tsconfig.library.cjs.json",

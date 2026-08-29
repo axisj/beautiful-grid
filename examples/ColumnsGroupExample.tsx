@@ -43,7 +43,7 @@ const columnGroups: BGridColumnGroupNode[] = [
     children: [
       {
         id: 'order-customer',
-        label: '주문·고객 정보',
+        label: t('주문·고객 정보', 'Order/Customer Info'),
         children: [
           'orderNo',
           {
@@ -56,7 +56,7 @@ const columnGroups: BGridColumnGroupNode[] = [
       },
       {
         id: 'product-sales',
-        label: '상품·매출 정보',
+        label: t('상품·매출 정보', 'Product/Sales Info'),
         children: [
           {
             id: 'product-detail',
@@ -91,7 +91,7 @@ const initialColumns: BGridColumn<Order>[] = [
     label: t('단가', 'Unit Price'),
     width: 120,
     align: 'right',
-    itemRender: ({ value }) => <>{Number(value).toLocaleString()}원</>,
+    itemRender: ({ value }) => <>{Number(value).toLocaleString()}{t('원', 'KRW')}</>,
   },
   {
     id: 'total',
@@ -100,7 +100,7 @@ const initialColumns: BGridColumn<Order>[] = [
     width: 140,
     align: 'right',
     headerClassName: 'column-groups-header-total',
-    itemRender: ({ value }) => <strong>{Number(value).toLocaleString()}원</strong>,
+    itemRender: ({ value }) => <strong>{Number(value).toLocaleString()}{t('원', 'KRW')}</strong>,
   },
 ];
 
@@ -116,16 +116,16 @@ export default function ColumnsGroupExample() {
     <div className='flex min-h-0 flex-col gap-3'>
       <div className='flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700'>
         <label className='inline-flex items-center gap-2 font-medium'>
-          <span>틀고정 경계</span>
+          <span>{t('틀고정 경계', 'Freeze Boundary')}</span>
           <Select<number>
-            aria-label={t(t('틀고정 위치', 'Freeze Position'), 'Freeze Position')}
+            aria-label={t('틀고정 위치', 'Freeze Position')}
             style={{ minWidth: 210 }}
             value={frozenColumnIndex}
             options={[
               { value: 0, label: t('고정 없음', 'No Freeze') },
               ...columns.map((column, index) => ({
                 value: index + 1,
-                label: `${index + 1}개 · ${column.label} 뒤`,
+                label: t(`${index + 1}개 · ${column.label} 뒤`, `${index + 1} cols · After ${column.label}`),
               })),
             ]}
             onChange={setFrozenColumnIndex}
@@ -134,11 +134,10 @@ export default function ColumnsGroupExample() {
         <p className='m-0 text-slate-600' aria-live='polite'>
           {frozenColumnIndex > 0 && frozenBoundaryColumn ? (
             <>
-              앞쪽 {frozenColumnIndex}개 컬럼을 고정했습니다. <strong>{frozenBoundaryColumn.label}</strong> 뒤가
-              경계입니다.
+              {t('앞쪽', 'First')} {frozenColumnIndex}{t('개 컬럼을 고정했습니다.', ' columns are frozen. Boundary is after ')} <strong>{frozenBoundaryColumn.label}</strong>.
             </>
           ) : (
-            '현재는 고정 컬럼 없이 모든 컬럼이 함께 스크롤됩니다.'
+            t('현재는 고정 컬럼 없이 모든 컬럼이 함께 스크롤됩니다.', 'Currently all columns scroll together with no freeze.')
           )}
         </p>
       </div>

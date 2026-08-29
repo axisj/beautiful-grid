@@ -60,7 +60,7 @@ function CustomerAutocompleteEditor({ value, commit, cancel, getPortalContainer 
 
   return (
     <AutoComplete
-      aria-label={t(t('고객 자동완성', 'Customer Autocomplete'), 'Customer Autocomplete')}
+      aria-label={t('고객 자동완성', 'Customer Autocomplete')}
       autoFocus
       className='lookup-editor-autocomplete'
       classNames={{ popup: { root: 'lookup-editor-autocomplete-popup' } }}
@@ -136,11 +136,11 @@ function CustomerLookupModal({ lookup }: CustomerLookupModalProps) {
   return (
     <Modal
       open
-      title={t(t('고객 선택', 'Select Customer'), 'Select Customer')}
+      title={t('고객 선택', 'Select Customer')}
       width={720}
       className='lookup-editor-modal site-grid-theme'
-      okText={t(t('확인', 'Confirm'), 'Confirm')}
-      cancelText={t(t('취소', 'Cancelled'), 'Cancelled')}
+      okText={t('확인', 'Confirm')}
+      cancelText={t('취소', 'Cancelled')}
       okButtonProps={{ disabled: !selectedCode }}
       confirmLoading={confirming}
       onCancel={lookup.cancel}
@@ -150,8 +150,8 @@ function CustomerLookupModal({ lookup }: CustomerLookupModalProps) {
         <Input.Search
           allowClear
           autoFocus
-          aria-label={t(t('고객 검색', 'Search Customer'), 'Search Customer')}
-          placeholder='고객명, 고객 코드 또는 등급 검색'
+          aria-label={t('고객 검색', 'Search Customer')}
+          placeholder={t('고객명, 고객 코드 또는 등급 검색', 'Search customer name, code or grade')}
           value={query}
           onChange={event => setQuery(event.currentTarget.value)}
         />
@@ -173,7 +173,7 @@ function CustomerLookupModal({ lookup }: CustomerLookupModalProps) {
             }}
             onClick={({ item }) => setSelectedCode(item.customerCode)}
             variant='vertical-bordered'
-            msg={{ emptyList: '검색 결과가 없습니다.' }}
+            msg={{ emptyList: t('검색 결과가 없습니다.', 'No search results.') }}
           />
         </DataGridContainer>
       </div>
@@ -193,7 +193,7 @@ export default function LookupEditorExample() {
       { key: 'customerCode', label: t('고객 코드', 'Customer Code'), width: 130, editable: false },
       {
         key: 'customerName',
-        label: '고객명 · 자동완성/lookup',
+        label: t('고객명 · 자동완성/lookup', 'Customer Name · Autocomplete/Lookup'),
         width: 240,
         editable: true,
         className: 'lookup-editor-customer-cell',
@@ -201,7 +201,7 @@ export default function LookupEditorExample() {
         editor: customerAutocompleteEditor,
         editorIcon: {
           render: <SearchIcon />,
-          ariaLabel: ({ values }) => `${values.orderCode} 고객 lookup 열기`,
+          ariaLabel: ({ values }) => `${values.orderCode} ${t('고객 lookup 열기', 'Open customer lookup')}`,
           visibility: 'always',
           onClick: params => {
             setLookup(params);
@@ -220,9 +220,7 @@ export default function LookupEditorExample() {
   return (
     <div className='relative flex min-h-0 flex-col gap-3'>
       <p className='m-0 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm leading-6 text-slate-700'>
-        고객명 라벨 영역을 더블클릭하면 Ant Design AutoComplete가 열리고, 같은 셀의 검색 아이콘을 한 번 클릭하면 검색과
-        단일 선택 그리드를 갖춘 Ant Design Modal을 엽니다. 고객을 확정하면 코드·이름·등급을 하나의 변경 목록으로
-        원자적으로 저장합니다.
+        {t('고객명 라벨 영역을 더블클릭하면 Ant Design AutoComplete가 열리고, 같은 셀의 검색 아이콘을 한 번 클릭하면 검색과 단일 선택 그리드를 갖춘 Ant Design Modal을 엽니다. 고객을 확정하면 코드·이름·등급을 하나의 변경 목록으로 원자적으로 저장합니다.', 'Double-clicking the customer name label area opens the Ant Design AutoComplete, and clicking the search icon in the same cell opens the Ant Design Modal with search and single-select grid. Confirming the customer atomically saves the code, name, and level as a single change list.')}
       </p>
       <DataGridContainer ref={containerRef} style={{ height: 340 }}>
         <BGrid<EditingOrder>

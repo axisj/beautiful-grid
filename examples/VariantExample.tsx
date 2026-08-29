@@ -20,7 +20,7 @@ const categories = [t('하드웨어', 'Hardware'), t('소프트웨어', 'Softwar
 const data: BGridDataItem<SalesRow>[] = Array.from({ length: 30 }, (_, index) => ({
   values: {
     id: `ORD-${String(index + 1).padStart(3, '0')}`,
-    product: `상품 ${index + 1}`,
+    product: `${t('상품', 'Product')} ${index + 1}`,
     category: categories[index % categories.length],
     quantity: (index % 5) + 1,
     amount: 28000 + index * 3500,
@@ -37,12 +37,12 @@ const columns: BGridColumn<SalesRow>[] = [
     label: t('금액', 'Amount'),
     width: 140,
     align: 'right',
-    itemRender: ({ values }) => `${values.amount.toLocaleString('ko-KR')}원`,
+    itemRender: ({ values }) => `${values.amount.toLocaleString('ko-KR')}${t('원', 'KRW')}`,
   },
 ];
 
 const summaryColumns: NonNullable<BGridProps<SalesRow>['summary']>['columns'] = [
-  { columnIndex: 0, align: 'center', itemRender: () => <strong>합계</strong> },
+  { columnIndex: 0, align: 'center', itemRender: () => <strong>{t('합계', 'Total')}</strong> },
   {
     columnIndex: 3,
     align: 'right',
@@ -51,7 +51,7 @@ const summaryColumns: NonNullable<BGridProps<SalesRow>['summary']>['columns'] = 
   {
     columnIndex: 4,
     align: 'right',
-    itemRender: ({ data }) => `${data.reduce((sum, item) => sum + item.values.amount, 0).toLocaleString('ko-KR')}원`,
+    itemRender: ({ data }) => `${data.reduce((sum, item) => sum + item.values.amount, 0).toLocaleString('ko-KR')}${t('원', 'KRW')}`,
   },
 ];
 
@@ -69,12 +69,12 @@ export default function VariantExample() {
     <div className='flex min-h-0 flex-col gap-3'>
       <div className='flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700'>
         <div>
-          <strong className='block text-slate-900'>세로 구분선 Variant</strong>
-          <span className='text-xs text-slate-500'>본문과 하단 합계 행에서 세로 구분선의 표시 여부를 비교해 보세요.</span>
+          <strong className='block text-slate-900'>{t('세로 구분선 Variant', 'Vertical Border Variant')}</strong>
+          <span className='text-xs text-slate-500'>{t('본문과 하단 합계 행에서 세로 구분선의 표시 여부를 비교해 보세요.', 'Compare whether the vertical border is displayed in the body and bottom summary rows.')}</span>
         </div>
 
         <Segmented
-          aria-label={t(t('세로 구분선 variant 선택', 'Select Vertical Separator Variant'), 'Select Vertical Separator Variant')}
+          aria-label={t('세로 구분선 variant 선택', 'Select Vertical Separator Variant')}
           value={variant}
           options={variantOptions.map(({ value, label }) => ({ value, label }))}
           onChange={value => setVariant(value as GridVariant)}
@@ -82,7 +82,7 @@ export default function VariantExample() {
       </div>
 
       <p className='m-0 text-xs text-slate-500' aria-live='polite'>
-        현재 설정: <code>variant=&quot;{variant}&quot;</code> —{' '}
+        {t('현재 설정:', 'Current Setting:')} <code>variant=&quot;{variant}&quot;</code> —{' '}
         {variantOptions.find(option => option.value === variant)?.description}
       </p>
 

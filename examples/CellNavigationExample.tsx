@@ -55,7 +55,7 @@ export default function CellNavigationExample() {
       { key: 'orderNo', label: t('주문 번호', 'Order Number'), width: 110, editable: false },
       {
         key: 'customer',
-        label: '고객 · 편집 가능',
+        label: t('고객 · 편집 가능', 'Customer · Editable'),
         width: 170,
         editable: true,
         editor: {
@@ -64,10 +64,10 @@ export default function CellNavigationExample() {
           inputProps: { maxLength: 50, autoComplete: 'off' },
         },
       },
-      { key: 'category', label: '분류 · 병합', width: 110, editable: false },
+      { key: 'category', label: t('분류 · 병합', 'Category · Merged'), width: 110, editable: false },
       {
         key: 'product',
-        label: '상품 · 편집 가능',
+        label: t('상품 · 편집 가능', 'Product · Editable'),
         width: 180,
         editable: true,
         editor: {
@@ -84,7 +84,7 @@ export default function CellNavigationExample() {
         width: 110,
         align: 'right',
         editable: false,
-        itemRender: ({ value }) => <>{Number(value).toLocaleString()}원</>,
+        itemRender: ({ value }) => <>{Number(value).toLocaleString()}{t('원', 'KRW')}</>,
       },
       {
         key: 'total',
@@ -92,7 +92,7 @@ export default function CellNavigationExample() {
         width: 120,
         align: 'right',
         editable: false,
-        itemRender: ({ value }) => <strong>{Number(value).toLocaleString()}원</strong>,
+        itemRender: ({ value }) => <strong>{Number(value).toLocaleString()}{t('원', 'KRW')}</strong>,
       },
     ],
     [],
@@ -102,22 +102,21 @@ export default function CellNavigationExample() {
     <div className='flex min-h-0 flex-col gap-3'>
       <div className='rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700'>
         <div className='mb-2 flex flex-wrap items-center gap-x-4 gap-y-2'>
-          <Toggle label={t(t('키보드 이동', 'Keyboard Navigation'), 'Keyboard Navigation')} checked={navigationEnabled} onChange={setNavigationEnabled} />
-          <Toggle label={t(t('범위 선택', 'Select Range'), 'Select Range')} checked={selectionEnabled} onChange={setSelectionEnabled} />
-          <Toggle label={t(t('경계 순환', 'Boundary Circulation'), 'Boundary Circulation')} checked={wrap} onChange={setWrap} />
-          <Toggle label={t(t('Enter로 편집', 'Press Enter to edit'), 'Press Enter to edit')} checked={editOnEnter} onChange={setEditOnEnter} />
+          <Toggle label={t('키보드 이동', 'Keyboard Navigation')} checked={navigationEnabled} onChange={setNavigationEnabled} />
+          <Toggle label={t('범위 선택', 'Select Range')} checked={selectionEnabled} onChange={setSelectionEnabled} />
+          <Toggle label={t('경계 순환', 'Boundary Circulation')} checked={wrap} onChange={setWrap} />
+          <Toggle label={t('Enter로 편집', 'Press Enter to edit')} checked={editOnEnter} onChange={setEditOnEnter} />
         </div>
         <p className='m-0 leading-6'>
-          셀 클릭 후 <kbd>방향키</kbd>, <kbd>Home</kbd>/<kbd>End</kbd>, <kbd>PageUp</kbd>/<kbd>PageDown</kbd>,{' '}
-          <kbd>Tab</kbd>을 사용하세요. <kbd>Shift</kbd>+방향키는 범위를 확장합니다. 편집 가능한 셀에서는{' '}
-          <kbd>Enter</kbd> 또는 <kbd>F2</kbd>로 편집을 시작하고, 그 외 셀에서는 <kbd>Enter</kbd> 또는 <kbd>Space</kbd>로
-          클릭 콜백을 실행합니다.
+          {t('셀 클릭 후', 'After clicking a cell, use')} <kbd>{t('방향키', 'Arrow keys')}</kbd>, <kbd>Home</kbd>/<kbd>End</kbd>, <kbd>PageUp</kbd>/<kbd>PageDown</kbd>,{' '}
+          <kbd>Tab</kbd>{t('을 사용하세요. ', ' to navigate. ')} <kbd>Shift</kbd>{t('+방향키는 범위를 확장합니다. 편집 가능한 셀에서는', '+Arrow keys expand selection. In editable cells,')} {' '}
+          <kbd>Enter</kbd> {t('또는', 'or')} <kbd>F2</kbd>{t('로 편집을 시작하고, 그 외 셀에서는', ' start editing, and in other cells,')} <kbd>Enter</kbd> {t('또는', 'or')} <kbd>Space</kbd>{t('로 클릭 콜백을 실행합니다.', ' execute the click callback.')}
         </p>
         <output aria-live='polite' className='mt-2 block font-mono text-xs text-blue-700'>
-          활성 셀: 행 {activeCell.rowIndex + 1}, 열 {activeCell.columnIndex + 1}
+          {t('활성 셀: 행', 'Active Cell: Row')} {activeCell.rowIndex + 1}, {t('열', 'Col')} {activeCell.columnIndex + 1}
         </output>
         <output aria-live='polite' className='mt-1 block font-mono text-xs text-slate-600'>
-          마지막 클릭 활성화: {lastActivation}
+          {t('마지막 클릭 활성화:', 'Last Click Activation:')} {lastActivation}
         </output>
       </div>
 
@@ -146,7 +145,7 @@ export default function CellNavigationExample() {
             setData(current => applyEditingDataChange(current, rowIndex, values, meta));
           }}
           onClick={({ index, columnIndex, item, column }) => {
-            setLastActivation(`${item.orderNo} · 행 ${index + 1}, 열 ${columnIndex + 1} (${String(column.label)})`);
+            setLastActivation(`${item.orderNo} · ${t('행', 'Row')} ${index + 1}, ${t('열', 'Col')} ${columnIndex + 1} (${String(column.label)})`);
           }}
         />
       </DataGridContainer>

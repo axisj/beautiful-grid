@@ -93,9 +93,9 @@ const list = Array.from({ length: ROW_COUNT }, (_, index) => {
     values: {
       orderNo: `ORD-2026-${String(sequence).padStart(6, '0')}`,
       orderedAt: formatDateTime(orderedTimestamp),
-      customerName: `${companyNames[index % companyNames.length]} ${regions[(index * 3) % regions.length]} ${
+      customerName: t(`${companyNames[index % companyNames.length]} ${regions[(index * 3) % regions.length]} ${
         (index % 37) + 1
-      }호점`,
+      }호점`, `Branch ${index + 1}`),
       customerTier: customerTiers[(index * 5) % customerTiers.length],
       salesChannel: salesChannels[(index * 7) % salesChannels.length],
       region: regions[(index * 3) % regions.length],
@@ -185,7 +185,7 @@ const columns: BGridColumn<IOrderItem>[] = [
       align: 'right',
       toolbox: true,
       filter: { type: 'number' },
-      itemRender: ({ value }) => `${formatNumber(value)}원`,
+      itemRender: ({ value }) => t(`${formatNumber(value)}원`, `${formatNumber(value)} KRW`),
     },
     {
       id: 'grossAmount',
@@ -195,7 +195,7 @@ const columns: BGridColumn<IOrderItem>[] = [
       align: 'right',
       toolbox: true,
       filter: { type: 'number' },
-      itemRender: ({ value }) => `${formatNumber(value)}원`,
+      itemRender: ({ value }) => t(`${formatNumber(value)}원`, `${formatNumber(value)} KRW`),
     },
     {
       id: 'discountRate',
@@ -215,7 +215,7 @@ const columns: BGridColumn<IOrderItem>[] = [
       align: 'right',
       toolbox: true,
       filter: { type: 'number' },
-      itemRender: ({ value }) => `${formatNumber(value)}원`,
+      itemRender: ({ value }) => t(`${formatNumber(value)}원`, `${formatNumber(value)} KRW`),
     },
     {
       id: 'paymentMethod',
@@ -293,14 +293,10 @@ function ScrollExample() {
     (error: BGridCellSelectionCopyError) => {
       const description =
         error.reason === 'maxClipboardCells'
-          ? `선택된 셀이 ${formatNumber(error.actual)}개입니다. 최대 ${formatNumber(
-              error.limit,
-            )}개까지만 복사할 수 있습니다.`
+          ? `${t('선택된 셀이', 'Selected cells are')} ${formatNumber(error.actual)}${t('개입니다. 최대', 'ea. Up to')} ${formatNumber(error.limit)}${t('개까지만 복사할 수 있습니다.', 'ea can be copied.')}`
           : error.reason === 'maxClipboardTextLength'
-          ? `복사할 텍스트가 ${formatNumber(error.actual)}자입니다. 최대 ${formatNumber(
-              error.limit,
-            )}자까지만 복사할 수 있습니다.`
-          : '브라우저가 클립보드 복사를 거부했습니다.';
+          ? `${t('복사할 텍스트가', 'Text to copy is')} ${formatNumber(error.actual)}${t('자입니다. 최대', 'characters long. Up to')} ${formatNumber(error.limit)}${t('자까지만 복사할 수 있습니다.', 'characters can be copied.')}`
+          : t('브라우저가 클립보드 복사를 거부했습니다.', 'The browser denied copying to the clipboard.');
 
       notificationApi.warning({
         message: t('복사할 수 없습니다', 'Cannot copy'),
@@ -332,7 +328,7 @@ function ScrollExample() {
         }}
         onClick={item => console.log(item)}
         status={{
-          content: ({ visibleItems }) => `현재 ${formatNumber(visibleItems)}건 / 전체 ${formatNumber(ROW_COUNT)}건`,
+          content: ({ visibleItems }) => `${t('현재', 'Current')} ${formatNumber(visibleItems)}${t('건 / 전체', 'cases / Total')} ${formatNumber(ROW_COUNT)}${t('건', 'cases')}`,
         }}
         pagination={{ visible: false }}
       />

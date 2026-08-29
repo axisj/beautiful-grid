@@ -25,7 +25,7 @@ const dateEditor = createDateEditorPlugin<EditingOrder>({ id: 'icon-date' });
 
 export default function EditorIconExample() {
   const [data, setData] = React.useState(cloneEditingOrders);
-  const [lastAction, setLastAction] = React.useState('아이콘을 눌러 동작을 확인하세요.');
+  const [lastAction, setLastAction] = React.useState(t('아이콘을 눌러 동작을 확인하세요.', 'Click on the icon to check its behavior.'));
   const containerRef = React.useRef<HTMLDivElement>(null);
   const { width, height } = useContainerSize(containerRef);
 
@@ -60,7 +60,7 @@ export default function EditorIconExample() {
           ariaLabel: t('메모 확인 완료', 'Memo Checked'),
           visibility: 'active',
           onClick: async ({ index, commit }) => {
-            setLastAction(`${index + 1}행 메모에 확인 표시를 추가했습니다.`);
+            setLastAction(`${index + 1}${t('행 메모에 확인 표시를 추가했습니다.', ' row note check mark added.')}`);
             await commit([{ key: 'note', value: t('확인 완료', 'Confirmation Completed') }]);
           },
         },
@@ -72,8 +72,7 @@ export default function EditorIconExample() {
   return (
     <div className='flex min-h-0 flex-col gap-3'>
       <div className='rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm leading-6 text-slate-700'>
-        <code>onClick</code>이 없는 아이콘은 연결된 editor를 시작합니다. callback 아이콘은 editor 대신 자체 작업을 실행하며
-        동일한 <code>commit(changes[])</code>으로 값을 저장합니다.
+        <code>onClick</code>{t('이 없는 아이콘은 연결된 editor를 시작합니다. callback 아이콘은 editor 대신 자체 작업을 실행하며 동일한', ' icon without onClick will start the linked editor. The callback icon executes its own action instead of the editor and uses the same')} <code>commit(changes[])</code>{t('으로 값을 저장합니다.', ' to save the value.')}
         <output aria-live='polite' className='mt-1 block text-xs text-blue-700'>{lastAction}</output>
       </div>
       <DataGridContainer ref={containerRef} style={{ height: 340 }}>

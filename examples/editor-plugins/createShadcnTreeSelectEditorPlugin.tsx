@@ -8,6 +8,7 @@ import {
   PopoverTrigger,
 } from '../../components/ui/popover';
 import './shadcnEditorPlugins.css';
+import { t } from '../i18n';
 
 export interface TreeNode {
   title: string;
@@ -34,8 +35,8 @@ export function createShadcnTreeSelectEditorPlugin<T>(
     const [open, setOpen] = React.useState(true);
     const [searchQuery, setSearchQuery] = React.useState('');
     const [expandedGroups, setExpandedGroups] = React.useState<Record<string, boolean>>({
-      영업본부: true,
-      운영본부: true,
+      [t('영업본부', 'Sales Headquarters')]: true,
+      [t('운영본부', 'Operations Headquarters')]: true,
     });
 
     const toggleGroup = (title: string) => {
@@ -70,7 +71,7 @@ export function createShadcnTreeSelectEditorPlugin<T>(
           }
           return null;
         })
-        .filter((group): group is TreeNode => Boolean(group));
+        .filter(Boolean) as TreeNode[];
     }, [searchQuery]);
 
     return (
@@ -94,7 +95,7 @@ export function createShadcnTreeSelectEditorPlugin<T>(
               }
             }}
           >
-            <span className="truncate">{currentValue || '조직 선택'}</span>
+            <span className="truncate">{currentValue || t('조직 선택', 'Select Organization')}</span>
             <GitBranch className="h-4 w-4 opacity-50 shrink-0" />
           </button>
         </PopoverTrigger>
@@ -105,7 +106,7 @@ export function createShadcnTreeSelectEditorPlugin<T>(
         >
           <div className="flex flex-col gap-2">
             <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider dark:text-slate-400">
-              조직도 선택
+              {t('조직도 선택', 'Select Organization Chart')}
             </div>
 
             {/* Search filter */}
@@ -115,7 +116,7 @@ export function createShadcnTreeSelectEditorPlugin<T>(
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                placeholder="조직 검색..."
+                placeholder={t('조직 검색...', 'Search organization...')}
                 className="w-full bg-transparent text-xs outline-none border-0 p-0 text-slate-900 placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500"
               />
             </div>

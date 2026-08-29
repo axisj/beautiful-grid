@@ -82,7 +82,7 @@ export default function BuiltInEditorsExample() {
         editor: {
           type: 'checkbox',
           header: { ariaLabel: t('승인 권한 전체 선택', 'Select All Approval Permissions') },
-          ariaLabel: ({ values }) => `${values.orderCode} 승인 권한`,
+          ariaLabel: ({ values }) => `${values.orderCode} ${t('승인 권한', 'Approval Permission')}`,
           label: ({ value }) => (value ? t('허용', 'Allowed') : t('차단', 'Blocked')),
         },
       },
@@ -93,8 +93,7 @@ export default function BuiltInEditorsExample() {
   return (
     <div className='flex min-h-0 flex-col gap-3'>
       <p className='m-0 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm leading-6 text-slate-700'>
-        text와 checkbox는 라이브러리 내장 편집기이며 Select와 Date는 <code>beautiful-grid/editors</code>가 제공하는
-        의존성 없는 plugin입니다. 승인 권한 헤더의 checkbox로 현재 행을 한 번에 선택하거나 해제할 수 있습니다.
+        {t('text와 checkbox는 라이브러리 내장 편집기이며 Select와 Date는', 'Text and checkbox are built-in editors, while Select and Date are provided by')} <code>beautiful-grid/editors</code>{t('가 제공하는 의존성 없는 plugin입니다. 승인 권한 헤더의 checkbox로 현재 행을 한 번에 선택하거나 해제할 수 있습니다.', ' as dependency-free plugins. You can select or deselect all rows at once using the checkbox in the Approval Permission header.')}
       </p>
       <DataGridContainer ref={containerRef} style={{ height: 340 }}>
         <BGrid<EditingOrder>

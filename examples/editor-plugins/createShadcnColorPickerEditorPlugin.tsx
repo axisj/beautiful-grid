@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import * as React from 'react';
 import type { BGridEditorPluginProps, BGridPluginEditorConfig } from 'beautiful-grid';
 import { defineEditorPlugin } from 'beautiful-grid/editors';
@@ -105,7 +106,7 @@ export function createShadcnColorPickerEditorPlugin<T>(
         >
           <div className="flex flex-col gap-3">
             <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider dark:text-slate-400">
-              색상 팔레트
+              {t('색상 팔레트', 'Color Palette')}
             </div>
 
             {/* Color Swatch Grid */}
@@ -119,7 +120,7 @@ export function createShadcnColorPickerEditorPlugin<T>(
                     onClick={() => handleSelectColor(color)}
                     style={{ backgroundColor: color }}
                     className="relative flex h-8 w-full items-center justify-center rounded-md border border-black/10 shadow-sm transition-transform hover:scale-105 active:scale-95 cursor-pointer dark:border-white/10"
-                    aria-label={`색상 ${color}`}
+                    aria-label={`${t('색상', 'Color')} ${color}`}
                   >
                     {isSelected && (
                       <Check
@@ -134,7 +135,7 @@ export function createShadcnColorPickerEditorPlugin<T>(
 
             {/* Custom HEX Input */}
             <form onSubmit={handleApplyCustom} className="flex flex-col gap-1.5 border-t border-slate-100 pt-2 dark:border-slate-800">
-              <span className="text-xs text-slate-500 font-medium dark:text-slate-400">직접 입력 (HEX)</span>
+              <span className="text-xs text-slate-500 font-medium dark:text-slate-400">{t('직접 입력 (HEX)', 'Direct Input (HEX)')}</span>
               <div className="flex items-center gap-1.5">
                 <Input
                   type="text"
@@ -148,7 +149,7 @@ export function createShadcnColorPickerEditorPlugin<T>(
                   size="sm"
                   className="shrink-0"
                 >
-                  적용
+                  {t('적용', 'Apply')}
                 </Button>
               </div>
             </form>

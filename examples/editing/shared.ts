@@ -83,13 +83,13 @@ export const editingOrders: BGridDataItem<EditingOrder>[] = [
       quantity: 5,
       unitPrice: 9000,
       amount: 45000,
-      note: '영문 송장',
+      note: t('영문 송장', 'English Invoice'),
       mergeGroup: 'C',
     },
   },
 ];
 
-export const cloneEditingOrders = () =>
+export const cloneEditingOrders = (): BGridDataItem<EditingOrder>[] =>
   editingOrders.map(item => ({
     ...item,
     values: { ...item.values },

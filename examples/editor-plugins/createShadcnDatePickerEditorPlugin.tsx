@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import * as React from 'react';
 import type { BGridEditorPluginProps, BGridPluginEditorConfig } from 'beautiful-grid';
 import { defineEditorPlugin } from 'beautiful-grid/editors';
@@ -133,7 +134,7 @@ export function createShadcnDatePickerEditorPlugin<T>(
               }
             }}
           >
-            <span className="truncate">{formattedValue || '날짜 선택'}</span>
+            <span className="truncate">{formattedValue || t('날짜 선택', 'Select Date')}</span>
             <CalendarIcon className="h-4 w-4 opacity-50 shrink-0" />
           </button>
         </PopoverTrigger>
@@ -146,7 +147,7 @@ export function createShadcnDatePickerEditorPlugin<T>(
             {/* Header */}
             <div className="flex items-center justify-between px-1">
               <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                {currentMonth.getFullYear()}년 {currentMonth.getMonth() + 1}월
+                {currentMonth.getFullYear()}{t('년', '')} {currentMonth.getMonth() + 1}{t('월', '')}
               </span>
               <div className="flex items-center gap-1">
                 <Button
@@ -155,7 +156,7 @@ export function createShadcnDatePickerEditorPlugin<T>(
                   size="icon"
                   onClick={handlePrevMonth}
                   className="h-7 w-7 bg-transparent opacity-70 hover:opacity-100 dark:border-slate-800"
-                  aria-label="이전 달"
+                  aria-label={t("이전 달", "Previous Month")}
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -165,7 +166,7 @@ export function createShadcnDatePickerEditorPlugin<T>(
                   size="icon"
                   onClick={handleNextMonth}
                   className="h-7 w-7 bg-transparent opacity-70 hover:opacity-100 dark:border-slate-800"
-                  aria-label="다음 달"
+                  aria-label={t("다음 달", "Next Month")}
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
@@ -174,13 +175,13 @@ export function createShadcnDatePickerEditorPlugin<T>(
 
             {/* Weekdays */}
             <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-slate-400 dark:text-slate-500">
-              <span className="w-8">일</span>
-              <span className="w-8">월</span>
-              <span className="w-8">화</span>
-              <span className="w-8">수</span>
-              <span className="w-8">목</span>
-              <span className="w-8">금</span>
-              <span className="w-8">토</span>
+              <span className="w-8">{t('일', 'Sun')}</span>
+              <span className="w-8">{t('월', 'Mon')}</span>
+              <span className="w-8">{t('화', 'Tue')}</span>
+              <span className="w-8">{t('수', 'Wed')}</span>
+              <span className="w-8">{t('목', 'Thu')}</span>
+              <span className="w-8">{t('금', 'Fri')}</span>
+              <span className="w-8">{t('토', 'Sat')}</span>
             </div>
 
             {/* Days Grid */}
@@ -219,7 +220,7 @@ export function createShadcnDatePickerEditorPlugin<T>(
                 onClick={() => handleQuickPreset(0)}
                 className="h-7 px-2 text-xs text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
               >
-                오늘
+                {t('오늘', 'Today')}
               </Button>
               <Button
                 type="button"
@@ -228,7 +229,7 @@ export function createShadcnDatePickerEditorPlugin<T>(
                 onClick={() => handleQuickPreset(1)}
                 className="h-7 px-2 text-xs text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
               >
-                내일
+                {t('내일', 'Tomorrow')}
               </Button>
               <Button
                 type="button"
@@ -237,7 +238,7 @@ export function createShadcnDatePickerEditorPlugin<T>(
                 onClick={() => handleQuickPreset(7)}
                 className="h-7 px-2 text-xs text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
               >
-                1주일 후
+                {t('1주일 후', 'In 1 Week')}
               </Button>
             </div>
           </div>

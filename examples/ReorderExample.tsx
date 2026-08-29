@@ -14,7 +14,7 @@ interface BannerPriority {
 }
 
 const bannerTitles = [
-  '여름 시즌 최대 40% 프로모션',
+  t('여름 시즌 최대 40% 프로모션', 'Summer Season Up to 40% Promotion'),
   t('신규 회원 웰컴 쿠폰 안내', 'New Member Welcome Coupon Guide'),
   t('프리미엄 멤버십 오픈', 'Premium Membership Open'),
   t('오늘 주문 내일 도착 캠페인', 'Order Today, Arrive Tomorrow Campaign'),

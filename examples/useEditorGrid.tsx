@@ -169,7 +169,7 @@ export default function useEditorGrid() {
         [
           {
             key: 'code',
-            label: '주문 코드 · 내장 text',
+            label: t('주문 코드 · 내장 text', 'Order Code · Built-in text'),
             width: 170,
             editable: true,
             editor: {
@@ -179,7 +179,7 @@ export default function useEditorGrid() {
           },
           {
             key: 'customerName',
-            label: '고객명 · 한글 직접 입력',
+            label: t('고객명 · 한글 직접 입력', 'Customer Name · Direct Korean Input'),
             width: 190,
             editable: true,
             editor: {
@@ -189,7 +189,7 @@ export default function useEditorGrid() {
           },
           {
             key: 'useYn',
-            label: '사용 여부 · 기본 plugin',
+            label: t('사용 여부 · 기본 plugin', 'Usage · Built-in plugin'),
             width: 160,
             editable: true,
             editor: useYnEditor,
@@ -197,14 +197,14 @@ export default function useEditorGrid() {
           },
           {
             key: 'deliveryDate',
-            label: '납기일 · 기본 plugin',
+            label: t('납기일 · 기본 plugin', 'Delivery Date · Built-in plugin'),
             width: 170,
             editable: true,
             editor: deliveryDateEditor,
           },
           {
             key: 'priority',
-            label: '우선순위 · AntD plugin',
+            label: t('우선순위 · AntD plugin', 'Priority · AntD plugin'),
             width: 180,
             editable: true,
             editor: priorityEditor,

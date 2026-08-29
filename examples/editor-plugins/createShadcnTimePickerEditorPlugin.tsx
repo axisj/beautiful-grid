@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import * as React from 'react';
 import type { BGridEditorPluginProps, BGridPluginEditorConfig } from 'beautiful-grid';
 import { defineEditorPlugin } from 'beautiful-grid/editors';
@@ -78,7 +79,7 @@ export function createShadcnTimePickerEditorPlugin<T>(
               }
             }}
           >
-            <span className="truncate">{displayText || '시간 선택'}</span>
+            <span className="truncate">{displayText || t('시간 선택', 'Select Time')}</span>
             <Clock className="h-4 w-4 opacity-50 shrink-0" />
           </button>
         </PopoverTrigger>
@@ -90,7 +91,7 @@ export function createShadcnTimePickerEditorPlugin<T>(
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider dark:text-slate-400">
-                시간 선택
+                {t('시간 선택', 'Select Time')}
               </span>
               <span className="font-mono text-sm font-bold text-slate-900 dark:text-slate-100">
                 {selectedHour}:{selectedMinute}
@@ -101,7 +102,7 @@ export function createShadcnTimePickerEditorPlugin<T>(
             <div className="grid grid-cols-2 gap-2 rounded-md border border-slate-100 bg-slate-50/50 p-1.5 dark:border-slate-800 dark:bg-slate-900/50">
               {/* Hours */}
               <div className="flex flex-col">
-                <span className="text-center text-[10px] font-semibold text-slate-400 pb-1 dark:text-slate-500">시</span>
+                <span className="text-center text-[10px] font-semibold text-slate-400 pb-1 dark:text-slate-500">{t('시', 'Hour')}</span>
                 <div className="bgrid-shadcn-scroll flex max-h-40 flex-col overflow-y-auto pr-1">
                   {HOURS.map(hour => {
                     const isSelected = selectedHour === hour;
@@ -125,7 +126,7 @@ export function createShadcnTimePickerEditorPlugin<T>(
 
               {/* Minutes */}
               <div className="flex flex-col">
-                <span className="text-center text-[10px] font-semibold text-slate-400 pb-1 dark:text-slate-500">분</span>
+                <span className="text-center text-[10px] font-semibold text-slate-400 pb-1 dark:text-slate-500">{t('분', 'Minute')}</span>
                 <div className="bgrid-shadcn-scroll flex max-h-40 flex-col overflow-y-auto pr-1">
                   {MINUTES.map(minute => {
                     const isSelected = selectedMinute === minute;
@@ -178,7 +179,7 @@ export function createShadcnTimePickerEditorPlugin<T>(
                 onClick={cancel}
                 className="h-7 text-xs text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
               >
-                취소
+                {t('취소', 'Cancel')}
               </Button>
               <Button
                 type="button"
@@ -187,7 +188,7 @@ export function createShadcnTimePickerEditorPlugin<T>(
                 onClick={handleConfirm}
                 className="h-7 text-xs"
               >
-                확인
+                {t('확인', 'Confirm')}
               </Button>
             </div>
           </div>

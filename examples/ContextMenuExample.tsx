@@ -63,17 +63,17 @@ export default function ContextMenuExample() {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const { width, height } = useContainerSize(containerRef);
   const [menuTarget, setMenuTarget] = React.useState<BGridContextMenuTarget<SupportRequest>>();
-  const [lastAction, setLastAction] = React.useState('본문 셀을 우클릭해 메뉴를 열어보세요.');
+  const [lastAction, setLastAction] = React.useState(t('본문 셀을 우클릭해 메뉴를 열어보세요.', 'Right-click a body cell to open the menu.'));
 
   return (
     <div className='flex min-h-0 flex-col gap-3'>
       <div className='flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700'>
         <div className='flex flex-wrap items-center gap-2'>
-          <Tag color='blue'>우클릭</Tag>
+          <Tag color='blue'>{t('우클릭', 'Right-click')}</Tag>
           <Tag>Shift+F10</Tag>
-          <span>본문 셀에서 포인터 또는 키보드로 메뉴를 열 수 있습니다.</span>
+          <span>{t('본문 셀에서 포인터 또는 키보드로 메뉴를 열 수 있습니다.', 'You can open the menu from a body cell using a pointer or keyboard.')}</span>
         </div>
-        <span>접수일 내림차순 · 표시/원본 인덱스 비교</span>
+        <span>{t('접수일 내림차순 · 표시/원본 인덱스 비교', 'Descending order of receipt date · Comparison of visible/source indices')}</span>
       </div>
 
       <div
@@ -81,11 +81,11 @@ export default function ContextMenuExample() {
         aria-live='polite'
         className='rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600'
       >
-        <strong className='mr-2 text-slate-800'>최근 동작</strong>
+        <strong className='mr-2 text-slate-800'>{t('최근 동작', 'Recent Action')}</strong>
         {lastAction}
         {menuTarget && (
           <span className='ml-2 text-slate-500'>
-            (표시 {menuTarget.visibleIndex}, 원본 {menuTarget.sourceIndex})
+            ({t('표시', 'Visible')} {menuTarget.visibleIndex}, {t('원본', 'Source')} {menuTarget.sourceIndex})
           </span>
         )}
       </div>
@@ -108,7 +108,7 @@ export default function ContextMenuExample() {
           contextMenuOptions={{
             onOpenChange: (open, target) => {
               if (target) setMenuTarget(target);
-              if (open && target) setLastAction(`메뉴 열림: ${describeTarget(target)}`);
+              if (open && target) setLastAction(`${t('메뉴 열림', 'Menu Opened')}: ${describeTarget(target)}`);
             },
             items: target => [
               {
@@ -118,7 +118,7 @@ export default function ContextMenuExample() {
                 shortcut: 'I',
                 onSelect: selected => {
                   setMenuTarget(selected);
-                  setLastAction(`셀 선택: ${describeTarget(selected)}`);
+                  setLastAction(`${t('셀 선택', 'Cell Selected')}: ${describeTarget(selected)}`);
                 },
               },
               {
@@ -128,7 +128,7 @@ export default function ContextMenuExample() {
                 shortcut: 'R',
                 onSelect: selected => {
                   setMenuTarget(selected);
-                  setLastAction(`행 선택: ${selected.values.requestNo} · ${selected.values.customer}`);
+                  setLastAction(`${t('행 선택', 'Row Selected')}: ${selected.values.requestNo} · ${selected.values.customer}`);
                 },
               },
               { type: 'separator', id: 'assignment-separator' },
@@ -145,7 +145,7 @@ export default function ContextMenuExample() {
                 disabled: target.values.status === t('완료', 'Completed'),
                 onSelect: selected => {
                   setMenuTarget(selected);
-                  setLastAction(`담당자 지정 요청: ${selected.values.requestNo}`);
+                  setLastAction(`${t('담당자 지정 요청', 'Assignee Assignment Requested')}: ${selected.values.requestNo}`);
                 },
               },
             ],
@@ -154,8 +154,7 @@ export default function ContextMenuExample() {
       </DataGridContainer>
 
       <p className='m-0 text-xs leading-5 text-slate-500'>
-        <code>shortcut</code>은 메뉴 오른쪽의 안내 표기입니다. 실제 애플리케이션 단축키는 별도 keyboard
-        handler와 연결하세요.
+        <code>shortcut</code>{t('은 메뉴 오른쪽의 안내 표기입니다. 실제 애플리케이션 단축키는 별도 keyboard handler와 연결하세요.', ' is a guide displayed on the right side of the menu. Connect actual application shortcuts to a separate keyboard handler.')}
       </p>
     </div>
   );

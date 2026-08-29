@@ -131,12 +131,12 @@ export default function ThemingExample() {
     <div className='theming-example'>
       <div className='theming-example__toolbar'>
         <div className='theming-example__intro'>
-          <strong>같은 데이터 · 같은 컬럼 · 다른 CSS 변수</strong>
+          <strong>{t('같은 데이터 · 같은 컬럼 · 다른 CSS 변수', 'Same Data · Same Column · Different CSS Variables')}</strong>
           <span>{activeTheme.description}</span>
         </div>
 
         <Segmented
-          aria-label={t(t('데이터그리드 테마 선택', 'Select Data Grid Theme'), 'Select Data Grid Theme')}
+          aria-label={t('데이터그리드 테마 선택', 'Select Data Grid Theme')}
           value={theme}
           options={themeOptions.map(option => ({
             value: option.id,
@@ -153,7 +153,7 @@ export default function ThemingExample() {
 
       <div className='theming-example__tokens' aria-live='polite'>
         <div className='theming-example__class-name'>
-          <span>적용 클래스</span>
+          <span>{t('적용 클래스', 'Applied Class')}</span>
           <code>.bgrid-theme-{theme}</code>
         </div>
         {activeTheme.tokens.map(token => (
@@ -181,11 +181,11 @@ export default function ThemingExample() {
           frozenColumnIndex={1}
           cellSelectionOptions={{ enabled: true }}
           cellNavigationOptions={{ enabled: true, defaultActiveCell: { rowIndex: 0, columnIndex: 0 } }}
-          status={{ content: `${services.length}개 서비스 · ${activeTheme.label} 테마` }}
+          status={{ content: `${services.length}${t('개 서비스 · ', ' services · ')}${activeTheme.label} ${t('테마', 'Theme')}` }}
         />
       </DataGridContainer>
 
-      <p className='theming-example__hint'>행에 마우스를 올리거나 셀을 클릭하면 hover·선택 색상도 테마에 맞게 바뀝니다.</p>
+      <p className='theming-example__hint'>{t('행에 마우스를 올리거나 셀을 클릭하면 hover·선택 색상도 테마에 맞게 바뀝니다.', 'Hovering over a row or clicking a cell also changes the hover and selection colors according to the theme.')}</p>
     </div>
   );
 }

@@ -220,7 +220,7 @@ const SparklineCanvas = React.memo(function SparklineCanvas({
         ref={canvasRef}
         className='item-render-trend__canvas'
         role='img'
-        aria-label={`최근 8개 구간 처리량 ${values.join(', ')}`}
+        aria-label={t(`최근 8개 구간 처리량 ${values.join(', ')}`, `Last 8 periods throughput ${values.join(', ')}`)}
       />
       <span className='item-render-trend__metric'>
         <strong>{latest}</strong>
@@ -268,10 +268,10 @@ const UtilizationCanvas = React.memo(function UtilizationCanvas({ values }: { va
         ref={canvasRef}
         className='item-render-heatmap__canvas'
         role='img'
-        aria-label={`시간대별 설비 부하 ${values.join(', ')} 퍼센트`}
+        aria-label={t(`시간대별 설비 부하 ${values.join(', ')} 퍼센트`, `Hourly equipment load ${values.join(', ')} percent`)}
       />
       <span>
-        최고 <strong>{peak}%</strong>
+        {t('최고', 'Peak')} <strong>{peak}%</strong>
       </span>
     </div>
   );
@@ -283,7 +283,7 @@ const SlaGauge = React.memo(function SlaGauge({ value }: { value: number }) {
     <div
       className='item-render-gauge'
       role='progressbar'
-      aria-label={t(t('출고 SLA 달성률', 'Dispatch SLA Achievement Rate'), 'Dispatch SLA Achievement Rate')}
+      aria-label={t('출고 SLA 달성률', 'Dispatch SLA Achievement Rate')}
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={value}
@@ -304,7 +304,7 @@ const SlaGauge = React.memo(function SlaGauge({ value }: { value: number }) {
 function ItemRenderExample() {
   const [rows, setRows] = React.useState(initialRows);
   const [onlyAttention, setOnlyAttention] = React.useState(false);
-  const [selectedCenter, setSelectedCenter] = React.useState('행을 선택하면 센터 정보가 표시됩니다.');
+  const [selectedCenter, setSelectedCenter] = React.useState(t('행을 선택하면 센터 정보가 표시됩니다.', 'Select a row to view center information.'));
   const containerRef = React.useRef<HTMLDivElement>(null);
   const { width, height } = useContainerSize(containerRef);
 
@@ -369,16 +369,16 @@ function ItemRenderExample() {
             <button
               type='button'
               className='item-render-action'
-              aria-label={`${values.centerName} 알림 ${values.alerts}건 확인 처리`}
+              aria-label={t(`${values.centerName} 알림 ${values.alerts}건 확인 처리`, `Process ${values.alerts} alerts for ${values.centerName}`)}
               onClick={event => {
                 event.stopPropagation();
                 acknowledgeAlerts(values.centerId);
               }}
             >
-              알림 {values.alerts}건 확인
+              {t('알림', 'Alert')} {values.alerts}{t('건 확인', 'cases checked')}
             </button>
           ) : (
-            <span className='item-render-clear'>이상 없음</span>
+            <span className='item-render-clear'>{t('이상 없음', 'No Anomaly')}</span>
           ),
         getClipboardText: ({ values }) => (values.alerts > 0 ? `알림 ${values.alerts}건` : t('이상 없음', 'No Anomaly')),
       },
@@ -397,8 +397,8 @@ function ItemRenderExample() {
       <div className='item-render-example__toolbar'>
         <div>
           <span className='item-render-example__eyebrow'>FULFILLMENT CONTROL TOWER</span>
-          <strong>셀 안에 운영 대시보드를 구성합니다</strong>
-          <small>Canvas 2종 · 복합 React UI · 행 단위 액션</small>
+          <strong>{t('셀 안에 운영 대시보드를 구성합니다', 'Configure operational dashboard within cells')}</strong>
+          <small>{t('Canvas 2종 · 복합 React UI · 행 단위 액션', '2 Types of Canvas · Complex React UI · Row-level Action')}</small>
         </div>
         <button
           type='button'
@@ -407,7 +407,7 @@ function ItemRenderExample() {
           onClick={() => setOnlyAttention(value => !value)}
         >
           <span aria-hidden='true' />
-          이상 거점만 보기
+          {t('이상 거점만 보기', 'View only anomalous hubs')}
           <b>{rows.filter(row => row.values.alerts > 0).length}</b>
         </button>
       </div>
@@ -428,10 +428,10 @@ function ItemRenderExample() {
           cellSelectionOptions={{ enabled: true }}
           cellNavigationOptions={{ enabled: true, defaultActiveCell: { rowIndex: 0, columnIndex: 0 } }}
           onClick={({ item }) =>
-            setSelectedCenter(`${item.centerName} · SLA ${item.sla}% · ${item.updatedAt} 갱신`)
+            setSelectedCenter(`${item.centerName} · SLA ${item.sla}% · ${item.updatedAt} ${t('갱신', 'Updated')}`)
           }
           status={{
-            content: `${displayedRows.length}개 거점 · ${onlyAttention ? t('이상 대응 대상', 'Target for Anomaly Response') : t('전체 운영 현황', 'Overall Operating Status')}`,
+            content: `${displayedRows.length}${t('개 거점', 'hubs')} · ${onlyAttention ? t('이상 대응 대상', 'Target for Anomaly Response') : t('전체 운영 현황', 'Overall Operating Status')}`,
           }}
         />
       </DataGridContainer>

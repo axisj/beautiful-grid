@@ -13,7 +13,7 @@ import './EditingEventsExample.css';
 
 export default function EditingEventsExample() {
   const [data, setData] = React.useState(cloneEditingOrders);
-  const [events, setEvents] = React.useState<string[]>(['편집을 시작하면 이벤트가 여기에 기록됩니다.']);
+  const [events, setEvents] = React.useState<string[]>([t('편집을 시작하면 이벤트가 여기에 기록됩니다.', 'Events will be recorded here once you start editing.')]);
   const containerRef = React.useRef<HTMLDivElement>(null);
   const eventLogRef = React.useRef<HTMLOListElement>(null);
   const { width, height } = useContainerSize(containerRef);
@@ -42,12 +42,12 @@ export default function EditingEventsExample() {
           inputProps: { inputMode: 'numeric' },
           parseValue: text => {
             const value = Number(text);
-            if (!Number.isFinite(value) || value < 0) throw new Error('수량은 0 이상의 숫자여야 합니다.');
+            if (!Number.isFinite(value) || value < 0) throw new Error(t('수량은 0 이상의 숫자여야 합니다.', 'Quantity must be a number greater than or equal to 0.'));
             return value;
           },
         },
         onChangeValue: async ({ changes, nextValues, commit }) => {
-          appendEvent(`onChangeValue: 수량 ${nextValues.quantity}, 합계 재계산`);
+          appendEvent(`onChangeValue: ${t('수량', 'Quantity')} ${nextValues.quantity}, ${t('합계 재계산', 'Recalculate Total')}`);
           await commit([...changes, { key: 'amount', value: nextValues.quantity * nextValues.unitPrice }]);
         },
       },
@@ -57,29 +57,29 @@ export default function EditingEventsExample() {
         width: 130,
         align: 'right',
         editable: true,
-        itemRender: ({ value }) => <>{Number(value).toLocaleString()}원</>,
+        itemRender: ({ value }) => <>{Number(value).toLocaleString()}{t('원', 'KRW')}</>,
         editor: {
           type: 'text',
           inputProps: { inputMode: 'numeric' },
           formatValue: value => String(value ?? ''),
           parseValue: text => {
             const value = Number(text);
-            if (!Number.isFinite(value) || value < 0) throw new Error('단가는 0 이상의 숫자여야 합니다.');
+            if (!Number.isFinite(value) || value < 0) throw new Error(t('단가는 0 이상의 숫자여야 합니다.', 'Unit price must be a number greater than or equal to 0.'));
             return value;
           },
         },
         onChangeValue: async ({ changes, nextValues, commit }) => {
-          appendEvent(`onChangeValue: 단가 ${nextValues.unitPrice}, 합계 재계산`);
+          appendEvent(`onChangeValue: ${t('단가', 'Unit Price')} ${nextValues.unitPrice}, ${t('합계 재계산', 'Recalculate Total')}`);
           await commit([...changes, { key: 'amount', value: nextValues.quantity * nextValues.unitPrice }]);
         },
       },
       {
         key: 'amount',
-        label: '합계 · 자동 변경',
+        label: t('합계 · 자동 변경', 'Total · Auto Calculated'),
         width: 170,
         align: 'right',
         editable: false,
-        itemRender: ({ value }) => <strong>{Number(value).toLocaleString()}원</strong>,
+        itemRender: ({ value }) => <strong>{Number(value).toLocaleString()}{t('원', 'KRW')}</strong>,
       },
     ]),
     [appendEvent],
@@ -89,8 +89,8 @@ export default function EditingEventsExample() {
     <div className='flex min-h-0 flex-col gap-3'>
       <div className='rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm leading-6 text-slate-700'>
         <p className='m-0'>
-          수량이나 단가를 바꾸면 <code>onChangeValue</code>가 제안 값을 검증하고 합계를 추가한 뒤 한 번의{' '}
-          <code>commit(changes[])</code>으로 저장합니다.
+          {t('수량이나 단가를 바꾸면', 'When you change the quantity or unit price,')} <code>onChangeValue</code>{t('가 제안 값을 검증하고 합계를 추가한 뒤 한 번의', ' verifies the suggested value, adds the total, and saves it in a single ')}
+          <code>commit(changes[])</code>{t('으로 저장합니다.', ' call.')}
         </p>
         <div className='editing-events-terminal'>
           <div className='editing-events-terminal-header' aria-hidden='true'>
@@ -120,7 +120,7 @@ export default function EditingEventsExample() {
           editTrigger='click'
           onChangeData={(sourceIndex, columnIndex, values, _column, meta) => {
             setData(current => applyEditingDataChange(current, sourceIndex, values, meta));
-            appendEvent(`onChangeData: source ${sourceIndex}, column ${columnIndex ?? 'multi'}, ${meta?.changes.length ?? 0}개 변경`);
+            appendEvent(`onChangeData: source ${sourceIndex}, column ${columnIndex ?? 'multi'}, ${meta?.changes.length ?? 0}${t('개 변경', ' changes')}`);
           }}
         />
       </DataGridContainer>

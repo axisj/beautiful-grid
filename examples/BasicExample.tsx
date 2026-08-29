@@ -27,7 +27,7 @@ const fulfillmentOrders: BGridDataItem<FulfillmentOrder>[] = [
       priority: 'URGENT',
       status: 'ON_HOLD',
       customer: t('ACME 리테일', 'ACME Retail'),
-      product: '산업용 센서 A-100',
+      product: t('산업용 센서 A-100', 'Industrial Sensor A-100'),
       orderedQty: 18,
       availableQty: 6,
       warehouse: t('이천 DC', 'Icheon DC'),
@@ -41,7 +41,7 @@ const fulfillmentOrders: BGridDataItem<FulfillmentOrder>[] = [
       priority: 'HIGH',
       status: 'PICKING',
       customer: t('한빛 모빌리티', 'Hanbit Mobility'),
-      product: '제어 모듈 CM-8',
+      product: t('제어 모듈 CM-8', 'Control Module CM-8'),
       orderedQty: 8,
       availableQty: 8,
       warehouse: t('평택 DC', 'Pyeongtaek DC'),
@@ -55,7 +55,7 @@ const fulfillmentOrders: BGridDataItem<FulfillmentOrder>[] = [
       priority: 'NORMAL',
       status: 'PACKED',
       customer: t('오로라 시스템즈', 'Aurora Systems'),
-      product: '게이트웨이 GW-20',
+      product: t('게이트웨이 GW-20', 'Gateway GW-20'),
       orderedQty: 24,
       availableQty: 31,
       warehouse: t('이천 DC', 'Icheon DC'),
@@ -69,7 +69,7 @@ const fulfillmentOrders: BGridDataItem<FulfillmentOrder>[] = [
       priority: 'URGENT',
       status: 'ON_HOLD',
       customer: t('세림 테크', 'Serim Tech'),
-      product: '서보 드라이브 SD-4',
+      product: t('서보 드라이브 SD-4', 'Servo Drive SD-4'),
       orderedQty: 12,
       availableQty: 4,
       warehouse: t('부산 DC', 'Busan DC'),
@@ -97,7 +97,7 @@ const fulfillmentOrders: BGridDataItem<FulfillmentOrder>[] = [
       priority: 'NORMAL',
       status: 'SHIPPED',
       customer: t('대성 로보틱스', 'Daesung Robotics'),
-      product: '엔코더 EC-12',
+      product: t('엔코더 EC-12', 'Encoder EC-12'),
       orderedQty: 15,
       availableQty: 22,
       warehouse: t('이천 DC', 'Icheon DC'),
@@ -111,7 +111,7 @@ const fulfillmentOrders: BGridDataItem<FulfillmentOrder>[] = [
       priority: 'URGENT',
       status: 'ON_HOLD',
       customer: t('뉴웨이브 에너지', 'New Wave Energy'),
-      product: '인버터 IV-75',
+      product: t('인버터 IV-75', 'Inverter IV-75'),
       orderedQty: 10,
       availableQty: 0,
       warehouse: t('부산 DC', 'Busan DC'),
@@ -125,7 +125,7 @@ const fulfillmentOrders: BGridDataItem<FulfillmentOrder>[] = [
       priority: 'HIGH',
       status: 'PACKED',
       customer: t('정우 정밀', 'Jungwoo Precision'),
-      product: '리니어 스케일 LS-9',
+      product: t('리니어 스케일 LS-9', 'Linear Scale LS-9'),
       orderedQty: 6,
       availableQty: 9,
       warehouse: t('평택 DC', 'Pyeongtaek DC'),
@@ -139,7 +139,7 @@ const fulfillmentOrders: BGridDataItem<FulfillmentOrder>[] = [
       priority: 'NORMAL',
       status: 'PICKING',
       customer: t('에이스 팩토리', 'Ace Factory'),
-      product: '비전 카메라 VC-3',
+      product: t('비전 카메라 VC-3', 'Vision Camera VC-3'),
       orderedQty: 14,
       availableQty: 14,
       warehouse: t('이천 DC', 'Icheon DC'),
@@ -153,7 +153,7 @@ const fulfillmentOrders: BGridDataItem<FulfillmentOrder>[] = [
       priority: 'HIGH',
       status: 'ON_HOLD',
       customer: t('태성 이노텍', 'Taesung Innotek'),
-      product: '안전 라이트커튼 LC-5',
+      product: t('안전 라이트커튼 LC-5', 'Safety Light Curtain LC-5'),
       orderedQty: 20,
       availableQty: 13,
       warehouse: t('부산 DC', 'Busan DC'),
@@ -181,7 +181,7 @@ const fulfillmentOrders: BGridDataItem<FulfillmentOrder>[] = [
       priority: 'HIGH',
       status: 'PICKING',
       customer: t('글로벌 메카', 'Global Mecca'),
-      product: '토크 센서 TS-2',
+      product: t('토크 센서 TS-2', 'Torque Sensor TS-2'),
       orderedQty: 16,
       availableQty: 16,
       warehouse: t('이천 DC', 'Icheon DC'),
@@ -241,7 +241,7 @@ const initialColumns: BGridColumn<FulfillmentOrder>[] = [
     label: t('주문수량', 'Order Quantity'),
     width: 95,
     align: 'right',
-    itemRender: ({ value }) => <>{Number(value).toLocaleString()}개</>,
+    itemRender: ({ value }) => <>{Number(value).toLocaleString()}{t('개', 'ea')}</>,
   },
   {
     key: 'availableQty',
@@ -250,7 +250,7 @@ const initialColumns: BGridColumn<FulfillmentOrder>[] = [
     align: 'right',
     itemRender: ({ value, values }) => (
       <strong className={values.availableQty < values.orderedQty ? 'text-rose-600' : 'text-emerald-700'}>
-        {Number(value).toLocaleString()}개
+        {Number(value).toLocaleString()}{t('개', 'ea')}
       </strong>
     ),
   },
@@ -261,7 +261,7 @@ const initialColumns: BGridColumn<FulfillmentOrder>[] = [
     label: t('주문금액', 'Order Amount'),
     width: 135,
     align: 'right',
-    itemRender: ({ value }) => <strong>{Number(value).toLocaleString()}원</strong>,
+    itemRender: ({ value }) => <strong>{Number(value).toLocaleString()}{t('원', 'KRW')}</strong>,
   },
 ];
 
@@ -293,11 +293,11 @@ function BasicExample() {
     <div className='flex min-h-0 flex-col gap-3'>
       <div className='flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600'>
         <div>
-          <strong className='text-slate-900'>주문 출고 예외 관리</strong>
-          <span className='ml-2'>재고 부족과 마감 임박 주문을 한 화면에서 우선 처리합니다.</span>
+          <strong className='text-slate-900'>{t('주문 출고 예외 관리', 'Order Dispatch Exception Management')}</strong>
+          <span className='ml-2'>{t('재고 부족과 마감 임박 주문을 한 화면에서 우선 처리합니다.', 'Handle out-of-stock and impending deadline orders with priority on one screen.')}</span>
         </div>
         <span aria-live='polite'>
-          검토 선택 {checkedRowKeys.length}건 · 현재 주문 {focusedOrderNo}
+          {t('검토 선택', 'Selected for review')} {checkedRowKeys.length}{t('건 · 현재 주문', ' items · Current Order')} {focusedOrderNo}
         </span>
       </div>
 

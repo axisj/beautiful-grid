@@ -16,13 +16,13 @@ const columns: BGridColumn<Order>[] = [
   { key: 'id', label: t('주문 번호', 'Order Number'), width: 120 },
   { key: 'customer', label: t('고객', 'Customer'), width: 180 },
   { key: 'status', label: t('상태', 'Status'), width: 110, align: 'center' },
-  { key: 'amount', label: t('금액', 'Amount'), width: 140, align: 'right', itemRender: ({ value }) => `${value.toLocaleString()}원` },
+  { key: 'amount', label: t('금액', 'Amount'), width: 140, align: 'right', itemRender: ({ value }) => `${value.toLocaleString()}${t('원', 'KRW')}` },
 ];
 
 const data: BGridDataItem<Order>[] = Array.from({ length: 80 }, (_, index) => ({
   values: {
     id: `ORDER-${String(index + 1).padStart(4, '0')}`,
-    customer: `고객 ${index + 1}`,
+    customer: `${t('고객', 'Customer')} ${index + 1}`,
     status: [t('준비 중', 'Preparing'), t('배송 중', 'In Transit'), t('완료', 'Completed')][index % 3] as Order['status'],
     amount: 18000 + index * 750,
   },
@@ -43,7 +43,7 @@ export default function ContainerResizeExample() {
         >
           {isSidebarOpen ? t('사이드 패널 닫기', 'Close Side Panel') : t('사이드 패널 열기', 'Open Side Panel')}
         </button>
-        <span style={{ color: '#64748b', fontSize: 13 }}>컨테이너: {Math.round(width)} × {Math.round(height)}px</span>
+        <span style={{ color: '#64748b', fontSize: 13 }}>{t('컨테이너', 'Container')}: {Math.round(width)} × {Math.round(height)}px</span>
       </div>
 
       <div
@@ -56,8 +56,8 @@ export default function ContainerResizeExample() {
       >
         {isSidebarOpen && (
           <aside style={{ background: '#f1f5f9', borderRadius: 8, color: '#475569', padding: 16 }}>
-            <strong style={{ display: 'block', marginBottom: 8 }}>필터 패널</strong>
-            화면 폭이 줄어도 그리드는 이 영역의 정확한 크기를 다시 측정합니다.
+            <strong style={{ display: 'block', marginBottom: 8 }}>{t('필터 패널', 'Filter Panel')}</strong>
+            {t('화면 폭이 줄어도 그리드는 이 영역의 정확한 크기를 다시 측정합니다.', 'The grid will remeasure the exact size of this area even if the screen width decreases.')}
           </aside>
         )}
         <DataGridContainer ref={containerRef} style={{ height: '100%', minWidth: 0 }}>

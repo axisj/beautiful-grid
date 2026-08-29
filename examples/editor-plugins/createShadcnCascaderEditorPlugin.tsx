@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import * as React from 'react';
 import type { BGridEditorPluginProps, BGridPluginEditorConfig } from 'beautiful-grid';
 import { defineEditorPlugin } from 'beautiful-grid/editors';
@@ -76,7 +77,7 @@ export function createShadcnCascaderEditorPlugin<T>(
               }
             }}
           >
-            <span className="truncate">{displayText || '분류 선택'}</span>
+            <span className="truncate">{displayText || t('분류 선택', 'Select Category')}</span>
             <Layers className="h-4 w-4 opacity-50 shrink-0" />
           </button>
         </PopoverTrigger>
@@ -87,7 +88,7 @@ export function createShadcnCascaderEditorPlugin<T>(
         >
           <div className="flex flex-col gap-2">
             <div className="text-xs font-semibold text-slate-500 px-2 pt-1 uppercase tracking-wider dark:text-slate-400">
-              계층 분류 선택
+              {t('계층 분류 선택', 'Select Hierarchical Category')}
             </div>
 
             <div className="flex divide-x divide-slate-100 rounded-md border border-slate-100 bg-slate-50/50 dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900/50">
@@ -169,7 +170,7 @@ export function createShadcnCascaderEditorPlugin<T>(
 
             {selectedPath.length > 0 && (
               <div className="flex items-center justify-between border-t border-slate-100 px-2 pt-2 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
-                <span>선택 경로: <strong className="text-slate-900 dark:text-slate-100">{selectedPath.join(' > ')}</strong></span>
+                <span>{t('선택 경로', 'Selected Path')}: <strong className="text-slate-900 dark:text-slate-100">{selectedPath.join(' > ')}</strong></span>
               </div>
             )}
           </div>

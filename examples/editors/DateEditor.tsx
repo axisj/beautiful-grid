@@ -57,7 +57,7 @@ export const DateEditor = <T,>({ editable, value, handleSave, handleCancel, hand
           handleCancelEdit();
           break;
         default:
-          return; // 키 이벤트를 처리하지 않는다면 종료합니다.
+          return; // If you don't handle key events, exit.
       }
     },
     [handleCancelEdit, handleSaveEdit],

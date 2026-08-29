@@ -28,7 +28,7 @@ const statuses: EditingOrder['status'][] = [t('접수', 'Receipt'), t('진행', 
 const notes = [
   t('오전 배송', 'Morning Delivery'),
   t('담당자 확인', 'Assignee Confirmation'),
-  '행 높이를 늘리지 않는 긴 메모 내용이 말줄임으로 표시됩니다.',
+  t('행 높이를 늘리지 않는 긴 메모 내용이 말줄임으로 표시됩니다.', 'Long memo content that does not increase row height is truncated.'),
 ];
 
 const createMergedEditingOrders = (): BGridDataItem<EditingOrder>[] =>
@@ -45,6 +45,7 @@ const createMergedEditingOrders = (): BGridDataItem<EditingOrder>[] =>
           ...customer,
           status: statuses[rowIndex % statuses.length],
           deliveryDate: `2026-09-${String((rowIndex % 28) + 1).padStart(2, '0')}`,
+          approved: rowIndex % 2 === 0,
           quantity,
           unitPrice,
           amount: quantity * unitPrice,
@@ -70,7 +71,7 @@ export default function MergedCellEditingExample() {
       { key: 'orderCode', label: t('주문 코드', 'Order Code'), width: 145, editable: false },
       {
         key: 'customerName',
-        label: '병합 고객명 · 편집',
+        label: t('병합 고객명 · 편집', 'Merged Customer Name · Edit'),
         width: 240,
         editable: true,
         editTrigger: 'click',
@@ -88,28 +89,28 @@ export default function MergedCellEditingExample() {
       <div className='rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm leading-6 text-slate-700'>
         <div className='flex flex-wrap items-center justify-between gap-3'>
           <p className='m-0'>
-            24개 행을 3개씩 병합해 세로 스크롤과 일반 병합·고정 경계 병합 편집을 함께 확인합니다.
+            {t('24개 행을 3개씩 병합해 세로 스크롤과 일반 병합·고정 경계 병합 편집을 함께 확인합니다.', 'Merge 24 rows in groups of 3 to check both vertical scrolling and regular/frozen-boundary merged cell editing.')}
           </p>
-          <div className='flex flex-wrap items-center gap-3' aria-label={t(t('병합 셀 틀고정 옵션', 'Merged Cell Freeze Option'), 'Merged Cell Freeze Option')}>
+          <div className='flex flex-wrap items-center gap-3' aria-label={t('병합 셀 틀고정 옵션', 'Merged Cell Freeze Option')}>
             <label className='inline-flex items-center gap-2 font-medium'>
-              <span>왼쪽 고정 컬럼 수</span>
+              <span>{t('왼쪽 고정 컬럼 수', 'Number of frozen left columns')}</span>
               <Select<number>
-                aria-label={t(t('고정할 컬럼 수', 'Number of Columns to Freeze'), 'Number of Columns to Freeze')}
+                aria-label={t('고정할 컬럼 수', 'Number of Columns to Freeze')}
                 aria-describedby='merged-frozen-column-help'
                 style={{ width: 84 }}
                 value={frozenColumnIndex}
-                options={[0, 1, 2].map(count => ({ value: count, label: `${count}개` }))}
+                options={[0, 1, 2].map(count => ({ value: count, label: t(`${count}개`, `${count} items`) }))}
                 onChange={setFrozenColumnIndex}
               />
             </label>
             <label className='inline-flex items-center gap-2 font-medium'>
-              <span>위쪽 고정 행 수</span>
+              <span>{t('위쪽 고정 행 수', 'Number of frozen top rows')}</span>
               <Select<number>
-                aria-label={t(t('고정할 행 수', 'Number of Rows to Freeze'), 'Number of Rows to Freeze')}
+                aria-label={t('고정할 행 수', 'Number of Rows to Freeze')}
                 aria-describedby='merged-frozen-row-help'
                 style={{ width: 84 }}
                 value={frozenRowCount}
-                options={[0, 1, 2, 3].map(count => ({ value: count, label: `${count}개` }))}
+                options={[0, 1, 2, 3].map(count => ({ value: count, label: t(`${count}개`, `${count} items`) }))}
                 onChange={setFrozenRowCount}
               />
             </label>
@@ -117,31 +118,26 @@ export default function MergedCellEditingExample() {
         </div>
         <div className='mt-2 grid gap-1 text-xs text-slate-600'>
           <p id='merged-frozen-column-help' className='m-0'>
-            <strong>왼쪽 고정 컬럼 수</strong>는 가로 스크롤 중에도 왼쪽에 남겨 둘 컬럼 수입니다. 1개는 ‘주문
-            코드’만, 2개는 ‘주문 코드’와 편집 대상인 ‘병합 고객명’을 고정합니다.
+            <strong>{t('왼쪽 고정 컬럼 수', 'Number of frozen left columns')}</strong>{t('는 가로 스크롤 중에도 왼쪽에 남겨 둘 컬럼 수입니다. 1개는 ‘주문 코드’만, 2개는 ‘주문 코드’와 편집 대상인 ‘병합 고객명’을 고정합니다.', ' is the number of columns to keep on the left during horizontal scrolling. 1 freezes only "Order Code", and 2 freezes both "Order Code" and "Merged Customer Name" which is the target for editing.')}
           </p>
           <p id='merged-frozen-row-help' className='m-0'>
-            <strong>위쪽 고정 행 수</strong>는 세로 스크롤 중에도 위쪽에 남겨 둘 실제 데이터 행 수입니다. 1~2개는
-            첫 3행 병합 셀을 고정·스크롤 영역으로 나누고, 3개는 첫 병합 그룹 전체를 고정합니다. 나뉜 어느 조각을
-            편집해도 같은 3행이 함께 변경됩니다.
+            <strong>{t('위쪽 고정 행 수', 'Number of frozen top rows')}</strong>{t('는 세로 스크롤 중에도 위쪽에 남겨 둘 실제 데이터 행 수입니다. 1~2개는 첫 3행 병합 셀을 고정·스크롤 영역으로 나누고, 3개는 첫 병합 그룹 전체를 고정합니다. 나뉜 어느 조각을 편집해도 같은 3행이 함께 변경됩니다.', ' is the number of actual data rows to keep on top during vertical scrolling. 1-2 splits the first 3-row merged cell into frozen/scroll areas, and 3 freezes the entire first merged group. Editing any split piece modifies the same 3 rows together.')}
           </p>
         </div>
         <p className='mb-0 mt-2 text-xs text-slate-600'>
           {hasFrozenBoundary ? (
             <>
-              <strong>고정 경계 병합</strong> · <code>frozenColumnIndex={frozenColumnIndex}</code>,{' '}
-              <code>frozenRowCount={frozenRowCount}</code>. 병합 그룹이 행 고정 경계를 가로지르면 각 영역 안에서 다시
-              병합되며, 어느 조각을 편집해도 세 행이 함께 변경됩니다.
+              <strong>{t('고정 경계 병합', 'Frozen Boundary Merge')}</strong> · <code>frozenColumnIndex={frozenColumnIndex}</code>,{' '}
+              <code>frozenRowCount={frozenRowCount}</code>. {t('병합 그룹이 행 고정 경계를 가로지르면 각 영역 안에서 다시 병합되며, 어느 조각을 편집해도 세 행이 함께 변경됩니다.', 'If a merged group crosses the row freeze boundary, it is merged again within each area, and editing any piece modifies all three rows together.')}
             </>
           ) : (
             <>
-              <strong>일반 병합</strong> · 틀고정 없이 하나의 병합 셀을 직접 편집하며, 병합 그룹의 세 실제 행이 함께
-              변경됩니다.
+              <strong>{t('일반 병합', 'Regular Merge')}</strong> · {t('틀고정 없이 하나의 병합 셀을 직접 편집하며, 병합 그룹의 세 실제 행이 함께 변경됩니다.', 'Directly edit a single merged cell without frozen panes, and all three actual rows of the merged group are modified together.')}
             </>
           )}
         </p>
         <output aria-live='polite' className='mt-1 block text-xs text-blue-700'>
-          마지막 트랜잭션의 변경 행: {changedRows.length ? changedRows.map(index => index + 1).join(', ') : t('없음', 'None')}
+          {t('마지막 트랜잭션의 변경 행:', 'Modified rows in the last transaction:')} {changedRows.length ? changedRows.map(index => index + 1).join(', ') : t('없음', 'None')}
         </output>
       </div>
       <DataGridContainer ref={containerRef} style={{ height: 360 }} data-merge-layout={layoutMode}>

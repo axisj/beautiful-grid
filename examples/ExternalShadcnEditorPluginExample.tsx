@@ -196,9 +196,8 @@ export default function ExternalShadcnEditorPluginExample() {
   return (
     <div className='flex min-h-0 flex-col gap-3'>
       <p className='m-0 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm leading-6 text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300'>
-        Shadcn UI (Radix UI) 기반의 Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect 컴포넌트를{' '}
-        <code className="dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">defineEditorPlugin()</code>으로 연결했습니다. 각 컴포넌트의 Portal 컨테이너로 <code className="dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">getPortalContainer()</code>를
-        전달하여 Grid의 가상 스크롤, 위치 계산, 바깥 클릭 판정 및 라이프사이클과 완벽히 동기화됩니다.
+        {t('Shadcn UI (Radix UI) 기반의 Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect 컴포넌트를', 'Shadcn UI (Radix UI) based Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect components connected via')}{' '}
+        <code className="dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">defineEditorPlugin()</code>{t('으로 연결했습니다. 각 컴포넌트의 Portal 컨테이너로', '. By passing')} <code className="dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">getPortalContainer()</code>{t('를 전달하여 Grid의 가상 스크롤, 위치 계산, 바깥 클릭 판정 및 라이프사이클과 완벽히 동기화됩니다.', ' as the Portal container for each component, it perfectly synchronizes with the Grid\'s virtual scrolling, position calculation, outside click detection, and lifecycle.')}
       </p>
       <DataGridContainer ref={containerRef} style={{ height: 340 }}>
         <BGrid<ExternalShadcnOrder>

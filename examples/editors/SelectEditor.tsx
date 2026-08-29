@@ -47,7 +47,7 @@ export const SelectEditor = <T,>({ editable, value, handleSave, handleCancel, ha
           handleCancelEdit();
           break;
         default:
-          return; // 키 이벤트를 처리하지 않는다면 종료합니다.
+          return; // If you don't handle key events, exit.
       }
     },
     [handleCancelEdit, handleSaveEdit],
@@ -74,7 +74,7 @@ export const SelectEditor = <T,>({ editable, value, handleSave, handleCancel, ha
           open
           options={[
             { value: 'Y', label: t('사용', 'Used') },
-            { value: 'N', label: '사용안함' },
+            { value: 'N', label: t('사용안함', 'Unused') },
           ]}
           defaultValue={value}
           onSelect={onSelect}

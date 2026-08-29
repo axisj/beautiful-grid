@@ -195,10 +195,9 @@ export default function ExternalEditorPluginExample() {
   return (
     <div className='flex min-h-0 flex-col gap-3'>
       <p className='m-0 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm leading-6 text-slate-700'>
-        Ant Design Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect를{' '}
-        <code>defineEditorPlugin()</code>으로 연결했습니다. 셀을 더블클릭하거나 각 아이콘과 ColorPicker 색상 박스를 클릭해
-        편집을 시작합니다. popup은 plugin의 <code>getPortalContainer()</code>에 렌더링하고 값 선택 시{' '}
-        <code>commit(changes[])</code>을 호출합니다.
+        {t('Ant Design Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect를', 'Ant Design Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect connected via')}{' '}
+        <code>defineEditorPlugin()</code>{t('으로 연결했습니다. 셀을 더블클릭하거나 각 아이콘과 ColorPicker 색상 박스를 클릭해 편집을 시작합니다. popup은 plugin의', '. Double-click a cell or click each icon and ColorPicker color box to start editing. The popup is rendered in the plugin\'s')} <code>getPortalContainer()</code>{t('에 렌더링하고 값 선택 시', ' and upon value selection,')}{' '}
+        <code>commit(changes[])</code>{t('을 호출합니다.', ' is called.')}
       </p>
       <DataGridContainer ref={containerRef} style={{ height: 340 }}>
         <BGrid<ExternalEditorOrder>

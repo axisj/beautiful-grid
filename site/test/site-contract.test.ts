@@ -428,7 +428,7 @@ describe('site product and navigation contracts', () => {
     const virtualScrollExample = readFileSync(resolve(repositoryRoot, 'examples/ScrollExample.tsx'), 'utf8');
 
     expect(homepage).toContain('현재 화면에 필요한 셀만 렌더링');
-    expect(homepage).toContain('렌더링 최적화');
+    expect(homepage).toContain('가상 스크롤 최적화');
     expect(homepage).toContain('55만 행 × 24열이면 셀은 모두 1,320만 개입니다.');
     expect(homepage).toContain("<strong>13,200,000<small>{t('셀', 'cells')}</small></strong>");
     expect(homepage).toContain("<strong>≈ 240<small>{t('셀', 'cells')}</small></strong>");

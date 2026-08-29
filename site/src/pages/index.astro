@@ -367,8 +367,8 @@ const localizedFeaturedExamples = localize(featuredExamples);
     <section class="section performance-section">
       <div class="container performance-layout">
         <div class="performance-copy">
-          <p class="eyebrow eyebrow-dark">{t('렌더링 최적화', 'Rendering Optimization')}</p>
-          <h2>{t('55만 행을 열어도,', 'Even with 550K rows,')}<br />{t('화면에는 필요한 셀만 그립니다.', 'only needed cells reach the screen.')}</h2>
+          <p class="eyebrow eyebrow-dark">{t('가상 스크롤 최적화', 'Virtual Scroll Optimization')}</p>
+          <h2>{t('화면에 필요한 셀만 렌더링', 'Render Only Visible Cells')}</h2>
           <p>
             {t('55만 행 × 24열이면 셀은 모두 1,320만 개입니다. BeautifulGrid는 이를 한꺼번에 그리지 않고, 지금 보이는 약 20행 × 12열만 화면에 표시합니다.', 'A 550,000 × 24 dataset contains 13.2 million cells. BeautifulGrid does not render them at once; it displays roughly the 20 × 12 cells currently visible.')}
           </p>
@@ -2764,6 +2764,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     .install-command { max-width: none; }
     .capability-rail { grid-template-columns: 1fr; gap: var(--home-space-2); }
     .capability-item { min-height: 192px; }
+    .capability-item-fps button { margin-top: var(--home-space-4); }
     .section { padding: var(--home-space-9) 0; }
     .section-heading h2,
     .performance-copy h2,

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { BGrid } from '../beautiful-grid';
 
 const data = [
@@ -139,7 +139,9 @@ describe('BGrid search and context menu', () => {
     const outside = screen.getByRole('button', { name: 'Outside' });
     outside.focus();
     const outsideFind = new KeyboardEvent('keydown', { key: 'f', ctrlKey: true, bubbles: true, cancelable: true });
-    document.dispatchEvent(outsideFind);
+    act(() => {
+      document.dispatchEvent(outsideFind);
+    });
     expect(outsideFind.defaultPrevented).toBe(false);
 
     focusGrid(container);
@@ -147,9 +149,12 @@ describe('BGrid search and context menu', () => {
     const editor = screen.getByRole('textbox', { name: /텍스트 편집/ });
     expect(document.activeElement).toBe(editor);
     const editingFind = new KeyboardEvent('keydown', { key: 'f', ctrlKey: true, bubbles: true, cancelable: true });
-    editor.dispatchEvent(editingFind);
+    act(() => {
+      editor.dispatchEvent(editingFind);
+    });
     expect(editingFind.defaultPrevented).toBe(false);
     expect(screen.queryByRole('search')).not.toBeInTheDocument();
+    fireEvent.keyDown(editor, { key: 'Escape' });
   });
 
   it('supports controlled open and query state from an external toolbar', async () => {
@@ -382,7 +387,9 @@ describe('BGrid search and context menu', () => {
       />,
     );
     const disabledEvent = new MouseEvent('contextmenu', { bubbles: true, cancelable: true });
-    screen.getByText('Apple').dispatchEvent(disabledEvent);
+    act(() => {
+      screen.getByText('Apple').dispatchEvent(disabledEvent);
+    });
     expect(disabledEvent.defaultPrevented).toBe(false);
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
 

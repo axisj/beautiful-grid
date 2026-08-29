@@ -17,6 +17,7 @@ test('loads column reordering on demand and moves a header in the real browser',
 
   await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
   await page.mouse.down();
+  await page.waitForTimeout(100);
   await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 8 });
   await page.mouse.up();
 

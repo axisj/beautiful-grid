@@ -42,6 +42,7 @@ test.describe('Cell context menu example', () => {
     const keyboardGateway = grid.getByRole('textbox', { name: 'DataGrid 키보드 탐색' });
     await grid.focus();
     await expect(keyboardGateway).toBeFocused();
+    await keyboardGateway.press('ArrowDown');
     await keyboardGateway.press('Shift+F10');
 
     const searchItem = page.getByRole('menuitem', { name: '그리드에서 검색' });

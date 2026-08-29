@@ -5,6 +5,7 @@
 [![NPM version](https://img.shields.io/npm/v/beautiful-grid.svg?style=flat)](https://npmjs.org/package/beautiful-grid)
 [![NPM downloads](https://img.shields.io/npm/dm/beautiful-grid.svg?style=flat)](https://npmjs.org/package/beautiful-grid)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![Coverage](https://img.shields.io/badge/coverage-84%25-brightgreen.svg)]()
 
 BeautifulGrid is a high-performance, feature-packed, and beautifully designed open-source React Data Grid for data-heavy business applications. It combines zero-runtime-CSS styling with virtual scrolling, spreadsheet-like cell selection and clipboard operations, built-in and plugin cell editing, multi-level grouped headers, filtering & sorting toolboxes, server/client pagination, pivot table transforms, row reordering, and flexible theming.
 
@@ -1006,6 +1007,9 @@ npm test
 # Run unit tests in watch mode
 npm run test:watch
 
+# Run unit tests with coverage report
+npm run test -- --coverage
+
 # Run library consumer compatibility tests (CJS, ESM, Types)
 npm run test:library:consumers
 
@@ -1022,6 +1026,17 @@ npm run build:library
 # Build docs & demo site
 npm run build
 npm run preview
+```
+
+---
+
+## Test Coverage
+
+BeautifulGrid maintains high test coverage to ensure stability across complex features like virtualization, cell editing, and focus management. 
+Coverage reports are generated via Vitest. To view the detailed HTML report, run:
+
+```bash
+npm run test -- --coverage
 ```
 
 ---

@@ -58,7 +58,7 @@ pnpm add beautiful-grid
 yarn add beautiful-grid
 ```
 
-> **Peer Dependency**: BeautifulGrid requires `react >= 19.0.0` and `react-dom >= 19.0.0`.
+> **Peer Dependency**: BeautifulGrid requires `react ^19.2.0` and `react-dom ^19.2.0`.
 
 ---
 

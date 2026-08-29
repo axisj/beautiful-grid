@@ -14,6 +14,25 @@ const repositoryRoot = resolve(siteRoot, '..');
 const readSiteFile = (path: string) => readFileSync(resolve(siteRoot, path), 'utf8');
 
 describe('site product and navigation contracts', () => {
+  it('publishes a 1200x630 homepage social image through Open Graph and Twitter metadata', () => {
+    const layout = readSiteFile('src/layouts/Layout.astro');
+    const marketingLayout = readSiteFile('src/layouts/MarketingLayout.astro');
+    const homepage = readSiteFile('src/pages/index.astro');
+    const ogImage = readFileSync(resolve(siteRoot, 'public/og-image.png'));
+
+    expect(ogImage.subarray(1, 4).toString('ascii')).toBe('PNG');
+    expect(ogImage.readUInt32BE(16)).toBe(1200);
+    expect(ogImage.readUInt32BE(20)).toBe(630);
+    expect(marketingLayout).toContain('ogImage?: string;');
+    expect(marketingLayout).toContain('ogImageAlt?: string;');
+    expect(homepage).toContain('ogImage="/og-image.png"');
+    expect(layout).toContain('<meta property="og:image" content={ogImageUrl} />');
+    expect(layout).toContain('<meta property="og:image:width" content="1200" />');
+    expect(layout).toContain('<meta property="og:image:height" content="630" />');
+    expect(layout).toContain('<meta name="twitter:card" content="summary_large_image" />');
+    expect(layout).toContain('<meta name="twitter:image" content={ogImageUrl} />');
+  });
+
   it('uses the independent BeautifulGrid brand lockup', () => {
     const header = readSiteFile('src/components/layout/Header.astro');
 

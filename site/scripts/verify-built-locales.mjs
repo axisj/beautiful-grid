@@ -35,6 +35,21 @@ for (const koRoute of corePairs) {
   assertMetadata(enRoute, 'en');
 }
 
+const socialImageUrl = 'https://bgrid.axisj.com/og-image.png';
+for (const homepageRoute of ['/', '/en/']) {
+  const html = readRoute(homepageRoute);
+  assert.ok(html.includes(`<meta property="og:image" content="${socialImageUrl}">`), `${homepageRoute} lacks the homepage Open Graph image`);
+  assert.ok(html.includes('<meta property="og:image:width" content="1200">'), `${homepageRoute} has the wrong Open Graph image width`);
+  assert.ok(html.includes('<meta property="og:image:height" content="630">'), `${homepageRoute} has the wrong Open Graph image height`);
+  assert.ok(html.includes('<meta name="twitter:card" content="summary_large_image">'), `${homepageRoute} lacks the large Twitter card`);
+  assert.ok(html.includes(`<meta name="twitter:image" content="${socialImageUrl}">`), `${homepageRoute} lacks the Twitter image`);
+}
+
+const socialImage = fs.readFileSync(path.join(distRoot, 'og-image.png'));
+assert.equal(socialImage.subarray(1, 4).toString('ascii'), 'PNG', 'built social image is not a PNG');
+assert.equal(socialImage.readUInt32BE(16), 1200, 'built social image width must be 1200');
+assert.equal(socialImage.readUInt32BE(20), 630, 'built social image height must be 630');
+
 const koreanSlugs = fs.readdirSync(learnRoot, { withFileTypes: true })
   .filter(entry => entry.isFile() && /\.mdx?$/.test(entry.name))
   .map(entry => entry.name.replace(/\.mdx?$/, ''))

@@ -11,6 +11,9 @@ concurrency:
   group: test-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   library-css:
     name: Library CSS Isolation
@@ -91,6 +94,18 @@ jobs:
 
       - name: Run unit tests
         run: npm test
+
+      - name: Update Coverage Badge
+        run: node scripts/update-coverage-badge.mjs
+
+      - name: Commit and push if changed
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "docs: auto-update coverage badge [skip ci]" || echo "No changes to commit"
+          git push || echo "Failed to push"
+
 
   e2e:
     name: E2E (Playwright)

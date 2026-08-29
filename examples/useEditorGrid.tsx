@@ -1,3 +1,4 @@
+import { t } from './i18n';
 import * as React from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import type { BGridChangeDataMeta, BGridColumn, BGridColumnGroup, BGridDataItem } from 'beautiful-grid';
@@ -16,25 +17,25 @@ export interface Item {
 
 const useYnEditor = createSelectEditorPlugin<Item, Item['useYn']>({
   id: 'use-yn',
-  ariaLabel: '사용 여부 편집',
+  ariaLabel: t('사용 여부 편집', 'Edit Usage Status'),
   options: [
-    { value: 'Y', label: '사용' },
-    { value: 'N', label: '사용 안 함' },
+    { value: 'Y', label: t('사용', 'Used') },
+    { value: 'N', label: t('사용 안 함', 'Not Used') },
   ],
 });
 
 const deliveryDateEditor = createDateEditorPlugin<Item>({
   id: 'delivery-date',
-  ariaLabel: '납기일 편집',
+  ariaLabel: t('납기일 편집', 'Edit Delivery Date'),
 });
 
 const priorityEditor = createAntdSelectEditorPlugin<Item, Item['priority']>({
   id: 'priority-antd',
-  ariaLabel: '우선순위 편집',
+  ariaLabel: t('우선순위 편집', 'Edit Priority'),
   options: [
-    { value: 'low', label: '낮음' },
-    { value: 'normal', label: '보통' },
-    { value: 'high', label: '높음' },
+    { value: 'low', label: t('낮음', 'Low') },
+    { value: 'normal', label: t('보통', 'Normal') },
+    { value: 'high', label: t('높음', 'High') },
   ],
 });
 
@@ -44,7 +45,7 @@ function createInitialData(): BGridDataItem<Item>[] {
       values: {
         uuid: uuidv4(),
         code: 'ORD-2401',
-        customerName: '서울상사',
+        customerName: t('서울상사', 'Seoul Sangsa'),
         useYn: 'Y',
         deliveryDate: '2026-08-21',
         priority: 'high',
@@ -54,7 +55,7 @@ function createInitialData(): BGridDataItem<Item>[] {
       values: {
         uuid: uuidv4(),
         code: 'ORD-2402',
-        customerName: '한빛물산',
+        customerName: t('한빛물산', 'Hanbit Mulsan'),
         useYn: 'Y',
         deliveryDate: '2026-08-25',
         priority: 'normal',
@@ -97,7 +98,7 @@ export default function useEditorGrid() {
         values: {
           uuid: uuidv4(),
           code: `ORD-${2401 + current.length}`,
-          customerName: '새 고객',
+          customerName: t('새 고객', 'New Customer'),
           useYn: 'Y',
           deliveryDate: '2026-09-10',
           priority: 'normal',
@@ -192,7 +193,7 @@ export default function useEditorGrid() {
             width: 160,
             editable: true,
             editor: useYnEditor,
-            itemRender: ({ value }) => (value === 'Y' ? '사용' : '사용 안 함'),
+            itemRender: ({ value }) => (value === 'Y' ? t('사용', 'Used') : t('사용 안 함', 'Not Used')),
           },
           {
             key: 'deliveryDate',
@@ -207,11 +208,12 @@ export default function useEditorGrid() {
             width: 180,
             editable: true,
             editor: priorityEditor,
-            itemRender: ({ value }) => ({ low: '낮음', normal: '보통', high: '높음' }[value] ?? value),
+            itemRender: ({ value }) =>
+              ({ low: t('낮음', 'Low'), normal: t('보통', 'Normal'), high: t('높음', 'High') })[value as 'low' | 'normal' | 'high'] ?? value,
           },
           {
             key: 'uuid',
-            label: '읽기 전용 UUID',
+            label: t('읽기 전용 UUID', 'Read-only UUID'),
             width: 250,
             editable: false,
           },

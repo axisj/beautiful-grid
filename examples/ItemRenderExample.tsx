@@ -1,10 +1,11 @@
+import { t } from './i18n';
 import * as React from 'react';
 import { BGrid, BGridColumn, BGridDataItem } from 'beautiful-grid';
 import DataGridContainer from '../components/DataGridContainer';
 import { useContainerSize } from '../hooks/useContainerSize';
 import './ItemRenderExample.css';
 
-type CenterStatus = '정상' | '관찰' | '대응 필요';
+type CenterStatus = string;
 
 interface FulfillmentCenter {
   centerId: string;
@@ -21,9 +22,9 @@ interface FulfillmentCenter {
 const initialRows: BGridDataItem<FulfillmentCenter>[] = [
   [
     'FC-SEO-01',
-    '서울 동부 센터',
-    '수도권',
-    '정상',
+    t('서울 동부 센터', 'Seoul East Center'),
+    t('수도권', 'Metropolitan Area'),
+    t('정상', 'Normal'),
     [72, 78, 76, 84, 88, 91, 96, 102],
     [42, 51, 64, 72, 78, 83, 76, 69, 62, 58, 47, 39],
     98,
@@ -32,9 +33,9 @@ const initialRows: BGridDataItem<FulfillmentCenter>[] = [
   ],
   [
     'FC-GMP-02',
-    '김포 허브',
-    '수도권',
-    '관찰',
+    t('김포 허브', 'Gimpo Hub'),
+    t('수도권', 'Metropolitan Area'),
+    t('관찰', 'Observation'),
     [96, 92, 99, 104, 101, 112, 108, 118],
     [55, 62, 74, 88, 94, 96, 91, 85, 72, 61, 53, 48],
     91,
@@ -43,9 +44,9 @@ const initialRows: BGridDataItem<FulfillmentCenter>[] = [
   ],
   [
     'FC-ICN-01',
-    '인천 항공 센터',
-    '수도권',
-    '정상',
+    t('인천 항공 센터', 'Incheon Aviation Center'),
+    t('수도권', 'Metropolitan Area'),
+    t('정상', 'Normal'),
     [64, 70, 74, 72, 79, 81, 86, 89],
     [31, 37, 42, 48, 55, 61, 66, 63, 54, 46, 39, 34],
     96,
@@ -54,9 +55,9 @@ const initialRows: BGridDataItem<FulfillmentCenter>[] = [
   ],
   [
     'FC-DAE-01',
-    '대전 중앙 허브',
-    '충청권',
-    '대응 필요',
+    t('대전 중앙 허브', 'Daejeon Central Hub'),
+    t('충청권', 'Chungcheong Region'),
+    t('대응 필요', 'Response Required'),
     [122, 119, 116, 111, 106, 101, 95, 88],
     [68, 78, 86, 92, 97, 99, 96, 91, 84, 76, 67, 59],
     82,
@@ -65,9 +66,9 @@ const initialRows: BGridDataItem<FulfillmentCenter>[] = [
   ],
   [
     'FC-BUS-02',
-    '부산 남부 센터',
-    '영남권',
-    '정상',
+    t('부산 남부 센터', 'Busan South Center'),
+    t('영남권', 'Yeongnam Region'),
+    t('정상', 'Normal'),
     [51, 55, 54, 61, 65, 69, 72, 76],
     [28, 34, 39, 45, 52, 58, 62, 57, 49, 42, 35, 30],
     97,
@@ -76,9 +77,9 @@ const initialRows: BGridDataItem<FulfillmentCenter>[] = [
   ],
   [
     'FC-DAE-03',
-    '대구 라스트마일',
-    '영남권',
-    '관찰',
+    t('대구 라스트마일', 'Daegu Last Mile'),
+    t('영남권', 'Yeongnam Region'),
+    t('관찰', 'Observation'),
     [83, 87, 91, 96, 94, 101, 98, 104],
     [44, 52, 61, 73, 84, 89, 86, 79, 68, 57, 49, 41],
     89,
@@ -87,9 +88,9 @@ const initialRows: BGridDataItem<FulfillmentCenter>[] = [
   ],
   [
     'FC-GWJ-01',
-    '광주 서부 센터',
-    '호남권',
-    '정상',
+    t('광주 서부 센터', 'Gwangju West Center'),
+    t('호남권', 'Honam Region'),
+    t('정상', 'Normal'),
     [46, 48, 52, 55, 58, 63, 61, 67],
     [25, 29, 35, 41, 48, 54, 59, 55, 46, 38, 32, 27],
     95,
@@ -98,9 +99,9 @@ const initialRows: BGridDataItem<FulfillmentCenter>[] = [
   ],
   [
     'FC-JEJ-01',
-    '제주 배송 거점',
-    '제주권',
-    '관찰',
+    t('제주 배송 거점', 'Jeju Delivery Hub'),
+    t('제주권', 'Jeju Region'),
+    t('관찰', 'Observation'),
     [38, 41, 39, 45, 51, 48, 56, 53],
     [22, 28, 34, 47, 64, 72, 68, 55, 43, 35, 29, 24],
     90,
@@ -122,9 +123,14 @@ const initialRows: BGridDataItem<FulfillmentCenter>[] = [
 }));
 
 const statusTone: Record<CenterStatus, string> = {
-  정상: 'healthy',
-  관찰: 'watch',
+  
+  
   '대응 필요': 'critical',
+  'Response Required': 'critical',
+  '정상': 'healthy',
+  'Normal': 'healthy',
+  '관찰': 'watch',
+  'Observation': 'watch',
 };
 
 const CenterIdentity = React.memo(function CenterIdentity({ values }: { values: FulfillmentCenter }) {
@@ -169,7 +175,7 @@ const SparklineCanvas = React.memo(function SparklineCanvas({
     context.setTransform(dpr, 0, 0, dpr, 0, 0);
     context.clearRect(0, 0, width, height);
 
-    const color = status === '대응 필요' ? '#dc2626' : status === '관찰' ? '#d97706' : '#2563eb';
+    const color = status === t('대응 필요', 'Response Required') ? '#dc2626' : status === t('관찰', 'Observation') ? '#d97706' : '#2563eb';
     const min = Math.min(...values);
     const max = Math.max(...values);
     const range = Math.max(1, max - min);
@@ -277,7 +283,7 @@ const SlaGauge = React.memo(function SlaGauge({ value }: { value: number }) {
     <div
       className='item-render-gauge'
       role='progressbar'
-      aria-label='출고 SLA 달성률'
+      aria-label={t(t('출고 SLA 달성률', 'Dispatch SLA Achievement Rate'), 'Dispatch SLA Achievement Rate')}
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={value}
@@ -289,7 +295,7 @@ const SlaGauge = React.memo(function SlaGauge({ value }: { value: number }) {
         <strong>{value}</strong>
       </span>
       <span className='item-render-gauge__label'>
-        SLA<small>{value >= 95 ? '안정' : value >= 88 ? '주의' : '위험'}</small>
+        SLA<small>{value >= 95 ? t('안정', 'Stable') : value >= 88 ? t('주의', 'Caution') : t('위험', 'Danger')}</small>
       </span>
     </div>
   );
@@ -305,7 +311,7 @@ function ItemRenderExample() {
   const acknowledgeAlerts = React.useCallback((centerId: string) => {
     setRows(current =>
       current.map(row =>
-        row.values.centerId === centerId ? { ...row, values: { ...row.values, alerts: 0, status: '정상' } } : row,
+        row.values.centerId === centerId ? { ...row, values: { ...row.values, alerts: 0, status: t('정상', 'Normal') } } : row,
       ),
     );
   }, []);
@@ -314,14 +320,14 @@ function ItemRenderExample() {
     () => [
       {
         key: 'centerName',
-        label: '물류 거점',
+        label: t('물류 거점', 'Logistics Hub'),
         width: 195,
         itemRender: ({ values }) => <CenterIdentity values={values} />,
         getClipboardText: ({ values }) => `${values.centerName} (${values.centerId})`,
       },
       {
         key: 'status',
-        label: '운영 상태',
+        label: t('운영 상태', 'Operating Status'),
         width: 105,
         align: 'center',
         itemRender: ({ value }) => (
@@ -333,21 +339,21 @@ function ItemRenderExample() {
       },
       {
         key: 'throughput',
-        label: '시간당 처리량 추이',
+        label: t('시간당 처리량 추이', 'Throughput per Hour Trend'),
         width: 205,
         itemRender: ({ values }) => <SparklineCanvas values={values.throughput} status={values.status} />,
         getClipboardText: ({ values }) => `${values.throughput[values.throughput.length - 1]} orders/h`,
       },
       {
         key: 'utilization',
-        label: '12시간 설비 부하',
+        label: t('12시간 설비 부하', '12-hour equipment load'),
         width: 205,
         itemRender: ({ value }) => <UtilizationCanvas values={value as number[]} />,
         getClipboardText: ({ value }) => (value as number[]).join(','),
       },
       {
         key: 'sla',
-        label: '출고 SLA',
+        label: t('출고 SLA', 'Dispatch SLA'),
         width: 125,
         align: 'center',
         itemRender: ({ value }) => <SlaGauge value={Number(value)} />,
@@ -355,7 +361,7 @@ function ItemRenderExample() {
       },
       {
         key: 'alerts',
-        label: '이상 대응',
+        label: t('이상 대응', 'Anomaly Response'),
         width: 150,
         align: 'center',
         itemRender: ({ values }) =>
@@ -374,9 +380,9 @@ function ItemRenderExample() {
           ) : (
             <span className='item-render-clear'>이상 없음</span>
           ),
-        getClipboardText: ({ values }) => (values.alerts > 0 ? `알림 ${values.alerts}건` : '이상 없음'),
+        getClipboardText: ({ values }) => (values.alerts > 0 ? `알림 ${values.alerts}건` : t('이상 없음', 'No Anomaly')),
       },
-      { key: 'updatedAt', label: '갱신', width: 80, align: 'center' },
+      { key: 'updatedAt', label: t('갱신', 'Renewal'), width: 80, align: 'center' },
     ],
     [acknowledgeAlerts],
   );
@@ -422,10 +428,10 @@ function ItemRenderExample() {
           cellSelectionOptions={{ enabled: true }}
           cellNavigationOptions={{ enabled: true, defaultActiveCell: { rowIndex: 0, columnIndex: 0 } }}
           onClick={({ item }) =>
-            setSelectedCenter(`${item.values.centerName} · SLA ${item.values.sla}% · ${item.values.updatedAt} 갱신`)
+            setSelectedCenter(`${item.centerName} · SLA ${item.sla}% · ${item.updatedAt} 갱신`)
           }
           status={{
-            content: `${displayedRows.length}개 거점 · ${onlyAttention ? '이상 대응 대상' : '전체 운영 현황'}`,
+            content: `${displayedRows.length}개 거점 · ${onlyAttention ? t('이상 대응 대상', 'Target for Anomaly Response') : t('전체 운영 현황', 'Overall Operating Status')}`,
           }}
         />
       </DataGridContainer>

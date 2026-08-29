@@ -1,3 +1,4 @@
+import { t } from './i18n';
 import * as React from 'react';
 import { BGrid } from 'beautiful-grid';
 import type { BGridColumn, BGridColumnGroupNode } from 'beautiful-grid';
@@ -23,8 +24,8 @@ const data = Array.from({ length: 100 }, (_, index) => {
   return {
     values: {
       orderNo: `ORD-${String(2401 + index).padStart(4, '0')}`,
-      customerName: ['서울상사', '한빛물산', 'Northwind'][index % 3],
-      region: ['서울', '부산', '대전'][index % 3],
+      customerName: [t('서울상사', 'Seoul Sangsa'), t('한빛물산', 'Hanbit Mulsan'), 'Northwind'][index % 3],
+      region: [t('서울', 'Seoul'), t('부산', 'Busan'), t('대전', 'Daejeon')][index % 3],
       productName: ['Workspace Pro', 'Analytics Seat', 'Automation Pack'][index % 3],
       category: ['Software', 'License', 'Service'][index % 3],
       quantity,
@@ -37,7 +38,7 @@ const data = Array.from({ length: 100 }, (_, index) => {
 const columnGroups: BGridColumnGroupNode[] = [
   {
     id: 'order-overview',
-    label: '주문 현황',
+    label: t('주문 현황', 'Order Status Overview'),
     className: 'column-groups-header-overview',
     children: [
       {
@@ -47,7 +48,7 @@ const columnGroups: BGridColumnGroupNode[] = [
           'orderNo',
           {
             id: 'customer-detail',
-            label: '고객 상세',
+            label: t('고객 상세', 'Customer Details'),
             className: 'column-groups-header-customer',
             children: ['customerName', 'region'],
           },
@@ -59,12 +60,12 @@ const columnGroups: BGridColumnGroupNode[] = [
         children: [
           {
             id: 'product-detail',
-            label: '상품 상세',
+            label: t('상품 상세', 'Product Details'),
             children: ['productName', 'category'],
           },
           {
             id: 'sales-detail',
-            label: '매출 상세',
+            label: t('매출 상세', 'Sales Details'),
             headerStyle: {
               backgroundColor: '#ffedd5',
               color: '#9a3412',
@@ -78,16 +79,16 @@ const columnGroups: BGridColumnGroupNode[] = [
 ];
 
 const initialColumns: BGridColumn<Order>[] = [
-  { id: 'orderNo', key: 'orderNo', label: '주문 번호', width: 140 },
-  { id: 'customerName', key: 'customerName', label: '고객명', width: 150 },
-  { id: 'region', key: 'region', label: '지역', width: 100, align: 'center' },
-  { id: 'productName', key: 'productName', label: '상품', width: 170 },
-  { id: 'category', key: 'category', label: '분류', width: 120, align: 'center' },
-  { id: 'quantity', key: 'quantity', label: '수량', width: 90, align: 'right' },
+  { id: 'orderNo', key: 'orderNo', label: t('주문 번호', 'Order Number'), width: 140 },
+  { id: 'customerName', key: 'customerName', label: t('고객명', 'Customer Name'), width: 150 },
+  { id: 'region', key: 'region', label: t('지역', 'Region'), width: 100, align: 'center' },
+  { id: 'productName', key: 'productName', label: t('상품', 'Product'), width: 170 },
+  { id: 'category', key: 'category', label: t('분류', 'Category'), width: 120, align: 'center' },
+  { id: 'quantity', key: 'quantity', label: t('수량', 'Quantity'), width: 90, align: 'right' },
   {
     id: 'unitPrice',
     key: 'unitPrice',
-    label: '단가',
+    label: t('단가', 'Unit Price'),
     width: 120,
     align: 'right',
     itemRender: ({ value }) => <>{Number(value).toLocaleString()}원</>,
@@ -95,7 +96,7 @@ const initialColumns: BGridColumn<Order>[] = [
   {
     id: 'total',
     key: 'total',
-    label: '합계',
+    label: t('합계', 'Total'),
     width: 140,
     align: 'right',
     headerClassName: 'column-groups-header-total',
@@ -117,11 +118,11 @@ export default function ColumnsGroupExample() {
         <label className='inline-flex items-center gap-2 font-medium'>
           <span>틀고정 경계</span>
           <Select<number>
-            aria-label='틀고정 위치'
+            aria-label={t(t('틀고정 위치', 'Freeze Position'), 'Freeze Position')}
             style={{ minWidth: 210 }}
             value={frozenColumnIndex}
             options={[
-              { value: 0, label: '고정 없음' },
+              { value: 0, label: t('고정 없음', 'No Freeze') },
               ...columns.map((column, index) => ({
                 value: index + 1,
                 label: `${index + 1}개 · ${column.label} 뒤`,

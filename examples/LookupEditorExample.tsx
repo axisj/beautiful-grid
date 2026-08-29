@@ -1,3 +1,4 @@
+import { t } from './i18n';
 import * as React from 'react';
 import { AutoComplete, Input, Modal } from 'antd';
 import {
@@ -22,10 +23,10 @@ import './LookupEditorExample.css';
 type Customer = Pick<EditingOrder, 'customerCode' | 'customerName' | 'customerGrade'>;
 
 const customers: Customer[] = [
-  { customerCode: 'C001', customerName: '서울상사', customerGrade: 'VIP' },
-  { customerCode: 'C002', customerName: '한빛물산', customerGrade: '우수' },
-  { customerCode: 'C003', customerName: 'Northwind', customerGrade: '일반' },
-  { customerCode: 'C004', customerName: 'AxisJ Studio', customerGrade: '우수' },
+  { customerCode: 'C001', customerName: t('서울상사', 'Seoul Sangsa'), customerGrade: 'VIP' },
+  { customerCode: 'C002', customerName: t('한빛물산', 'Hanbit Mulsan'), customerGrade: t('우수', 'Excellent') },
+  { customerCode: 'C003', customerName: 'Northwind', customerGrade: t('일반', 'General') },
+  { customerCode: 'C004', customerName: 'AxisJ Studio', customerGrade: t('우수', 'Excellent') },
 ];
 
 const customerRows: BGridDataItem<Customer>[] = customers.map(customer => ({ values: customer }));
@@ -59,7 +60,7 @@ function CustomerAutocompleteEditor({ value, commit, cancel, getPortalContainer 
 
   return (
     <AutoComplete
-      aria-label='고객 자동완성'
+      aria-label={t(t('고객 자동완성', 'Customer Autocomplete'), 'Customer Autocomplete')}
       autoFocus
       className='lookup-editor-autocomplete'
       classNames={{ popup: { root: 'lookup-editor-autocomplete-popup' } }}
@@ -114,9 +115,9 @@ function CustomerLookupModal({ lookup }: CustomerLookupModalProps) {
 
   const columns = React.useMemo<BGridColumn<Customer>[]>(
     () => [
-      { key: 'customerCode', label: '고객 코드', width: 130 },
-      { key: 'customerName', label: '고객명', width: 260 },
-      { key: 'customerGrade', label: '고객 등급', width: 120 },
+      { key: 'customerCode', label: t('고객 코드', 'Customer Code'), width: 130 },
+      { key: 'customerName', label: t('고객명', 'Customer Name'), width: 260 },
+      { key: 'customerGrade', label: t('고객 등급', 'Customer Level'), width: 120 },
     ],
     [],
   );
@@ -135,11 +136,11 @@ function CustomerLookupModal({ lookup }: CustomerLookupModalProps) {
   return (
     <Modal
       open
-      title='고객 선택'
+      title={t(t('고객 선택', 'Select Customer'), 'Select Customer')}
       width={720}
       className='lookup-editor-modal site-grid-theme'
-      okText='확인'
-      cancelText='취소'
+      okText={t(t('확인', 'Confirm'), 'Confirm')}
+      cancelText={t(t('취소', 'Cancelled'), 'Cancelled')}
       okButtonProps={{ disabled: !selectedCode }}
       confirmLoading={confirming}
       onCancel={lookup.cancel}
@@ -149,7 +150,7 @@ function CustomerLookupModal({ lookup }: CustomerLookupModalProps) {
         <Input.Search
           allowClear
           autoFocus
-          aria-label='고객 검색'
+          aria-label={t(t('고객 검색', 'Search Customer'), 'Search Customer')}
           placeholder='고객명, 고객 코드 또는 등급 검색'
           value={query}
           onChange={event => setQuery(event.currentTarget.value)}
@@ -188,8 +189,8 @@ export default function LookupEditorExample() {
 
   const columns = React.useMemo<BGridColumn<EditingOrder>[]>(
     () => withEditingCellClasses<EditingOrder>([
-      { key: 'orderCode', label: '주문 코드', width: 145, editable: false },
-      { key: 'customerCode', label: '고객 코드', width: 130, editable: false },
+      { key: 'orderCode', label: t('주문 코드', 'Order Code'), width: 145, editable: false },
+      { key: 'customerCode', label: t('고객 코드', 'Customer Code'), width: 130, editable: false },
       {
         key: 'customerName',
         label: '고객명 · 자동완성/lookup',
@@ -211,7 +212,7 @@ export default function LookupEditorExample() {
           await commit(changes);
         },
       },
-      { key: 'customerGrade', label: '고객 등급', width: 130, editable: false },
+      { key: 'customerGrade', label: t('고객 등급', 'Customer Level'), width: 130, editable: false },
     ]),
     [],
   );

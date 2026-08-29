@@ -1,3 +1,4 @@
+import { t } from './i18n';
 import * as React from 'react';
 import { BGrid, type BGridColumn, type BGridDataItem } from 'beautiful-grid';
 import { Segmented } from 'antd';
@@ -7,7 +8,7 @@ import { useContainerSize } from '../hooks/useContainerSize';
 import './ThemingExample.css';
 
 type ThemeId = 'default' | 'brand' | 'dark';
-type ServiceStatus = '정상' | '점검 예정' | '주의';
+type ServiceStatus = string;
 
 interface ServiceMetric {
   id: string;
@@ -30,8 +31,8 @@ interface ThemeOption {
 const themeOptions: ThemeOption[] = [
   {
     id: 'default',
-    label: '기본',
-    description: '별도 오버라이드가 없는 기본 라이트 테마',
+    label: t('기본', 'Default'),
+    description: t('별도 오버라이드가 없는 기본 라이트 테마', 'Default Light Theme without Override'),
     icon: <Sun size={14} aria-hidden='true' />,
     tokens: [
       { name: '--bgrid-primary-color', value: '#3073f1' },
@@ -42,8 +43,8 @@ const themeOptions: ThemeOption[] = [
   },
   {
     id: 'brand',
-    label: '브랜드',
-    description: '기업 컬러와 둥근 모서리를 적용한 커스텀 테마',
+    label: t('브랜드', 'Brand'),
+    description: t('기업 컬러와 둥근 모서리를 적용한 커스텀 테마', 'Custom Theme with Corporate Colors and Rounded Corners'),
     icon: <Building2 size={14} aria-hidden='true' />,
     tokens: [
       { name: '--bgrid-primary-color', value: '#0f766e' },
@@ -54,8 +55,8 @@ const themeOptions: ThemeOption[] = [
   },
   {
     id: 'dark',
-    label: '다크',
-    description: '어두운 업무 화면에 맞춘 고대비 다크 테마',
+    label: t('다크', 'Dark'),
+    description: t('어두운 업무 화면에 맞춘 고대비 다크 테마', 'High Contrast Dark Theme for Dark Work Screen'),
     icon: <Moon size={14} aria-hidden='true' />,
     tokens: [
       { name: '--bgrid-primary-color', value: '#38bdf8' },
@@ -67,16 +68,16 @@ const themeOptions: ThemeOption[] = [
 ];
 
 const services: BGridDataItem<ServiceMetric>[] = [
-  ['API-GW', 'API Gateway', '플랫폼', '정상', 99.99, 82, '10:42'],
-  ['AUTH', '인증 서비스', '플랫폼', '정상', 99.97, 104, '10:41'],
-  ['PAY', '결제 처리', '커머스', '주의', 99.82, 286, '10:40'],
-  ['ORDER', '주문 관리', '커머스', '정상', 99.95, 127, '10:42'],
-  ['SEARCH', '상품 검색', '프로덕트', '점검 예정', 99.91, 168, '10:39'],
-  ['NOTIFY', '알림 발송', 'CRM', '정상', 99.98, 91, '10:41'],
-  ['REPORT', '리포트 생성', '데이터', '주의', 99.76, 342, '10:38'],
-  ['STORAGE', '파일 저장소', '플랫폼', '정상', 99.99, 73, '10:42'],
-  ['PROFILE', '회원 프로필', 'CRM', '정상', 99.96, 118, '10:40'],
-  ['CATALOG', '상품 카탈로그', '프로덕트', '점검 예정', 99.89, 194, '10:39'],
+  ['API-GW', 'API Gateway', t('플랫폼', 'Platform'), t('정상', 'Normal'), 99.99, 82, '10:42'],
+  ['AUTH', t('인증 서비스', 'Authentication Service'), t('플랫폼', 'Platform'), t('정상', 'Normal'), 99.97, 104, '10:41'],
+  ['PAY', t('결제 처리', 'Payment Processing'), t('커머스', 'Commerce'), t('주의', 'Caution'), 99.82, 286, '10:40'],
+  ['ORDER', t('주문 관리', 'Order Management'), t('커머스', 'Commerce'), t('정상', 'Normal'), 99.95, 127, '10:42'],
+  ['SEARCH', t('상품 검색', 'Search Product'), t('프로덕트', 'Product'), t('점검 예정', 'Scheduled for Inspection'), 99.91, 168, '10:39'],
+  ['NOTIFY', t('알림 발송', 'Send Notification'), 'CRM', t('정상', 'Normal'), 99.98, 91, '10:41'],
+  ['REPORT', t('리포트 생성', 'Create Report'), t('데이터', 'Data'), t('주의', 'Caution'), 99.76, 342, '10:38'],
+  ['STORAGE', t('파일 저장소', 'File Storage'), t('플랫폼', 'Platform'), t('정상', 'Normal'), 99.99, 73, '10:42'],
+  ['PROFILE', t('회원 프로필', 'Member Profile'), 'CRM', t('정상', 'Normal'), 99.96, 118, '10:40'],
+  ['CATALOG', t('상품 카탈로그', 'Product Catalog'), t('프로덕트', 'Product'), t('점검 예정', 'Scheduled for Inspection'), 99.89, 194, '10:39'],
 ].map(([id, service, team, status, availability, responseTime, updatedAt]) => ({
   values: {
     id: String(id),
@@ -90,34 +91,34 @@ const services: BGridDataItem<ServiceMetric>[] = [
 }));
 
 const columns: BGridColumn<ServiceMetric>[] = [
-  { key: 'service', label: '서비스', width: 190 },
-  { key: 'team', label: '담당 팀', width: 110, align: 'center' },
+  { key: 'service', label: t('서비스', 'Service'), width: 190 },
+  { key: 'team', label: t('담당 팀', 'Responsible Team'), width: 110, align: 'center' },
   {
     key: 'status',
-    label: '운영 상태',
+    label: t('운영 상태', 'Operating Status'),
     width: 120,
     align: 'center',
     itemRender: ({ value }) => (
-      <span className={`theming-example-status theming-example-status--${value === '정상' ? 'healthy' : value === '주의' ? 'warning' : 'scheduled'}`}>
+      <span className={`theming-example-status theming-example-status--${value === t('정상', 'Normal') ? 'healthy' : value === t('주의', 'Caution') ? 'warning' : 'scheduled'}`}>
         {String(value)}
       </span>
     ),
   },
   {
     key: 'availability',
-    label: '가용성',
+    label: t('가용성', 'Availability'),
     width: 110,
     align: 'right',
     itemRender: ({ value }) => <strong>{Number(value).toFixed(2)}%</strong>,
   },
   {
     key: 'responseTime',
-    label: '응답 시간',
+    label: t('응답 시간', 'Response Time'),
     width: 120,
     align: 'right',
     itemRender: ({ value }) => `${Number(value).toLocaleString()}ms`,
   },
-  { key: 'updatedAt', label: '최근 확인', width: 100, align: 'center' },
+  { key: 'updatedAt', label: t('최근 확인', 'Recently Checked'), width: 100, align: 'center' },
 ];
 
 export default function ThemingExample() {
@@ -135,7 +136,7 @@ export default function ThemingExample() {
         </div>
 
         <Segmented
-          aria-label='데이터그리드 테마 선택'
+          aria-label={t(t('데이터그리드 테마 선택', 'Select Data Grid Theme'), 'Select Data Grid Theme')}
           value={theme}
           options={themeOptions.map(option => ({
             value: option.id,

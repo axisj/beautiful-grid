@@ -1,3 +1,4 @@
+import { t } from './i18n';
 import * as React from 'react';
 import { notification } from 'antd';
 import { BGrid, BGridColumn } from 'beautiful-grid';
@@ -36,29 +37,29 @@ const ROW_COUNT = 550000;
 const DAY_MS = 24 * 60 * 60 * 1000;
 const ORDER_START_AT = Date.UTC(2026, 0, 1, 9);
 const companyNames = [
-  '한빛리테일',
-  '서울커머스',
-  '오로라테크',
-  '브릿지웍스',
-  '그린마켓',
-  '넥스트랩',
-  '모노오피스',
-  '클라우드나인',
-  '페이퍼앤코',
-  '어반스토어',
-  '블루하버',
-  '트리니티솔루션',
+  t('한빛리테일', 'Hanbit Retail'),
+  t('서울커머스', 'Seoul Commerce'),
+  t('오로라테크', 'Aurora Tech'),
+  t('브릿지웍스', 'Bridge Works'),
+  t('그린마켓', 'Green Market'),
+  t('넥스트랩', 'Next Lab'),
+  t('모노오피스', 'Mono Office'),
+  t('클라우드나인', 'Cloud Nine'),
+  t('페이퍼앤코', 'Paper & Co'),
+  t('어반스토어', 'Urban Store'),
+  t('블루하버', 'Blue Harbor'),
+  t('트리니티솔루션', 'Trinity Solution'),
 ];
-const customerTiers = ['일반', '실버', '골드', 'VIP'];
-const salesChannels = ['직영몰', '오픈마켓', '파트너', '오프라인', 'B2B'];
-const regions = ['서울', '경기', '인천', '부산', '대전', '광주', '대구', '제주'];
-const salesTeams = ['엔터프라이즈 1팀', '엔터프라이즈 2팀', '커머스팀', '파트너팀', '공공영업팀'];
-const salesReps = ['김하늘', '박민준', '이서연', '최도윤', '정유진', '한지민', '윤서준', '송지아', '임도현', '강유나'];
-const categories = ['노트북', '모니터', '네트워크', '스토리지', '소프트웨어', '주변기기', '협업도구', '보안'];
+const customerTiers = [t('일반', 'General'), t('실버', 'Silver'), t('골드', 'Gold'), 'VIP'];
+const salesChannels = [t('직영몰', 'Direct Mall'), t('오픈마켓', 'Open Market'), t('파트너', 'Partner'), t('오프라인', 'Offline'), 'B2B'];
+const regions = [t('서울', 'Seoul'), t('경기', 'Gyeonggi'), t('인천', 'Incheon'), t('부산', 'Busan'), t('대전', 'Daejeon'), t('광주', 'Gwangju'), t('대구', 'Daegu'), t('제주', 'Jeju')];
+const salesTeams = [t('엔터프라이즈 1팀', 'Enterprise Team 1'), t('엔터프라이즈 2팀', 'Enterprise Team 2'), t('커머스팀', 'Commerce Team'), t('파트너팀', 'Partner Team'), t('공공영업팀', 'Public Sales Team')];
+const salesReps = [t('김하늘', 'Haneul Kim'), t('박민준', 'Minjun Park'), t('이서연', 'Seoyeon Lee'), t('최도윤', 'Doyun Choi'), t('정유진', 'Yujin Jeong'), t('한지민', 'Jimin Han'), t('윤서준', 'Seojun Yoon'), t('송지아', 'Jia Song'), t('임도현', 'Dohyun Lim'), t('강유나', 'Yuna Kang')];
+const categories = [t('노트북', 'Laptop'), t('모니터', 'Monitor'), t('네트워크', 'Network'), t('스토리지', 'Storage'), t('소프트웨어', 'Software'), t('주변기기', 'Peripherals'), t('협업도구', 'Collaboration Tool'), t('보안', 'Security')];
 const products = [
-  'AX 워크스테이션',
-  'UltraView 모니터',
-  'EdgeLink 라우터',
+  t('AX 워크스테이션', 'AX Workstation'),
+  t('UltraView 모니터', 'UltraView Monitor'),
+  t('EdgeLink 라우터', 'EdgeLink Router'),
   'Vault NAS',
   'Workspace Pro',
   'Smart Dock',
@@ -69,12 +70,12 @@ const products = [
   'WiFi 7 Access Point',
   'Ergo Keyboard',
 ];
-const paymentMethods = ['신용카드', '계좌이체', '가상계좌', '후불결제', '법인카드'];
-const paymentStatuses = ['결제 완료', '입금 대기', '부분 결제', '환불 완료'];
-const orderStatuses = ['주문 접수', '상품 준비', '출고 완료', '배송 중', '배송 완료', '주문 취소'];
-const fulfillmentCenters = ['김포 FC', '용인 FC', '이천 FC', '대구 FC', '부산 FC'];
-const shippingMethods = ['일반 택배', '당일 배송', '새벽 배송', '화물 배송', '방문 수령'];
-const riskLevels = ['낮음', '관찰', '주의', '높음'];
+const paymentMethods = [t('신용카드', 'Credit Card'), t('계좌이체', 'Account Transfer'), t('가상계좌', 'Virtual Account'), t('후불결제', 'Postpaid Payment'), t('법인카드', 'Corporate Card')];
+const paymentStatuses = [t('결제 완료', 'Payment Completed'), t('입금 대기', 'Waiting for Deposit'), t('부분 결제', 'Partial Payment'), t('환불 완료', 'Refund Completed')];
+const orderStatuses = [t('주문 접수', 'Order Receipt'), t('상품 준비', 'Product Preparation'), t('출고 완료', 'Dispatch Completed'), t('배송 중', 'In Transit'), t('배송 완료', 'Delivery Completed'), t('주문 취소', 'Order Cancelled')];
+const fulfillmentCenters = [t('김포 FC', 'Gimpo FC'), t('용인 FC', 'Yongin FC'), t('이천 FC', 'Icheon FC'), t('대구 FC', 'Daegu FC'), t('부산 FC', 'Busan FC')];
+const shippingMethods = [t('일반 택배', 'General Courier'), t('당일 배송', 'Same-day Delivery'), t('새벽 배송', 'Dawn Delivery'), t('화물 배송', 'Freight Delivery'), t('방문 수령', 'Pick Up in Store')];
+const riskLevels = [t('낮음', 'Low'), t('관찰', 'Observation'), t('주의', 'Caution'), t('높음', 'High')];
 function formatDateTime(timestamp: number) {
   return new Date(timestamp).toISOString().replace('T', ' ').slice(0, 16);
 }
@@ -124,7 +125,7 @@ const columns: BGridColumn<IOrderItem>[] = [
     {
       id: 'orderNo',
       key: 'orderNo',
-      label: '주문 번호',
+      label: t('주문 번호', 'Order Number'),
       width: 150,
       toolbox: true,
       filter: { type: 'text', caseSensitive: true },
@@ -132,16 +133,16 @@ const columns: BGridColumn<IOrderItem>[] = [
     {
       id: 'orderedAt',
       key: 'orderedAt',
-      label: '주문 일시',
+      label: t('주문 일시', 'Order Date and Time'),
       width: 145,
       toolbox: true,
       filter: { type: 'text', caseSensitive: true },
     },
-    { id: 'customerName', key: 'customerName', label: '고객사', width: 210, toolbox: true, filter: { type: 'text' } },
+    { id: 'customerName', key: 'customerName', label: t('고객사', 'Client'), width: 210, toolbox: true, filter: { type: 'text' } },
     {
       id: 'customerTier',
       key: 'customerTier',
-      label: '고객 등급',
+      label: t('고객 등급', 'Customer Level'),
       width: 100,
       toolbox: true,
       filter: { type: 'values' },
@@ -149,16 +150,16 @@ const columns: BGridColumn<IOrderItem>[] = [
     {
       id: 'salesChannel',
       key: 'salesChannel',
-      label: '판매 채널',
+      label: t('판매 채널', 'Sales Channel'),
       width: 110,
       toolbox: true,
       filter: { type: 'values' },
     },
-    { id: 'region', key: 'region', label: '권역', width: 80, toolbox: true, filter: { type: 'values' } },
-    { id: 'salesTeam', key: 'salesTeam', label: '영업 조직', width: 135, toolbox: true, filter: { type: 'values' } },
-    { id: 'salesRep', key: 'salesRep', label: '담당자', width: 90, toolbox: true, filter: { type: 'values' } },
-    { id: 'category', key: 'category', label: '상품 분류', width: 105, toolbox: true, filter: { type: 'values' } },
-    { id: 'productName', key: 'productName', label: '상품명', width: 225, toolbox: true, filter: { type: 'text' } },
+    { id: 'region', key: 'region', label: t('권역', 'Region'), width: 80, toolbox: true, filter: { type: 'values' } },
+    { id: 'salesTeam', key: 'salesTeam', label: t('영업 조직', 'Sales Organization'), width: 135, toolbox: true, filter: { type: 'values' } },
+    { id: 'salesRep', key: 'salesRep', label: t('담당자', 'Assignee'), width: 90, toolbox: true, filter: { type: 'values' } },
+    { id: 'category', key: 'category', label: t('상품 분류', 'Product Category'), width: 105, toolbox: true, filter: { type: 'values' } },
+    { id: 'productName', key: 'productName', label: t('상품명', 'Product Name'), width: 225, toolbox: true, filter: { type: 'text' } },
     {
       id: 'sku',
       key: 'sku',
@@ -170,7 +171,7 @@ const columns: BGridColumn<IOrderItem>[] = [
     {
       id: 'quantity',
       key: 'quantity',
-      label: '수량',
+      label: t('수량', 'Quantity'),
       width: 75,
       align: 'right',
       toolbox: true,
@@ -179,7 +180,7 @@ const columns: BGridColumn<IOrderItem>[] = [
     {
       id: 'unitPrice',
       key: 'unitPrice',
-      label: '단가',
+      label: t('단가', 'Unit Price'),
       width: 115,
       align: 'right',
       toolbox: true,
@@ -189,7 +190,7 @@ const columns: BGridColumn<IOrderItem>[] = [
     {
       id: 'grossAmount',
       key: 'grossAmount',
-      label: '주문 금액',
+      label: t('주문 금액', 'Order Amount'),
       width: 135,
       align: 'right',
       toolbox: true,
@@ -199,7 +200,7 @@ const columns: BGridColumn<IOrderItem>[] = [
     {
       id: 'discountRate',
       key: 'discountRate',
-      label: '할인율',
+      label: t('할인율', 'Discount Rate'),
       width: 85,
       align: 'right',
       toolbox: true,
@@ -209,7 +210,7 @@ const columns: BGridColumn<IOrderItem>[] = [
     {
       id: 'netAmount',
       key: 'netAmount',
-      label: '결제 금액',
+      label: t('결제 금액', 'Payment Amount'),
       width: 135,
       align: 'right',
       toolbox: true,
@@ -219,7 +220,7 @@ const columns: BGridColumn<IOrderItem>[] = [
     {
       id: 'paymentMethod',
       key: 'paymentMethod',
-      label: '결제 수단',
+      label: t('결제 수단', 'Payment Method'),
       width: 110,
       toolbox: true,
       filter: { type: 'values' },
@@ -227,7 +228,7 @@ const columns: BGridColumn<IOrderItem>[] = [
     {
       id: 'paymentStatus',
       key: 'paymentStatus',
-      label: '결제 상태',
+      label: t('결제 상태', 'Payment Status'),
       width: 110,
       toolbox: true,
       filter: { type: 'values' },
@@ -235,7 +236,7 @@ const columns: BGridColumn<IOrderItem>[] = [
     {
       id: 'orderStatus',
       key: 'orderStatus',
-      label: '주문 상태',
+      label: t('주문 상태', 'Order Status'),
       width: 110,
       toolbox: true,
       filter: { type: 'values' },
@@ -243,7 +244,7 @@ const columns: BGridColumn<IOrderItem>[] = [
     {
       id: 'fulfillmentCenter',
       key: 'fulfillmentCenter',
-      label: '출고 센터',
+      label: t('출고 센터', 'Dispatch Center'),
       width: 105,
       toolbox: true,
       filter: { type: 'values' },
@@ -251,7 +252,7 @@ const columns: BGridColumn<IOrderItem>[] = [
     {
       id: 'shippingMethod',
       key: 'shippingMethod',
-      label: '배송 방식',
+      label: t('배송 방식', 'Delivery Method'),
       width: 110,
       toolbox: true,
       filter: { type: 'values' },
@@ -259,16 +260,16 @@ const columns: BGridColumn<IOrderItem>[] = [
     {
       id: 'promisedAt',
       key: 'promisedAt',
-      label: '출고 예정일',
+      label: t('출고 예정일', 'Expected Dispatch Date'),
       width: 145,
       toolbox: true,
       filter: { type: 'text', caseSensitive: true },
     },
-    { id: 'riskLevel', key: 'riskLevel', label: '거래 위험도', width: 105, toolbox: true, filter: { type: 'values' } },
+    { id: 'riskLevel', key: 'riskLevel', label: t('거래 위험도', 'Transaction Risk Level'), width: 105, toolbox: true, filter: { type: 'values' } },
     {
       id: 'marginRate',
       key: 'marginRate',
-      label: '매출 총이익률',
+      label: t('매출 총이익률', 'Gross Margin'),
       width: 120,
       align: 'right',
       toolbox: true,
@@ -302,7 +303,7 @@ function ScrollExample() {
           : '브라우저가 클립보드 복사를 거부했습니다.';
 
       notificationApi.warning({
-        message: '복사할 수 없습니다',
+        message: t('복사할 수 없습니다', 'Cannot copy'),
         description,
         placement: 'topRight',
       });

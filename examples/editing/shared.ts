@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import type { BGridChangeDataMeta, BGridColumn, BGridDataItem } from 'beautiful-grid';
 import './editingExamples.css';
 
@@ -6,8 +7,8 @@ export interface EditingOrder {
   orderCode: string;
   customerCode: string;
   customerName: string;
-  customerGrade: '일반' | '우수' | 'VIP';
-  status: '접수' | '진행' | '완료';
+  customerGrade: string;
+  status: string;
   deliveryDate: string;
   approved: boolean;
   quantity: number;
@@ -23,15 +24,15 @@ export const editingOrders: BGridDataItem<EditingOrder>[] = [
       id: 'ORDER-001',
       orderCode: 'ORD-2601',
       customerCode: 'C001',
-      customerName: '서울상사',
+      customerName: t('서울상사', 'Seoul Sangsa'),
       customerGrade: 'VIP',
-      status: '접수',
+      status: t('접수', 'Receipt'),
       deliveryDate: '2026-08-25',
       approved: true,
       quantity: 2,
       unitPrice: 12000,
       amount: 24000,
-      note: '오전 배송',
+      note: t('오전 배송', 'Morning Delivery'),
       mergeGroup: 'A',
     },
   },
@@ -40,15 +41,15 @@ export const editingOrders: BGridDataItem<EditingOrder>[] = [
       id: 'ORDER-002',
       orderCode: 'ORD-2602',
       customerCode: 'C001',
-      customerName: '서울상사',
+      customerName: t('서울상사', 'Seoul Sangsa'),
       customerGrade: 'VIP',
-      status: '진행',
+      status: t('진행', 'In Progress'),
       deliveryDate: '2026-08-26',
       approved: false,
       quantity: 3,
       unitPrice: 18000,
       amount: 54000,
-      note: '담당자 확인',
+      note: t('담당자 확인', 'Assignee Confirmation'),
       mergeGroup: 'A',
     },
   },
@@ -57,9 +58,9 @@ export const editingOrders: BGridDataItem<EditingOrder>[] = [
       id: 'ORDER-003',
       orderCode: 'ORD-2603',
       customerCode: 'C002',
-      customerName: '한빛물산',
-      customerGrade: '우수',
-      status: '완료',
+      customerName: t('한빛물산', 'Hanbit Mulsan'),
+      customerGrade: t('우수', 'Excellent'),
+      status: t('완료', 'Completed'),
       deliveryDate: '2026-08-28',
       approved: true,
       quantity: 1,
@@ -75,8 +76,8 @@ export const editingOrders: BGridDataItem<EditingOrder>[] = [
       orderCode: 'ORD-2604',
       customerCode: 'C003',
       customerName: 'Northwind',
-      customerGrade: '일반',
-      status: '접수',
+      customerGrade: t('일반', 'General'),
+      status: t('접수', 'Receipt'),
       deliveryDate: '2026-09-01',
       approved: false,
       quantity: 5,

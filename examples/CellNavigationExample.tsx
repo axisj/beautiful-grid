@@ -1,3 +1,4 @@
+import { t } from './i18n';
 import * as React from 'react';
 import { BGrid, type BGridCellAddress, type BGridColumn, type BGridDataItem } from 'beautiful-grid';
 import DataGridContainer from '../components/DataGridContainer';
@@ -15,7 +16,7 @@ interface OrderRow {
   total: number;
 }
 
-const categories = ['오피스', '디자인', '분석', '자동화'];
+const categories = [t('오피스', 'Office'), t('디자인', 'Design'), t('분석', 'Analysis'), t('자동화', 'Automation')];
 const products = ['Workspace Pro', 'Design System', 'Analytics Seat', 'Automation Pack'];
 const customers = ['AxisJ Studio', 'Northwind', 'Paperworks', 'Seoul Labs', 'Mono Office', 'Orbit Works'];
 
@@ -30,7 +31,7 @@ const initialData: BGridDataItem<OrderRow>[] = Array.from({ length: 48 }, (_, in
       customer: customers[index % customers.length],
       category: categories[groupIndex],
       product: products[groupIndex],
-      status: ['완료', '배송 중', '준비'][index % 3],
+      status: [t('완료', 'Completed'), t('배송 중', 'In Transit'), t('준비', 'Ready')][index % 3],
       quantity,
       unitPrice,
       total: quantity * unitPrice,
@@ -45,13 +46,13 @@ export default function CellNavigationExample() {
   const [selectionEnabled, setSelectionEnabled] = React.useState(true);
   const [wrap, setWrap] = React.useState(false);
   const [editOnEnter, setEditOnEnter] = React.useState(true);
-  const [lastActivation, setLastActivation] = React.useState('없음');
+  const [lastActivation, setLastActivation] = React.useState(t('없음', 'None'));
   const containerRef = React.useRef<HTMLDivElement>(null);
   const { width, height } = useContainerSize(containerRef);
 
   const columns = React.useMemo<BGridColumn<OrderRow>[]>(
     () => [
-      { key: 'orderNo', label: '주문 번호', width: 110, editable: false },
+      { key: 'orderNo', label: t('주문 번호', 'Order Number'), width: 110, editable: false },
       {
         key: 'customer',
         label: '고객 · 편집 가능',
@@ -59,7 +60,7 @@ export default function CellNavigationExample() {
         editable: true,
         editor: {
           type: 'text',
-          ariaLabel: '고객 편집',
+          ariaLabel: t('고객 편집', 'Edit Customer'),
           inputProps: { maxLength: 50, autoComplete: 'off' },
         },
       },
@@ -71,15 +72,15 @@ export default function CellNavigationExample() {
         editable: true,
         editor: {
           type: 'text',
-          ariaLabel: '상품 편집',
+          ariaLabel: t('상품 편집', 'Edit Product'),
           inputProps: { maxLength: 80, autoComplete: 'off' },
         },
       },
-      { key: 'status', label: '상태', width: 100, align: 'center', editable: false },
-      { key: 'quantity', label: '수량', width: 80, align: 'right', editable: false },
+      { key: 'status', label: t('상태', 'Status'), width: 100, align: 'center', editable: false },
+      { key: 'quantity', label: t('수량', 'Quantity'), width: 80, align: 'right', editable: false },
       {
         key: 'unitPrice',
-        label: '단가',
+        label: t('단가', 'Unit Price'),
         width: 110,
         align: 'right',
         editable: false,
@@ -87,7 +88,7 @@ export default function CellNavigationExample() {
       },
       {
         key: 'total',
-        label: '합계',
+        label: t('합계', 'Total'),
         width: 120,
         align: 'right',
         editable: false,
@@ -101,10 +102,10 @@ export default function CellNavigationExample() {
     <div className='flex min-h-0 flex-col gap-3'>
       <div className='rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700'>
         <div className='mb-2 flex flex-wrap items-center gap-x-4 gap-y-2'>
-          <Toggle label='키보드 이동' checked={navigationEnabled} onChange={setNavigationEnabled} />
-          <Toggle label='범위 선택' checked={selectionEnabled} onChange={setSelectionEnabled} />
-          <Toggle label='경계 순환' checked={wrap} onChange={setWrap} />
-          <Toggle label='Enter로 편집' checked={editOnEnter} onChange={setEditOnEnter} />
+          <Toggle label={t(t('키보드 이동', 'Keyboard Navigation'), 'Keyboard Navigation')} checked={navigationEnabled} onChange={setNavigationEnabled} />
+          <Toggle label={t(t('범위 선택', 'Select Range'), 'Select Range')} checked={selectionEnabled} onChange={setSelectionEnabled} />
+          <Toggle label={t(t('경계 순환', 'Boundary Circulation'), 'Boundary Circulation')} checked={wrap} onChange={setWrap} />
+          <Toggle label={t(t('Enter로 편집', 'Press Enter to edit'), 'Press Enter to edit')} checked={editOnEnter} onChange={setEditOnEnter} />
         </div>
         <p className='m-0 leading-6'>
           셀 클릭 후 <kbd>방향키</kbd>, <kbd>Home</kbd>/<kbd>End</kbd>, <kbd>PageUp</kbd>/<kbd>PageDown</kbd>,{' '}

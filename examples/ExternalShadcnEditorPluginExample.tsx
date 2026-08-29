@@ -1,3 +1,4 @@
+import { t } from './i18n';
 import * as React from 'react';
 import { BGrid, type BGridColumn, type BGridDataItem } from 'beautiful-grid';
 import DataGridContainer from '../components/DataGridContainer';
@@ -27,44 +28,44 @@ type ExternalShadcnOrder = EditingOrder & {
 
 const shadcnStatusEditor = createShadcnSelectEditorPlugin<ExternalShadcnOrder, EditingOrder['status']>({
   id: 'external-shadcn-status',
-  ariaLabel: 'Shadcn UI 주문 상태 선택',
+  ariaLabel: t('Shadcn UI 주문 상태 선택', 'Shadcn UI Select Order Status'),
   options: [
-    { value: '접수', label: '접수' },
-    { value: '진행', label: '진행' },
-    { value: '완료', label: '완료' },
+    { value: t('접수', 'Receipt'), label: t('접수', 'Receipt') },
+    { value: t('진행', 'In Progress'), label: t('진행', 'In Progress') },
+    { value: t('완료', 'Completed'), label: t('완료', 'Completed') },
   ],
 });
 
 const shadcnDeliveryDateEditor = createShadcnDatePickerEditorPlugin<ExternalShadcnOrder>({
   id: 'external-shadcn-delivery-date',
-  ariaLabel: 'Shadcn UI 납기일 선택',
+  ariaLabel: t('Shadcn UI 납기일 선택', 'Shadcn UI Select Delivery Date'),
 });
 
 const shadcnLabelColorEditor = createShadcnColorPickerEditorPlugin<ExternalShadcnOrder>({
   id: 'external-shadcn-label-color',
-  ariaLabel: 'Shadcn UI 라벨 색상 선택',
+  ariaLabel: t('Shadcn UI 라벨 색상 선택', 'Shadcn UI Select Label Color'),
 });
 
 const shadcnCategoryEditor = createShadcnCascaderEditorPlugin<ExternalShadcnOrder>({
   id: 'external-shadcn-category',
-  ariaLabel: 'Shadcn UI 분류 경로 선택',
+  ariaLabel: t('Shadcn UI 분류 경로 선택', 'Shadcn UI Select Category Path'),
   options: [
     {
-      value: '국내',
-      label: '국내',
+      value: t('국내', 'Domestic'),
+      label: t('국내', 'Domestic'),
       children: [
-        { value: '서울', label: '서울' },
-        { value: '부산', label: '부산' },
-        { value: '제주', label: '제주' },
+        { value: t('서울', 'Seoul'), label: t('서울', 'Seoul') },
+        { value: t('부산', 'Busan'), label: t('부산', 'Busan') },
+        { value: t('제주', 'Jeju'), label: t('제주', 'Jeju') },
       ],
     },
     {
-      value: '해외',
-      label: '해외',
+      value: t('해외', 'Overseas'),
+      label: t('해외', 'Overseas'),
       children: [
-        { value: '아시아', label: '아시아' },
-        { value: '유럽', label: '유럽' },
-        { value: '북미', label: '북미' },
+        { value: t('아시아', 'Asia'), label: t('아시아', 'Asia') },
+        { value: t('유럽', 'Europe'), label: t('유럽', 'Europe') },
+        { value: t('북미', 'North America'), label: t('북미', 'North America') },
       ],
     },
   ],
@@ -72,25 +73,25 @@ const shadcnCategoryEditor = createShadcnCascaderEditorPlugin<ExternalShadcnOrde
 
 const shadcnDeliveryTimeEditor = createShadcnTimePickerEditorPlugin<ExternalShadcnOrder>({
   id: 'external-shadcn-delivery-time',
-  ariaLabel: 'Shadcn UI 배송 시간 선택',
+  ariaLabel: t('Shadcn UI 배송 시간 선택', 'Shadcn UI Select Delivery Time'),
 });
 
 const shadcnOrganizationEditor = createShadcnTreeSelectEditorPlugin<ExternalShadcnOrder>({
   id: 'external-shadcn-organization',
-  ariaLabel: 'Shadcn UI 담당 조직 선택',
+  ariaLabel: t('Shadcn UI 담당 조직 선택', 'Shadcn UI Select Responsible Organization'),
   treeData: [
     {
-      title: '영업본부',
+      title: t('영업본부', 'Sales Headquarters'),
       children: [
-        { title: '서울 영업팀', value: '서울 영업팀' },
-        { title: '부산 영업팀', value: '부산 영업팀' },
+        { title: t('서울 영업팀', 'Seoul Sales Team'), value: t('서울 영업팀', 'Seoul Sales Team') },
+        { title: t('부산 영업팀', 'Busan Sales Team'), value: t('부산 영업팀', 'Busan Sales Team') },
       ],
     },
     {
-      title: '운영본부',
+      title: t('운영본부', 'Operations Headquarters'),
       children: [
-        { title: '물류팀', value: '물류팀' },
-        { title: '고객지원팀', value: '고객지원팀' },
+        { title: t('물류팀', 'Logistics Team'), value: t('물류팀', 'Logistics Team') },
+        { title: t('고객지원팀', 'Customer Support Team'), value: t('고객지원팀', 'Customer Support Team') },
       ],
     },
   ],
@@ -98,13 +99,13 @@ const shadcnOrganizationEditor = createShadcnTreeSelectEditorPlugin<ExternalShad
 
 const initialColors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'];
 const initialCategoryPaths = [
-  ['국내', '서울'],
-  ['국내', '부산'],
-  ['해외', '아시아'],
-  ['해외', '유럽'],
+  [t('국내', 'Domestic'), t('서울', 'Seoul')],
+  [t('국내', 'Domestic'), t('부산', 'Busan')],
+  [t('해외', 'Overseas'), t('아시아', 'Asia')],
+  [t('해외', 'Overseas'), t('유럽', 'Europe')],
 ];
 const initialDeliveryTimes = ['09:30', '11:00', '14:30', '16:00'];
-const initialOrganizations = ['서울 영업팀', '부산 영업팀', '물류팀', '고객지원팀'];
+const initialOrganizations = [t('서울 영업팀', 'Seoul Sales Team'), t('부산 영업팀', 'Busan Sales Team'), t('물류팀', 'Logistics Team'), t('고객지원팀', 'Customer Support Team')];
 
 const cloneExternalShadcnOrders = (): BGridDataItem<ExternalShadcnOrder>[] =>
   cloneEditingOrders().map((item, index) => ({
@@ -125,15 +126,15 @@ export default function ExternalShadcnEditorPluginExample() {
 
   const columns = React.useMemo<BGridColumn<ExternalShadcnOrder>[]>(
     () => withEditingCellClasses<ExternalShadcnOrder>([
-      { key: 'orderCode', label: '주문 코드', width: 140, editable: false },
-      { key: 'customerName', label: '고객명', width: 160, editable: false },
+      { key: 'orderCode', label: t('주문 코드', 'Order Code'), width: 140, editable: false },
+      { key: 'customerName', label: t('고객명', 'Customer Name'), width: 160, editable: false },
       {
         key: 'status',
         label: 'Shadcn UI Select',
         width: 180,
         editable: true,
         editor: shadcnStatusEditor,
-        editorIcon: { render: <ChevronDownIcon />, ariaLabel: 'Shadcn UI 상태 선택' },
+        editorIcon: { render: <ChevronDownIcon />, ariaLabel: t('Shadcn UI 상태 선택', 'Shadcn UI Select Status') },
       },
       {
         key: 'deliveryDate',
@@ -141,7 +142,7 @@ export default function ExternalShadcnEditorPluginExample() {
         width: 200,
         editable: true,
         editor: shadcnDeliveryDateEditor,
-        editorIcon: { render: <CalendarIcon />, ariaLabel: 'Shadcn UI 납기일 선택' },
+        editorIcon: { render: <CalendarIcon />, ariaLabel: t('Shadcn UI 납기일 선택', 'Shadcn UI Select Delivery Date') },
       },
       {
         key: 'labelColor',
@@ -158,7 +159,7 @@ export default function ExternalShadcnEditorPluginExample() {
               aria-hidden='true'
             />
           ),
-          ariaLabel: 'Shadcn UI 라벨 색상 선택',
+          ariaLabel: t('Shadcn UI 라벨 색상 선택', 'Shadcn UI Select Label Color'),
         },
       },
       {
@@ -170,7 +171,7 @@ export default function ExternalShadcnEditorPluginExample() {
         itemRender: ({ value }) => <>{Array.isArray(value) ? value.join(' / ') : ''}</>,
         getClipboardText: ({ value }) => formatCascaderClipboardText(value),
         parseClipboardText: parseCascaderClipboardText,
-        editorIcon: { render: <ChevronDownIcon />, ariaLabel: 'Shadcn UI 분류 경로 선택' },
+        editorIcon: { render: <ChevronDownIcon />, ariaLabel: t('Shadcn UI 분류 경로 선택', 'Shadcn UI Select Category Path') },
       },
       {
         key: 'deliveryTime',
@@ -178,7 +179,7 @@ export default function ExternalShadcnEditorPluginExample() {
         width: 190,
         editable: true,
         editor: shadcnDeliveryTimeEditor,
-        editorIcon: { render: <ClockIcon />, ariaLabel: 'Shadcn UI 배송 시간 선택' },
+        editorIcon: { render: <ClockIcon />, ariaLabel: t('Shadcn UI 배송 시간 선택', 'Shadcn UI Select Delivery Time') },
       },
       {
         key: 'organization',
@@ -186,7 +187,7 @@ export default function ExternalShadcnEditorPluginExample() {
         width: 210,
         editable: true,
         editor: shadcnOrganizationEditor,
-        editorIcon: { render: <ChevronDownIcon />, ariaLabel: 'Shadcn UI 담당 조직 선택' },
+        editorIcon: { render: <ChevronDownIcon />, ariaLabel: t('Shadcn UI 담당 조직 선택', 'Shadcn UI Select Responsible Organization') },
       },
     ]),
     [],

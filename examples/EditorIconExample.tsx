@@ -1,3 +1,4 @@
+import { t } from './i18n';
 import * as React from 'react';
 import { BGrid, type BGridColumn } from 'beautiful-grid';
 import { createDateEditorPlugin, createSelectEditorPlugin } from 'beautiful-grid/editors';
@@ -14,9 +15,9 @@ import {
 const statusEditor = createSelectEditorPlugin<EditingOrder, EditingOrder['status']>({
   id: 'icon-status',
   options: [
-    { value: '접수', label: '접수' },
-    { value: '진행', label: '진행' },
-    { value: '완료', label: '완료' },
+    { value: t('접수', 'Receipt'), label: t('접수', 'Receipt') },
+    { value: t('진행', 'In Progress'), label: t('진행', 'In Progress') },
+    { value: t('완료', 'Completed'), label: t('완료', 'Completed') },
   ],
 });
 
@@ -30,37 +31,37 @@ export default function EditorIconExample() {
 
   const columns = React.useMemo<BGridColumn<EditingOrder>[]>(
     () => withEditingCellClasses<EditingOrder>([
-      { key: 'orderCode', label: '주문 코드', width: 145, editable: false },
+      { key: 'orderCode', label: t('주문 코드', 'Order Code'), width: 145, editable: false },
       {
         key: 'status',
-        label: '항상 표시',
+        label: t('항상 표시', 'Always Show'),
         width: 145,
         editable: true,
         editor: statusEditor,
         editTrigger: 'click',
-        editorIcon: { render: <ChevronDownIcon />, ariaLabel: '상태 선택', visibility: 'always' },
+        editorIcon: { render: <ChevronDownIcon />, ariaLabel: t('상태 선택', 'Select Status'), visibility: 'always' },
       },
       {
         key: 'deliveryDate',
-        label: 'hover 표시',
+        label: t('hover 표시', 'Show on hover'),
         width: 165,
         editable: true,
         editor: dateEditor,
-        editorIcon: { render: <CalendarIcon />, ariaLabel: '납기일 선택', visibility: 'hover' },
+        editorIcon: { render: <CalendarIcon />, ariaLabel: t('납기일 선택', 'Select Delivery Date'), visibility: 'hover' },
       },
       {
         key: 'note',
-        label: 'callback 아이콘',
+        label: t('callback 아이콘', 'callback icon'),
         width: 210,
         editable: true,
         editor: { type: 'text' },
         editorIcon: {
           render: <CheckIcon />,
-          ariaLabel: '메모 확인 완료',
+          ariaLabel: t('메모 확인 완료', 'Memo Checked'),
           visibility: 'active',
           onClick: async ({ index, commit }) => {
             setLastAction(`${index + 1}행 메모에 확인 표시를 추가했습니다.`);
-            await commit([{ key: 'note', value: '확인 완료' }]);
+            await commit([{ key: 'note', value: t('확인 완료', 'Confirmation Completed') }]);
           },
         },
       },

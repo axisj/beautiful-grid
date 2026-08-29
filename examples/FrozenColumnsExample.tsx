@@ -1,3 +1,4 @@
+import { t } from './i18n';
 import * as React from 'react';
 import { BGrid, type BGridColumn, type BGridDataItem, type BGridProps } from 'beautiful-grid';
 import { Select } from 'antd';
@@ -17,8 +18,8 @@ interface EmployeeRow {
   status: string;
 }
 
-const departments = ['플랫폼개발', '디자인시스템', '데이터엔지니어링', '서비스운영'];
-const positions = ['책임', '선임', '주임', '매니저'];
+const departments = [t('플랫폼개발', 'Platform Development'), t('디자인시스템', 'Design System'), t('데이터엔지니어링', 'Data Engineering'), t('서비스운영', 'Service Operation')];
+const positions = [t('책임', 'Responsible'), t('선임', 'Senior'), t('주임', 'Assistant Manager'), t('매니저', 'Manager')];
 
 const data: BGridDataItem<EmployeeRow>[] = Array.from({ length: 80 }, (_, index) => ({
   values: {
@@ -26,26 +27,26 @@ const data: BGridDataItem<EmployeeRow>[] = Array.from({ length: 80 }, (_, index)
     name: `구성원 ${index + 1}`,
     department: departments[index % departments.length],
     position: positions[index % positions.length],
-    location: ['서울', '부산', '대전'][index % 3],
+    location: [t('서울', 'Seoul'), t('부산', 'Busan'), t('대전', 'Daejeon')][index % 3],
     project: `프로젝트 ${String.fromCharCode(65 + (index % 6))}`,
     allocationRate: 60 + (index % 5) * 10,
     remainingLeaveDays: 4 + (index % 12),
     joinedAt: `202${index % 6}-0${(index % 9) + 1}-15`,
-    status: index % 11 === 0 ? '휴직' : index % 5 === 0 ? '휴가' : '재직',
+    status: index % 11 === 0 ? t('휴직', 'Leave of Absence') : index % 5 === 0 ? t('휴가', 'On Leave') : t('재직', 'Employed'),
   },
 }));
 
 const columns: BGridColumn<EmployeeRow>[] = [
-  { key: 'employeeNo', label: '사번', width: 100 },
-  { key: 'name', label: '이름', width: 120 },
-  { key: 'department', label: '부서', width: 130 },
-  { key: 'position', label: '직급', width: 90 },
-  { key: 'location', label: '근무지', width: 90 },
-  { key: 'project', label: '담당 프로젝트', width: 130 },
+  { key: 'employeeNo', label: t('사번', 'Employee Number'), width: 100 },
+  { key: 'name', label: t('이름', 'Name'), width: 120 },
+  { key: 'department', label: t('부서', 'Department'), width: 130 },
+  { key: 'position', label: t('직급', 'Job Title'), width: 90 },
+  { key: 'location', label: t('근무지', 'Workplace'), width: 90 },
+  { key: 'project', label: t('담당 프로젝트', 'Responsible Project'), width: 130 },
   { key: 'allocationRate', label: '투입률(%)', width: 100, align: 'right' },
   { key: 'remainingLeaveDays', label: '잔여 연차(일)', width: 110, align: 'right' },
-  { key: 'joinedAt', label: '입사일', width: 110 },
-  { key: 'status', label: '상태', width: 200, align: 'center' },
+  { key: 'joinedAt', label: t('입사일', 'Date of Joining'), width: 110 },
+  { key: 'status', label: t('상태', 'Status'), width: 200, align: 'center' },
 ];
 
 const summaryColumns: NonNullable<BGridProps<EmployeeRow>['summary']>['columns'] = [
@@ -127,7 +128,7 @@ export default function FrozenColumnsExample() {
           <label className="inline-flex items-center gap-2 font-medium">
             <span>고정할 선행 컬럼 수</span>
             <Select<number>
-              aria-label="고정할 컬럼 수"
+              aria-label={t(t('고정할 컬럼 수', 'Number of Columns to Freeze'), 'Number of Columns to Freeze')}
               style={{ width: 84 }}
               value={frozenColumnIndex}
               options={[0, 1, 2, 3].map(count => ({ value: count, label: `${count}개` }))}
@@ -137,7 +138,7 @@ export default function FrozenColumnsExample() {
           <label className="inline-flex items-center gap-2 font-medium">
             <span>고정할 선행 행 수</span>
             <Select<number>
-              aria-label="고정할 행 수"
+              aria-label={t(t('고정할 행 수', 'Number of Rows to Freeze'), 'Number of Rows to Freeze')}
               style={{ width: 84 }}
               value={frozenRowCount}
               options={[0, 1, 2, 3, 5].map(count => ({ value: count, label: `${count}개` }))}
@@ -146,7 +147,7 @@ export default function FrozenColumnsExample() {
           </label>
           <label className="inline-flex items-center gap-2 font-medium">
             <input
-              aria-label="Summary 표시"
+              aria-label={t(t('Summary 표시', 'Show Summary'), 'Show Summary')}
               type="checkbox"
               checked={summaryVisible}
               onChange={event => setSummaryVisible(event.target.checked)}
@@ -156,21 +157,21 @@ export default function FrozenColumnsExample() {
           <label className="inline-flex items-center gap-2 font-medium">
             <span>Summary 위치</span>
             <Select<'top' | 'bottom'>
-              aria-label="Summary 위치"
+              aria-label={t(t('Summary 위치', 'Summary Position'), 'Summary Position')}
               style={{ width: 96 }}
               value={summaryPosition}
               disabled={!summaryVisible}
               options={[
-                { value: 'top', label: '상단' },
-                { value: 'bottom', label: '하단' },
+                { value: 'top', label: t('상단', 'Top') },
+                { value: 'bottom', label: t('하단', 'Bottom') },
               ]}
               onChange={setSummaryPosition}
             />
           </label>
         </div>
         <p className="m-0 text-slate-600">
-          {summaryVisible ? `Summary ${summaryPosition === 'top' ? '상단' : '하단'} 표시` : 'Summary 숨김'} ·{' '}
-          {summaryVisible && summaryPosition === 'top' ? 'Summary 다음 줄부터' : '첫 데이터 행부터'} {frozenRowCount}
+          {summaryVisible ? `Summary ${summaryPosition === 'top' ? t('상단', 'Top') : t('하단', 'Bottom')} 표시` : t('Summary 숨김', 'Hide Summary')} ·{' '}
+          {summaryVisible && summaryPosition === 'top' ? t('Summary 다음 줄부터', 'From next line of Summary') : t('첫 데이터 행부터', 'From First Data Row')} {frozenRowCount}
           개 행, 왼쪽 {frozenColumnIndex}개 컬럼을 고정합니다.
         </p>
       </div>

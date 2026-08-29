@@ -1,3 +1,4 @@
+import { t } from './i18n';
 import * as React from 'react';
 import { BGrid, type BGridColumn, type BGridDataItem } from 'beautiful-grid';
 import { Select } from 'antd';
@@ -13,20 +14,20 @@ import {
 const customerGroups: Array<
   Pick<EditingOrder, 'customerCode' | 'customerName' | 'customerGrade'>
 > = [
-  { customerCode: 'C001', customerName: '서울상사', customerGrade: 'VIP' },
-  { customerCode: 'C002', customerName: '한빛물산', customerGrade: '우수' },
-  { customerCode: 'C003', customerName: 'Northwind', customerGrade: '일반' },
-  { customerCode: 'C004', customerName: 'AxisJ Studio', customerGrade: '우수' },
-  { customerCode: 'C005', customerName: '대한유통 장기 고객사명 샘플', customerGrade: 'VIP' },
-  { customerCode: 'C006', customerName: 'Blue Ocean Trading', customerGrade: '일반' },
-  { customerCode: 'C007', customerName: '새봄물류', customerGrade: '우수' },
+  { customerCode: 'C001', customerName: t('서울상사', 'Seoul Sangsa'), customerGrade: 'VIP' },
+  { customerCode: 'C002', customerName: t('한빛물산', 'Hanbit Mulsan'), customerGrade: t('우수', 'Excellent') },
+  { customerCode: 'C003', customerName: 'Northwind', customerGrade: t('일반', 'General') },
+  { customerCode: 'C004', customerName: 'AxisJ Studio', customerGrade: t('우수', 'Excellent') },
+  { customerCode: 'C005', customerName: t('대한유통 장기 고객사명 샘플', 'Daehan Distribution Long-term Client Name Sample'), customerGrade: 'VIP' },
+  { customerCode: 'C006', customerName: 'Blue Ocean Trading', customerGrade: t('일반', 'General') },
+  { customerCode: 'C007', customerName: t('새봄물류', 'Saebom Logistics'), customerGrade: t('우수', 'Excellent') },
   { customerCode: 'C008', customerName: 'Global Partners Korea', customerGrade: 'VIP' },
 ];
 
-const statuses: EditingOrder['status'][] = ['접수', '진행', '완료'];
+const statuses: EditingOrder['status'][] = [t('접수', 'Receipt'), t('진행', 'In Progress'), t('완료', 'Completed')];
 const notes = [
-  '오전 배송',
-  '담당자 확인',
+  t('오전 배송', 'Morning Delivery'),
+  t('담당자 확인', 'Assignee Confirmation'),
   '행 높이를 늘리지 않는 긴 메모 내용이 말줄임으로 표시됩니다.',
 ];
 
@@ -66,7 +67,7 @@ export default function MergedCellEditingExample() {
 
   const columns = React.useMemo<BGridColumn<EditingOrder>[]>(
     () => withEditingCellClasses<EditingOrder>([
-      { key: 'orderCode', label: '주문 코드', width: 145, editable: false },
+      { key: 'orderCode', label: t('주문 코드', 'Order Code'), width: 145, editable: false },
       {
         key: 'customerName',
         label: '병합 고객명 · 편집',
@@ -74,10 +75,10 @@ export default function MergedCellEditingExample() {
         editable: true,
         editTrigger: 'click',
         editor: { type: 'text' },
-        editorIcon: { render: <Pencil aria-hidden='true' size={14} strokeWidth={1.8} />, ariaLabel: '병합 고객명 편집' },
+        editorIcon: { render: <Pencil aria-hidden='true' size={14} strokeWidth={1.8} />, ariaLabel: t('병합 고객명 편집', 'Edit Merged Customer Name') },
       },
-      { key: 'status', label: '상태', width: 120, editable: false },
-      { key: 'note', label: '메모', width: 300, editable: false },
+      { key: 'status', label: t('상태', 'Status'), width: 120, editable: false },
+      { key: 'note', label: t('메모', 'Memo'), width: 300, editable: false },
     ]),
     [],
   );
@@ -89,11 +90,11 @@ export default function MergedCellEditingExample() {
           <p className='m-0'>
             24개 행을 3개씩 병합해 세로 스크롤과 일반 병합·고정 경계 병합 편집을 함께 확인합니다.
           </p>
-          <div className='flex flex-wrap items-center gap-3' aria-label='병합 셀 틀고정 옵션'>
+          <div className='flex flex-wrap items-center gap-3' aria-label={t(t('병합 셀 틀고정 옵션', 'Merged Cell Freeze Option'), 'Merged Cell Freeze Option')}>
             <label className='inline-flex items-center gap-2 font-medium'>
               <span>왼쪽 고정 컬럼 수</span>
               <Select<number>
-                aria-label='고정할 컬럼 수'
+                aria-label={t(t('고정할 컬럼 수', 'Number of Columns to Freeze'), 'Number of Columns to Freeze')}
                 aria-describedby='merged-frozen-column-help'
                 style={{ width: 84 }}
                 value={frozenColumnIndex}
@@ -104,7 +105,7 @@ export default function MergedCellEditingExample() {
             <label className='inline-flex items-center gap-2 font-medium'>
               <span>위쪽 고정 행 수</span>
               <Select<number>
-                aria-label='고정할 행 수'
+                aria-label={t(t('고정할 행 수', 'Number of Rows to Freeze'), 'Number of Rows to Freeze')}
                 aria-describedby='merged-frozen-row-help'
                 style={{ width: 84 }}
                 value={frozenRowCount}
@@ -140,7 +141,7 @@ export default function MergedCellEditingExample() {
           )}
         </p>
         <output aria-live='polite' className='mt-1 block text-xs text-blue-700'>
-          마지막 트랜잭션의 변경 행: {changedRows.length ? changedRows.map(index => index + 1).join(', ') : '없음'}
+          마지막 트랜잭션의 변경 행: {changedRows.length ? changedRows.map(index => index + 1).join(', ') : t('없음', 'None')}
         </output>
       </div>
       <DataGridContainer ref={containerRef} style={{ height: 360 }} data-merge-layout={layoutMode}>

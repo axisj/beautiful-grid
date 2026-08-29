@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import * as React from 'react';
 import type { BGridItemRenderProps, MoveDirection } from 'beautiful-grid';
 import { Select } from 'antd';
@@ -72,7 +73,7 @@ export const SelectEditor = <T,>({ editable, value, handleSave, handleCancel, ha
           autoFocus
           open
           options={[
-            { value: 'Y', label: '사용' },
+            { value: 'Y', label: t('사용', 'Used') },
             { value: 'N', label: '사용안함' },
           ]}
           defaultValue={value}

@@ -1,3 +1,4 @@
+import { t } from './i18n';
 import * as React from 'react';
 import { BGrid, type BGridColumn } from 'beautiful-grid';
 import { createDateEditorPlugin, createSelectEditorPlugin } from 'beautiful-grid/editors';
@@ -19,17 +20,17 @@ function formatDate(value: unknown) {
 
 const statusEditor = createSelectEditorPlugin<EditingOrder, EditingOrder['status']>({
   id: 'built-in-status',
-  ariaLabel: '주문 상태 선택',
+  ariaLabel: t('주문 상태 선택', 'Select Order Status'),
   options: [
-    { value: '접수', label: '접수' },
-    { value: '진행', label: '진행' },
-    { value: '완료', label: '완료' },
+    { value: t('접수', 'Receipt'), label: t('접수', 'Receipt') },
+    { value: t('진행', 'In Progress'), label: t('진행', 'In Progress') },
+    { value: t('완료', 'Completed'), label: t('완료', 'Completed') },
   ],
 });
 
 const deliveryDateEditor = createDateEditorPlugin<EditingOrder>({
   id: 'built-in-delivery-date',
-  ariaLabel: '납기일 선택',
+  ariaLabel: t('납기일 선택', 'Select Delivery Date'),
   min: '2026-08-01',
   max: '2026-12-31',
 });
@@ -41,10 +42,10 @@ export default function BuiltInEditorsExample() {
 
   const columns = React.useMemo<BGridColumn<EditingOrder>[]>(
     () => withEditingCellClasses<EditingOrder>([
-      { key: 'orderCode', label: '주문 코드', width: 145, editable: false },
+      { key: 'orderCode', label: t('주문 코드', 'Order Code'), width: 145, editable: false },
       {
         key: 'customerName',
-        label: '내장 text',
+        label: t('내장 text', 'Built-in text'),
         width: 180,
         editable: true,
         editor: {
@@ -54,35 +55,35 @@ export default function BuiltInEditorsExample() {
       },
       {
         key: 'status',
-        label: '기본 Select',
+        label: t('기본 Select', 'Default Select'),
         width: 150,
         editable: true,
         editTrigger: 'click',
         editor: statusEditor,
-        editorIcon: { render: <ChevronDownIcon />, ariaLabel: '주문 상태 선택', visibility: 'always' },
+        editorIcon: { render: <ChevronDownIcon />, ariaLabel: t('주문 상태 선택', 'Select Order Status'), visibility: 'always' },
       },
       {
         key: 'deliveryDate',
-        label: '기본 Date',
+        label: t('기본 Date', 'Default Date'),
         width: 170,
         editable: true,
         editTrigger: 'click',
         editor: deliveryDateEditor,
         itemRender: ({ value }) => formatDate(value),
-        editorIcon: { render: <CalendarIcon />, ariaLabel: '납기일 선택', visibility: 'always' },
+        editorIcon: { render: <CalendarIcon />, ariaLabel: t('납기일 선택', 'Select Delivery Date'), visibility: 'always' },
       },
       {
         key: 'approved',
-        label: '승인 권한',
+        label: t('승인 권한', 'Approval Permission'),
         width: 150,
         align: 'center',
         headerAlign: 'center',
         editable: true,
         editor: {
           type: 'checkbox',
-          header: { ariaLabel: '승인 권한 전체 선택' },
+          header: { ariaLabel: t('승인 권한 전체 선택', 'Select All Approval Permissions') },
           ariaLabel: ({ values }) => `${values.orderCode} 승인 권한`,
-          label: ({ value }) => (value ? '허용' : '차단'),
+          label: ({ value }) => (value ? t('허용', 'Allowed') : t('차단', 'Blocked')),
         },
       },
     ]),

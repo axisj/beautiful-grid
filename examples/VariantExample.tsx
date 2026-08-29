@@ -1,3 +1,4 @@
+import { t } from './i18n';
 import * as React from 'react';
 import { BGrid, type BGridColumn, type BGridDataItem, type BGridProps } from 'beautiful-grid';
 import { Segmented } from 'antd';
@@ -14,7 +15,7 @@ interface SalesRow {
 
 type GridVariant = NonNullable<BGridProps<SalesRow>['variant']>;
 
-const categories = ['하드웨어', '소프트웨어', '서비스'];
+const categories = [t('하드웨어', 'Hardware'), t('소프트웨어', 'Software'), t('서비스', 'Service')];
 
 const data: BGridDataItem<SalesRow>[] = Array.from({ length: 30 }, (_, index) => ({
   values: {
@@ -27,13 +28,13 @@ const data: BGridDataItem<SalesRow>[] = Array.from({ length: 30 }, (_, index) =>
 }));
 
 const columns: BGridColumn<SalesRow>[] = [
-  { key: 'id', label: '주문번호', width: 100, align: 'center' },
-  { key: 'product', label: '상품명', width: 180 },
-  { key: 'category', label: '분류', width: 120, align: 'center' },
-  { key: 'quantity', label: '수량', width: 90, align: 'right' },
+  { key: 'id', label: t('주문번호', 'Order Number'), width: 100, align: 'center' },
+  { key: 'product', label: t('상품명', 'Product Name'), width: 180 },
+  { key: 'category', label: t('분류', 'Category'), width: 120, align: 'center' },
+  { key: 'quantity', label: t('수량', 'Quantity'), width: 90, align: 'right' },
   {
     key: 'amount',
-    label: '금액',
+    label: t('금액', 'Amount'),
     width: 140,
     align: 'right',
     itemRender: ({ values }) => `${values.amount.toLocaleString('ko-KR')}원`,
@@ -55,8 +56,8 @@ const summaryColumns: NonNullable<BGridProps<SalesRow>['summary']>['columns'] = 
 ];
 
 const variantOptions: Array<{ value: GridVariant; label: string; description: string }> = [
-  { value: 'default', label: 'default', description: '본문과 요약 셀의 세로 구분선 생략' },
-  { value: 'vertical-bordered', label: 'vertical-bordered', description: '본문과 요약 셀의 세로 구분선 표시' },
+  { value: 'default', label: 'default', description: t('본문과 요약 셀의 세로 구분선 생략', 'Omit vertical separator between body and summary cell') },
+  { value: 'vertical-bordered', label: 'vertical-bordered', description: t('본문과 요약 셀의 세로 구분선 표시', 'Show vertical separator between body and summary cell') },
 ];
 
 export default function VariantExample() {
@@ -73,7 +74,7 @@ export default function VariantExample() {
         </div>
 
         <Segmented
-          aria-label='세로 구분선 variant 선택'
+          aria-label={t(t('세로 구분선 variant 선택', 'Select Vertical Separator Variant'), 'Select Vertical Separator Variant')}
           value={variant}
           options={variantOptions.map(({ value, label }) => ({ value, label }))}
           onChange={value => setVariant(value as GridVariant)}

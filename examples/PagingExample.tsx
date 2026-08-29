@@ -1,3 +1,4 @@
+import { t } from './i18n';
 import * as React from 'react';
 import { BGrid, BGridColumn, BGridDataItem } from 'beautiful-grid';
 import DataGridContainer from '../components/DataGridContainer';
@@ -8,14 +9,14 @@ interface MemberRecord {
   name: string;
   email: string;
   membership: string;
-  status: '정상' | '휴면' | '차단';
+  status: string;
   joinedAt: string;
 }
 
 const TOTAL_ELEMENTS = 498;
 const PAGE_SIZE = 50;
-const names = ['김민준', '이서연', '박지후', '최하윤', '정도현', '한유진'];
-const memberships = ['일반', 'Silver', 'Gold', 'VIP'];
+const names = [t('김민준', 'Minjun Kim'), t('이서연', 'Seoyeon Lee'), t('박지후', 'Jihu Park'), t('최하윤', 'Hayun Choi'), t('정도현', 'Dohyun Jeong'), t('한유진', 'Yujin Han')];
+const memberships = [t('일반', 'General'), 'Silver', 'Gold', 'VIP'];
 
 const createPageData = (currentPage: number): BGridDataItem<MemberRecord>[] => {
   const startIndex = (currentPage - 1) * PAGE_SIZE;
@@ -28,7 +29,7 @@ const createPageData = (currentPage: number): BGridDataItem<MemberRecord>[] => {
         name: names[index % names.length],
         email: `member${String(index).padStart(4, '0')}@example.com`,
         membership: memberships[index % memberships.length],
-        status: index % 17 === 0 ? '차단' : index % 7 === 0 ? '휴면' : '정상',
+        status: index % 17 === 0 ? t('차단', 'Blocked') : index % 7 === 0 ? t('휴면', 'Dormant') : t('정상', 'Normal'),
         joinedAt: `2026-${String(((index - 1) % 8) + 1).padStart(2, '0')}-${String(((index - 1) % 27) + 1).padStart(2, '0')}`,
       },
     };
@@ -38,12 +39,12 @@ const createPageData = (currentPage: number): BGridDataItem<MemberRecord>[] => {
 function PagingExample() {
   const [currentPage, setCurrentPage] = React.useState(1);
   const [columns, setColumns] = React.useState<BGridColumn<MemberRecord>[]>([
-    { key: 'memberNo', label: '회원번호', width: 120, align: 'center', sortDisable: true },
-    { key: 'name', label: '회원명', width: 110, align: 'center' },
-    { key: 'email', label: '이메일', width: 240 },
-    { key: 'membership', label: '등급', width: 100, align: 'center' },
-    { key: 'status', label: '계정 상태', width: 100, align: 'center' },
-    { key: 'joinedAt', label: '가입일', width: 120, align: 'center' },
+    { key: 'memberNo', label: t('회원번호', 'Member Number'), width: 120, align: 'center', sortDisable: true },
+    { key: 'name', label: t('회원명', 'Member Name'), width: 110, align: 'center' },
+    { key: 'email', label: t('이메일', 'Email'), width: 240 },
+    { key: 'membership', label: t('등급', 'Level'), width: 100, align: 'center' },
+    { key: 'status', label: t('계정 상태', 'Account Status'), width: 100, align: 'center' },
+    { key: 'joinedAt', label: t('가입일', 'Join Date'), width: 120, align: 'center' },
   ]);
   const data = React.useMemo(() => createPageData(currentPage), [currentPage]);
   const containerRef = React.useRef<HTMLDivElement>(null);

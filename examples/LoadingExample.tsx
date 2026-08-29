@@ -1,3 +1,4 @@
+import { t } from './i18n';
 import * as React from 'react';
 import { BGrid, BGridColumn, BGridDataItem } from 'beautiful-grid';
 import { Button, Space } from 'antd';
@@ -13,8 +14,8 @@ interface ProductSearchResult {
   syncedAt: string;
 }
 
-const categories = ['디지털', '오피스', '생활가전', '홈카페'];
-const productNames = ['프리미엄 무선 키보드', '인체공학 마우스', 'USB-C 멀티 허브', '온도조절 전기포트', '모션 데스크'];
+const categories = [t('디지털', 'Digital'), t('오피스', 'Office'), t('생활가전', 'Home Appliances'), t('홈카페', 'Home Cafe')];
+const productNames = [t('프리미엄 무선 키보드', 'Premium Wireless Keyboard'), t('인체공학 마우스', 'Ergonomic Mouse'), 'USB-C 멀티 허브', t('온도조절 전기포트', 'Temperature Control Electric Kettle'), t('모션 데스크', 'Motion Desk')];
 const products: BGridDataItem<ProductSearchResult>[] = Array.from({ length: 200 }, (_, index) => ({
   values: {
     sku: `SKU-${String(index + 1).padStart(5, '0')}`,
@@ -32,11 +33,11 @@ function LoadingExample() {
   const [data, setData] = React.useState(products);
   const [columns, setColumns] = React.useState<BGridColumn<ProductSearchResult>[]>([
     { key: 'sku', label: 'SKU', width: 110, align: 'center', sortDisable: true },
-    { key: 'productName', label: '상품명', width: 240 },
-    { key: 'category', label: '카테고리', width: 110, align: 'center' },
-    { key: 'salePrice', label: '판매가', width: 120, align: 'right', itemRender: ({ values }) => <>{values.salePrice.toLocaleString()}원</> },
-    { key: 'availableStock', label: '판매가능 재고', width: 120, align: 'right', itemRender: ({ values }) => <>{values.availableStock}개</> },
-    { key: 'syncedAt', label: '최종 동기화', width: 150, align: 'center' },
+    { key: 'productName', label: t('상품명', 'Product Name'), width: 240 },
+    { key: 'category', label: t('카테고리', 'Category'), width: 110, align: 'center' },
+    { key: 'salePrice', label: t('판매가', 'Selling Price'), width: 120, align: 'right', itemRender: ({ values }) => <>{values.salePrice.toLocaleString()}원</> },
+    { key: 'availableStock', label: t('판매가능 재고', 'Sellable Stock'), width: 120, align: 'right', itemRender: ({ values }) => <>{values.availableStock}개</> },
+    { key: 'syncedAt', label: t('최종 동기화', 'Last Synchronized'), width: 150, align: 'center' },
   ]);
   const containerRef = React.useRef<HTMLDivElement>(null);
   const { width, height } = useContainerSize(containerRef);

@@ -1,3 +1,4 @@
+import { t } from './i18n';
 import * as React from 'react';
 import { BGrid, BGridColumn, BGridDataItem } from 'beautiful-grid';
 import DataGridContainer from '../components/DataGridContainer';
@@ -12,7 +13,7 @@ interface InventoryRisk {
   inboundDate: string;
 }
 
-const productNames = ['고속 충전 어댑터 65W', '무선 블루투스 이어폰', '강화유리 필름', '태블릿 마그네틱 거치대', 'USB-C 케이블'];
+const productNames = [t('고속 충전 어댑터 65W', 'Fast Charging Adapter 65W'), t('무선 블루투스 이어폰', 'Wireless Bluetooth Earbuds'), t('강화유리 필름', 'Tempered Glass Film'), t('태블릿 마그네틱 거치대', 'Tablet Magnetic Stand'), 'USB-C 케이블'];
 const data: BGridDataItem<InventoryRisk>[] = Array.from({ length: 120 }, (_, index) => {
   const safetyStock = 10 + (index % 4) * 5;
   const stock = index % 13 === 0 ? 0 : (index * 7) % 65;
@@ -30,14 +31,14 @@ const data: BGridDataItem<InventoryRisk>[] = Array.from({ length: 120 }, (_, ind
 
 export default function GetRowClassName() {
   const [columns, setColumns] = React.useState<BGridColumn<InventoryRisk>[]>([
-    { key: 'sku', label: '품목코드', width: 110, align: 'center' },
-    { key: 'productName', label: '품목명', width: 240 },
-    { key: 'warehouse', label: '보관센터', width: 100, align: 'center' },
-    { key: 'stock', label: '현재 재고', width: 100, align: 'right', itemRender: ({ values }) => <strong>{values.stock}개</strong> },
-    { key: 'safetyStock', label: '안전 재고', width: 100, align: 'right', itemRender: ({ values }) => <>{values.safetyStock}개</> },
+    { key: 'sku', label: t('품목코드', 'Item Code'), width: 110, align: 'center' },
+    { key: 'productName', label: t('품목명', 'Item Name'), width: 240 },
+    { key: 'warehouse', label: t('보관센터', 'Storage Center'), width: 100, align: 'center' },
+    { key: 'stock', label: t('현재 재고', 'Current Stock'), width: 100, align: 'right', itemRender: ({ values }) => <strong>{values.stock}개</strong> },
+    { key: 'safetyStock', label: t('안전 재고', 'Safety Stock'), width: 100, align: 'right', itemRender: ({ values }) => <>{values.safetyStock}개</> },
     {
       key: 'inboundDate',
-      label: '입고 예정일',
+      label: t('입고 예정일', 'Expected Arrival Date'),
       width: 120,
       align: 'center',
       itemRender: ({ values }) => <>{values.stock === 0 ? '품절 · 긴급 발주' : values.inboundDate}</>,

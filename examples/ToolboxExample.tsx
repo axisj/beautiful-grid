@@ -1,3 +1,4 @@
+import { t } from './i18n';
 import * as React from 'react';
 import { useState, useCallback, useMemo } from 'react';
 import { BGrid, BGridColumn } from 'beautiful-grid';
@@ -20,26 +21,26 @@ const lucideToolboxIcons: BGridToolboxIcons = {
 const categories = ['Frontend', 'Backend', 'Database', 'DevOps', 'Design', 'Language', 'Security', 'Cloud', 'Mobile'];
 const authors = ['Tom', 'Jerry', 'Alice', 'Bob', 'Charlie', 'David', 'Emma'];
 const topics = [
-  'React 18 새로운 기능 살펴보기',
+  t('React 18 새로운 기능 살펴보기', 'Exploring New Features in React 18'),
   'TypeScript 5.0 마스터 가이드',
   'Next.js 14 App Router 실전',
-  'Zustand와 Recoil 상태관리 비교',
+  t('Zustand와 Recoil 상태관리 비교', 'Comparison of Zustand and Recoil State Management'),
   'Node.js 백엔드 아키텍처 패턴',
-  'PostgreSQL 인덱스 최적화 기법',
-  'Docker와 K8s 배포 파이프라인 구축',
-  'Vite 기반 번들 최적화 꿀팁',
-  'GraphQL vs REST API 완벽 비교',
-  'Tailwind CSS로 모던 UI 디자인하기',
-  'Rust 기초부터 웹서버 구현까지',
+  t('PostgreSQL 인덱스 최적화 기법', 'PostgreSQL Index Optimization Techniques'),
+  t('Docker와 K8s 배포 파이프라인 구축', 'Docker and K8s Deployment Pipeline Construction'),
+  t('Vite 기반 번들 최적화 꿀팁', 'Tips for Vite-based Bundle Optimization'),
+  t('GraphQL vs REST API 완벽 비교', 'GraphQL vs REST API Complete Comparison'),
+  t('Tailwind CSS로 모던 UI 디자인하기', 'Designing Modern UI with Tailwind CSS'),
+  t('Rust 기초부터 웹서버 구현까지', 'Rust from Basics to Web Server Implementation'),
   '웹 접근성(A11y) 가이드라인 준수하기',
-  'Redis 분산 캐시 설계 및 활용',
-  'Kafka 대용량 메시지 브로커 실습',
-  'Kubernetes 클러스터 모니터링 가이드',
-  'Elasticsearch 검색 엔진 최적화',
+  t('Redis 분산 캐시 설계 및 활용', 'Redis Distributed Cache Design and Utilization'),
+  t('Kafka 대용량 메시지 브로커 실습', 'Kafka Large Scale Message Broker Practice'),
+  t('Kubernetes 클러스터 모니터링 가이드', 'Kubernetes Cluster Monitoring Guide'),
+  t('Elasticsearch 검색 엔진 최적화', 'Elasticsearch Search Engine Optimization'),
   'OAuth 2.0 및 JWT 인증 아키텍처',
   'Microservices Event-driven 아키텍처',
-  'Flutter 크로스 플랫폼 앱 제작',
-  'Kotlin Coroutine 비동기 프로그래밍',
+  t('Flutter 크로스 플랫폼 앱 제작', 'Flutter Cross Platform App Development'),
+  t('Kotlin Coroutine 비동기 프로그래밍', 'Kotlin Coroutine Asynchronous Programming'),
 ];
 
 const mockData = Array.from({ length: 60 }, (_, index) => {
@@ -109,7 +110,7 @@ export default function ToolboxExample() {
       {
         id: 'col_title',
         key: 'title',
-        label: '제목',
+        label: t('제목', 'Title'),
         width: 280,
         toolbox: {
           sort: true,
@@ -117,7 +118,7 @@ export default function ToolboxExample() {
           extraItems: [
             {
               id: 'copy-col',
-              label: '컬럼명 복사',
+              label: t('컬럼명 복사', 'Copy Column Name'),
               onClick: ({ column }) => {
                 navigator.clipboard?.writeText(String(column.label));
                 alert('컬럼명이 복사되었습니다.');
@@ -132,7 +133,7 @@ export default function ToolboxExample() {
       {
         id: 'col_category',
         key: 'category',
-        label: '카테고리',
+        label: t('카테고리', 'Category'),
         width: 120,
         align: 'center',
         toolbox: true,
@@ -143,7 +144,7 @@ export default function ToolboxExample() {
       {
         id: 'col_author',
         key: 'author',
-        label: '작성자',
+        label: t('작성자', 'Author'),
         width: 100,
         align: 'center',
         toolbox: true,
@@ -154,7 +155,7 @@ export default function ToolboxExample() {
       {
         id: 'col_views',
         key: 'views',
-        label: '조회수',
+        label: t('조회수', 'Views'),
         width: 110,
         align: 'right',
         toolbox: true,
@@ -178,7 +179,7 @@ export default function ToolboxExample() {
       {
         id: 'col_date',
         key: 'date',
-        label: '등록일',
+        label: t('등록일', 'Registration Date'),
         width: 110,
         align: 'center',
         toolbox: true,

@@ -1,3 +1,4 @@
+import { t } from './i18n';
 import * as React from 'react';
 import { Tag } from 'antd';
 import { Info, LockKeyhole, Rows3, Search, UserCheck } from 'lucide-react';
@@ -16,16 +17,16 @@ interface SupportRequest {
   customer: string;
   subject: string;
   owner: string;
-  priority: '높음' | '보통' | '낮음';
-  status: '접수' | '처리 중' | '완료';
+  priority: string;
+  status: string;
   createdAt: string;
 }
 
-const customers = ['AxisJ Studio', 'Northwind', '서울 물류', 'Mono Office'];
-const subjects = ['권한 설정 문의', '데이터 업로드 확인', '결제 내역 요청', '화면 표시 오류'];
-const owners = ['김하늘', '박민준', '이서연', '최도윤'];
-const priorities: SupportRequest['priority'][] = ['높음', '보통', '낮음'];
-const statuses: SupportRequest['status'][] = ['접수', '처리 중', '완료'];
+const customers = ['AxisJ Studio', 'Northwind', t('서울 물류', 'Seoul Logistics'), 'Mono Office'];
+const subjects = [t('권한 설정 문의', 'Inquiry on Permission Settings'), t('데이터 업로드 확인', 'Data Upload Confirmation'), t('결제 내역 요청', 'Request Payment History'), t('화면 표시 오류', 'Display Error')];
+const owners = [t('김하늘', 'Haneul Kim'), t('박민준', 'Minjun Park'), t('이서연', 'Seoyeon Lee'), t('최도윤', 'Doyun Choi')];
+const priorities: SupportRequest['priority'][] = [t('높음', 'High'), t('보통', 'Normal'), t('낮음', 'Low')];
+const statuses: SupportRequest['status'][] = [t('접수', 'Receipt'), t('처리 중', 'Processing'), t('완료', 'Completed')];
 
 const data: BGridDataItem<SupportRequest>[] = Array.from({ length: 24 }, (_, index) => ({
   values: {
@@ -40,13 +41,13 @@ const data: BGridDataItem<SupportRequest>[] = Array.from({ length: 24 }, (_, ind
 }));
 
 const columns: BGridColumn<SupportRequest>[] = [
-  { id: 'requestNo', key: 'requestNo', label: '요청 번호', width: 120 },
-  { id: 'customer', key: 'customer', label: '고객', width: 150 },
-  { id: 'subject', key: 'subject', label: '문의 내용', width: 190 },
-  { id: 'owner', key: 'owner', label: '담당자', width: 110 },
-  { id: 'priority', key: 'priority', label: '우선순위', width: 100, align: 'center' },
-  { id: 'status', key: 'status', label: '상태', width: 100, align: 'center' },
-  { id: 'createdAt', key: 'createdAt', label: '접수일', width: 120 },
+  { id: 'requestNo', key: 'requestNo', label: t('요청 번호', 'Request Number'), width: 120 },
+  { id: 'customer', key: 'customer', label: t('고객', 'Customer'), width: 150 },
+  { id: 'subject', key: 'subject', label: t('문의 내용', 'Inquiry Details'), width: 190 },
+  { id: 'owner', key: 'owner', label: t('담당자', 'Assignee'), width: 110 },
+  { id: 'priority', key: 'priority', label: t('우선순위', 'Priority'), width: 100, align: 'center' },
+  { id: 'status', key: 'status', label: t('상태', 'Status'), width: 100, align: 'center' },
+  { id: 'createdAt', key: 'createdAt', label: t('접수일', 'Receipt Date'), width: 120 },
 ];
 
 const dataQuery: BGridDataQuery = {
@@ -102,7 +103,7 @@ export default function ContextMenuExample() {
           cellNavigationOptions={{ defaultActiveCell: { rowIndex: 0, columnIndex: 1 } }}
           searchOptions={{
             icons: { search: <Search size={16} aria-hidden='true' /> },
-            labels: { contextMenuItem: '그리드에서 검색' },
+            labels: { contextMenuItem: t('그리드에서 검색', 'Search in Grid') },
           }}
           contextMenuOptions={{
             onOpenChange: (open, target) => {
@@ -112,7 +113,7 @@ export default function ContextMenuExample() {
             items: target => [
               {
                 id: 'inspect-cell',
-                label: '셀 정보 보기',
+                label: t('셀 정보 보기', 'View Cell Information'),
                 icon: <Info size={15} aria-hidden='true' />,
                 shortcut: 'I',
                 onSelect: selected => {
@@ -122,7 +123,7 @@ export default function ContextMenuExample() {
               },
               {
                 id: 'inspect-row',
-                label: '행 전체 정보 보기',
+                label: t('행 전체 정보 보기', 'View Full Row Information'),
                 icon: <Rows3 size={15} aria-hidden='true' />,
                 shortcut: 'R',
                 onSelect: selected => {
@@ -134,14 +135,14 @@ export default function ContextMenuExample() {
               {
                 id: 'assign-owner',
                 label:
-                  target.values.status === '완료' ? '완료된 요청은 담당자 지정 불가' : '현재 사용자에게 담당자 지정',
+                  target.values.status === t('완료', 'Completed') ? t('완료된 요청은 담당자 지정 불가', 'Completed requests cannot be assigned') : t('현재 사용자에게 담당자 지정', 'Assign to Current User'),
                 icon:
-                  target.values.status === '완료' ? (
+                  target.values.status === t('완료', 'Completed') ? (
                     <LockKeyhole size={15} aria-hidden='true' />
                   ) : (
                     <UserCheck size={15} aria-hidden='true' />
                   ),
-                disabled: target.values.status === '완료',
+                disabled: target.values.status === t('완료', 'Completed'),
                 onSelect: selected => {
                   setMenuTarget(selected);
                   setLastAction(`담당자 지정 요청: ${selected.values.requestNo}`);

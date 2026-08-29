@@ -1,3 +1,4 @@
+import { t } from './i18n';
 import * as React from 'react';
 import { Button, Select, Tag } from 'antd';
 import { ChevronDown, ChevronUp, Search, X } from 'lucide-react';
@@ -22,8 +23,8 @@ interface SearchRow {
   status: string;
 }
 
-const departments = ['플랫폼개발', '디자인시스템', '데이터엔지니어링', '서비스운영'];
-const locations = ['서울', '부산', '대전'];
+const departments = [t('플랫폼개발', 'Platform Development'), t('디자인시스템', 'Design System'), t('데이터엔지니어링', 'Data Engineering'), t('서비스운영', 'Service Operation')];
+const locations = [t('서울', 'Seoul'), t('부산', 'Busan'), t('대전', 'Daejeon')];
 
 const data: BGridDataItem<SearchRow>[] = Array.from({ length: 200 }, (_, index) => ({
   values: {
@@ -34,34 +35,34 @@ const data: BGridDataItem<SearchRow>[] = Array.from({ length: 200 }, (_, index) 
     project: `프로젝트 ${String.fromCharCode(65 + (index % 8))}`,
     allocationRate: 60 + (index % 5) * 10,
     joinedAt: `202${index % 6}-${String((index % 12) + 1).padStart(2, '0')}-15`,
-    status: index % 11 === 0 ? '휴직' : index % 5 === 0 ? '휴가' : '재직',
+    status: index % 11 === 0 ? t('휴직', 'Leave of Absence') : index % 5 === 0 ? t('휴가', 'On Leave') : t('재직', 'Employed'),
   },
 }));
 
 const columns: BGridColumn<SearchRow>[] = [
-  { id: 'employeeNo', key: 'employeeNo', label: '사번', width: 110 },
-  { id: 'name', key: 'name', label: '이름', width: 120, toolbox: true, filter: { type: 'text' } },
+  { id: 'employeeNo', key: 'employeeNo', label: t('사번', 'Employee Number'), width: 110 },
+  { id: 'name', key: 'name', label: t('이름', 'Name'), width: 120, toolbox: true, filter: { type: 'text' } },
   {
     id: 'department',
     key: 'department',
-    label: '부서',
+    label: t('부서', 'Department'),
     width: 150,
     toolbox: true,
     filter: { type: 'values' },
   },
-  { id: 'location', key: 'location', label: '근무지', width: 100 },
-  { id: 'project', key: 'project', label: '담당 프로젝트', width: 140 },
+  { id: 'location', key: 'location', label: t('근무지', 'Workplace'), width: 100 },
+  { id: 'project', key: 'project', label: t('담당 프로젝트', 'Responsible Project'), width: 140 },
   {
     id: 'allocationRate',
     key: 'allocationRate',
-    label: '투입률',
+    label: t('투입률', 'Input Rate'),
     width: 100,
     align: 'right',
     itemRender: ({ values }) => `${values.allocationRate}%`,
     getSearchText: ({ value }) => `${value}%`,
   },
-  { id: 'joinedAt', key: 'joinedAt', label: '입사일', width: 120 },
-  { id: 'status', key: 'status', label: '상태', width: 100, align: 'center' },
+  { id: 'joinedAt', key: 'joinedAt', label: t('입사일', 'Date of Joining'), width: 120 },
+  { id: 'status', key: 'status', label: t('상태', 'Status'), width: 100, align: 'center' },
 ];
 
 export default function SearchExample() {
@@ -84,10 +85,10 @@ export default function SearchExample() {
             그리드 검색
           </Button>
           <Select
-            aria-label='검색 대상 부서 필터'
+            aria-label={t(t('검색 대상 부서 필터', 'Search Target Department Filter'), 'Search Target Department Filter')}
             value={department}
             style={{ width: 170 }}
-            options={[{ value: 'all', label: '전체 부서' }, ...departments.map(value => ({ value, label: value }))]}
+            options={[{ value: 'all', label: t('전체 부서', 'All Departments') }, ...departments.map(value => ({ value, label: value }))]}
             onChange={nextDepartment =>
               setDataQuery(current => ({
                 ...current,
@@ -109,7 +110,7 @@ export default function SearchExample() {
           <Tag color='blue'>Ctrl/Cmd+F</Tag>
           <span>또는 셀 우클릭 → 검색</span>
         </div>
-        <span>검색 범위: {department === 'all' ? '현재 로드된 200개 행' : `${department} 필터 결과`}</span>
+        <span>검색 범위: {department === 'all' ? t('현재 로드된 200개 행', 'Currently Loaded 200 Rows') : `${department} 필터 결과`}</span>
       </div>
 
       {inspectedCell && (
@@ -143,7 +144,7 @@ export default function SearchExample() {
               close: <X size={16} aria-hidden='true' />,
             },
             labels: {
-              placeholder: '현재 로드된 데이터에서 찾기',
+              placeholder: t('현재 로드된 데이터에서 찾기', 'Find in Currently Loaded Data'),
               formatResultCount: ({ activeResult, totalResults }) => `${activeResult} / ${totalResults}`,
             },
           }}
@@ -151,7 +152,7 @@ export default function SearchExample() {
             items: target => [
               {
                 id: 'inspect-cell',
-                label: '이 셀 정보 보기',
+                label: t('이 셀 정보 보기', 'View this cell\'s information'),
                 onSelect: () => setInspectedCell(target),
               },
             ],

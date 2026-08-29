@@ -1,3 +1,4 @@
+import { t } from './i18n';
 import * as React from 'react';
 import { BGrid, type BGridColumn } from 'beautiful-grid';
 import DataGridContainer from '../components/DataGridContainer';
@@ -29,10 +30,10 @@ export default function EditingEventsExample() {
 
   const columns = React.useMemo<BGridColumn<EditingOrder>[]>(
     () => withEditingCellClasses<EditingOrder>([
-      { key: 'orderCode', label: '주문 코드', width: 145, editable: false },
+      { key: 'orderCode', label: t('주문 코드', 'Order Code'), width: 145, editable: false },
       {
         key: 'quantity',
-        label: '수량',
+        label: t('수량', 'Quantity'),
         width: 110,
         align: 'right',
         editable: true,
@@ -52,7 +53,7 @@ export default function EditingEventsExample() {
       },
       {
         key: 'unitPrice',
-        label: '단가',
+        label: t('단가', 'Unit Price'),
         width: 130,
         align: 'right',
         editable: true,

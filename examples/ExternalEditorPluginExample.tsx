@@ -1,3 +1,4 @@
+import { t } from './i18n';
 import * as React from 'react';
 import { BGrid, type BGridColumn, type BGridDataItem } from 'beautiful-grid';
 import DataGridContainer from '../components/DataGridContainer';
@@ -26,42 +27,42 @@ type ExternalEditorOrder = EditingOrder & {
 
 const antdStatusEditor = createAntdSelectEditorPlugin<ExternalEditorOrder, EditingOrder['status']>({
   id: 'external-antd-status',
-  ariaLabel: 'Ant Design 주문 상태 선택',
+  ariaLabel: t('Ant Design 주문 상태 선택', 'Ant Design Select Order Status'),
   options: [
-    { value: '접수', label: '접수' },
-    { value: '진행', label: '진행' },
-    { value: '완료', label: '완료' },
+    { value: t('접수', 'Receipt'), label: t('접수', 'Receipt') },
+    { value: t('진행', 'In Progress'), label: t('진행', 'In Progress') },
+    { value: t('완료', 'Completed'), label: t('완료', 'Completed') },
   ],
 });
 
 const antdDeliveryDateEditor = createAntdDatePickerEditorPlugin<ExternalEditorOrder>({
   id: 'external-antd-delivery-date',
-  ariaLabel: 'Ant Design 납기일 선택',
+  ariaLabel: t('Ant Design 납기일 선택', 'Ant Design Select Delivery Date'),
 });
 
 const antdLabelColorEditor = createAntdColorPickerEditorPlugin<ExternalEditorOrder>({
   id: 'external-antd-label-color',
-  ariaLabel: 'Ant Design 라벨 색상 선택',
+  ariaLabel: t('Ant Design 라벨 색상 선택', 'Ant Design Select Label Color'),
 });
 
 const antdCategoryEditor = createAntdCascaderEditorPlugin<ExternalEditorOrder>({
   id: 'external-antd-category',
-  ariaLabel: 'Ant Design 분류 경로 선택',
+  ariaLabel: t('Ant Design 분류 경로 선택', 'Ant Design Select Category Path'),
   options: [
     {
-      value: '국내',
-      label: '국내',
+      value: t('국내', 'Domestic'),
+      label: t('국내', 'Domestic'),
       children: [
-        { value: '서울', label: '서울' },
-        { value: '부산', label: '부산' },
+        { value: t('서울', 'Seoul'), label: t('서울', 'Seoul') },
+        { value: t('부산', 'Busan'), label: t('부산', 'Busan') },
       ],
     },
     {
-      value: '해외',
-      label: '해외',
+      value: t('해외', 'Overseas'),
+      label: t('해외', 'Overseas'),
       children: [
-        { value: '아시아', label: '아시아' },
-        { value: '유럽', label: '유럽' },
+        { value: t('아시아', 'Asia'), label: t('아시아', 'Asia') },
+        { value: t('유럽', 'Europe'), label: t('유럽', 'Europe') },
       ],
     },
   ],
@@ -69,27 +70,27 @@ const antdCategoryEditor = createAntdCascaderEditorPlugin<ExternalEditorOrder>({
 
 const antdDeliveryTimeEditor = createAntdTimePickerEditorPlugin<ExternalEditorOrder>({
   id: 'external-antd-delivery-time',
-  ariaLabel: 'Ant Design 배송 시간 선택',
+  ariaLabel: t('Ant Design 배송 시간 선택', 'Ant Design Select Delivery Time'),
 });
 
 const antdOrganizationEditor = createAntdTreeSelectEditorPlugin<ExternalEditorOrder>({
   id: 'external-antd-organization',
-  ariaLabel: 'Ant Design 담당 조직 선택',
+  ariaLabel: t('Ant Design 담당 조직 선택', 'Ant Design Select Responsible Organization'),
   treeData: [
     {
-      value: '영업본부',
-      title: '영업본부',
+      value: t('영업본부', 'Sales Headquarters'),
+      title: t('영업본부', 'Sales Headquarters'),
       children: [
-        { value: '서울 영업팀', title: '서울 영업팀' },
-        { value: '부산 영업팀', title: '부산 영업팀' },
+        { value: t('서울 영업팀', 'Seoul Sales Team'), title: t('서울 영업팀', 'Seoul Sales Team') },
+        { value: t('부산 영업팀', 'Busan Sales Team'), title: t('부산 영업팀', 'Busan Sales Team') },
       ],
     },
     {
-      value: '운영본부',
-      title: '운영본부',
+      value: t('운영본부', 'Operations Headquarters'),
+      title: t('운영본부', 'Operations Headquarters'),
       children: [
-        { value: '물류팀', title: '물류팀' },
-        { value: '고객지원팀', title: '고객지원팀' },
+        { value: t('물류팀', 'Logistics Team'), title: t('물류팀', 'Logistics Team') },
+        { value: t('고객지원팀', 'Customer Support Team'), title: t('고객지원팀', 'Customer Support Team') },
       ],
     },
   ],
@@ -97,13 +98,13 @@ const antdOrganizationEditor = createAntdTreeSelectEditorPlugin<ExternalEditorOr
 
 const initialColors = ['#1677FF', '#13C2C2', '#52C41A', '#FA8C16'];
 const initialCategoryPaths = [
-  ['국내', '서울'],
-  ['국내', '부산'],
-  ['해외', '아시아'],
-  ['해외', '유럽'],
+  [t('국내', 'Domestic'), t('서울', 'Seoul')],
+  [t('국내', 'Domestic'), t('부산', 'Busan')],
+  [t('해외', 'Overseas'), t('아시아', 'Asia')],
+  [t('해외', 'Overseas'), t('유럽', 'Europe')],
 ];
 const initialDeliveryTimes = ['09:30', '11:00', '14:30', '16:00'];
-const initialOrganizations = ['서울 영업팀', '부산 영업팀', '물류팀', '고객지원팀'];
+const initialOrganizations = [t('서울 영업팀', 'Seoul Sales Team'), t('부산 영업팀', 'Busan Sales Team'), t('물류팀', 'Logistics Team'), t('고객지원팀', 'Customer Support Team')];
 
 const cloneExternalEditorOrders = (): BGridDataItem<ExternalEditorOrder>[] =>
   cloneEditingOrders().map((item, index) => ({
@@ -124,15 +125,15 @@ export default function ExternalEditorPluginExample() {
 
   const columns = React.useMemo<BGridColumn<ExternalEditorOrder>[]>(
     () => withEditingCellClasses<ExternalEditorOrder>([
-      { key: 'orderCode', label: '주문 코드', width: 140, editable: false },
-      { key: 'customerName', label: '고객명', width: 160, editable: false },
+      { key: 'orderCode', label: t('주문 코드', 'Order Code'), width: 140, editable: false },
+      { key: 'customerName', label: t('고객명', 'Customer Name'), width: 160, editable: false },
       {
         key: 'status',
         label: 'Ant Design Select',
         width: 180,
         editable: true,
         editor: antdStatusEditor,
-        editorIcon: { render: <ChevronDownIcon />, ariaLabel: 'Ant Design 상태 선택' },
+        editorIcon: { render: <ChevronDownIcon />, ariaLabel: t('Ant Design 상태 선택', 'Ant Design Select Status') },
       },
       {
         key: 'deliveryDate',
@@ -140,7 +141,7 @@ export default function ExternalEditorPluginExample() {
         width: 200,
         editable: true,
         editor: antdDeliveryDateEditor,
-        editorIcon: { render: <CalendarIcon />, ariaLabel: 'Ant Design 납기일 선택' },
+        editorIcon: { render: <CalendarIcon />, ariaLabel: t('Ant Design 납기일 선택', 'Ant Design Select Delivery Date') },
       },
       {
         key: 'labelColor',
@@ -157,7 +158,7 @@ export default function ExternalEditorPluginExample() {
               aria-hidden='true'
             />
           ),
-          ariaLabel: 'Ant Design 라벨 색상 선택',
+          ariaLabel: t('Ant Design 라벨 색상 선택', 'Ant Design Select Label Color'),
         },
       },
       {
@@ -169,7 +170,7 @@ export default function ExternalEditorPluginExample() {
         itemRender: ({ value }) => <>{Array.isArray(value) ? value.join(' / ') : ''}</>,
         getClipboardText: ({ value }) => formatCascaderClipboardText(value),
         parseClipboardText: parseCascaderClipboardText,
-        editorIcon: { render: <ChevronDownIcon />, ariaLabel: 'Ant Design 분류 경로 선택' },
+        editorIcon: { render: <ChevronDownIcon />, ariaLabel: t('Ant Design 분류 경로 선택', 'Ant Design Select Category Path') },
       },
       {
         key: 'deliveryTime',
@@ -177,7 +178,7 @@ export default function ExternalEditorPluginExample() {
         width: 190,
         editable: true,
         editor: antdDeliveryTimeEditor,
-        editorIcon: { render: <ClockIcon />, ariaLabel: 'Ant Design 배송 시간 선택' },
+        editorIcon: { render: <ClockIcon />, ariaLabel: t('Ant Design 배송 시간 선택', 'Ant Design Select Delivery Time') },
       },
       {
         key: 'organization',
@@ -185,7 +186,7 @@ export default function ExternalEditorPluginExample() {
         width: 210,
         editable: true,
         editor: antdOrganizationEditor,
-        editorIcon: { render: <ChevronDownIcon />, ariaLabel: 'Ant Design 담당 조직 선택' },
+        editorIcon: { render: <ChevronDownIcon />, ariaLabel: t('Ant Design 담당 조직 선택', 'Ant Design Select Responsible Organization') },
       },
     ]),
     [],

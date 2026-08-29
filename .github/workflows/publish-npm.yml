@@ -164,8 +164,22 @@ jobs:
         run: |
           set -Eeuo pipefail
 
-          published_version="$(npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version)"
-          dist_tag_version="$(npm view "$PACKAGE_NAME" "dist-tags.${NPM_DIST_TAG}")"
+          for attempt in {1..12}; do
+            published_version="$(npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version 2>/dev/null || true)"
+            dist_tag_version="$(npm view "$PACKAGE_NAME" "dist-tags.${NPM_DIST_TAG}" 2>/dev/null || true)"
 
-          test "$published_version" = "$PACKAGE_VERSION"
-          test "$dist_tag_version" = "$PACKAGE_VERSION"
+            if [ "$published_version" = "$PACKAGE_VERSION" ] && [ "$dist_tag_version" = "$PACKAGE_VERSION" ]; then
+              echo "Verified ${PACKAGE_NAME}@${PACKAGE_VERSION} with npm dist-tag ${NPM_DIST_TAG}."
+              exit 0
+            fi
+
+            if [ "$attempt" -lt 12 ]; then
+              echo "npm registry metadata is not ready yet (attempt ${attempt}/12); retrying in 5 seconds."
+              sleep 5
+            fi
+          done
+
+          echo "::error::npm registry did not expose ${PACKAGE_NAME}@${PACKAGE_VERSION} with dist-tag ${NPM_DIST_TAG} within 60 seconds."
+          echo "Observed version: ${published_version:-<missing>}"
+          echo "Observed dist-tag: ${dist_tag_version:-<missing>}"
+          exit 1

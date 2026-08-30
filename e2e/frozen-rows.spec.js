@@ -119,7 +119,7 @@ test.describe('Frozen rows and columns', () => {
         zIndex: boundaryStyle.zIndex,
       };
     });
-    expect(frozenRowBoundaryStyle.shadow).toBe('rgba(15, 23, 42, 0.09) 0px 2px 2px 0px');
+    expect(frozenRowBoundaryStyle.shadow).toBe('rgba(15, 23, 42, 0.067) 0px 4px 8px 0px');
     expect(frozenRowBoundaryStyle.zIndex).toBe('10');
     await expect(bodyMain.locator('tr[data-ri="0"]')).toHaveCount(0);
     await expect(bodyMain.locator('tr[data-ri="1"]')).toHaveCount(0);
@@ -158,7 +158,7 @@ test.describe('Frozen rows and columns', () => {
     expect(frozenResizerColor).toBe(headerBoundaryStyle.color);
     expect(frozenRowBoundaryStyle.color).toBe(headerBoundaryStyle.color);
     expect(regularResizerColor).not.toBe(headerBoundaryStyle.color);
-    expect(headerBoundaryStyle.shadow).toBe('rgba(15, 23, 42, 0.09) 2px 0px 2px 0px');
+    expect(headerBoundaryStyle.shadow).toBe('rgba(15, 23, 42, 0.067) 4px 0px 8px 0px');
 
     const topLeftBefore = await topLeft.boundingBox();
     const topMainBefore = await topMain.boundingBox();

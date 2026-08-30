@@ -1154,16 +1154,26 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     z-index: 2;
     width: 100%;
     max-width: 108rem;
-    margin-top: var(--home-space-9);
+    margin-top: var(--home-space-7);
     padding-inline: clamp(16px, 2.5vw, 40px);
+    display: flex;
+    align-items: center;
+  }
+  .capability-heading::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    margin-left: 16px;
+    background: linear-gradient(90deg, rgba(226, 232, 240, 0.8), transparent);
   }
 
   .capability-heading p {
     margin: 0;
-    color: #24334a;
-    font-size: clamp(19px, 2vw, 25px);
-    font-weight: 830;
-    letter-spacing: -0.015em;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   .capability-rail {
@@ -1171,47 +1181,38 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     z-index: 2;
     display: grid;
     grid-template-columns: 1.35fr 1fr 1fr 1.1fr;
-    gap: var(--home-space-4);
+    gap: 0;
     width: 100%;
     max-width: 108rem;
-    margin-top: var(--home-space-4);
+    margin-top: var(--home-space-2);
     padding-inline: clamp(16px, 2.5vw, 40px);
+    background: transparent;
+    border-top: 1px solid rgba(226, 232, 240, 0.6);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+    padding-block: 16px;
   }
 
   .capability-item {
     position: relative;
     display: flex;
-    min-height: 216px;
     flex-direction: column;
-    padding: clamp(24px, 2.5vw, 32px);
-    border-radius: 20px;
-    background: linear-gradient(to bottom, #ffffff, #fdfdfd);
-    border: 1px solid rgba(226, 232, 240, 0.6);
-    box-shadow: 0 2px 12px -8px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255,255,255,0.6);
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 16px 24px;
+    background: transparent;
+    border-left: 1px solid rgba(226, 232, 240, 0.6);
+  }
+  .capability-item:first-child {
+    border-left: none;
+    padding-left: 0;
   }
   .capability-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px -8px rgba(15, 23, 42, 0.12), inset 0 1px 0 rgba(255,255,255,0.8);
+    background: rgba(248, 250, 252, 0.4);
   }
 
-  .capability-item-primary {
-    background:
-      radial-gradient(circle at 92% 5%, rgba(37, 99, 235, 0.14), transparent 42%),
-      rgba(255, 255, 255, 0.9);
-  }
+  .capability-item-primary { background: transparent; }
 
-  .capability-item-bundle {
-    background:
-      radial-gradient(circle at 95% 7%, rgba(14, 165, 233, 0.09), transparent 38%),
-      rgba(255, 255, 255, 0.9);
-  }
+  .capability-item-bundle { background: transparent; }
 
-  .capability-item-feature {
-    background:
-      radial-gradient(circle at 92% 7%, rgba(124, 58, 237, 0.08), transparent 38%),
-      rgba(255, 255, 255, 0.9);
-  }
+  .capability-item-feature { background: transparent; }
 
   .capability-card-head {
     display: flex;
@@ -1245,12 +1246,12 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   }
 
   .capability-item > strong {
-    color: #132039;
-    font-family: var(--site-font-mono);
-    font-size: clamp(34px, 3.2vw, 48px);
-    font-weight: 860;
-    letter-spacing: -0.065em;
-    line-height: 1;
+    margin-top: auto;
+    color: #0f172a;
+    font-size: clamp(20px, 2vw, 24px);
+    font-weight: 760;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
   }
 
   .capability-item-primary > strong { color: #1d5fd4; }
@@ -1310,11 +1311,11 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   }
 
   .capability-item h2 {
-    margin: var(--home-space-3) 0 0;
-    color: #26364d;
-    font-size: 13px;
-    font-weight: 820;
-    letter-spacing: -0.008em;
+    margin: var(--home-space-2) 0 0;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0;
   }
 
   .capability-item > span {
@@ -2940,11 +2941,10 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     background: rgba(23, 32, 51, 0.94);
     color: #a9b6c9;
   }
+  :global(html[data-theme='dark']) .capability-rail { border-color: rgba(51, 65, 85, 0.6); }
   :global(html[data-theme='dark']) .capability-item {
-    box-shadow:
-      0 1px 3px rgba(0, 0, 0, 0.18),
-      0 22px 52px -42px rgba(0, 0, 0, 0.9),
-      inset 0 0 0 1px rgba(74, 89, 112, 0.58);
+    box-shadow: none;
+    border-color: rgba(51, 65, 85, 0.6);
   }
 
   @media (max-width: 1100px) {
@@ -3009,7 +3009,9 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     .hero-actions { display: grid; grid-template-columns: 1fr; }
     .hero-actions .btn { width: 100%; }
     .install-command { max-width: none; }
-    .capability-rail { grid-template-columns: 1fr; gap: var(--home-space-2); }
+    .capability-rail { grid-template-columns: 1fr; gap: 0; }
+    .capability-item { border-left: none; border-top: 1px solid rgba(226, 232, 240, 0.6); padding-inline: 0; padding-block: 24px; }
+    .capability-item:first-child { border-top: none; padding-top: 0; }
     .capability-item { min-height: 192px; }
     .capability-item-fps button { margin-top: var(--home-space-4); }
     .why-item:nth-child(n) { grid-column: 1 / -1; }

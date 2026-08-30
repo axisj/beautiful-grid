@@ -1181,20 +1181,18 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   .capability-item {
     position: relative;
     display: flex;
-    min-width: 0;
-    min-height: 292px;
+    min-height: 216px;
     flex-direction: column;
-    justify-content: flex-start;
-    overflow: hidden;
-    border: 0;
-    border-radius: 18px;
-    padding: var(--home-space-5);
-    background: rgba(255, 255, 255, 0.88);
-    box-shadow:
-      0 1px 3px rgba(15, 23, 42, 0.05),
-      0 22px 52px -42px rgba(32, 55, 88, 0.55),
-      inset 0 0 0 1px rgba(211, 221, 234, 0.72);
-    backdrop-filter: blur(16px);
+    padding: clamp(24px, 2.5vw, 32px);
+    border-radius: 20px;
+    background: linear-gradient(to bottom, #ffffff, #fdfdfd);
+    border: 1px solid rgba(226, 232, 240, 0.6);
+    box-shadow: 0 2px 12px -8px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255,255,255,0.6);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .capability-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px -8px rgba(15, 23, 42, 0.12), inset 0 1px 0 rgba(255,255,255,0.8);
   }
 
   .capability-item-primary {
@@ -1452,20 +1450,30 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
 
   .why-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    overflow: hidden;
-    border: 1px solid #dce6f2;
-    border-radius: 22px;
-    background: #f8fbff;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--home-space-4);
   }
 
   .why-item {
-    min-width: 0;
-    min-height: 202px;
-    padding: clamp(24px, 2.4vw, 34px);
+    position: relative;
+    min-height: 240px;
+    padding: clamp(32px, 3vw, 42px);
+    border-radius: 24px;
+    background: linear-gradient(145deg, #ffffff, #f8fafc);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 4px 24px -12px rgba(15, 23, 42, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
+  .why-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px -12px rgba(15, 23, 42, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 1);
+  }
+  .why-item:nth-child(1) { grid-column: span 7; }
+  .why-item:nth-child(2) { grid-column: span 5; }
+  .why-item:nth-child(3) { grid-column: span 5; }
+  .why-item:nth-child(4) { grid-column: span 7; }
 
-  .why-item + .why-item { border-left: 1px solid #dce6f2; }
+  
 
   .why-icon {
     display: grid;
@@ -1553,11 +1561,16 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     display: grid;
     min-height: 430px;
     overflow: hidden;
-    border: 1px solid #dfe7f1;
-    border-radius: 24px;
-    padding: clamp(32px, 3.2vw, 40px);
-    background: #fbfdff;
-    box-shadow: 0 26px 56px -48px rgba(15, 23, 42, 0.54);
+    padding: clamp(32px, 3.5vw, 48px);
+    border-radius: 28px;
+    background: linear-gradient(160deg, #ffffff, #f4f7fb);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 8px 32px -16px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255,255,255,0.8);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .strength-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px -16px rgba(15, 23, 42, 0.12), inset 0 1px 0 rgba(255,255,255,1);
   }
 
   .strength-card:nth-child(1),
@@ -2772,7 +2785,6 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   :global(html[data-theme='dark']) .decision-copy > p:not(.eyebrow) { color: var(--site-text-secondary); }
   :global(html[data-theme='dark']) .install-command,
   :global(html[data-theme='dark']) .capability-item,
-  :global(html[data-theme='dark']) .why-grid,
   :global(html[data-theme='dark']) .strength-card,
   :global(html[data-theme='dark']) .example-grid,
   :global(html[data-theme='dark']) .example-card,
@@ -2876,8 +2888,21 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     border-color: var(--site-border);
     background: var(--site-page-bg);
   }
-  :global(html[data-theme='dark']) .why-grid { background: var(--site-control-bg); }
-  :global(html[data-theme='dark']) .why-item + .why-item { border-color: var(--site-border); }
+  
+  :global(html[data-theme='dark']) .why-grid {
+    background: transparent;
+    border: none;
+  }
+  :global(html[data-theme='dark']) .why-item {
+    background: linear-gradient(135deg, #162032, #0f1623);
+    border-color: rgba(51, 65, 85, 0.6);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  :global(html[data-theme='dark']) .why-item:hover {
+    box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+
+  
   :global(html[data-theme='dark']) .why-icon { background: var(--site-accent-soft); color: var(--site-accent-strong); }
   :global(html[data-theme='dark']) .example-arrow {
     border-color: var(--site-border);
@@ -2928,9 +2953,9 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     .hero-actions-container { align-items: center; text-align: center; margin-inline: auto; padding-bottom: 0; }
     .hero-actions { justify-content: center; }
     .capability-rail { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .why-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .why-item:nth-child(3) { border-left: 0; border-top: 1px solid #dce6f2; }
-    .why-item:nth-child(4) { border-top: 1px solid #dce6f2; }
+    .why-item:nth-child(n) { grid-column: span 6; }
+    
+    
     .strength-card:nth-child(n) { grid-column: span 6; }
     .performance-layout { grid-template-columns: 1fr; }
     .performance-copy { max-width: 720px; }
@@ -2987,11 +3012,9 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     .capability-rail { grid-template-columns: 1fr; gap: var(--home-space-2); }
     .capability-item { min-height: 192px; }
     .capability-item-fps button { margin-top: var(--home-space-4); }
-    .why-grid { grid-template-columns: 1fr; }
+    .why-item:nth-child(n) { grid-column: 1 / -1; }
     .why-item { min-height: auto; }
-    .why-item + .why-item,
-    .why-item:nth-child(3),
-    .why-item:nth-child(4) { border-top: 1px solid #dce6f2; border-left: 0; }
+    
     .section { padding: var(--home-space-9) 0; }
     .section-heading h2,
     .performance-copy h2,

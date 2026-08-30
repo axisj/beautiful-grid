@@ -99,6 +99,14 @@ describe('site product and navigation contracts', () => {
     expect(reference).toContain('top: calc(var(--site-header-offset, 68px) + 0.75rem)');
   });
 
+  it('keeps guide catalog card hover neutral without a colored top rail', () => {
+    const learnIndex = readSiteFile('src/components/learn/LearnIndexPage.astro');
+
+    expect(learnIndex).toMatch(/\.guide-card:hover, \.guide-card:focus-within\s*\{[^}]*border-color:\s*var\(--site-border-strong\);[^}]*background:\s*color-mix\(in srgb, var\(--site-surface-elevated\) 94%, var\(--site-page-bg\)\);[^}]*box-shadow:\s*none;[^}]*transform:\s*translateY\(-2px\);/s);
+    expect(learnIndex).not.toContain('.guide-card::before');
+    expect(learnIndex).not.toContain('.guide-card:hover::before');
+  });
+
   it('keeps the displayed package version aligned with the publishable package', () => {
     const packageJson = JSON.parse(readFileSync(resolve(repositoryRoot, 'package.json'), 'utf8')) as {
       version: string;
@@ -216,12 +224,32 @@ describe('site product and navigation contracts', () => {
     expect(heroGrid).toContain('{size && (');
   });
 
-  it('uses borderless modern cards below the hero grid', () => {
+  it('groups the four evidence metrics inside one flat panel', () => {
     const homepage = readSiteFile('src/pages/index.astro');
 
-    expect(homepage).toMatch(/\.capability-item\s*\{[^}]*border:\s*0;[^}]*border-radius:\s*18px;[^}]*backdrop-filter:\s*blur\(16px\);/s);
-    expect(homepage).not.toContain('.capability-item::before');
+    expect(homepage.match(/<article class="capability-item/g)).toHaveLength(4);
+    expect(homepage).toMatch(/\.capability-rail\s*\{[^}]*gap:\s*0;[^}]*overflow:\s*hidden;[^}]*border:\s*1px solid #d8e1eb;[^}]*border-radius:\s*24px;[^}]*box-shadow:\s*none;/s);
+    expect(homepage).toMatch(/\.capability-item\s*\{[^}]*border:\s*0;[^}]*border-right:\s*1px solid #e0e7ef;[^}]*border-radius:\s*0;[^}]*background:\s*transparent;[^}]*box-shadow:\s*none;/s);
+    expect(homepage).toContain('.capability-item:last-child { border-right: 0; }');
+    expect(homepage).not.toContain('.capability-item::after');
+    expect(homepage).toMatch(/\.example-grid\s*\{[^}]*gap:\s*0;[^}]*border-top:\s*1px solid #ced9e6;[^}]*border-left:\s*1px solid #ced9e6;/s);
+    expect(homepage).not.toContain('.decision-copy::before');
+    expect(homepage).toMatch(/\.strength-card\s*\{[^}]*border:\s*1px solid #dce4ed;[^}]*box-shadow:\s*none;/s);
+    expect(homepage).toMatch(/\.example-card\s*\{[^}]*border:\s*0;[^}]*border-right:\s*1px solid #ced9e6;[^}]*border-bottom:\s*1px solid #ced9e6;[^}]*border-radius:\s*0;[^}]*box-shadow:\s*none;/s);
+    expect(homepage).toContain('.capability-item:nth-child(-n + 2) { border-bottom: 1px solid #e0e7ef; }');
     expect(homepage).not.toContain('.capability-item-fps.is-measured::before');
+  });
+
+  it('keeps the Why section proportional to its compact content', () => {
+    const homepage = readSiteFile('src/pages/index.astro');
+
+    expect(homepage).toContain('class="container why-layout"');
+    expect(homepage).toMatch(/\.why-section\s*\{[^}]*margin-top:\s*clamp\(24px, 2\.5vw, 36px\);[^}]*padding-block:\s*clamp\(80px, 7vw, 96px\) clamp\(40px, 3\.5vw, 52px\);/s);
+    expect(homepage).toMatch(/\.strengths-section\s*\{[^}]*padding-top:\s*clamp\(64px, 5vw, 72px\);/s);
+    expect(homepage).toMatch(/\.why-layout\s*\{[^}]*grid-template-columns:\s*minmax\(320px, 0\.72fr\) minmax\(0, 1\.28fr\);/s);
+    expect(homepage).toMatch(/\.why-grid\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\);[^}]*border-top:\s*1px solid #d7e0ea;/s);
+    expect(homepage).toMatch(/\.why-item\s*\{[^}]*min-height:\s*0;[^}]*grid-template-columns:\s*42px minmax\(0, 1fr\);[^}]*border-bottom:\s*1px solid #d7e0ea;[^}]*padding:\s*25px 0 24px;/s);
+    expect(homepage).not.toContain('min-height: 240px;');
   });
 
   it('links the decision section to runtime and open-source guidance', () => {
@@ -231,6 +259,10 @@ describe('site product and navigation contracts', () => {
     expect(homepage).toContain("href={localizePath('/open-source', locale)} class=\"btn btn-outline\"");
     expect(homepage).toContain("t('지원 환경 확인', 'Review runtime support')");
     expect(homepage).toContain("t('오픈소스 안내', 'Explore open source')");
+    expect(homepage).toContain("aria-label={t('도입 기준 체크리스트', 'Adoption baseline checklist')}");
+    expect(homepage).toMatch(/\.decision-card\s*\{[^}]*grid-template-columns:\s*minmax\(340px, 0\.78fr\) minmax\(0, 1\.22fr\);[^}]*border:\s*0;[^}]*border-radius:\s*0;[^}]*background:\s*transparent;[^}]*box-shadow:\s*none;/s);
+    expect(homepage).toMatch(/\.decision-list\s*\{[^}]*border-top:\s*1px solid #cbd6e2;[^}]*border-bottom:\s*1px solid #cbd6e2;/s);
+    expect(homepage).toMatch(/\.decision-item\s*\{[^}]*display:\s*grid;[^}]*border:\s*0;[^}]*border-bottom:\s*1px solid #dce4ed;[^}]*border-radius:\s*0;[^}]*background:\s*transparent;[^}]*box-shadow:\s*none;/s);
   });
 
   it('keeps the product facts route focused on runtime and compatibility guidance', () => {
@@ -321,6 +353,7 @@ describe('site product and navigation contracts', () => {
 
   it('keeps every library color token editable in Theme Builder and defined by the site palette', () => {
     const libraryCss = readFileSync(resolve(repositoryRoot, 'beautiful-grid/style.css'), 'utf8');
+    const siteDefaultThemeCss = readSiteFile('src/styles/datagrid-theme.css').split(":root[data-theme='dark']")[0];
     const libraryColorTokens = Array.from(new Set(libraryCss.match(/--bgrid-[a-z0-9-]+/g) ?? []))
       .filter(token => /-color(?:-|$)|-bg$/.test(token))
       .sort();
@@ -330,6 +363,10 @@ describe('site product and navigation contracts', () => {
     expect(builderColorTokens).toEqual(libraryColorTokens);
     for (const token of themeColorTokenNames) {
       expect(siteGridThemePalette[token], `${token} is missing from the site palette`).toBeDefined();
+    }
+    for (const [token, value] of Object.entries(siteGridThemePalette)) {
+      expect(libraryCss, `${token} differs from the example palette`).toContain(`${token}: ${value};`);
+      expect(siteDefaultThemeCss, `${token} differs from the example CSS`).toContain(`${token}: ${value};`);
     }
 
     const graphiteTheme = createGridTheme({
@@ -587,6 +624,7 @@ describe('site product and navigation contracts', () => {
 
   it('curates example-backed homepage proof without an autoplay billboard', () => {
     const homepage = readSiteFile('src/pages/index.astro');
+    const featuredExampleDefinition = homepage.match(/const featuredExamples = \[([\s\S]*?)\n\];/)?.[1] ?? '';
 
     expect(homepage).toContain("import { getCollection } from 'astro:content';");
     expect(homepage).toContain("const liveExampleCount = (await getCollection('learn')).filter(");
@@ -596,7 +634,20 @@ describe('site product and navigation contracts', () => {
     expect(homepage).toContain("href: '/learn/editor-plugins'");
     expect(homepage).toContain("href: '/learn/editing-merged-cells'");
     expect(homepage).toContain("href: '/learn/pivot'");
+    expect(homepage).toContain("href: '/learn/row-selection'");
+    expect(homepage).toContain("href: '/learn/frozen-columns'");
+    expect(featuredExampleDefinition.match(/index: '0[1-8]'/g)).toHaveLength(8);
     expect(homepage).toContain('class="example-grid"');
+    expect(homepage).toContain('class="example-row"');
+    expect(homepage).toContain('localizedFeaturedExamples.slice(0, 4)');
+    expect(homepage).toContain('localizedFeaturedExamples.slice(4, 8)');
+    expect(homepage).toMatch(/\.example-row\s*\{[^}]*display:\s*flex;/s);
+    expect(homepage).toMatch(/\.example-card\s*\{[^}]*transform-origin:\s*center;[^}]*transition:\s*transform 220ms cubic-bezier\(0\.2, 0\.82, 0\.24, 1\)/s);
+    expect(homepage).toMatch(/\.example-card:focus-visible\s*\{[^}]*transform:\s*translateY\(-6px\) scale\(1\.025\);/s);
+    expect(homepage).toContain('@media (hover: hover) and (pointer: fine)');
+    expect(homepage).toMatch(/\.example-card:hover\s*\{[^}]*box-shadow:\s*none;[^}]*transform:\s*translateY\(-6px\) scale\(1\.025\);/s);
+    expect(homepage).not.toContain(':has(.example-card:hover)');
+    expect(homepage).not.toContain('flex-grow: 1.3');
     expect(homepage).not.toContain('data-demo-carousel');
   });
 
@@ -626,11 +677,19 @@ describe('site product and navigation contracts', () => {
     expect(homepage).not.toContain('data-quick-start-panel');
   });
 
-  it('keeps the Quick Start rounded border on the outer code block only', () => {
+  it('keeps the Quick Start rounded surface on the outer code block only', () => {
     const homepage = readSiteFile('src/pages/index.astro');
 
     expect(homepage).toMatch(
-      /\.quick-start-code-block\s*\{[^}]*overflow:\s*hidden;[^}]*border:\s*1px solid #223049;[^}]*border-radius:\s*18px;/s,
+      /\.quick-start-step\s*\{[^}]*min-height:\s*72px;[^}]*border:\s*0;[^}]*border-top:\s*1px solid #d4dee9;[^}]*border-radius:\s*0;[^}]*background:\s*transparent;[^}]*box-shadow:\s*none;/s,
+    );
+    expect(homepage).not.toContain('.quick-start-item:nth-child(2) .quick-start-step');
+    expect(homepage).not.toContain('.quick-start-item:nth-child(3) .quick-start-step');
+    expect(homepage).toMatch(
+      /:global\(html\[data-theme='dark'\]\) \.quick-start-step\s*\{[^}]*border-color:\s*var\(--site-border\);[^}]*background:\s*transparent;[^}]*box-shadow:\s*none;/s,
+    );
+    expect(homepage).toMatch(
+      /\.quick-start-code-block\s*\{[^}]*overflow:\s*hidden;[^}]*border:\s*0;[^}]*border-radius:\s*18px;/s,
     );
     expect(homepage).toMatch(/\.quick-start-code-block pre\s*\{[^}]*border:\s*0;[^}]*border-radius:\s*0;/s);
   });

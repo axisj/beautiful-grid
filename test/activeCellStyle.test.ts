@@ -6,8 +6,8 @@ const libraryCss = readFileSync(resolve(process.cwd(), 'beautiful-grid/style.css
 
 describe('Active cell selection styles', () => {
   it('gives a single focused cell its own background and an inset ring', () => {
-    expect(libraryCss).toContain('--bgrid-active-cell-bg: var(--bgrid-body-bg)');
-    expect(libraryCss).toContain('--bgrid-active-cell-ring-color: var(--bgrid-active-cell-color)');
+    expect(libraryCss).toContain('--bgrid-active-cell-bg: #ffffff');
+    expect(libraryCss).toContain('--bgrid-active-cell-ring-color: #3073f1');
     expect(libraryCss).toContain('--bgrid-active-cell-ring-width: 2px');
     expect(libraryCss).toMatch(
       /\.bgrid-cell-active-fragment\[data-active-fill='true'\]\s*\{[^}]*background-color:\s*var\(--bgrid-active-cell-bg/s,

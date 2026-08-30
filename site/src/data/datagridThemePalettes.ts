@@ -9,8 +9,8 @@ const withAlpha = (color: string, alpha: number, fallback: string) => {
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 };
 
-// Shared site palette: midway between the restrained homepage blue-gray and
-// the library's more neutral default theme. Component density stays local.
+// Shared default palette. Keep these values identical to the publishable
+// library defaults so an unthemed consumer matches every site example.
 export const siteGridThemePalette: ThemePalette = {
   '--bgrid-primary-color': '#3073f1',
   '--bgrid-header-bg': '#f3f5f8',
@@ -23,7 +23,7 @@ export const siteGridThemePalette: ThemePalette = {
   '--bgrid-border-color-light': '#d9dee4',
   '--bgrid-border-color-subtle': '#ebeff3',
   '--bgrid-header-separator-color': '#d3d9e1',
-  '--bgrid-frozen-boundary-color': '#aab4c1',
+  '--bgrid-frozen-boundary-color': '#c4ccd6',
   '--bgrid-row-selector-color': '#ffffff',
   '--bgrid-body-bg': '#ffffff',
   '--bgrid-body-color': '#3c434d',

@@ -285,10 +285,8 @@ const tracks = pageCopy.tracks.map(track => ({
   .catalog-group-head p { margin: 0; color: var(--site-text-muted); font-size: 13px; }
   .catalog-group-head > span { color: var(--site-text-muted); font-size: 13px; font-weight: 700; }
   .guide-card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-  .guide-card { position: relative; display: flex; min-height: 330px; flex-direction: column; overflow: hidden; border: 1px solid var(--site-border); border-radius: 17px; padding: 22px; background: var(--site-surface-elevated); transition: transform 170ms ease, border-color 170ms ease, box-shadow 170ms ease; }
-  .guide-card:hover { border-color: color-mix(in srgb, var(--site-accent) 32%, var(--site-border)); box-shadow: 0 28px 56px -48px rgba(15, 23, 42, .8); transform: translateY(-3px); }
-  .guide-card::before { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, var(--site-accent), transparent 72%); opacity: 0; content: ''; transition: opacity 170ms ease; }
-  .guide-card:hover::before { opacity: 1; }
+  .guide-card { position: relative; display: flex; min-height: 330px; flex-direction: column; overflow: hidden; border: 1px solid var(--site-border); border-radius: 17px; padding: 22px; background: var(--site-surface-elevated); transition: transform 180ms cubic-bezier(.2, .72, .24, 1), border-color 180ms ease, background 180ms ease; }
+  .guide-card:hover, .guide-card:focus-within { border-color: var(--site-border-strong); background: color-mix(in srgb, var(--site-surface-elevated) 94%, var(--site-page-bg)); box-shadow: none; transform: translateY(-2px); }
   .guide-card-top { display: flex; justify-content: space-between; align-items: center; min-height: 23px; }
   .guide-number { color: var(--site-text-muted); font-family: var(--site-font-mono); font-size: 13px; font-weight: 800; letter-spacing: .06em; }
   .guide-live { display: inline-flex; align-items: center; gap: 5px; border: 1px solid color-mix(in srgb, #10b981 20%, var(--site-border)); border-radius: 999px; padding: 4px 7px; background: color-mix(in srgb, #10b981 7%, var(--site-surface)); color: #059669; font-size: 13px; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; }
@@ -348,7 +346,7 @@ const tracks = pageCopy.tracks.map(track => ({
   }
   @media (prefers-reduced-motion: reduce) {
     .learning-path-card, .guide-card { transition: none; }
-    .learning-path-card:hover, .guide-card:hover { transform: none; }
+    .learning-path-card:hover, .guide-card:hover, .guide-card:focus-within { transform: none; }
   }
 </style>
 

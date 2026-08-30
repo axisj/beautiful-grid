@@ -6,14 +6,14 @@ const libraryCss = readFileSync(resolve(process.cwd(), 'beautiful-grid/style.css
 
 describe('Frozen boundary styles', () => {
   it('uses a dedicated, subtle theme contract for frozen columns', () => {
-    expect(libraryCss).toMatch(/--bgrid-header-separator-color:\s*#d2d5d9;/);
-    expect(libraryCss).toMatch(/--bgrid-frozen-boundary-color:\s*#aab4c1;/);
+    expect(libraryCss).toMatch(/--bgrid-header-separator-color:\s*#d3d9e1;/);
+    expect(libraryCss).toMatch(/--bgrid-frozen-boundary-color:\s*#c4ccd6;/);
     expect(libraryCss).toMatch(/--bgrid-frozen-boundary-width:\s*1px;/);
     expect(libraryCss).toMatch(
-      /--bgrid-frozen-boundary-shadow:\s*2px 0 2px rgba\(15, 23, 42, 0\.09\);/,
+      /--bgrid-frozen-boundary-shadow:\s*4px 0 8px rgba\(15, 23, 42, 0\.065\);/,
     );
     expect(libraryCss).toMatch(
-      /--bgrid-frozen-row-boundary-shadow:\s*0 2px 2px rgba\(15, 23, 42, 0\.09\);/,
+      /--bgrid-frozen-row-boundary-shadow:\s*0 4px 8px rgba\(15, 23, 42, 0\.065\);/,
     );
     expect(libraryCss).toMatch(
       /\.bgrid-col-resizer-handle::after\s*\{[^}]*background:\s*var\(--bgrid-header-separator-color\);/s,

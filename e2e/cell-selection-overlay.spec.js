@@ -16,9 +16,9 @@ test.describe('Cell selection overlay', () => {
   test('keeps the active selection aligned while resizing the frozen boundary column', async ({ page }) => {
     await page.goto('/frozenColumns');
 
-    await selectAntdOption(page, page.getByRole('combobox', { name: '고정할 컬럼 수' }), '1개');
-    await selectAntdOption(page, page.getByRole('combobox', { name: '고정할 행 수' }), '1개');
-    await selectAntdOption(page, page.getByRole('combobox', { name: 'Summary 위치' }), '하단');
+    await selectAntdOption(page, page.getByRole('combobox', { name: 'Number of Columns to Freeze' }), '1 cols');
+    await selectAntdOption(page, page.getByRole('combobox', { name: 'Number of Rows to Freeze' }), '1 rows');
+    await selectAntdOption(page, page.getByRole('combobox', { name: 'Summary Position' }), 'Bottom');
 
     const targetCell = page.locator(
       '[data-bgrid-quadrant="body-main"] td[data-row-index="4"][data-column-index="2"]',

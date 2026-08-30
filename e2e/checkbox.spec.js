@@ -13,27 +13,27 @@ test.describe('Row Checked E2E', () => {
     await firstRowCheckbox.click();
 
     const output = page.getByTestId('checked-row-keys');
-    await expect(output).toContainText('대한민국(15+ LFS)');
+    await expect(output).toContainText('South Korea (15+ LFS)');
 
     // Select the second row
     const secondRowCheckbox = page.locator('[role="rfdg-body-frozen"] tr[data-ri="1"] [role="checkbox"]');
     await secondRowCheckbox.click();
-    await expect(output).toContainText('아르메니아(15~75 LFS)');
-    await expect(output).toContainText('선택한 키 (2)');
+    await expect(output).toContainText('Armenia (15~75 LFS)');
+    await expect(output).toContainText('Selected Keys (2)');
 
     // Switch to radio mode
-    const radioBtn = page.locator('.ant-segmented-item', { hasText: 'Radio (단일 선택)' });
+    const radioBtn = page.locator('.ant-segmented-item', { hasText: 'Radio (Single)' });
     await radioBtn.click();
 
     // The state should be sliced to 1 (only the first one remains)
-    await expect(output).toContainText('선택한 키 (1)');
-    await expect(output).toContainText('대한민국');
-    await expect(output).not.toContainText('아르메니아');
+    await expect(output).toContainText('Selected Keys (1)');
+    await expect(output).toContainText('South Korea');
+    await expect(output).not.toContainText('Armenia');
 
     // In radio mode, selecting a new row should replace the selection
     const thirdRowRadio = page.locator('[role="rfdg-body-frozen"] tr[data-ri="2"] [role="radio"]');
     await thirdRowRadio.click();
-    await expect(output).toContainText('선택한 키 (1)');
-    await expect(output).toContainText('아제르바이잔');
+    await expect(output).toContainText('Selected Keys (1)');
+    await expect(output).toContainText('Azerbaijan');
   });
 });

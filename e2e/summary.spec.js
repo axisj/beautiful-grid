@@ -9,14 +9,14 @@ test.describe('Summary Row E2E', () => {
     await expect(summaryRow).toBeVisible();
 
     // Check default top summary text
-    const firstCell = summaryRow.locator('td', { hasText: '매출 합계' });
-    await expect(firstCell).toContainText('상단 매출 합계 · 30건');
+    const firstCell = summaryRow.locator('td', { hasText: 'Total Sales' });
+    await expect(firstCell).toContainText('Top Total Sales · 30cases');
 
     // Switch to bottom summary using the Antd radio
-    const bottomRadio = page.getByRole('radio', { name: '하단 요약' });
+    const bottomRadio = page.getByRole('radio', { name: 'Bottom Summary' });
     await bottomRadio.click();
 
-    // The text should update to 하단
-    await expect(firstCell).toContainText('하단 매출 합계 · 30건');
+    // The text should update to Bottom
+    await expect(firstCell).toContainText('Bottom Total Sales · 30cases');
   });
 });

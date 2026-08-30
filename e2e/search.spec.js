@@ -39,7 +39,7 @@ test.describe('Grid search and cell context menu', () => {
     expect(searchBox).not.toBeNull();
     expect(intersects(currentBox, searchBox)).toBe(false);
 
-    await input.fill('프로젝트 H');
+    await input.fill('Project H');
     await expect(search.getByRole('status')).toHaveText('1 / 25');
     await page.keyboard.press('Enter');
     await expect(search.getByRole('status')).toHaveText('2 / 25');
@@ -66,7 +66,7 @@ test.describe('Grid search and cell context menu', () => {
       element.style.setProperty('--bgrid-context-menu-bg', '#0f172a');
       element.style.setProperty('--bgrid-context-menu-color', '#f8fafc');
     });
-    await page.getByText('구성원 1', { exact: true }).click({ button: 'right' });
+    await page.getByText('Member 1', { exact: true }).click({ button: 'right' });
     const menu = page.getByRole('menu');
     await expect(menu).toBeVisible();
     await expect(menu).toHaveCSS('background-color', 'rgb(15, 23, 42)');
@@ -80,7 +80,7 @@ test.describe('Grid search and cell context menu', () => {
     await expect(menu).toBeVisible();
     await expect(menu.getByRole('menuitem', { name: /검색/ })).toBeFocused();
     await page.keyboard.press('ArrowDown');
-    await expect(menu.getByRole('menuitem', { name: '이 셀 정보 보기' })).toBeFocused();
+    await expect(menu.getByRole('menuitem', { name: "View this cell's information" })).toBeFocused();
     await page.keyboard.press('Escape');
     await expect(menu).toBeHidden();
     await expect.poll(() => grid.evaluate(element => element.contains(document.activeElement))).toBe(true);
@@ -97,10 +97,10 @@ test.describe('Grid search and cell context menu', () => {
     await page.keyboard.press('Control+f');
 
     const input = grid.getByRole('textbox', { name: '그리드 데이터 찾기' });
-    await input.fill('서비스운영');
+    await input.fill('Service Operation');
 
     const current = grid.locator('[data-bgrid-search-current="true"]');
-    await expect(current).toContainText('서비스운영');
+    await expect(current).toContainText('Service Operation');
     await current.click();
     await expect(current).toHaveClass(/bgrid-cell-active/);
 
@@ -132,11 +132,11 @@ test.describe('Grid search and cell context menu', () => {
     const initialBox = await search.boundingBox();
     expect(initialBox).not.toBeNull();
 
-    await input.fill('프로젝트');
+    await input.fill('Project');
     await expect(search.getByRole('status')).toHaveText('1 / 200');
     const matchingBox = await search.boundingBox();
 
-    await input.fill('프로젝트요매');
+    await input.fill('Projectyomae');
     await expect(search.getByRole('status')).toHaveText('0 / 0');
     const emptyBox = await search.boundingBox();
 
@@ -153,7 +153,7 @@ test.describe('Grid search and cell context menu', () => {
 
     const search = grid.getByRole('search');
     const input = search.getByRole('textbox', { name: '그리드 데이터 찾기' });
-    await input.fill('서울');
+    await input.fill('Seoul');
     await expect(search.getByRole('status')).toHaveText('1 / 67');
 
     for (let index = 1; index < 14; index += 1) await input.press('Enter');

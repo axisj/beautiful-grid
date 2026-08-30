@@ -23,15 +23,15 @@ test.describe('Nested column groups', () => {
   test('changes the frozen boundary from the example controls', async ({ page }) => {
     await page.goto('/columnGroup');
 
-    const boundarySelect = page.getByRole('combobox', { name: '틀고정 위치' });
-    await expect(page.locator('.ant-select').filter({ has: boundarySelect })).toContainText('4개 · 상품 뒤');
-    await selectAntdOption(page, boundarySelect, '2개 · 고객명 뒤');
+    const boundarySelect = page.getByRole('combobox', { name: 'Freeze Position' });
+    await expect(page.locator('.ant-select').filter({ has: boundarySelect })).toContainText('4 cols · After Product');
+    await selectAntdOption(page, boundarySelect, '2 cols · After Customer Name');
 
     const frozenHead = page.locator('[role="rfdg-head-frozen"]');
     const scrollingHead = page.locator('[role="rfdg-head"]');
     await expect(frozenHead.locator('[data-group-id="order-overview"]')).toHaveAttribute('colspan', '2');
     await expect(scrollingHead.locator('[data-group-id="order-overview"]')).toHaveAttribute('colspan', '6');
-    await expect(page.getByText('앞쪽 2개 컬럼을 고정했습니다.')).toBeVisible();
+    await expect(page.getByText('First 2 columns are frozen.')).toBeVisible();
   });
 
   test('resizes a leaf column without using a group cell as its geometry target', async ({ page }) => {
@@ -74,7 +74,7 @@ test.describe('Nested column groups', () => {
     const labels = page.locator(
       '[role="rfdg-head-frozen"] .bgrid-head-cell[data-parent-group-id="customer-detail"] .bgrid-head-column-label',
     );
-    await expect(labels).toHaveText(['지역', '고객명']);
+    await expect(labels).toHaveText(['Region', 'Customer Name']);
   });
 
   test('rejects a leaf move into a different parent group', async ({ page }) => {
@@ -93,10 +93,10 @@ test.describe('Nested column groups', () => {
     await page.mouse.up();
 
     await expect(page.locator('[role="rfdg-head-frozen"] .bgrid-head-cell[data-column-index="2"]')).toContainText(
-      '지역',
+      'Region',
     );
     await expect(page.locator('[role="rfdg-head-frozen"] .bgrid-head-cell[data-column-index="3"]')).toContainText(
-      '상품',
+      'Product',
     );
   });
 });

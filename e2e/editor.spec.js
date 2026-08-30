@@ -9,14 +9,14 @@ test.describe('Cell editor lifecycle', () => {
   test('starts the built-in text editor from direct Korean input and restores navigation focus', async ({ page }) => {
     const customerCell = page.locator('td[data-row-index="0"][data-column-index="1"]').first();
     await customerCell.click();
-    await page.keyboard.type('장기영');
+    await page.keyboard.type('Jang Ki-young');
 
     const gateway = page.locator('[data-bgrid-text-editor-gateway="true"]');
     await expect(gateway).toHaveClass(/bgrid-text-editor-active/);
-    await expect(gateway).toHaveValue('장기영');
+    await expect(gateway).toHaveValue('Jang Ki-young');
 
     await page.keyboard.press('Enter');
-    await expect(customerCell).toContainText('장기영');
+    await expect(customerCell).toContainText('Jang Ki-young');
     await expect(gateway).not.toHaveClass(/bgrid-text-editor-active/);
     await expect(gateway).toBeFocused();
 
@@ -30,11 +30,11 @@ test.describe('Cell editor lifecycle', () => {
     await page.locator('[data-bgrid-text-editor-gateway="true"]').focus();
     await page.keyboard.press('Enter');
 
-    const editor = page.getByLabel('사용 여부 편집');
+    const editor = page.getByLabel('Edit Usage Status');
     await expect(editor).toBeVisible();
     await editor.selectOption('1');
 
-    await expect(useCell).toContainText('사용 안 함');
+    await expect(useCell).toContainText('Not Used');
     await expect(page.locator('[data-bgrid-text-editor-gateway="true"]')).toBeFocused();
   });
 });

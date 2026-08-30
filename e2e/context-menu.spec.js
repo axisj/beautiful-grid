@@ -13,9 +13,9 @@ test.describe('Cell context menu example', () => {
     await expect(menu).toBeVisible();
     await expect(firstTarget).toHaveAttribute('data-bgrid-cell-active', 'true');
     await expect(grid.locator('[data-bgrid-selection-fragment="true"]')).toHaveCount(1);
-    await expect(menu.getByRole('menuitem', { name: '그리드에서 검색' })).toBeVisible();
-    await expect(menu.getByRole('menuitem', { name: '셀 정보 보기' })).toBeVisible();
-    await expect(menu.getByRole('menuitem', { name: '행 전체 정보 보기' })).toBeVisible();
+    await expect(menu.getByRole('menuitem', { name: 'Search in Grid' })).toBeVisible();
+    await expect(menu.getByRole('menuitem', { name: "View Cell Info" })).toBeVisible();
+    await expect(menu.getByRole('menuitem', { name: 'View Full Row Info' })).toBeVisible();
     await expect(menu.getByRole('separator')).toHaveCount(2);
 
     const otherCell = grid.locator('td[data-row-index="1"][data-column-index="1"]');
@@ -26,13 +26,13 @@ test.describe('Cell context menu example', () => {
     await firstTarget.click({ button: 'right' });
     await expect(menu).toBeVisible();
 
-    await menu.getByRole('menuitem', { name: '셀 정보 보기' }).click();
+    await menu.getByRole('menuitem', { name: "View Cell Info" }).click();
     const status = page.getByRole('status').first();
     await expect(status).toContainText('REQ-0022');
-    await expect(status).toContainText('표시 0, 원본 21');
+    await expect(status).toContainText('Visible 0, Source 21');
 
     await grid.locator('td[data-row-index="1"][data-column-index="1"]').click({ button: 'right' });
-    await expect(menu.getByRole('menuitem', { name: '완료된 요청은 담당자 지정 불가' })).toBeDisabled();
+    await expect(menu.getByRole('menuitem', { name: 'Completed requests cannot be assigned' })).toBeDisabled();
   });
 
   test('opens from the keyboard and hands off to the built-in search item', async ({ page }) => {
@@ -45,7 +45,7 @@ test.describe('Cell context menu example', () => {
     await keyboardGateway.press('ArrowDown');
     await keyboardGateway.press('Shift+F10');
 
-    const searchItem = page.getByRole('menuitem', { name: '그리드에서 검색' });
+    const searchItem = page.getByRole('menuitem', { name: 'Search in Grid' });
     await expect(searchItem).toBeFocused();
     await searchItem.click();
 

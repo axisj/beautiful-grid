@@ -1,11 +1,11 @@
 import { expect, test } from '@playwright/test';
 
 const initialTitles = [
-  '여름 시즌 최대 40% 프로모션',
-  '신규 회원 웰컴 쿠폰 안내',
-  '프리미엄 멤버십 오픈',
-  '오늘 주문 내일 도착 캠페인',
-  '카카오페이 즉시 할인',
+  'Summer Season Up to 40% Promotion',
+  'New Member Welcome Coupon Guide',
+  'Premium Membership Open',
+  'Order Today, Arrive Tomorrow Campaign',
+  'KakaoPay Instant Discount',
 ];
 const reorderedTitles = [initialTitles[1], initialTitles[2], initialTitles[0], initialTitles[3], initialTitles[4]];
 

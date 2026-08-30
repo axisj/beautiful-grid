@@ -297,12 +297,12 @@ test.describe('Frozen rows and columns', () => {
   test('changes the frozen row boundary from the example control', async ({ page }) => {
     await page.goto('/frozenColumns');
 
-    const rowCountSelect = page.getByRole('combobox', { name: '고정할 행 수' });
+    const rowCountSelect = page.getByRole('combobox', { name: 'Number of Rows to Freeze' });
     const frozenBand = page.locator('[data-bgrid-row-band="frozen"]');
     const scrollableBand = page.locator('[data-bgrid-row-band="scrollable"]');
 
     for (const count of [1, 2, 3, 5]) {
-      await selectAntdOption(page, rowCountSelect, `${count}개`);
+      await selectAntdOption(page, rowCountSelect, `${count} rows`);
       const frozenRows = page.locator('[data-bgrid-quadrant="top-main"] tr[data-ri]');
       await expect(frozenRows).toHaveCount(count);
       await expect(page.locator(`[data-bgrid-quadrant="body-main"] tr[data-ri="${count}"]`)).toBeVisible();
@@ -321,28 +321,28 @@ test.describe('Frozen rows and columns', () => {
         .toEqual({ rowToBoundary: 0, boundaryToBody: 0 });
     }
 
-    await selectAntdOption(page, rowCountSelect, '0개');
+    await selectAntdOption(page, rowCountSelect, '0 rows');
     await expect(page.locator('[data-bgrid-row-band="frozen"]')).toHaveCount(0);
     await expect(
-      page.getByText('Summary 상단 표시 · Summary 다음 줄부터 0개 행, 왼쪽 2개 컬럼을 고정합니다.'),
+      page.getByText('Summary Top Shown · From next line of Summary 0 rows, left 2 columns are frozen.'),
     ).toBeVisible();
   });
 
   test('toggles the detailed summary and moves it below the body', async ({ page }) => {
     await page.goto('/frozenColumns');
 
-    const summaryToggle = page.getByLabel('Summary 표시');
-    const summaryPosition = page.getByRole('combobox', { name: 'Summary 위치' });
+    const summaryToggle = page.getByLabel('Show Summary');
+    const summaryPosition = page.getByRole('combobox', { name: 'Summary Position' });
     const summaryBand = page.locator('[role="rfdg-summary-container"]');
-    const summaryLabel = summaryBand.getByText('인력 요약');
+    const summaryLabel = summaryBand.getByText('Workforce Summary');
 
     await expect(summaryBand).toBeVisible();
-    await expect(summaryBand).toContainText('4개 부서');
-    await expect(summaryBand).toContainText('평균 80%');
+    await expect(summaryBand).toContainText('4 departments');
+    await expect(summaryBand).toContainText('Avg 80%');
     await expect(summaryLabel.locator('xpath=ancestor::td')).toHaveCSS('text-align', 'center');
 
-    await selectAntdOption(page, summaryPosition, '하단');
-    await expect(page.getByText(/Summary 하단 표시 · 첫 데이터 행부터/)).toBeVisible();
+    await selectAntdOption(page, summaryPosition, 'Bottom');
+    await expect(page.getByText(/Summary Bottom Shown · From First Data Row/)).toBeVisible();
     await expect
       .poll(async () => {
         const bodyBox = await page.locator('.bgrid-body-container').boundingBox();
@@ -354,6 +354,6 @@ test.describe('Frozen rows and columns', () => {
     await summaryToggle.uncheck();
     await expect(summaryBand).toHaveCount(0);
     await expect(summaryPosition).toBeDisabled();
-    await expect(page.getByText(/Summary 숨김 · 첫 데이터 행부터/)).toBeVisible();
+    await expect(page.getByText(/Summary Hidden · From First Data Row/)).toBeVisible();
   });
 });

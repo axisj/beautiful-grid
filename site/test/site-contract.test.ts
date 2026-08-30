@@ -164,6 +164,47 @@ describe('site product and navigation contracts', () => {
     expect(homepage).toContain("kicker: '구조화와 집계'");
   });
 
+  it('makes the landing-page identity, value, installation, and final Star journey explicit', () => {
+    const homepage = readSiteFile('src/pages/index.astro');
+    const footer = readSiteFile('src/components/layout/Footer.astro');
+    const hero = homepage.slice(homepage.indexOf('<section class="hero-section">'), homepage.indexOf('<section class="section why-section"'));
+    const finalCta = homepage.slice(homepage.indexOf('<section class="final-cta">'), homepage.indexOf('</MarketingLayout>'));
+
+    expect(hero).toContain('Open-source React Data Grid for business applications');
+    expect(hero).toContain('아름답게, 강력하게.');
+    expect(hero).toContain('대용량 데이터부터 편집, 병합, 정렬, 필터링, 집계까지.');
+    expect(hero).toContain('Apache-2.0 React Data Grid입니다.');
+    expect(hero).toContain('>Get Started <');
+    expect(hero).toContain('>GitHub ↗</a>');
+    expect(hero).not.toContain('Star BeautifulGrid');
+    expect(hero).toContain('설치하고 바로 시작하세요.');
+    expect(hero).toContain('Install and start building in minutes.');
+    expect(hero).toContain('실제 업무 환경을 위해 만들었습니다.');
+    expect(hero).toContain('Built for real-world applications');
+
+    expect(homepage).toContain("id=\"why-bgrid-title\">{t('왜 BeautifulGrid인가요?', 'Why BeautifulGrid?')}</h2>");
+    expect(homepage).toContain('업무용 데이터 화면에 필요한 기능을 오픈소스로 제공합니다.');
+    expect(homepage).toContain("title: 'Apache-2.0'");
+    expect(homepage).toContain("title: 'React에 최적화'");
+    expect(homepage).toContain("title: '대용량 데이터에 최적화'");
+    expect(homepage).toContain("title: '업무에 필요한 기능'");
+    expect(homepage).toContain('Built for developers. Easy for AI to understand.');
+    expect(homepage).toContain('<code>llms.txt</code>');
+
+    expect(finalCta).toContain('<h2>Like BeautifulGrid?</h2>');
+    expect(finalCta).toContain('Star BeautifulGrid on GitHub');
+    expect(finalCta).toContain('Apache-2.0 · Open Source · React · TypeScript');
+    expect(finalCta.match(/class="btn /g)).toHaveLength(1);
+    expect(finalCta).not.toContain('Sponsor');
+
+    expect(footer).toContain('data-en="Documentation"');
+    expect(footer).toContain('data-en="Examples / Learn"');
+    expect(footer).toContain('data-en="API Reference"');
+    expect(footer).toContain('data-en="License ↗"');
+    expect(footer).toContain('data-en="Issues ↗"');
+    expect(footer).toContain('{productFacts.repositoryUrl}');
+  });
+
   it('reserves the responsive hero grid area while the client grid is loading', () => {
     const homepage = readSiteFile('src/pages/index.astro');
     const heroGrid = readSiteFile('src/components/home/HomeHeroGrid.tsx');
@@ -363,7 +404,7 @@ describe('site product and navigation contracts', () => {
     expect(footer).toContain("href={localizePath('/product-facts', locale)} data-footer-route=\"/product-facts\"");
     expect(footer).toContain("href={localizePath('/api/props', locale)} data-footer-route=\"/api/props\"");
     expect(footer).toContain("href={localizePath('/open-source', locale)} data-footer-route=\"/open-source\"");
-    expect(footer).toContain("learn: 'Learn & Examples'");
+    expect(footer).toContain("learn: 'Examples / Learn'");
     expect(footer).toContain('https://www.axboot.dev/');
   });
 
@@ -467,8 +508,8 @@ describe('site product and navigation contracts', () => {
     expect(Math.floor((16_777_216 - 30) / 550000)).toBe(30);
     expect(550000 * 30 + 30).toBeLessThan(16_777_216);
     expect(550000 * 31 + 30).toBeGreaterThan(16_777_216);
-    expect(virtualScrollExample).toContain("label: '주문 번호'");
-    expect(virtualScrollExample).toContain("label: '거래 위험도'");
+    expect(virtualScrollExample).toContain("label: t('주문 번호', 'Order Number')");
+    expect(virtualScrollExample).toContain("label: t('거래 위험도', 'Transaction Risk Level')");
     expect(virtualScrollExample).not.toContain('React.useTransition()');
     expect(virtualScrollExample).not.toContain('dataControl={dataControl}');
     expect(virtualScrollExample).toContain('columns={virtualScrollColumns}');
@@ -479,12 +520,13 @@ describe('site product and navigation contracts', () => {
   it('keeps the homepage positioning aligned in Korean and English', () => {
     const homepage = readSiteFile('src/pages/index.astro');
 
-    expect(homepage).toContain("t('오픈소스 · Apache-2.0', 'Open Source · Apache-2.0')");
+    expect(homepage).toContain("t('업무용 애플리케이션을 위한 오픈소스 React Data Grid', 'Open-source React Data Grid for business applications')");
     expect(homepage).toContain("t('아름답게, 강력하게.', 'Beautiful. Powerful.')");
     expect(homepage).toContain("t('React로 자연스럽게.', 'Naturally React.')");
-    expect(homepage).toContain('복잡한 업무 데이터도 깔끔하게. 검증된 기본 디자인 위에');
-    expect(homepage).toContain("t('5분 만에 시작하기', 'Get started in 5 minutes')");
-    expect(homepage).toContain("t('라이브 데모 보기', 'View live demos')");
+    expect(homepage).toContain('대용량 데이터부터 편집, 병합, 정렬, 필터링, 집계까지.');
+    expect(homepage).toContain('복잡한 업무 화면을 빠르고 유연하게 구현할 수 있는 Apache-2.0 React Data Grid입니다.');
+    expect(homepage).toContain('>Get Started <');
+    expect(homepage).toContain('>GitHub ↗</a>');
     expect(homepage).toContain("t('도입 전 체크포인트', 'Evaluation Checklist')");
     expect(homepage).toContain("t('지원 환경 및 라이선스', 'Supported Environments & License')");
     expect(homepage).toContain("t('최신 안정 브라우저 지원', 'Current stable browsers')");
@@ -715,8 +757,8 @@ describe('site product and navigation contracts', () => {
     expect(demo).toContain('cellSelectionOptions={{ enabled: selectionEnabled }}');
     expect(demo).toContain('cellMergeOptions={{');
     expect(demo).toContain('frozenColumnIndex={1}');
-    expect(demo).toContain("ariaLabel: '고객 편집'");
-    expect(demo).toContain("ariaLabel: '상품 편집'");
+    expect(demo).toContain("ariaLabel: t('고객 편집', 'Edit Customer')");
+    expect(demo).toContain("ariaLabel: t('상품 편집', 'Edit Product')");
     expect(demo).not.toContain('function TextEditor');
     expect(demo).not.toContain('BGridItemRenderProps');
     expect(demo).toContain('마지막 클릭 활성화');
@@ -753,7 +795,7 @@ describe('site product and navigation contracts', () => {
     expect(demo).toContain("React.useState<GridVariant>('default')");
     expect(demo).toContain('variant={variant}');
     expect(demo).toContain('<Segmented');
-    expect(demo).toContain("aria-label='세로 구분선 variant 선택'");
+    expect(demo).toContain("aria-label={t('세로 구분선 variant 선택', 'Select Vertical Separator Variant')}");
   });
 
   it('provides a dedicated interactive example for scoped CSS variable themes', () => {
@@ -770,7 +812,7 @@ describe('site product and navigation contracts', () => {
     expect(demo).toContain("<div className='theming-example'>");
     expect(demo).not.toContain('theming-example--${theme}');
     expect(demo).toContain("className={`theming-example-grid bgrid-theme-${theme}`}");
-    expect(demo).toContain("aria-label='데이터그리드 테마 선택'");
+    expect(demo).toContain("aria-label={t('데이터그리드 테마 선택', 'Select Data Grid Theme')}");
     expect(styles).toContain('.bgrid-theme-brand');
     expect(styles).toContain('.bgrid-theme-dark');
     expect(styles).toContain('--bgrid-header-bg: #0f766e;');

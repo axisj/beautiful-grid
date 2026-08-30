@@ -75,6 +75,13 @@ const englishCopy: Record<string, string> = {
   '타입·예제·문서를 함께 제공해 사람이 결과를 확인하고 다음 수정까지 이어갈 수 있는 기반을 만듭니다.': 'Types, examples, and documentation give people a clear basis to review the result and continue refining it.',
   'AI용 프로젝트 컨텍스트 열기': 'Open project context for AI',
   'API 문서 보기': 'View API reference',
+  '기능 제한 없이 자유롭게 사용할 수 있는 오픈소스 라이선스': 'An open-source license you can use freely without feature restrictions',
+  'React에 최적화': 'Built for React',
+  'React와 TypeScript를 기반으로 자연스럽게 사용할 수 있도록 설계': 'Designed to fit naturally into React and TypeScript projects',
+  '대용량 데이터에 최적화': 'Built for large data',
+  '가상 스크롤을 기반으로 대용량 데이터도 부드럽게 처리': 'Virtual scrolling keeps large datasets smooth and responsive',
+  '업무에 필요한 기능': 'Business-ready features',
+  '편집, 병합, 필터, 요약, 피벗, 고정 열 등 업무 시스템에 필요한 기능 제공': 'Business-ready editing, merge, filter, summary, pivot, frozen columns, and more',
 };
 
 const t = (ko: string, en?: string) => locale === 'en' ? (en ?? englishCopy[ko] ?? ko) : ko;
@@ -200,6 +207,30 @@ const featuredExamples = [
   },
 ];
 const localizedFeaturedExamples = localize(featuredExamples);
+
+const whyBGridItems = [
+  {
+    icon: 'license',
+    title: 'Apache-2.0',
+    description: '기능 제한 없이 자유롭게 사용할 수 있는 오픈소스 라이선스',
+  },
+  {
+    icon: 'react',
+    title: 'React에 최적화',
+    description: 'React와 TypeScript를 기반으로 자연스럽게 사용할 수 있도록 설계',
+  },
+  {
+    icon: 'scale',
+    title: '대용량 데이터에 최적화',
+    description: '가상 스크롤을 기반으로 대용량 데이터도 부드럽게 처리',
+  },
+  {
+    icon: 'business',
+    title: '업무에 필요한 기능',
+    description: '편집, 병합, 필터, 요약, 피벗, 고정 열 등 업무 시스템에 필요한 기능 제공',
+  },
+];
+const localizedWhyBGridItems = localize(whyBGridItems);
 ---
 
 <MarketingLayout
@@ -215,18 +246,20 @@ const localizedFeaturedExamples = localize(featuredExamples);
       <div class="hero-grid-pattern" aria-hidden="true"></div>
       <div class="container hero-layout">
         <div class="hero-copy">
-          <p class="hero-kicker"><span></span> {t('오픈소스 · Apache-2.0', 'Open Source · Apache-2.0')}</p>
+          <p class="hero-kicker"><span></span> {t('업무용 애플리케이션을 위한 오픈소스 React Data Grid', 'Open-source React Data Grid for business applications')}</p>
           <h1>
             {t('아름답게, 강력하게.', 'Beautiful. Powerful.')}<br />{' '}
             <span>{t('React로 자연스럽게.', 'Naturally React.')}</span>
           </h1>
           <p class="hero-description">
-            {t('복잡한 업무 데이터도 깔끔하게. 검증된 기본 디자인 위에 편집, 조회, 집계 기능을 프로젝트에 맞춰 유연하게 연결하세요.', 'Clean handling for complex business data. Seamlessly connect editing, querying, and aggregation on top of proven defaults.')}
+            <strong>{t('대용량 데이터부터 편집, 병합, 정렬, 필터링, 집계까지.', 'From large datasets to editing, merging, sorting, filtering, and aggregation.')}</strong>
+            <span>{t('복잡한 업무 화면을 빠르고 유연하게 구현할 수 있는 Apache-2.0 React Data Grid입니다.', 'An Apache-2.0 React Data Grid for building complex business applications quickly and flexibly.')}</span>
           </p>
           <div class="hero-actions">
-            <a href={localizePath('/learn/getting-started', locale)} class="btn btn-primary btn-large">{t('5분 만에 시작하기', 'Get started in 5 minutes')} <span aria-hidden="true">→</span></a>
-            <a href={localizePath('/learn', locale)} class="btn btn-secondary btn-large">{t('라이브 데모 보기', 'View live demos')}</a>
+            <a href={localizePath('/learn/getting-started', locale)} class="btn btn-primary btn-large">Get Started <span aria-hidden="true">→</span></a>
+            <a href={productFacts.repositoryUrl} class="btn btn-secondary btn-large" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
           </div>
+          <p class="install-caption">{t('설치하고 바로 시작하세요.', 'Install and start building in minutes.')}</p>
           <div class="install-command" aria-label={t('npm 설치 명령', 'npm installation command')}>
             <span class="install-prompt" aria-hidden="true">$</span>
             <code>npm i {productFacts.packageName}</code>
@@ -252,6 +285,9 @@ const localizedFeaturedExamples = localize(featuredExamples);
         </div>
       </div>
 
+      <div class="container capability-heading">
+        <p>{t('실제 업무 환경을 위해 만들었습니다.', 'Built for real-world applications')}</p>
+      </div>
       <div class="container capability-rail" aria-label={t('BeautifulGrid의 검증 가능한 규모와 지원 환경', 'Verified BeautifulGrid scale and support baseline')}>
         <article class="capability-item capability-item-primary">
           <div class="capability-card-head"><p>{t('대용량 데이터', 'Large datasets')}</p><span>01</span></div>
@@ -297,6 +333,32 @@ const localizedFeaturedExamples = localize(featuredExamples);
           </div>
           <span>{t('편집부터 집계까지, 실제 예제와 소스로 바로 확인합니다.', 'Explore everything from editing to aggregation through real examples and source code.')}</span>
         </article>
+      </div>
+    </section>
+
+    <section class="section why-section" aria-labelledby="why-bgrid-title">
+      <div class="container">
+        <div class="why-heading">
+          <div>
+            <p class="eyebrow">{t('선택 기준을 한눈에', 'The essentials at a glance')}</p>
+            <h2 id="why-bgrid-title">{t('왜 BeautifulGrid인가요?', 'Why BeautifulGrid?')}</h2>
+          </div>
+          <p>{t('업무용 데이터 화면에 필요한 기능을 오픈소스로 제공합니다.', 'Open-source capabilities for the data-heavy screens business applications need.')}</p>
+        </div>
+        <div class="why-grid">
+          {localizedWhyBGridItems.map((item) => (
+            <article class="why-item">
+              <span class="why-icon" aria-hidden="true">
+                {item.icon === 'license' && <svg viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.6 2.8 8 7 10 4.2-2 7-5.4 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-5"/></svg>}
+                {item.icon === 'react' && <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.8"/><ellipse cx="12" cy="12" rx="9" ry="3.5"/><ellipse cx="12" cy="12" rx="9" ry="3.5" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.5" transform="rotate(120 12 12)"/></svg>}
+                {item.icon === 'scale' && <svg viewBox="0 0 24 24"><path d="M4 18V9m5 9V5m6 13v-7m5 7V3"/><path d="m4 6 5-3 6 5 5-6"/></svg>}
+                {item.icon === 'business' && <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="15" rx="2"/><path d="M3 10h18M8 5V3m8 2V3M8 14h3m2 0h3m-8 3h3m2 0h3"/></svg>}
+              </span>
+              <h3>{item.title}</h3>
+              <p>{item.description}</p>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
 
@@ -497,7 +559,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
         <div class="ai-heading">
           <div>
             <p class="eyebrow eyebrow-dark">{t('AI 친화적 설계', 'AI-ready by design')}</p>
-            <h2>{t('AI가 이해하기 쉬운 그리드.', 'A grid AI can understand.')}</h2>
+            <h2>{t('AI와 함께 개발하기 좋은 React Data Grid', 'Built for developers. Easy for AI to understand.')}</h2>
           </div>
           <div class="ai-heading-copy">
             <strong>{t('요구사항에서 구현까지, 맥락이 끊기지 않도록.', 'From intent to implementation, without losing context.')}</strong>
@@ -621,13 +683,13 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     <section class="final-cta">
       <div class="container final-cta-inner">
         <div>
-          <p class="eyebrow eyebrow-dark">{t('프로젝트에 연결하기', 'Connect to your project')}</p>
-          <h2>{t('Playground에서 직접 체험하기', 'Try It in the Playground')}</h2>
-          <p>{t('Playground에서 열 구성과 스타일을 먼저 맞춰 보고, 실행 예제의 코드를 실제 프로젝트 흐름에 연결하세요.', 'Tune columns and styles in the Playground, then connect runnable example code to your project workflow.')}</p>
+          <p class="eyebrow eyebrow-dark">Open Source</p>
+          <h2>Like BeautifulGrid?</h2>
+          <p>{t('BeautifulGrid가 프로젝트에 도움이 되셨다면 GitHub Star로 응원해주세요. 더 좋은 오픈소스를 만드는 데 큰 도움이 됩니다.', 'If BeautifulGrid is useful for your project, consider giving us a star on GitHub. It helps the project grow.')}</p>
+          <p class="final-cta-meta">Apache-2.0 · Open Source · React · TypeScript</p>
         </div>
         <div class="final-cta-actions">
-          <a href={localizePath('/playground', locale)} class="btn btn-light btn-large">{t('Playground 열기', 'Open Playground')} <span aria-hidden="true">→</span></a>
-          <a href={productFacts.repositoryUrl} class="btn btn-dark-outline btn-large" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+          <a href={productFacts.repositoryUrl} class="btn btn-light btn-large" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">★</span> Star BeautifulGrid on GitHub</a>
         </div>
       </div>
     </section>
@@ -842,6 +904,10 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     word-break: keep-all;
   }
 
+  .hero-description strong,
+  .hero-description span { display: block; }
+  .hero-description strong { color: #34445b; font-weight: 720; }
+
   .hero-actions,
   .decision-actions,
   .final-cta-actions {
@@ -867,12 +933,19 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
 
   .btn-primary:hover { transform: translateY(-2px); }
 
+  .install-caption {
+    margin: var(--home-space-5) 0 0;
+    color: #65748a;
+    font-size: 13px;
+    font-weight: 720;
+  }
+
   .install-command {
     display: flex;
     width: min(100%, 440px);
     align-items: center;
     gap: var(--home-space-3);
-    margin-top: var(--home-space-4);
+    margin-top: var(--home-space-2);
     border: 1px solid #dbe4f0;
     border-radius: 12px;
     padding: var(--home-space-2) var(--home-space-2) var(--home-space-2) var(--home-space-4);
@@ -1058,6 +1131,23 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     .hero-grid-loading { height: 280px; }
   }
 
+  .capability-heading {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 108rem;
+    margin-top: var(--home-space-9);
+    padding-inline: clamp(16px, 2.5vw, 40px);
+  }
+
+  .capability-heading p {
+    margin: 0;
+    color: #24334a;
+    font-size: clamp(19px, 2vw, 25px);
+    font-weight: 830;
+    letter-spacing: -0.015em;
+  }
+
   .capability-rail {
     position: relative;
     z-index: 2;
@@ -1066,7 +1156,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     gap: var(--home-space-4);
     width: 100%;
     max-width: 108rem;
-    margin-top: var(--home-space-9);
+    margin-top: var(--home-space-4);
     padding-inline: clamp(16px, 2.5vw, 40px);
   }
 
@@ -1310,6 +1400,90 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   }
 
   .section { padding: var(--home-section-space) 0; }
+
+  .why-section {
+    padding-block: clamp(64px, 6vw, 84px);
+    background: #ffffff;
+  }
+
+  .why-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--home-space-8);
+    margin-bottom: var(--home-space-7);
+  }
+
+  .why-heading h2 {
+    margin: 10px 0 0;
+    color: #0f172a;
+    font-size: clamp(34px, 4vw, 48px);
+    font-weight: 850;
+    letter-spacing: -0.025em;
+    line-height: 1.12;
+  }
+
+  .why-heading > p {
+    max-width: 520px;
+    margin: 0;
+    color: #66758a;
+    font-size: 15px;
+    line-height: 1.75;
+    word-break: keep-all;
+  }
+
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    overflow: hidden;
+    border: 1px solid #dce6f2;
+    border-radius: 22px;
+    background: #f8fbff;
+  }
+
+  .why-item {
+    min-width: 0;
+    min-height: 202px;
+    padding: clamp(24px, 2.4vw, 34px);
+  }
+
+  .why-item + .why-item { border-left: 1px solid #dce6f2; }
+
+  .why-icon {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border-radius: 12px;
+    background: #e8f1ff;
+    color: #2563eb;
+  }
+
+  .why-icon svg {
+    width: 23px;
+    height: 23px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.7;
+  }
+
+  .why-item h3 {
+    margin: var(--home-space-5) 0 0;
+    color: #25364d;
+    font-size: 16px;
+    font-weight: 820;
+    letter-spacing: -0.012em;
+  }
+
+  .why-item p {
+    margin: var(--home-space-3) 0 0;
+    color: #6b7b91;
+    font-size: 13px;
+    line-height: 1.7;
+    word-break: keep-all;
+  }
 
   .section-heading {
     margin-bottom: clamp(40px, 5vw, 64px);
@@ -2531,6 +2705,13 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   }
 
   .final-cta p:not(.eyebrow) { max-width: 650px; margin-top: var(--home-space-4); color: #d5e6ff; }
+  .final-cta .final-cta-meta {
+    color: #b8d6ff;
+    font-family: var(--site-font-mono);
+    font-size: 13px;
+    font-weight: 760;
+    letter-spacing: 0.02em;
+  }
   .btn-light {
     border-color: #ffffff;
     background: #ffffff;
@@ -2555,17 +2736,25 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   :global(html[data-theme='dark']) .hero-grid-pattern { opacity: 0.28; }
   :global(html[data-theme='dark']) .hero-copy h1,
   :global(html[data-theme='dark']) .section-heading h2,
+  :global(html[data-theme='dark']) .why-heading h2,
+  :global(html[data-theme='dark']) .why-item h3,
   :global(html[data-theme='dark']) .strength-card h3,
   :global(html[data-theme='dark']) .quick-start-intro h2,
   :global(html[data-theme='dark']) .decision-copy h2 { color: var(--site-text-primary); }
   :global(html[data-theme='dark']) .hero-kicker,
   :global(html[data-theme='dark']) .hero-description,
+  :global(html[data-theme='dark']) .hero-description strong,
+  :global(html[data-theme='dark']) .install-caption,
+  :global(html[data-theme='dark']) .capability-heading p,
+  :global(html[data-theme='dark']) .why-heading > p,
+  :global(html[data-theme='dark']) .why-item p,
   :global(html[data-theme='dark']) .section-heading-split > p,
   :global(html[data-theme='dark']) .strength-copy > p,
   :global(html[data-theme='dark']) .quick-start-summary > p,
   :global(html[data-theme='dark']) .decision-copy > p:not(.eyebrow) { color: var(--site-text-secondary); }
   :global(html[data-theme='dark']) .install-command,
   :global(html[data-theme='dark']) .capability-item,
+  :global(html[data-theme='dark']) .why-grid,
   :global(html[data-theme='dark']) .strength-card,
   :global(html[data-theme='dark']) .example-grid,
   :global(html[data-theme='dark']) .example-card,
@@ -2663,11 +2852,15 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   :global(html[data-theme='dark']) .insight-bars span { background: #1d4b46; }
   :global(html[data-theme='dark']) .insight-bars span:nth-child(2) { background: #277866; }
   :global(html[data-theme='dark']) .strengths-section,
+  :global(html[data-theme='dark']) .why-section,
   :global(html[data-theme='dark']) .examples-section,
   :global(html[data-theme='dark']) .quick-start-section {
     border-color: var(--site-border);
     background: var(--site-page-bg);
   }
+  :global(html[data-theme='dark']) .why-grid { background: var(--site-control-bg); }
+  :global(html[data-theme='dark']) .why-item + .why-item { border-color: var(--site-border); }
+  :global(html[data-theme='dark']) .why-icon { background: var(--site-accent-soft); color: var(--site-accent-strong); }
   :global(html[data-theme='dark']) .example-arrow {
     border-color: var(--site-border);
     background: var(--site-control-bg);
@@ -2713,6 +2906,9 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
 
   @media (max-width: 1100px) {
     .capability-rail { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .why-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .why-item:nth-child(3) { border-left: 0; border-top: 1px solid #dce6f2; }
+    .why-item:nth-child(4) { border-top: 1px solid #dce6f2; }
     .strength-card:nth-child(n) { grid-column: span 6; }
     .performance-layout { grid-template-columns: 1fr; }
     .performance-copy { max-width: 720px; }
@@ -2728,6 +2924,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     .hero-section { padding-top: var(--home-space-8); }
     .hero-copy h1 { font-size: clamp(44px, 9vw, 64px); }
     .section-heading-split { grid-template-columns: 1fr; align-items: start; }
+    .why-heading { align-items: flex-start; flex-direction: column; gap: var(--home-space-4); }
     .section-heading-split > p,
     .examples-heading-aside { max-width: 660px; }
     .strength-card:nth-child(n) { grid-column: 1 / -1; }
@@ -2754,6 +2951,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   @media (max-width: 620px) {
     .hero-section { padding-top: var(--home-space-6); }
     .hero-layout,
+    .capability-heading,
     .capability-rail { padding-inline: var(--home-space-2); }
     .hero-copy h1 { font-size: 39px; line-height: 1.1; }
     :global(html[lang='en']) .hero-copy h1 { font-size: 35px; }
@@ -2767,6 +2965,11 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     .capability-rail { grid-template-columns: 1fr; gap: var(--home-space-2); }
     .capability-item { min-height: 192px; }
     .capability-item-fps button { margin-top: var(--home-space-4); }
+    .why-grid { grid-template-columns: 1fr; }
+    .why-item { min-height: auto; }
+    .why-item + .why-item,
+    .why-item:nth-child(3),
+    .why-item:nth-child(4) { border-top: 1px solid #dce6f2; border-left: 0; }
     .section { padding: var(--home-space-9) 0; }
     .section-heading h2,
     .performance-copy h2,

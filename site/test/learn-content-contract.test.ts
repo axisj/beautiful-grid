@@ -146,7 +146,7 @@ describe('Learn Content Architecture Contracts', () => {
     expect(contextMenuGuide).toContain("searchOptions.contextMenu = false");
     expect(contextMenuExample).toContain('contextMenuOptions={{');
     expect(contextMenuExample).toContain("type: 'separator'");
-    expect(contextMenuExample).toContain("disabled: target.values.status === '완료'");
+    expect(contextMenuExample).toContain("disabled: target.values.status === t('완료', 'Completed')");
   });
 
   it('keeps the keyboard shortcut guide aligned with current runtime surfaces', () => {

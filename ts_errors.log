@@ -1,0 +1,71 @@
+site/src/content.config.ts(1,34): error TS2307: Cannot find module 'astro:content' or its corresponding type declarations.
+site/src/content.config.ts(2,19): error TS2307: Cannot find module 'astro/zod' or its corresponding type declarations.
+  There are types at '/Users/tom-air/DEV/beautiful-grid/site/node_modules/astro/dist/zod.d.ts', but this result could not be resolved under your current 'moduleResolution' setting. Consider updating to 'node16', 'nodenext', or 'bundler'.
+site/src/content.config.ts(3,22): error TS2307: Cannot find module 'astro/loaders' or its corresponding type declarations.
+  There are types at '/Users/tom-air/DEV/beautiful-grid/site/node_modules/astro/dist/content/loaders/index.d.ts', but this result could not be resolved under your current 'moduleResolution' setting. Consider updating to 'node16', 'nodenext', or 'bundler'.
+site/src/pages/llms.txt.ts(1,31): error TS2307: Cannot find module 'astro' or its corresponding type declarations.
+  There are types at '/Users/tom-air/DEV/beautiful-grid/site/node_modules/astro/dist/index.d.ts', but this result could not be resolved under your current 'moduleResolution' setting. Consider updating to 'node16', 'nodenext', or 'bundler'.
+site/src/pages/product-facts.json.ts(1,31): error TS2307: Cannot find module 'astro' or its corresponding type declarations.
+  There are types at '/Users/tom-air/DEV/beautiful-grid/site/node_modules/astro/dist/index.d.ts', but this result could not be resolved under your current 'moduleResolution' setting. Consider updating to 'node16', 'nodenext', or 'bundler'.
+test/bodyGridRefactor.test.tsx(184,19): error TS2339: Property 'focus' does not exist on type 'Element'.
+test/cellNavigation.test.tsx(95,19): error TS2339: Property 'focus' does not exist on type 'Element'.
+test/cellNavigation.test.tsx(136,21): error TS2339: Property 'focus' does not exist on type 'Element'.
+test/cellNavigation.test.tsx(180,21): error TS2339: Property 'focus' does not exist on type 'Element'.
+test/cellNavigation.test.tsx(216,19): error TS2339: Property 'focus' does not exist on type 'Element'.
+test/cellNavigation.test.tsx(262,19): error TS2339: Property 'focus' does not exist on type 'Element'.
+test/cellNavigation.test.tsx(318,19): error TS2339: Property 'focus' does not exist on type 'Element'.
+test/cellNavigation.test.tsx(349,19): error TS2339: Property 'focus' does not exist on type 'Element'.
+test/cellNavigation.test.tsx(384,19): error TS2339: Property 'focus' does not exist on type 'Element'.
+test/cellNavigation.test.tsx(425,19): error TS2339: Property 'focus' does not exist on type 'Element'.
+test/cellNavigation.test.tsx(459,19): error TS2339: Property 'focus' does not exist on type 'Element'.
+test/cellNavigation.test.tsx(569,19): error TS2339: Property 'focus' does not exist on type 'Element'.
+test/cellNavigation.test.tsx(602,19): error TS2339: Property 'focus' does not exist on type 'Element'.
+test/cellNavigation.test.tsx(646,19): error TS2339: Property 'focus' does not exist on type 'Element'.
+test/cellNavigation.test.tsx(684,19): error TS2339: Property 'focus' does not exist on type 'Element'.
+test/cellNavigation.test.tsx(732,19): error TS2339: Property 'focus' does not exist on type 'Element'.
+test/cellNavigation.test.tsx(762,19): error TS2339: Property 'focus' does not exist on type 'Element'.
+test/cellNavigation.test.tsx(806,19): error TS2339: Property 'focus' does not exist on type 'Element'.
+test/cellNavigation.test.tsx(835,19): error TS2339: Property 'focus' does not exist on type 'Element'.
+test/cellNavigation.test.tsx(861,19): error TS2339: Property 'focus' does not exist on type 'Element'.
+test/cellNavigation.test.tsx(927,19): error TS2339: Property 'focus' does not exist on type 'Element'.
+test/cellNavigation.test.tsx(1087,19): error TS2339: Property 'focus' does not exist on type 'Element'.
+test/index.test.tsx(361,17): error TS2503: Cannot find namespace 'JSX'.
+test/index.test.tsx(1120,25): error TS2339: Property 'status' does not exist on type '{ values: { id: number; name: string; status: string; }; }'.
+test/index.test.tsx(1121,25): error TS2339: Property 'status' does not exist on type '{ values: { id: number; name: string; status: string; }; }'.
+test/inlineEditing.test.tsx(100,19): error TS2339: Property 'focus' does not exist on type 'Element'.
+test/rowReorderUtils.test.ts(31,47): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(iterable?: Iterable<readonly [number, boolean]> | null | undefined): Map<number, boolean>', gave the following error.
+    Argument of type '([number, true] | [number, string])[]' is not assignable to parameter of type 'Iterable<readonly [number, boolean]>'.
+      The types returned by '[Symbol.iterator]().next(...)' are incompatible between these types.
+        Type 'IteratorResult<[number, true] | [number, string], undefined>' is not assignable to type 'IteratorResult<readonly [number, boolean], any>'.
+          Type 'IteratorYieldResult<[number, true] | [number, string]>' is not assignable to type 'IteratorResult<readonly [number, boolean], any>'.
+            Type 'IteratorYieldResult<[number, true] | [number, string]>' is not assignable to type 'IteratorYieldResult<readonly [number, boolean]>'.
+              Type '[number, true] | [number, string]' is not assignable to type 'readonly [number, boolean]'.
+                Type '[number, string]' is not assignable to type 'readonly [number, boolean]'.
+                  Type at position 1 in source is not compatible with type at position 1 in target.
+                    Type 'string' is not assignable to type 'boolean'.
+  Overload 2 of 4, '(entries?: readonly (readonly [number, boolean])[] | null | undefined): Map<number, boolean>', gave the following error.
+    Type 'string' is not assignable to type 'boolean'.
+test/scrollbar.test.tsx(141,32): error TS2304: Cannot find name 'vi'.
+test/scrollbar.test.tsx(194,32): error TS2304: Cannot find name 'vi'.
+test/scrollbar.test.tsx(220,32): error TS2304: Cannot find name 'vi'.
+test/toolbox-components.test.tsx(15,5): error TS2741: Property 'width' is missing in type '{ id: string; key: string; label: string; toolbox: true; filter: { type: "number"; }; }' but required in type 'BGridColumn<any>'.
+test/toolbox-components.test.tsx(16,5): error TS2741: Property 'width' is missing in type '{ id: string; key: string; label: string; toolbox: true; filter: { type: "values"; }; }' but required in type 'BGridColumn<any>'.
+test/toolbox-components.test.tsx(17,5): error TS2741: Property 'width' is missing in type '{ id: string; key: string; label: string; toolbox: true; filter: { type: "number"; }; }' but required in type 'BGridColumn<any>'.
+test/toolbox-components.test.tsx(30,8): error TS2739: Type '{ data: { values: { id: number; category: string; price: number; }; }[]; columns: BGridColumn<any>[]; dataControl: { mode: "client"; query: { sortParams: never[]; filterParams: never[]; }; onChange: Mock<...>; }; }' is missing the following properties from type 'BGridProps<any>': width, height
+test/toolbox-components.test.tsx(47,8): error TS2739: Type '{ data: { values: { id: number; category: string; price: number; }; }[]; columns: BGridColumn<any>[]; dataControl: { mode: "client"; query: { sortParams: never[]; filterParams: never[]; }; onChange: Mock<...>; }; }' is missing the following properties from type 'BGridProps<any>': width, height
+test/toolbox-components.test.tsx(63,8): error TS2739: Type '{ data: { values: { id: number; category: string; price: number; }; }[]; columns: BGridColumn<any>[]; dataControl: { mode: "client"; query: { sortParams: never[]; filterParams: never[]; }; onChange: Mock<...>; }; }' is missing the following properties from type 'BGridProps<any>': width, height
+test/toolbox-components.test.tsx(73,39): error TS2339: Property 'orderBy' does not exist on type 'never'.
+test/toolbox-components.test.tsx(80,8): error TS2739: Type '{ data: { values: { id: number; category: string; price: number; }; }[]; columns: BGridColumn<any>[]; dataControl: { mode: "client"; query: { sortParams: never[]; filterParams: never[]; }; onChange: Mock<...>; }; }' is missing the following properties from type 'BGridProps<any>': width, height
+test/toolbox-components.test.tsx(123,41): error TS2339: Property 'values' does not exist on type 'never'.
+test/toolbox-components.test.tsx(137,8): error TS2739: Type '{ data: { values: { id: number; category: string; price: number; }; }[]; columns: BGridColumn<any>[]; dataControl: { mode: "client"; query: { sortParams: never[]; filterParams: never[]; }; onChange: Mock<...>; }; }' is missing the following properties from type 'BGridProps<any>': width, height
+test/toolbox-components.test.tsx(158,8): error TS2739: Type '{ data: never[]; columns: { id: string; key: string; label: string; toolbox: true; filter: { type: "values"; values: never[]; }; }[]; dataControl: { mode: "manual"; query: { sortParams: never[]; filterParams: never[]; }; onChange: Mock<...>; }; }' is missing the following properties from type 'BGridProps<Record<string, any>>': width, height
+test/toolbox-filters.test.tsx(11,5): error TS2741: Property 'width' is missing in type '{ id: string; key: string; label: string; toolbox: true; filter: { type: "text"; }; }' but required in type 'BGridColumn<any>'.
+test/toolbox-filters.test.tsx(12,5): error TS2741: Property 'width' is missing in type '{ id: string; key: string; label: string; toolbox: true; filter: { type: "number"; }; }' but required in type 'BGridColumn<any>'.
+test/toolbox-filters.test.tsx(25,8): error TS2739: Type '{ data: { values: { id: number; name: string; price: number; }; }[]; columns: BGridColumn<any>[]; dataControl: { mode: "client"; query: { sortParams: never[]; filterParams: never[]; }; onChange: Mock<...>; }; }' is missing the following properties from type 'BGridProps<any>': width, height
+test/toolbox-filters.test.tsx(55,8): error TS2739: Type '{ data: { values: { id: number; name: string; price: number; }; }[]; columns: BGridColumn<any>[]; dataControl: { mode: "client"; query: { sortParams: never[]; filterParams: never[]; }; onChange: Mock<...>; }; }' is missing the following properties from type 'BGridProps<any>': width, height
+vite.config.ts(1,30): error TS2307: Cannot find module 'vite' or its corresponding type declarations.
+  There are types at '/Users/tom-air/DEV/beautiful-grid/node_modules/vite/dist/node/index.d.ts', but this result could not be resolved under your current 'moduleResolution' setting. Consider updating to 'node16', 'nodenext', or 'bundler'.
+vite.config.ts(2,19): error TS2307: Cannot find module '@vitejs/plugin-react' or its corresponding type declarations.
+  There are types at '/Users/tom-air/DEV/beautiful-grid/node_modules/@vitejs/plugin-react/dist/index.d.ts', but this result could not be resolved under your current 'moduleResolution' setting. Consider updating to 'node16', 'nodenext', or 'bundler'.
+vite.config.ts(13,3): error TS1117: An object literal cannot have multiple properties with the same name.

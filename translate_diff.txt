@@ -1,0 +1,1634 @@
+commit e9466047ac2ee7c0e533b8066247a9ceea811f29
+Author: thomasjang <tom@axisj.com>
+Date:   Sun Aug 30 00:43:25 2026 +0900
+
+    fix(docs): completely translate all Korean text in examples to English
+
+diff --git a/examples/BasicEditingExample.tsx b/examples/BasicEditingExample.tsx
+index bd7905e..1eb4ef7 100644
+--- a/examples/BasicEditingExample.tsx
++++ b/examples/BasicEditingExample.tsx
+@@ -23,3 +23,3 @@ export default function BasicEditingExample() {
+         key: 'customerName',
+-        label: '고객명 · 더블클릭',
++        label: t('고객명 · 더블클릭', 'Customer Name · Double Click'),
+         width: 190,
+@@ -30,3 +30,3 @@ export default function BasicEditingExample() {
+         key: 'note',
+-        label: '메모 · 한 번 클릭',
++        label: t('메모 · 한 번 클릭', 'Note · Click Once'),
+         width: 210,
+@@ -36,3 +36,3 @@ export default function BasicEditingExample() {
+       },
+-      { key: 'status', label: '상태 · 읽기 전용', width: 130, editable: false },
++      { key: 'status', label: t('상태 · 읽기 전용', 'Status · Read Only'), width: 130, editable: false },
+     ]),
+@@ -44,9 +44,10 @@ export default function BasicEditingExample() {
+       <div className='rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm leading-6 text-slate-700'>
+-        <strong>마우스:</strong> 고객명은 Grid 기본값인 더블클릭, 메모는 컬럼의 <code>editTrigger='click'</code>으로
+-        편집합니다.
++        <strong>{t('마우스:', 'Mouse:')}</strong> {t('고객명은 Grid 기본값인 더블클릭, 메모는 컬럼의', 'Customer name is double-clicked as the Grid default, and memo is edited with the column\'s')} <code>editTrigger='click'</code>{t('으로', '')}
+         <br />
+-        <strong>키보드:</strong> 방향키로 셀을 이동하고 바로 입력하면 기존 값을 대체합니다. <kbd>Enter</kbd> 또는{' '}
+-        <kbd>F2</kbd>는 기존 값을 유지하며 시작하고, <kbd>Tab</kbd>은 저장 후 이동, <kbd>Escape</kbd>는 취소합니다.
++        {t('편집합니다.', 'edit.')}
++        <br />
++        <strong>{t('키보드:', 'Keyboard:')}</strong> {t('방향키로 셀을 이동하고 바로 입력하면 기존 값을 대체합니다.', 'Moving cells with arrow keys and typing directly replaces existing values.')} <kbd>Enter</kbd> {t('또는', 'or')}{' '}
++        <kbd>F2</kbd>{t('는 기존 값을 유지하며 시작하고,', ' starts editing keeping the existing value,')} <kbd>Tab</kbd>{t('은 저장 후 이동,', ' saves and moves,')} <kbd>Escape</kbd>{t('는 취소합니다.', ' cancels.')}
+         <output aria-live='polite' className='mt-1 block font-mono text-xs text-blue-700'>
+-          활성 셀: 행 {activeCell.rowIndex + 1}, 열 {activeCell.columnIndex + 1}
++          {t('활성 셀: 행', 'Active cell: Row')} {activeCell.rowIndex + 1}, {t('열', 'Col')} {activeCell.columnIndex + 1}
+         </output>
+diff --git a/examples/BasicExample.tsx b/examples/BasicExample.tsx
+index 1d99244..e98c0ae 100644
+--- a/examples/BasicExample.tsx
++++ b/examples/BasicExample.tsx
+@@ -29,3 +29,3 @@ const fulfillmentOrders: BGridDataItem<FulfillmentOrder>[] = [
+       customer: t('ACME 리테일', 'ACME Retail'),
+-      product: '산업용 센서 A-100',
++      product: t('산업용 센서 A-100', 'Industrial Sensor A-100'),
+       orderedQty: 18,
+@@ -43,3 +43,3 @@ const fulfillmentOrders: BGridDataItem<FulfillmentOrder>[] = [
+       customer: t('한빛 모빌리티', 'Hanbit Mobility'),
+-      product: '제어 모듈 CM-8',
++      product: t('제어 모듈 CM-8', 'Control Module CM-8'),
+       orderedQty: 8,
+@@ -57,3 +57,3 @@ const fulfillmentOrders: BGridDataItem<FulfillmentOrder>[] = [
+       customer: t('오로라 시스템즈', 'Aurora Systems'),
+-      product: '게이트웨이 GW-20',
++      product: t('게이트웨이 GW-20', 'Gateway GW-20'),
+       orderedQty: 24,
+@@ -71,3 +71,3 @@ const fulfillmentOrders: BGridDataItem<FulfillmentOrder>[] = [
+       customer: t('세림 테크', 'Serim Tech'),
+-      product: '서보 드라이브 SD-4',
++      product: t('서보 드라이브 SD-4', 'Servo Drive SD-4'),
+       orderedQty: 12,
+@@ -99,3 +99,3 @@ const fulfillmentOrders: BGridDataItem<FulfillmentOrder>[] = [
+       customer: t('대성 로보틱스', 'Daesung Robotics'),
+-      product: '엔코더 EC-12',
++      product: t('엔코더 EC-12', 'Encoder EC-12'),
+       orderedQty: 15,
+@@ -113,3 +113,3 @@ const fulfillmentOrders: BGridDataItem<FulfillmentOrder>[] = [
+       customer: t('뉴웨이브 에너지', 'New Wave Energy'),
+-      product: '인버터 IV-75',
++      product: t('인버터 IV-75', 'Inverter IV-75'),
+       orderedQty: 10,
+@@ -127,3 +127,3 @@ const fulfillmentOrders: BGridDataItem<FulfillmentOrder>[] = [
+       customer: t('정우 정밀', 'Jungwoo Precision'),
+-      product: '리니어 스케일 LS-9',
++      product: t('리니어 스케일 LS-9', 'Linear Scale LS-9'),
+       orderedQty: 6,
+@@ -141,3 +141,3 @@ const fulfillmentOrders: BGridDataItem<FulfillmentOrder>[] = [
+       customer: t('에이스 팩토리', 'Ace Factory'),
+-      product: '비전 카메라 VC-3',
++      product: t('비전 카메라 VC-3', 'Vision Camera VC-3'),
+       orderedQty: 14,
+@@ -155,3 +155,3 @@ const fulfillmentOrders: BGridDataItem<FulfillmentOrder>[] = [
+       customer: t('태성 이노텍', 'Taesung Innotek'),
+-      product: '안전 라이트커튼 LC-5',
++      product: t('안전 라이트커튼 LC-5', 'Safety Light Curtain LC-5'),
+       orderedQty: 20,
+@@ -183,3 +183,3 @@ const fulfillmentOrders: BGridDataItem<FulfillmentOrder>[] = [
+       customer: t('글로벌 메카', 'Global Mecca'),
+-      product: '토크 센서 TS-2',
++      product: t('토크 센서 TS-2', 'Torque Sensor TS-2'),
+       orderedQty: 16,
+@@ -243,3 +243,3 @@ const initialColumns: BGridColumn<FulfillmentOrder>[] = [
+     align: 'right',
+-    itemRender: ({ value }) => <>{Number(value).toLocaleString()}개</>,
++    itemRender: ({ value }) => <>{Number(value).toLocaleString()}{t('개', 'ea')}</>,
+   },
+@@ -252,3 +252,3 @@ const initialColumns: BGridColumn<FulfillmentOrder>[] = [
+       <strong className={values.availableQty < values.orderedQty ? 'text-rose-600' : 'text-emerald-700'}>
+-        {Number(value).toLocaleString()}개
++        {Number(value).toLocaleString()}{t('개', 'ea')}
+       </strong>
+@@ -263,3 +263,3 @@ const initialColumns: BGridColumn<FulfillmentOrder>[] = [
+     align: 'right',
+-    itemRender: ({ value }) => <strong>{Number(value).toLocaleString()}원</strong>,
++    itemRender: ({ value }) => <strong>{Number(value).toLocaleString()}{t('원', 'KRW')}</strong>,
+   },
+@@ -295,7 +295,7 @@ function BasicExample() {
+         <div>
+-          <strong className='text-slate-900'>주문 출고 예외 관리</strong>
+-          <span className='ml-2'>재고 부족과 마감 임박 주문을 한 화면에서 우선 처리합니다.</span>
++          <strong className='text-slate-900'>{t('주문 출고 예외 관리', 'Order Dispatch Exception Management')}</strong>
++          <span className='ml-2'>{t('재고 부족과 마감 임박 주문을 한 화면에서 우선 처리합니다.', 'Handle out-of-stock and impending deadline orders with priority on one screen.')}</span>
+         </div>
+         <span aria-live='polite'>
+-          검토 선택 {checkedRowKeys.length}건 · 현재 주문 {focusedOrderNo}
++          {t('검토 선택', 'Selected for review')} {checkedRowKeys.length}{t('건 · 현재 주문', ' items · Current Order')} {focusedOrderNo}
+         </span>
+diff --git a/examples/BuiltInEditorsExample.tsx b/examples/BuiltInEditorsExample.tsx
+index 612b3d7..e79080a 100644
+--- a/examples/BuiltInEditorsExample.tsx
++++ b/examples/BuiltInEditorsExample.tsx
+@@ -84,3 +84,3 @@ export default function BuiltInEditorsExample() {
+           header: { ariaLabel: t('승인 권한 전체 선택', 'Select All Approval Permissions') },
+-          ariaLabel: ({ values }) => `${values.orderCode} 승인 권한`,
++          ariaLabel: ({ values }) => `${values.orderCode} ${t('승인 권한', 'Approval Permission')}`,
+           label: ({ value }) => (value ? t('허용', 'Allowed') : t('차단', 'Blocked')),
+@@ -95,4 +95,3 @@ export default function BuiltInEditorsExample() {
+       <p className='m-0 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm leading-6 text-slate-700'>
+-        text와 checkbox는 라이브러리 내장 편집기이며 Select와 Date는 <code>beautiful-grid/editors</code>가 제공하는
+-        의존성 없는 plugin입니다. 승인 권한 헤더의 checkbox로 현재 행을 한 번에 선택하거나 해제할 수 있습니다.
++        {t('text와 checkbox는 라이브러리 내장 편집기이며 Select와 Date는', 'Text and checkbox are built-in editors, while Select and Date are provided by')} <code>beautiful-grid/editors</code>{t('가 제공하는 의존성 없는 plugin입니다. 승인 권한 헤더의 checkbox로 현재 행을 한 번에 선택하거나 해제할 수 있습니다.', ' as dependency-free plugins. You can select or deselect all rows at once using the checkbox in the Approval Permission header.')}
+       </p>
+diff --git a/examples/CellMergeExample.tsx b/examples/CellMergeExample.tsx
+index 719f726..416b465 100644
+--- a/examples/CellMergeExample.tsx
++++ b/examples/CellMergeExample.tsx
+@@ -17,14 +17,14 @@ interface InventoryItem {
+ const inventoryRows: InventoryItem[] = [
+-  { mainCategory: '가전/디지털', subCategory: t('컴퓨터 주변기기', 'Computer Peripherals'), itemCode: 'IT-001', itemName: t('프리미엄 무선 키보드', 'Premium Wireless Keyboard'), unitPrice: 129000, stockQty: 84, warehouse: 'A-01' },
+-  { mainCategory: '가전/디지털', subCategory: t('컴퓨터 주변기기', 'Computer Peripherals'), itemCode: 'IT-002', itemName: t('인체공학 마우스', 'Ergonomic Mouse'), unitPrice: 69000, stockQty: 46, warehouse: 'A-01' },
+-  { mainCategory: '가전/디지털', subCategory: t('컴퓨터 주변기기', 'Computer Peripherals'), itemCode: 'IT-003', itemName: 'USB-C 멀티 허브', unitPrice: 89000, stockQty: 31, warehouse: 'A-02' },
+-  { mainCategory: '가전/디지털', subCategory: '모니터/디스플레이', itemCode: 'IT-004', itemName: t('27인치 QHD 모니터', '27-inch QHD Monitor'), unitPrice: 389000, stockQty: 18, warehouse: 'B-01' },
+-  { mainCategory: '가전/디지털', subCategory: '모니터/디스플레이', itemCode: 'IT-005', itemName: t('32인치 4K 모니터', '32-inch 4K Monitor'), unitPrice: 629000, stockQty: 9, warehouse: 'B-01' },
+-  { mainCategory: '가구/인테리어', subCategory: t('사무용 가구', 'Office Furniture'), itemCode: 'FN-001', itemName: t('모션 데스크 1400', 'Motion Desk 1400'), unitPrice: 459000, stockQty: 22, warehouse: 'C-01' },
+-  { mainCategory: '가구/인테리어', subCategory: t('사무용 가구', 'Office Furniture'), itemCode: 'FN-002', itemName: t('인체공학 메시 의자', 'Ergonomic Mesh Chair'), unitPrice: 329000, stockQty: 37, warehouse: 'C-01' },
+-  { mainCategory: '가구/인테리어', subCategory: t('수납 가구', 'Storage Furniture'), itemCode: 'FN-003', itemName: t('이동식 서랍장', 'Mobile Drawer'), unitPrice: 119000, stockQty: 41, warehouse: 'C-02' },
+-  { mainCategory: '가구/인테리어', subCategory: t('수납 가구', 'Storage Furniture'), itemCode: 'FN-004', itemName: t('5단 철제 선반', '5-tier steel shelf'), unitPrice: 149000, stockQty: 26, warehouse: 'C-02' },
+-  { mainCategory: '생활/주방', subCategory: t('홈카페', 'Home Cafe'), itemCode: 'KT-001', itemName: t('전자동 커피머신', 'Fully Automatic Coffee Machine'), unitPrice: 749000, stockQty: 12, warehouse: 'D-01' },
+-  { mainCategory: '생활/주방', subCategory: t('홈카페', 'Home Cafe'), itemCode: 'KT-002', itemName: t('온도조절 전기포트', 'Temperature Control Electric Kettle'), unitPrice: 99000, stockQty: 53, warehouse: 'D-01' },
+-  { mainCategory: '생활/주방', subCategory: t('조리도구', 'Cooking Utensils'), itemCode: 'KT-003', itemName: t('스테인리스 팬 세트', 'Stainless Steel Pan Set'), unitPrice: 189000, stockQty: 29, warehouse: 'D-02' },
++  { mainCategory: t('가전/디지털', 'Home Appliances/Digital'), subCategory: t('컴퓨터 주변기기', 'Computer Peripherals'), itemCode: 'IT-001', itemName: t('프리미엄 무선 키보드', 'Premium Wireless Keyboard'), unitPrice: 129000, stockQty: 84, warehouse: 'A-01' },
++  { mainCategory: t('가전/디지털', 'Home Appliances/Digital'), subCategory: t('컴퓨터 주변기기', 'Computer Peripherals'), itemCode: 'IT-002', itemName: t('인체공학 마우스', 'Ergonomic Mouse'), unitPrice: 69000, stockQty: 46, warehouse: 'A-01' },
++  { mainCategory: t('가전/디지털', 'Home Appliances/Digital'), subCategory: t('컴퓨터 주변기기', 'Computer Peripherals'), itemCode: 'IT-003', itemName: t('USB-C 멀티 허브', 'USB-C Multi Hub'), unitPrice: 89000, stockQty: 31, warehouse: 'A-02' },
++  { mainCategory: t('가전/디지털', 'Home Appliances/Digital'), subCategory: t('모니터/디스플레이', 'Monitor/Display'), itemCode: 'IT-004', itemName: t('27인치 QHD 모니터', '27-inch QHD Monitor'), unitPrice: 389000, stockQty: 18, warehouse: 'B-01' },
++  { mainCategory: t('가전/디지털', 'Home Appliances/Digital'), subCategory: t('모니터/디스플레이', 'Monitor/Display'), itemCode: 'IT-005', itemName: t('32인치 4K 모니터', '32-inch 4K Monitor'), unitPrice: 629000, stockQty: 9, warehouse: 'B-01' },
++  { mainCategory: t('가구/인테리어', 'Furniture/Interior'), subCategory: t('사무용 가구', 'Office Furniture'), itemCode: 'FN-001', itemName: t('모션 데스크 1400', 'Motion Desk 1400'), unitPrice: 459000, stockQty: 22, warehouse: 'C-01' },
++  { mainCategory: t('가구/인테리어', 'Furniture/Interior'), subCategory: t('사무용 가구', 'Office Furniture'), itemCode: 'FN-002', itemName: t('인체공학 메시 의자', 'Ergonomic Mesh Chair'), unitPrice: 329000, stockQty: 37, warehouse: 'C-01' },
++  { mainCategory: t('가구/인테리어', 'Furniture/Interior'), subCategory: t('수납 가구', 'Storage Furniture'), itemCode: 'FN-003', itemName: t('이동식 서랍장', 'Mobile Drawer'), unitPrice: 119000, stockQty: 41, warehouse: 'C-02' },
++  { mainCategory: t('가구/인테리어', 'Furniture/Interior'), subCategory: t('수납 가구', 'Storage Furniture'), itemCode: 'FN-004', itemName: t('5단 철제 선반', '5-tier steel shelf'), unitPrice: 149000, stockQty: 26, warehouse: 'C-02' },
++  { mainCategory: t('생활/주방', 'Living/Kitchen'), subCategory: t('홈카페', 'Home Cafe'), itemCode: 'KT-001', itemName: t('전자동 커피머신', 'Fully Automatic Coffee Machine'), unitPrice: 749000, stockQty: 12, warehouse: 'D-01' },
++  { mainCategory: t('생활/주방', 'Living/Kitchen'), subCategory: t('홈카페', 'Home Cafe'), itemCode: 'KT-002', itemName: t('온도조절 전기포트', 'Temperature Control Electric Kettle'), unitPrice: 99000, stockQty: 53, warehouse: 'D-01' },
++  { mainCategory: t('생활/주방', 'Living/Kitchen'), subCategory: t('조리도구', 'Cooking Utensils'), itemCode: 'KT-003', itemName: t('스테인리스 팬 세트', 'Stainless Steel Pan Set'), unitPrice: 189000, stockQty: 29, warehouse: 'D-02' },
+ ];
+@@ -44,5 +44,5 @@ function CellMergeExample() {
+       align: 'right',
+-      itemRender: ({ values }) => <>{values.unitPrice.toLocaleString()}원</>,
++      itemRender: ({ values }) => <>{values.unitPrice.toLocaleString()}{t('원', 'KRW')}</>,
+     },
+-    { key: 'stockQty', label: t('재고', 'Stock'), width: 80, align: 'right', itemRender: ({ values }) => <>{values.stockQty}개</> },
++    { key: 'stockQty', label: t('재고', 'Stock'), width: 80, align: 'right', itemRender: ({ values }) => <>{values.stockQty}{t('개', 'ea')}</> },
+     { key: 'warehouse', label: t('창고', 'Warehouse'), width: 90, align: 'center' },
+diff --git a/examples/CellNavigationExample.tsx b/examples/CellNavigationExample.tsx
+index a9b8300..ca9b02f 100644
+--- a/examples/CellNavigationExample.tsx
++++ b/examples/CellNavigationExample.tsx
+@@ -57,3 +57,3 @@ export default function CellNavigationExample() {
+         key: 'customer',
+-        label: '고객 · 편집 가능',
++        label: t('고객 · 편집 가능', 'Customer · Editable'),
+         width: 170,
+@@ -66,6 +66,6 @@ export default function CellNavigationExample() {
+       },
+-      { key: 'category', label: '분류 · 병합', width: 110, editable: false },
++      { key: 'category', label: t('분류 · 병합', 'Category · Merged'), width: 110, editable: false },
+       {
+         key: 'product',
+-        label: '상품 · 편집 가능',
++        label: t('상품 · 편집 가능', 'Product · Editable'),
+         width: 180,
+@@ -86,3 +86,3 @@ export default function CellNavigationExample() {
+         editable: false,
+-        itemRender: ({ value }) => <>{Number(value).toLocaleString()}원</>,
++        itemRender: ({ value }) => <>{Number(value).toLocaleString()}{t('원', 'KRW')}</>,
+       },
+@@ -94,3 +94,3 @@ export default function CellNavigationExample() {
+         editable: false,
+-        itemRender: ({ value }) => <strong>{Number(value).toLocaleString()}원</strong>,
++        itemRender: ({ value }) => <strong>{Number(value).toLocaleString()}{t('원', 'KRW')}</strong>,
+       },
+@@ -104,18 +104,17 @@ export default function CellNavigationExample() {
+         <div className='mb-2 flex flex-wrap items-center gap-x-4 gap-y-2'>
+-          <Toggle label={t(t('키보드 이동', 'Keyboard Navigation'), 'Keyboard Navigation')} checked={navigationEnabled} onChange={setNavigationEnabled} />
+-          <Toggle label={t(t('범위 선택', 'Select Range'), 'Select Range')} checked={selectionEnabled} onChange={setSelectionEnabled} />
+-          <Toggle label={t(t('경계 순환', 'Boundary Circulation'), 'Boundary Circulation')} checked={wrap} onChange={setWrap} />
+-          <Toggle label={t(t('Enter로 편집', 'Press Enter to edit'), 'Press Enter to edit')} checked={editOnEnter} onChange={setEditOnEnter} />
++          <Toggle label={t('키보드 이동', 'Keyboard Navigation')} checked={navigationEnabled} onChange={setNavigationEnabled} />
++          <Toggle label={t('범위 선택', 'Select Range')} checked={selectionEnabled} onChange={setSelectionEnabled} />
++          <Toggle label={t('경계 순환', 'Boundary Circulation')} checked={wrap} onChange={setWrap} />
++          <Toggle label={t('Enter로 편집', 'Press Enter to edit')} checked={editOnEnter} onChange={setEditOnEnter} />
+         </div>
+         <p className='m-0 leading-6'>
+-          셀 클릭 후 <kbd>방향키</kbd>, <kbd>Home</kbd>/<kbd>End</kbd>, <kbd>PageUp</kbd>/<kbd>PageDown</kbd>,{' '}
+-          <kbd>Tab</kbd>을 사용하세요. <kbd>Shift</kbd>+방향키는 범위를 확장합니다. 편집 가능한 셀에서는{' '}
+-          <kbd>Enter</kbd> 또는 <kbd>F2</kbd>로 편집을 시작하고, 그 외 셀에서는 <kbd>Enter</kbd> 또는 <kbd>Space</kbd>로
+-          클릭 콜백을 실행합니다.
++          {t('셀 클릭 후', 'After clicking a cell, use')} <kbd>{t('방향키', 'Arrow keys')}</kbd>, <kbd>Home</kbd>/<kbd>End</kbd>, <kbd>PageUp</kbd>/<kbd>PageDown</kbd>,{' '}
++          <kbd>Tab</kbd>{t('을 사용하세요. ', ' to navigate. ')} <kbd>Shift</kbd>{t('+방향키는 범위를 확장합니다. 편집 가능한 셀에서는', '+Arrow keys expand selection. In editable cells,')} {' '}
++          <kbd>Enter</kbd> {t('또는', 'or')} <kbd>F2</kbd>{t('로 편집을 시작하고, 그 외 셀에서는', ' start editing, and in other cells,')} <kbd>Enter</kbd> {t('또는', 'or')} <kbd>Space</kbd>{t('로 클릭 콜백을 실행합니다.', ' execute the click callback.')}
+         </p>
+         <output aria-live='polite' className='mt-2 block font-mono text-xs text-blue-700'>
+-          활성 셀: 행 {activeCell.rowIndex + 1}, 열 {activeCell.columnIndex + 1}
++          {t('활성 셀: 행', 'Active Cell: Row')} {activeCell.rowIndex + 1}, {t('열', 'Col')} {activeCell.columnIndex + 1}
+         </output>
+         <output aria-live='polite' className='mt-1 block font-mono text-xs text-slate-600'>
+-          마지막 클릭 활성화: {lastActivation}
++          {t('마지막 클릭 활성화:', 'Last Click Activation:')} {lastActivation}
+         </output>
+@@ -148,3 +147,3 @@ export default function CellNavigationExample() {
+           onClick={({ index, columnIndex, item, column }) => {
+-            setLastActivation(`${item.orderNo} · 행 ${index + 1}, 열 ${columnIndex + 1} (${String(column.label)})`);
++            setLastActivation(`${item.orderNo} · ${t('행', 'Row')} ${index + 1}, ${t('열', 'Col')} ${columnIndex + 1} (${String(column.label)})`);
+           }}
+diff --git a/examples/CheckedExample.tsx b/examples/CheckedExample.tsx
+index 8d53f55..08a30a8 100644
+--- a/examples/CheckedExample.tsx
++++ b/examples/CheckedExample.tsx
+@@ -1 +1,2 @@
++import { t } from './i18n';
+ import * as React from 'react';
+@@ -23,33 +24,33 @@ interface IListItem {
+ const rawData = [
+-  ['대한민국(15+ LFS)', 44504, 28186, 16090, 12097, 63, 73, 53],
+-  ['아르메니아(15~75 LFS)', 2204, 1563, 780, 783, 70, 76, 66],
+-  ['아제르바이잔(15+ LFS)', 0, 5190, 2664, 2526, 66, 69, 63],
+-  ['부탄(15+ LFS)', 482, 320, 169, 151, 66, 71, 61],
+-  ['브루나이(15+ LFS)', 370, 238, 144, 94, 64, 72, 54],
+-  ['캄보디아(15+ LFS)', 11515, 8756, 4481, 4274, 76, 82, 69],
+-  ['키프로스(15+ LFS)', 712, 448, 236, 212, 63, 68, 57],
+-  ['조지아(15+ LFS)', 3037, 1911, 1025, 886, 62, 72, 54],
+-  ['홍콩(15+ LFS)', 6573, 3988, 1990, 1998, 60, 67, 55],
+-  ['인도네시아(15+ LFS)', 200485, 136808, 82760, 54048, 68, 82, 53],
+-  ['이란(15+ LFS)', 61658, 26940, 21707, 5233, 43, 70, 17],
+-  ['이스라엘(15+ LFS)', 6494, 4124, 2149, 1974, 63, 67, 59],
+-  ['일본(15+ LFS)', 110271, 68377, 37997, 30380, 62, 71, 53],
+-  ['카자흐스탄(15+ LFS)', 13131, 9203, 0, 0, 70, 0, 0],
+-  ['키르기스스탄(15+ LFS)', 4288, 2755, 1620, 1136, 64, 77, 51],
+-  ['레바논(15+ LFS)', 3677, 1798, 1230, 567, 48, 70, 29],
+-  ['마카오(16+ LFS)', 0, 395, 193, 202, 0, 74, 66],
+-  ['말레이시아(15~64 LFS)', 22685, 15582, 9503, 6078, 68, 80, 55],
+-  ['몰디브(15+ HIES)', 317, 202, 116, 86, 63, 78, 50],
+-  ['몽골(15+ LFS)', 2106, 1326, 706, 620, 63, 70, 55],
+-  ['파키스탄(15+ LFS)', 120220, 62030, 47845, 14185, 51, 79, 23],
+-  ['필리핀(15+ LFS )', 73008, 43399, 26527, 16872, 59, 72, 46],
+-  ['카타르(15+ LFS)', 2393, 2108, 1823, 285, 88, 95, 57],
+-  ['사우디아라비아(15+ LFS)', 0, 0, 0, 0, 57, 80, 24],
+-  ['싱가포르(15+ LFS)', 3422, 2329, 1251, 1077, 68, 75, 61],
+-  ['스리랑카(15+ LFS)', 16424, 8581, 5550, 3032, 52, 72, 34],
+-  ['대만(15+ LFS)', 20188, 11946, 6631, 5315, 59, 67, 51],
+-  ['태국(15+ LFS)', 56575, 37885, 20611, 17274, 67, 75, 59],
+-  ['튀르키예(15+ LFS)', 61468, 32524, 21855, 10669, 52, 72, 34],
+-  ['아랍에미리트(15+ LFS)', 9432, 7565, 5693, 1871, 80, 92, 57],
+-  ['베트남(15+ LFS)', 73394, 55507, 29068, 26440, 75, 81, 70],
++  [t('대한민국(15+ LFS)', 'South Korea (15+ LFS)'), 44504, 28186, 16090, 12097, 63, 73, 53],
++  [t('아르메니아(15~75 LFS)', 'Armenia (15~75 LFS)'), 2204, 1563, 780, 783, 70, 76, 66],
++  [t('아제르바이잔(15+ LFS)', 'Azerbaijan (15+ LFS)'), 0, 5190, 2664, 2526, 66, 69, 63],
++  [t('부탄(15+ LFS)', 'Bhutan (15+ LFS)'), 482, 320, 169, 151, 66, 71, 61],
++  [t('브루나이(15+ LFS)', 'Brunei (15+ LFS)'), 370, 238, 144, 94, 64, 72, 54],
++  [t('캄보디아(15+ LFS)', 'Cambodia (15+ LFS)'), 11515, 8756, 4481, 4274, 76, 82, 69],
++  [t('키프로스(15+ LFS)', 'Cyprus (15+ LFS)'), 712, 448, 236, 212, 63, 68, 57],
++  [t('조지아(15+ LFS)', 'Georgia (15+ LFS)'), 3037, 1911, 1025, 886, 62, 72, 54],
++  [t('홍콩(15+ LFS)', 'Hong Kong (15+ LFS)'), 6573, 3988, 1990, 1998, 60, 67, 55],
++  [t('인도네시아(15+ LFS)', 'Indonesia (15+ LFS)'), 200485, 136808, 82760, 54048, 68, 82, 53],
++  [t('이란(15+ LFS)', 'Iran (15+ LFS)'), 61658, 26940, 21707, 5233, 43, 70, 17],
++  [t('이스라엘(15+ LFS)', 'Israel (15+ LFS)'), 6494, 4124, 2149, 1974, 63, 67, 59],
++  [t('일본(15+ LFS)', 'Japan (15+ LFS)'), 110271, 68377, 37997, 30380, 62, 71, 53],
++  [t('카자흐스탄(15+ LFS)', 'Kazakhstan (15+ LFS)'), 13131, 9203, 0, 0, 70, 0, 0],
++  [t('키르기스스탄(15+ LFS)', 'Kyrgyzstan (15+ LFS)'), 4288, 2755, 1620, 1136, 64, 77, 51],
++  [t('레바논(15+ LFS)', 'Lebanon (15+ LFS)'), 3677, 1798, 1230, 567, 48, 70, 29],
++  [t('마카오(16+ LFS)', 'Macau (16+ LFS)'), 0, 395, 193, 202, 0, 74, 66],
++  [t('말레이시아(15~64 LFS)', 'Malaysia (15~64 LFS)'), 22685, 15582, 9503, 6078, 68, 80, 55],
++  [t('몰디브(15+ HIES)', 'Maldives (15+ HIES)'), 317, 202, 116, 86, 63, 78, 50],
++  [t('몽골(15+ LFS)', 'Mongolia (15+ LFS)'), 2106, 1326, 706, 620, 63, 70, 55],
++  [t('파키스탄(15+ LFS)', 'Pakistan (15+ LFS)'), 120220, 62030, 47845, 14185, 51, 79, 23],
++  [t('필리핀(15+ LFS )', 'Philippines (15+ LFS)'), 73008, 43399, 26527, 16872, 59, 72, 46],
++  [t('카타르(15+ LFS)', 'Qatar (15+ LFS)'), 2393, 2108, 1823, 285, 88, 95, 57],
++  [t('사우디아라비아(15+ LFS)', 'Saudi Arabia (15+ LFS)'), 0, 0, 0, 0, 57, 80, 24],
++  [t('싱가포르(15+ LFS)', 'Singapore (15+ LFS)'), 3422, 2329, 1251, 1077, 68, 75, 61],
++  [t('스리랑카(15+ LFS)', 'Sri Lanka (15+ LFS)'), 16424, 8581, 5550, 3032, 52, 72, 34],
++  [t('대만(15+ LFS)', 'Taiwan (15+ LFS)'), 20188, 11946, 6631, 5315, 59, 67, 51],
++  [t('태국(15+ LFS)', 'Thailand (15+ LFS)'), 56575, 37885, 20611, 17274, 67, 75, 59],
++  [t('튀르키예(15+ LFS)', 'Turkey (15+ LFS)'), 61468, 32524, 21855, 10669, 52, 72, 34],
++  [t('아랍에미리트(15+ LFS)', 'United Arab Emirates (15+ LFS)'), 9432, 7565, 5693, 1871, 80, 92, 57],
++  [t('베트남(15+ LFS)', 'Vietnam (15+ LFS)'), 73394, 55507, 29068, 26440, 75, 81, 70],
+ ];
+@@ -144,3 +145,3 @@ function CheckedExample(props: Props) {
+         <div className='flex items-center gap-2'>
+-          <span className='font-medium text-slate-600'>행 선택 방식</span>
++          <span className='font-medium text-slate-600'>{t('행 선택 방식', 'Row Selection Mode')}</span>
+           <Segmented
+@@ -148,4 +149,4 @@ function CheckedExample(props: Props) {
+             options={[
+-              { label: 'Checkbox (복수 선택)', value: 'checkbox' },
+-              { label: 'Radio (단일 선택)', value: 'radio' },
++              { label: t('Checkbox (복수 선택)', 'Checkbox (Multiple)'), value: 'checkbox' },
++              { label: t('Radio (단일 선택)', 'Radio (Single)'), value: 'radio' },
+             ]}
+@@ -164,3 +165,3 @@ function CheckedExample(props: Props) {
+         >
+-          <span className='mr-1 font-medium text-slate-600'>선택한 키 ({checkedKeys.length})</span>
++          <span className='mr-1 font-medium text-slate-600'>{t('선택한 키', 'Selected Keys')} ({checkedKeys.length})</span>
+           {checkedKeys.length > 0 ? (
+@@ -168,3 +169,3 @@ function CheckedExample(props: Props) {
+           ) : (
+-            <span className='text-slate-400'>없음</span>
++            <span className='text-slate-400'>{t('없음', 'None')}</span>
+           )}
+diff --git a/examples/ColumnSortExample.tsx b/examples/ColumnSortExample.tsx
+index 05a8cdf..a5c2bc5 100644
+--- a/examples/ColumnSortExample.tsx
++++ b/examples/ColumnSortExample.tsx
+@@ -1 +1,2 @@
++import { t } from './i18n';
+ import * as React from 'react';
+@@ -29,33 +30,33 @@ interface IListItem {
+ const rawData = [
+-  ['대한민국(15+ LFS)', 44504, 28186, 16090, 12097, 63, 73, 53],
+-  ['아르메니아(15~75 LFS)', 2204, 1563, 780, 783, 70, 76, 66],
+-  ['아제르바이잔(15+ LFS)', 0, 5190, 2664, 2526, 66, 69, 63],
+-  ['부탄(15+ LFS)', 482, 320, 169, 151, 66, 71, 61],
+-  ['브루나이(15+ LFS)', 370, 238, 144, 94, 64, 72, 54],
+-  ['캄보디아(15+ LFS)', 11515, 8756, 4481, 4274, 76, 82, 69],
+-  ['키프로스(15+ LFS)', 712, 448, 236, 212, 63, 68, 57],
+-  ['조지아(15+ LFS)', 3037, 1911, 1025, 886, 62, 72, 54],
+-  ['홍콩(15+ LFS)', 6573, 3988, 1990, 1998, 60, 67, 55],
+-  ['인도네시아(15+ LFS)', 200485, 136808, 82760, 54048, 68, 82, 53],
+-  ['이란(15+ LFS)', 61658, 26940, 21707, 5233, 43, 70, 17],
+-  ['이스라엘(15+ LFS)', 6494, 4124, 2149, 1974, 63, 67, 59],
+-  ['일본(15+ LFS)', 110271, 68377, 37997, 30380, 62, 71, 53],
+-  ['카자흐스탄(15+ LFS)', 13131, 9203, 0, 0, 70, 0, 0],
+-  ['키르기스스탄(15+ LFS)', 4288, 2755, 1620, 1136, 64, 77, 51],
+-  ['레바논(15+ LFS)', 3677, 1798, 1230, 567, 48, 70, 29],
+-  ['마카오(16+ LFS)', 0, 395, 193, 202, 0, 74, 66],
+-  ['말레이시아(15~64 LFS)', 22685, 15582, 9503, 6078, 68, 80, 55],
+-  ['몰디브(15+ HIES)', 317, 202, 116, 86, 63, 78, 50],
+-  ['몽골(15+ LFS)', 2106, 1326, 706, 620, 63, 70, 55],
+-  ['파키스탄(15+ LFS)', 120220, 62030, 47845, 14185, 51, 79, 23],
+-  ['필리핀(15+ LFS )', 73008, 43399, 26527, 16872, 59, 72, 46],
+-  ['카타르(15+ LFS)', 2393, 2108, 1823, 285, 88, 95, 57],
+-  ['사우디아라비아(15+ LFS)', 0, 0, 0, 0, 57, 80, 24],
+-  ['싱가포르(15+ LFS)', 3422, 2329, 1251, 1077, 68, 75, 61],
+-  ['스리랑카(15+ LFS)', 16424, 8581, 5550, 3032, 52, 72, 34],
+-  ['대만(15+ LFS)', 20188, 11946, 6631, 5315, 59, 67, 51],
+-  ['태국(15+ LFS)', 56575, 37885, 20611, 17274, 67, 75, 59],
+-  ['튀르키예(15+ LFS)', 61468, 32524, 21855, 10669, 52, 72, 34],
+-  ['아랍에미리트(15+ LFS)', 9432, 7565, 5693, 1871, 80, 92, 57],
+-  ['베트남(15+ LFS)', 73394, 55507, 29068, 26440, 75, 81, 70],
++  [t('대한민국(15+ LFS)', 'South Korea (15+ LFS)'), 44504, 28186, 16090, 12097, 63, 73, 53],
++  [t('아르메니아(15~75 LFS)', 'Armenia (15~75 LFS)'), 2204, 1563, 780, 783, 70, 76, 66],
++  [t('아제르바이잔(15+ LFS)', 'Azerbaijan (15+ LFS)'), 0, 5190, 2664, 2526, 66, 69, 63],
++  [t('부탄(15+ LFS)', 'Bhutan (15+ LFS)'), 482, 320, 169, 151, 66, 71, 61],
++  [t('브루나이(15+ LFS)', 'Brunei (15+ LFS)'), 370, 238, 144, 94, 64, 72, 54],
++  [t('캄보디아(15+ LFS)', 'Cambodia (15+ LFS)'), 11515, 8756, 4481, 4274, 76, 82, 69],
++  [t('키프로스(15+ LFS)', 'Cyprus (15+ LFS)'), 712, 448, 236, 212, 63, 68, 57],
++  [t('조지아(15+ LFS)', 'Georgia (15+ LFS)'), 3037, 1911, 1025, 886, 62, 72, 54],
++  [t('홍콩(15+ LFS)', 'Hong Kong (15+ LFS)'), 6573, 3988, 1990, 1998, 60, 67, 55],
++  [t('인도네시아(15+ LFS)', 'Indonesia (15+ LFS)'), 200485, 136808, 82760, 54048, 68, 82, 53],
++  [t('이란(15+ LFS)', 'Iran (15+ LFS)'), 61658, 26940, 21707, 5233, 43, 70, 17],
++  [t('이스라엘(15+ LFS)', 'Israel (15+ LFS)'), 6494, 4124, 2149, 1974, 63, 67, 59],
++  [t('일본(15+ LFS)', 'Japan (15+ LFS)'), 110271, 68377, 37997, 30380, 62, 71, 53],
++  [t('카자흐스탄(15+ LFS)', 'Kazakhstan (15+ LFS)'), 13131, 9203, 0, 0, 70, 0, 0],
++  [t('키르기스스탄(15+ LFS)', 'Kyrgyzstan (15+ LFS)'), 4288, 2755, 1620, 1136, 64, 77, 51],
++  [t('레바논(15+ LFS)', 'Lebanon (15+ LFS)'), 3677, 1798, 1230, 567, 48, 70, 29],
++  [t('마카오(16+ LFS)', 'Macau (16+ LFS)'), 0, 395, 193, 202, 0, 74, 66],
++  [t('말레이시아(15~64 LFS)', 'Malaysia (15~64 LFS)'), 22685, 15582, 9503, 6078, 68, 80, 55],
++  [t('몰디브(15+ HIES)', 'Maldives (15+ HIES)'), 317, 202, 116, 86, 63, 78, 50],
++  [t('몽골(15+ LFS)', 'Mongolia (15+ LFS)'), 2106, 1326, 706, 620, 63, 70, 55],
++  [t('파키스탄(15+ LFS)', 'Pakistan (15+ LFS)'), 120220, 62030, 47845, 14185, 51, 79, 23],
++  [t('필리핀(15+ LFS )', 'Philippines (15+ LFS)'), 73008, 43399, 26527, 16872, 59, 72, 46],
++  [t('카타르(15+ LFS)', 'Qatar (15+ LFS)'), 2393, 2108, 1823, 285, 88, 95, 57],
++  [t('사우디아라비아(15+ LFS)', 'Saudi Arabia (15+ LFS)'), 0, 0, 0, 0, 57, 80, 24],
++  [t('싱가포르(15+ LFS)', 'Singapore (15+ LFS)'), 3422, 2329, 1251, 1077, 68, 75, 61],
++  [t('스리랑카(15+ LFS)', 'Sri Lanka (15+ LFS)'), 16424, 8581, 5550, 3032, 52, 72, 34],
++  [t('대만(15+ LFS)', 'Taiwan (15+ LFS)'), 20188, 11946, 6631, 5315, 59, 67, 51],
++  [t('태국(15+ LFS)', 'Thailand (15+ LFS)'), 56575, 37885, 20611, 17274, 67, 75, 59],
++  [t('튀르키예(15+ LFS)', 'Turkey (15+ LFS)'), 61468, 32524, 21855, 10669, 52, 72, 34],
++  [t('아랍에미리트(15+ LFS)', 'United Arab Emirates (15+ LFS)'), 9432, 7565, 5693, 1871, 80, 92, 57],
++  [t('베트남(15+ LFS)', 'Vietnam (15+ LFS)'), 73394, 55507, 29068, 26440, 75, 81, 70],
+ ];
+diff --git a/examples/ColumnsGroupExample.tsx b/examples/ColumnsGroupExample.tsx
+index a49c3ac..f88d158 100644
+--- a/examples/ColumnsGroupExample.tsx
++++ b/examples/ColumnsGroupExample.tsx
+@@ -45,3 +45,3 @@ const columnGroups: BGridColumnGroupNode[] = [
+         id: 'order-customer',
+-        label: '주문·고객 정보',
++        label: t('주문·고객 정보', 'Order/Customer Info'),
+         children: [
+@@ -58,3 +58,3 @@ const columnGroups: BGridColumnGroupNode[] = [
+         id: 'product-sales',
+-        label: '상품·매출 정보',
++        label: t('상품·매출 정보', 'Product/Sales Info'),
+         children: [
+@@ -93,3 +93,3 @@ const initialColumns: BGridColumn<Order>[] = [
+     align: 'right',
+-    itemRender: ({ value }) => <>{Number(value).toLocaleString()}원</>,
++    itemRender: ({ value }) => <>{Number(value).toLocaleString()}{t('원', 'KRW')}</>,
+   },
+@@ -102,3 +102,3 @@ const initialColumns: BGridColumn<Order>[] = [
+     headerClassName: 'column-groups-header-total',
+-    itemRender: ({ value }) => <strong>{Number(value).toLocaleString()}원</strong>,
++    itemRender: ({ value }) => <strong>{Number(value).toLocaleString()}{t('원', 'KRW')}</strong>,
+   },
+@@ -118,5 +118,5 @@ export default function ColumnsGroupExample() {
+         <label className='inline-flex items-center gap-2 font-medium'>
+-          <span>틀고정 경계</span>
++          <span>{t('틀고정 경계', 'Freeze Boundary')}</span>
+           <Select<number>
+-            aria-label={t(t('틀고정 위치', 'Freeze Position'), 'Freeze Position')}
++            aria-label={t('틀고정 위치', 'Freeze Position')}
+             style={{ minWidth: 210 }}
+@@ -127,3 +127,3 @@ export default function ColumnsGroupExample() {
+                 value: index + 1,
+-                label: `${index + 1}개 · ${column.label} 뒤`,
++                label: t(`${index + 1}개 · ${column.label} 뒤`, `${index + 1} cols · After ${column.label}`),
+               })),
+@@ -136,7 +136,6 @@ export default function ColumnsGroupExample() {
+             <>
+-              앞쪽 {frozenColumnIndex}개 컬럼을 고정했습니다. <strong>{frozenBoundaryColumn.label}</strong> 뒤가
+-              경계입니다.
++              {t('앞쪽', 'First')} {frozenColumnIndex}{t('개 컬럼을 고정했습니다.', ' columns are frozen. Boundary is after ')} <strong>{frozenBoundaryColumn.label}</strong>.
+             </>
+           ) : (
+-            '현재는 고정 컬럼 없이 모든 컬럼이 함께 스크롤됩니다.'
++            t('현재는 고정 컬럼 없이 모든 컬럼이 함께 스크롤됩니다.', 'Currently all columns scroll together with no freeze.')
+           )}
+diff --git a/examples/ContainerResizeExample.tsx b/examples/ContainerResizeExample.tsx
+index f3a727b..806b87c 100644
+--- a/examples/ContainerResizeExample.tsx
++++ b/examples/ContainerResizeExample.tsx
+@@ -18,3 +18,3 @@ const columns: BGridColumn<Order>[] = [
+   { key: 'status', label: t('상태', 'Status'), width: 110, align: 'center' },
+-  { key: 'amount', label: t('금액', 'Amount'), width: 140, align: 'right', itemRender: ({ value }) => `${value.toLocaleString()}원` },
++  { key: 'amount', label: t('금액', 'Amount'), width: 140, align: 'right', itemRender: ({ value }) => `${value.toLocaleString()}${t('원', 'KRW')}` },
+ ];
+@@ -24,3 +24,3 @@ const data: BGridDataItem<Order>[] = Array.from({ length: 80 }, (_, index) => ({
+     id: `ORDER-${String(index + 1).padStart(4, '0')}`,
+-    customer: `고객 ${index + 1}`,
++    customer: `${t('고객', 'Customer')} ${index + 1}`,
+     status: [t('준비 중', 'Preparing'), t('배송 중', 'In Transit'), t('완료', 'Completed')][index % 3] as Order['status'],
+@@ -45,3 +45,3 @@ export default function ContainerResizeExample() {
+         </button>
+-        <span style={{ color: '#64748b', fontSize: 13 }}>컨테이너: {Math.round(width)} × {Math.round(height)}px</span>
++        <span style={{ color: '#64748b', fontSize: 13 }}>{t('컨테이너', 'Container')}: {Math.round(width)} × {Math.round(height)}px</span>
+       </div>
+@@ -58,4 +58,4 @@ export default function ContainerResizeExample() {
+           <aside style={{ background: '#f1f5f9', borderRadius: 8, color: '#475569', padding: 16 }}>
+-            <strong style={{ display: 'block', marginBottom: 8 }}>필터 패널</strong>
+-            화면 폭이 줄어도 그리드는 이 영역의 정확한 크기를 다시 측정합니다.
++            <strong style={{ display: 'block', marginBottom: 8 }}>{t('필터 패널', 'Filter Panel')}</strong>
++            {t('화면 폭이 줄어도 그리드는 이 영역의 정확한 크기를 다시 측정합니다.', 'The grid will remeasure the exact size of this area even if the screen width decreases.')}
+           </aside>
+diff --git a/examples/ContextMenuExample.tsx b/examples/ContextMenuExample.tsx
+index 69f3dcb..71891ca 100644
+--- a/examples/ContextMenuExample.tsx
++++ b/examples/ContextMenuExample.tsx
+@@ -65,3 +65,3 @@ export default function ContextMenuExample() {
+   const [menuTarget, setMenuTarget] = React.useState<BGridContextMenuTarget<SupportRequest>>();
+-  const [lastAction, setLastAction] = React.useState('본문 셀을 우클릭해 메뉴를 열어보세요.');
++  const [lastAction, setLastAction] = React.useState(t('본문 셀을 우클릭해 메뉴를 열어보세요.', 'Right-click a body cell to open the menu.'));
+
+@@ -71,7 +71,7 @@ export default function ContextMenuExample() {
+         <div className='flex flex-wrap items-center gap-2'>
+-          <Tag color='blue'>우클릭</Tag>
++          <Tag color='blue'>{t('우클릭', 'Right-click')}</Tag>
+           <Tag>Shift+F10</Tag>
+-          <span>본문 셀에서 포인터 또는 키보드로 메뉴를 열 수 있습니다.</span>
++          <span>{t('본문 셀에서 포인터 또는 키보드로 메뉴를 열 수 있습니다.', 'You can open the menu from a body cell using a pointer or keyboard.')}</span>
+         </div>
+-        <span>접수일 내림차순 · 표시/원본 인덱스 비교</span>
++        <span>{t('접수일 내림차순 · 표시/원본 인덱스 비교', 'Descending order of receipt date · Comparison of visible/source indices')}</span>
+       </div>
+@@ -83,3 +83,3 @@ export default function ContextMenuExample() {
+       >
+-        <strong className='mr-2 text-slate-800'>최근 동작</strong>
++        <strong className='mr-2 text-slate-800'>{t('최근 동작', 'Recent Action')}</strong>
+         {lastAction}
+@@ -87,3 +87,3 @@ export default function ContextMenuExample() {
+           <span className='ml-2 text-slate-500'>
+-            (표시 {menuTarget.visibleIndex}, 원본 {menuTarget.sourceIndex})
++            ({t('표시', 'Visible')} {menuTarget.visibleIndex}, {t('원본', 'Source')} {menuTarget.sourceIndex})
+           </span>
+@@ -110,3 +110,3 @@ export default function ContextMenuExample() {
+               if (target) setMenuTarget(target);
+-              if (open && target) setLastAction(`메뉴 열림: ${describeTarget(target)}`);
++              if (open && target) setLastAction(`${t('메뉴 열림', 'Menu Opened')}: ${describeTarget(target)}`);
+             },
+@@ -120,3 +120,3 @@ export default function ContextMenuExample() {
+                   setMenuTarget(selected);
+-                  setLastAction(`셀 선택: ${describeTarget(selected)}`);
++                  setLastAction(`${t('셀 선택', 'Cell Selected')}: ${describeTarget(selected)}`);
+                 },
+@@ -130,3 +130,3 @@ export default function ContextMenuExample() {
+                   setMenuTarget(selected);
+-                  setLastAction(`행 선택: ${selected.values.requestNo} · ${selected.values.customer}`);
++                  setLastAction(`${t('행 선택', 'Row Selected')}: ${selected.values.requestNo} · ${selected.values.customer}`);
+                 },
+@@ -147,3 +147,3 @@ export default function ContextMenuExample() {
+                   setMenuTarget(selected);
+-                  setLastAction(`담당자 지정 요청: ${selected.values.requestNo}`);
++                  setLastAction(`${t('담당자 지정 요청', 'Assignee Assignment Requested')}: ${selected.values.requestNo}`);
+                 },
+@@ -156,4 +156,3 @@ export default function ContextMenuExample() {
+       <p className='m-0 text-xs leading-5 text-slate-500'>
+-        <code>shortcut</code>은 메뉴 오른쪽의 안내 표기입니다. 실제 애플리케이션 단축키는 별도 keyboard
+-        handler와 연결하세요.
++        <code>shortcut</code>{t('은 메뉴 오른쪽의 안내 표기입니다. 실제 애플리케이션 단축키는 별도 keyboard handler와 연결하세요.', ' is a guide displayed on the right side of the menu. Connect actual application shortcuts to a separate keyboard handler.')}
+       </p>
+diff --git a/examples/EditingEventsExample.tsx b/examples/EditingEventsExample.tsx
+index 1a42033..0c8328a 100644
+--- a/examples/EditingEventsExample.tsx
++++ b/examples/EditingEventsExample.tsx
+@@ -15,3 +15,3 @@ export default function EditingEventsExample() {
+   const [data, setData] = React.useState(cloneEditingOrders);
+-  const [events, setEvents] = React.useState<string[]>(['편집을 시작하면 이벤트가 여기에 기록됩니다.']);
++  const [events, setEvents] = React.useState<string[]>([t('편집을 시작하면 이벤트가 여기에 기록됩니다.', 'Events will be recorded here once you start editing.')]);
+   const containerRef = React.useRef<HTMLDivElement>(null);
+@@ -44,3 +44,3 @@ export default function EditingEventsExample() {
+             const value = Number(text);
+-            if (!Number.isFinite(value) || value < 0) throw new Error('수량은 0 이상의 숫자여야 합니다.');
++            if (!Number.isFinite(value) || value < 0) throw new Error(t('수량은 0 이상의 숫자여야 합니다.', 'Quantity must be a number greater than or equal to 0.'));
+             return value;
+@@ -49,3 +49,3 @@ export default function EditingEventsExample() {
+         onChangeValue: async ({ changes, nextValues, commit }) => {
+-          appendEvent(`onChangeValue: 수량 ${nextValues.quantity}, 합계 재계산`);
++          appendEvent(`onChangeValue: ${t('수량', 'Quantity')} ${nextValues.quantity}, ${t('합계 재계산', 'Recalculate Total')}`);
+           await commit([...changes, { key: 'amount', value: nextValues.quantity * nextValues.unitPrice }]);
+@@ -59,3 +59,3 @@ export default function EditingEventsExample() {
+         editable: true,
+-        itemRender: ({ value }) => <>{Number(value).toLocaleString()}원</>,
++        itemRender: ({ value }) => <>{Number(value).toLocaleString()}{t('원', 'KRW')}</>,
+         editor: {
+@@ -66,3 +66,3 @@ export default function EditingEventsExample() {
+             const value = Number(text);
+-            if (!Number.isFinite(value) || value < 0) throw new Error('단가는 0 이상의 숫자여야 합니다.');
++            if (!Number.isFinite(value) || value < 0) throw new Error(t('단가는 0 이상의 숫자여야 합니다.', 'Unit price must be a number greater than or equal to 0.'));
+             return value;
+@@ -71,3 +71,3 @@ export default function EditingEventsExample() {
+         onChangeValue: async ({ changes, nextValues, commit }) => {
+-          appendEvent(`onChangeValue: 단가 ${nextValues.unitPrice}, 합계 재계산`);
++          appendEvent(`onChangeValue: ${t('단가', 'Unit Price')} ${nextValues.unitPrice}, ${t('합계 재계산', 'Recalculate Total')}`);
+           await commit([...changes, { key: 'amount', value: nextValues.quantity * nextValues.unitPrice }]);
+@@ -77,3 +77,3 @@ export default function EditingEventsExample() {
+         key: 'amount',
+-        label: '합계 · 자동 변경',
++        label: t('합계 · 자동 변경', 'Total · Auto Calculated'),
+         width: 170,
+@@ -81,3 +81,3 @@ export default function EditingEventsExample() {
+         editable: false,
+-        itemRender: ({ value }) => <strong>{Number(value).toLocaleString()}원</strong>,
++        itemRender: ({ value }) => <strong>{Number(value).toLocaleString()}{t('원', 'KRW')}</strong>,
+       },
+@@ -91,4 +91,4 @@ export default function EditingEventsExample() {
+         <p className='m-0'>
+-          수량이나 단가를 바꾸면 <code>onChangeValue</code>가 제안 값을 검증하고 합계를 추가한 뒤 한 번의{' '}
+-          <code>commit(changes[])</code>으로 저장합니다.
++          {t('수량이나 단가를 바꾸면', 'When you change the quantity or unit price,')} <code>onChangeValue</code>{t('가 제안 값을 검증하고 합계를 추가한 뒤 한 번의', ' verifies the suggested value, adds the total, and saves it in a single ')}
++          <code>commit(changes[])</code>{t('으로 저장합니다.', ' call.')}
+         </p>
+@@ -122,3 +122,3 @@ export default function EditingEventsExample() {
+             setData(current => applyEditingDataChange(current, sourceIndex, values, meta));
+-            appendEvent(`onChangeData: source ${sourceIndex}, column ${columnIndex ?? 'multi'}, ${meta?.changes.length ?? 0}개 변경`);
++            appendEvent(`onChangeData: source ${sourceIndex}, column ${columnIndex ?? 'multi'}, ${meta?.changes.length ?? 0}${t('개 변경', ' changes')}`);
+           }}
+diff --git a/examples/EditorExample.tsx b/examples/EditorExample.tsx
+index 429745c..e12bf18 100644
+--- a/examples/EditorExample.tsx
++++ b/examples/EditorExample.tsx
+@@ -6,2 +6,3 @@ import useEditorGrid, { Item } from './useEditorGrid';
+ import { Button, Divider, Radio } from 'antd';
++import { t } from './i18n';
+
+@@ -26,3 +27,3 @@ function EditorExample() {
+   const [editTrigger, setEditTrigger] = React.useState<'dblclick' | 'click'>('dblclick');
+-  const [lastChange, setLastChange] = React.useState('아직 편집된 셀이 없습니다.');
++  const [lastChange, setLastChange] = React.useState(t('아직 편집된 셀이 없습니다.', 'No cell has been edited yet.'));
+
+@@ -31,9 +32,6 @@ function EditorExample() {
+       <div className='rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs leading-5 text-slate-700'>
+-        <strong className='text-slate-900'>편집기 구분:</strong> 주문 코드·고객명은 내장 <code>text</code>, 사용
+-        여부·납기일은 기본 제공 plugin, 우선순위는 <code>defineEditorPlugin()</code>으로 연결한 Ant Design plugin입니다.
+-        text 셀에 포커스를 둔 뒤 바로 한글을 입력하거나 Enter/F2로 기존 값을 편집해 보세요.
+-        <br />여러 셀을 선택해 Ctrl/Cmd+C로 복사한 뒤 대상 셀을 선택하고 Ctrl/Cmd+V를 누르면 표 형태로
+-        붙여넣습니다. 읽기 전용 열과 삭제 대기 행은 자동으로 건너뛰고, 행이 부족하면 I 상태의 새 행을 추가합니다.
+-        <br />행 번호의 I/U/D는 추가·수정·삭제 대기 상태입니다. 새 행은 선택 삭제 시 즉시 제거되고, 기존 행은 D로 표시된
+-        뒤 변경 커밋 시 제거됩니다. 값이 바뀐 셀은 별도 편집 셀 색상으로 표시되고 커밋 시 해제됩니다.
++        <strong className='text-slate-900'>{t('편집기 구분:', 'Editor Types:')}</strong> {t('주문 코드·고객명은 내장', 'Order Code and Customer Name use built-in')} <code>text</code>{t(', 사용 여부·납기일은 기본 제공 plugin, 우선순위는', ', Usage and Delivery Date use built-in plugin, Priority uses')} <code>defineEditorPlugin()</code>{t('으로 연결한 Ant Design plugin입니다.', ' connected Ant Design plugin.')}
++        {t('text 셀에 포커스를 둔 뒤 바로 한글을 입력하거나 Enter/F2로 기존 값을 편집해 보세요.', 'Try typing directly after focusing on a text cell, or edit existing values with Enter/F2.')}
++        <br />{t('여러 셀을 선택해 Ctrl/Cmd+C로 복사한 뒤 대상 셀을 선택하고 Ctrl/Cmd+V를 누르면 표 형태로 붙여넣습니다.', 'Select multiple cells, copy with Ctrl/Cmd+C, select a target cell and press Ctrl/Cmd+V to paste as a table.')} {t('읽기 전용 열과 삭제 대기 행은 자동으로 건너뛰고, 행이 부족하면 I 상태의 새 행을 추가합니다.', 'Read-only columns and rows waiting to be deleted are automatically skipped. If rows are insufficient, new rows with status I are added.')}
++        <br />{t('행 번호의 I/U/D는 추가·수정·삭제 대기 상태입니다.', 'The I/U/D in row numbers mean Insert/Update/Delete pending states.')} {t('새 행은 선택 삭제 시 즉시 제거되고, 기존 행은 D로 표시된 뒤 변경 커밋 시 제거됩니다.', 'New rows are removed immediately when selected for deletion, and existing rows are marked with D and removed upon commit.')} {t('값이 바뀐 셀은 별도 편집 셀 색상으로 표시되고 커밋 시 해제됩니다.', 'Cells with changed values are displayed in a separate edited cell color, which is cleared upon commit.')}
+       </div>
+@@ -41,15 +39,15 @@ function EditorExample() {
+       <div className='flex flex-wrap items-center gap-2'>
+-        <span className='text-xs font-semibold text-slate-600'>편집 시작</span>
++        <span className='text-xs font-semibold text-slate-600'>{t('편집 시작', 'Start Editing')}</span>
+         <Radio.Group value={editTrigger} onChange={e => setEditTrigger(e.target.value)}>
+-          <Radio value='click'>한 번 클릭</Radio>
+-          <Radio value='dblclick'>두 번 클릭</Radio>
++          <Radio value='click'>{t('한 번 클릭', 'Single Click')}</Radio>
++          <Radio value='dblclick'>{t('두 번 클릭', 'Double Click')}</Radio>
+         </Radio.Group>
+         <Button size={'small'} type='primary' onClick={handleAddList}>
+-          행 추가
++          {t('행 추가', 'Add Row')}
+         </Button>
+         <Button size={'small'} onClick={handleRemoveList}>
+-          선택 행 삭제
++          {t('선택 행 삭제', 'Delete Selected Rows')}
+         </Button>
+         <Button size={'small'} onClick={handleCommitList}>
+-          변경 커밋
++          {t('변경 커밋', 'Commit Changes')}
+         </Button>
+@@ -63,3 +61,3 @@ function EditorExample() {
+         >
+-          현재 데이터 확인
++          {t('현재 데이터 확인', 'Check Current Data')}
+         </Button>
+@@ -78,3 +76,3 @@ function EditorExample() {
+             handleDataChange(ri, item, meta);
+-            setLastChange(`행 ${ri + 1}, 열 ${(ci ?? 0) + 1}: ${JSON.stringify(item)}`);
++            setLastChange(`${t('행', 'Row')} ${ri + 1}, ${t('열', 'Column')} ${(ci ?? 0) + 1}: ${JSON.stringify(item)}`);
+           }}
+@@ -100,3 +98,3 @@ function EditorExample() {
+       <p className='m-0 truncate text-xs text-slate-500' aria-live='polite'>
+-        마지막 변경: {lastChange}
++        {t('마지막 변경:', 'Last Change:')} {lastChange}
+       </p>
+diff --git a/examples/EditorIconExample.tsx b/examples/EditorIconExample.tsx
+index 12089de..a905cab 100644
+--- a/examples/EditorIconExample.tsx
++++ b/examples/EditorIconExample.tsx
+@@ -27,3 +27,3 @@ export default function EditorIconExample() {
+   const [data, setData] = React.useState(cloneEditingOrders);
+-  const [lastAction, setLastAction] = React.useState('아이콘을 눌러 동작을 확인하세요.');
++  const [lastAction, setLastAction] = React.useState(t('아이콘을 눌러 동작을 확인하세요.', 'Click on the icon to check its behavior.'));
+   const containerRef = React.useRef<HTMLDivElement>(null);
+@@ -62,3 +62,3 @@ export default function EditorIconExample() {
+           onClick: async ({ index, commit }) => {
+-            setLastAction(`${index + 1}행 메모에 확인 표시를 추가했습니다.`);
++            setLastAction(`${index + 1}${t('행 메모에 확인 표시를 추가했습니다.', ' row note check mark added.')}`);
+             await commit([{ key: 'note', value: t('확인 완료', 'Confirmation Completed') }]);
+@@ -74,4 +74,3 @@ export default function EditorIconExample() {
+       <div className='rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm leading-6 text-slate-700'>
+-        <code>onClick</code>이 없는 아이콘은 연결된 editor를 시작합니다. callback 아이콘은 editor 대신 자체 작업을 실행하며
+-        동일한 <code>commit(changes[])</code>으로 값을 저장합니다.
++        <code>onClick</code>{t('이 없는 아이콘은 연결된 editor를 시작합니다. callback 아이콘은 editor 대신 자체 작업을 실행하며 동일한', ' icon without onClick will start the linked editor. The callback icon executes its own action instead of the editor and uses the same')} <code>commit(changes[])</code>{t('으로 값을 저장합니다.', ' to save the value.')}
+         <output aria-live='polite' className='mt-1 block text-xs text-blue-700'>{lastAction}</output>
+diff --git a/examples/ExternalEditorPluginExample.tsx b/examples/ExternalEditorPluginExample.tsx
+index 20602b5..ae9b2f8 100644
+--- a/examples/ExternalEditorPluginExample.tsx
++++ b/examples/ExternalEditorPluginExample.tsx
+@@ -197,6 +197,5 @@ export default function ExternalEditorPluginExample() {
+       <p className='m-0 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm leading-6 text-slate-700'>
+-        Ant Design Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect를{' '}
+-        <code>defineEditorPlugin()</code>으로 연결했습니다. 셀을 더블클릭하거나 각 아이콘과 ColorPicker 색상 박스를 클릭해
+-        편집을 시작합니다. popup은 plugin의 <code>getPortalContainer()</code>에 렌더링하고 값 선택 시{' '}
+-        <code>commit(changes[])</code>을 호출합니다.
++        {t('Ant Design Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect를', 'Ant Design Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect connected via')}{' '}
++        <code>defineEditorPlugin()</code>{t('으로 연결했습니다. 셀을 더블클릭하거나 각 아이콘과 ColorPicker 색상 박스를 클릭해 편집을 시작합니다. popup은 plugin의', '. Double-click a cell or click each icon and ColorPicker color box to start editing. The popup is rendered in the plugin\'s')} <code>getPortalContainer()</code>{t('에 렌더링하고 값 선택 시', ' and upon value selection,')}{' '}
++        <code>commit(changes[])</code>{t('을 호출합니다.', ' is called.')}
+       </p>
+diff --git a/examples/ExternalShadcnEditorPluginExample.tsx b/examples/ExternalShadcnEditorPluginExample.tsx
+index 55b5fd6..cd8560f 100644
+--- a/examples/ExternalShadcnEditorPluginExample.tsx
++++ b/examples/ExternalShadcnEditorPluginExample.tsx
+@@ -198,5 +198,4 @@ export default function ExternalShadcnEditorPluginExample() {
+       <p className='m-0 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm leading-6 text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300'>
+-        Shadcn UI (Radix UI) 기반의 Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect 컴포넌트를{' '}
+-        <code className="dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">defineEditorPlugin()</code>으로 연결했습니다. 각 컴포넌트의 Portal 컨테이너로 <code className="dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">getPortalContainer()</code>를
+-        전달하여 Grid의 가상 스크롤, 위치 계산, 바깥 클릭 판정 및 라이프사이클과 완벽히 동기화됩니다.
++        {t('Shadcn UI (Radix UI) 기반의 Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect 컴포넌트를', 'Shadcn UI (Radix UI) based Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect components connected via')}{' '}
++        <code className="dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">defineEditorPlugin()</code>{t('으로 연결했습니다. 각 컴포넌트의 Portal 컨테이너로', '. By passing')} <code className="dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">getPortalContainer()</code>{t('를 전달하여 Grid의 가상 스크롤, 위치 계산, 바깥 클릭 판정 및 라이프사이클과 완벽히 동기화됩니다.', ' as the Portal container for each component, it perfectly synchronizes with the Grid\'s virtual scrolling, position calculation, outside click detection, and lifecycle.')}
+       </p>
+diff --git a/examples/FrozenColumnsExample.tsx b/examples/FrozenColumnsExample.tsx
+index f3903c4..1e8b1cc 100644
+--- a/examples/FrozenColumnsExample.tsx
++++ b/examples/FrozenColumnsExample.tsx
+@@ -26,3 +26,3 @@ const data: BGridDataItem<EmployeeRow>[] = Array.from({ length: 80 }, (_, index)
+     employeeNo: `EMP-${String(index + 1).padStart(4, '0')}`,
+-    name: `구성원 ${index + 1}`,
++    name: `${t('구성원', 'Member')} ${index + 1}`,
+     department: departments[index % departments.length],
+@@ -30,3 +30,3 @@ const data: BGridDataItem<EmployeeRow>[] = Array.from({ length: 80 }, (_, index)
+     location: [t('서울', 'Seoul'), t('부산', 'Busan'), t('대전', 'Daejeon')][index % 3],
+-    project: `프로젝트 ${String.fromCharCode(65 + (index % 6))}`,
++    project: `${t('프로젝트', 'Project')} ${String.fromCharCode(65 + (index % 6))}`,
+     allocationRate: 60 + (index % 5) * 10,
+@@ -45,4 +45,4 @@ const columns: BGridColumn<EmployeeRow>[] = [
+   { key: 'project', label: t('담당 프로젝트', 'Responsible Project'), width: 130 },
+-  { key: 'allocationRate', label: '투입률(%)', width: 100, align: 'right' },
+-  { key: 'remainingLeaveDays', label: '잔여 연차(일)', width: 110, align: 'right' },
++  { key: 'allocationRate', label: t('투입률(%)', 'Allocation Rate(%)'), width: 100, align: 'right' },
++  { key: 'remainingLeaveDays', label: t('잔여 연차(일)', 'Remaining Leave Days'), width: 110, align: 'right' },
+   { key: 'joinedAt', label: t('입사일', 'Date of Joining'), width: 110 },
+@@ -52,4 +52,4 @@ const columns: BGridColumn<EmployeeRow>[] = [
+ const summaryColumns: NonNullable<BGridProps<EmployeeRow>['summary']>['columns'] = [
+-  { columnIndex: 0, align: 'center', itemRender: () => <strong>인력 요약</strong> },
+-  { columnIndex: 1, align: 'center', itemRender: ({ data }) => `전체 ${data.length}명` },
++  { columnIndex: 0, align: 'center', itemRender: () => <strong>{t('인력 요약', 'Workforce Summary')}</strong> },
++  { columnIndex: 1, align: 'center', itemRender: ({ data }) => `${t('전체', 'Total')} ${data.length}${t('명', ' people')}` },
+   {
+@@ -57,3 +57,3 @@ const summaryColumns: NonNullable<BGridProps<EmployeeRow>['summary']>['columns']
+     align: 'center',
+-    itemRender: ({ data }) => `${new Set(data.map(item => item.values.department)).size}개 부서`,
++    itemRender: ({ data }) => `${new Set(data.map(item => item.values.department)).size}${t('개 부서', ' departments')}`,
+   },
+@@ -62,3 +62,3 @@ const summaryColumns: NonNullable<BGridProps<EmployeeRow>['summary']>['columns']
+     align: 'center',
+-    itemRender: ({ data }) => `${new Set(data.map(item => item.values.position)).size}개 직급`,
++    itemRender: ({ data }) => `${new Set(data.map(item => item.values.position)).size}${t('개 직급', ' job titles')}`,
+   },
+@@ -67,3 +67,3 @@ const summaryColumns: NonNullable<BGridProps<EmployeeRow>['summary']>['columns']
+     align: 'center',
+-    itemRender: ({ data }) => `${new Set(data.map(item => item.values.location)).size}개 근무지`,
++    itemRender: ({ data }) => `${new Set(data.map(item => item.values.location)).size}${t('개 근무지', ' workplaces')}`,
+   },
+@@ -72,3 +72,3 @@ const summaryColumns: NonNullable<BGridProps<EmployeeRow>['summary']>['columns']
+     align: 'center',
+-    itemRender: ({ data }) => `${new Set(data.map(item => item.values.project)).size}개 프로젝트`,
++    itemRender: ({ data }) => `${new Set(data.map(item => item.values.project)).size}${t('개 프로젝트', ' projects')}`,
+   },
+@@ -78,3 +78,3 @@ const summaryColumns: NonNullable<BGridProps<EmployeeRow>['summary']>['columns']
+     itemRender: ({ data }) =>
+-      `평균 ${Math.round(data.reduce((sum, item) => sum + item.values.allocationRate, 0) / data.length)}%`,
++      `${t('평균', 'Avg')} ${Math.round(data.reduce((sum, item) => sum + item.values.allocationRate, 0) / data.length)}%`,
+   },
+@@ -84,3 +84,3 @@ const summaryColumns: NonNullable<BGridProps<EmployeeRow>['summary']>['columns']
+     itemRender: ({ data }) =>
+-      `총 ${data.reduce((sum, item) => sum + item.values.remainingLeaveDays, 0).toLocaleString('ko-KR')}일`,
++      `${t('총', 'Total')} ${data.reduce((sum, item) => sum + item.values.remainingLeaveDays, 0).toLocaleString('ko-KR')}${t('일', ' days')}`,
+   },
+@@ -95,3 +95,3 @@ const summaryColumns: NonNullable<BGridProps<EmployeeRow>['summary']>['columns']
+         (365.25 * 24 * 60 * 60 * 1000);
+-      return `평균 ${averageYears.toFixed(1)}년`;
++      return `${t('평균', 'Avg')} ${averageYears.toFixed(1)}${t('년', ' years')}`;
+     },
+@@ -106,3 +106,3 @@ const summaryColumns: NonNullable<BGridProps<EmployeeRow>['summary']>['columns']
+       }, {});
+-      return `재직 ${statusCounts.재직 ?? 0} · 휴가 ${statusCounts.휴가 ?? 0} · 휴직 ${statusCounts.휴직 ?? 0}`;
++      return `${t('재직', 'Employed')} ${statusCounts[t('재직', 'Employed')] ?? 0} · ${t('휴가', 'On Leave')} ${statusCounts[t('휴가', 'On Leave')] ?? 0} · ${t('휴직', 'Leave of Absence')} ${statusCounts[t('휴직', 'Leave of Absence')] ?? 0}`;
+     },
+@@ -128,8 +128,8 @@ export default function FrozenColumnsExample() {
+           <label className="inline-flex items-center gap-2 font-medium">
+-            <span>고정할 선행 컬럼 수</span>
++            <span>{t('고정할 선행 컬럼 수', 'Number of Columns to Freeze')}</span>
+             <Select<number>
+-              aria-label={t(t('고정할 컬럼 수', 'Number of Columns to Freeze'), 'Number of Columns to Freeze')}
++              aria-label={t('고정할 컬럼 수', 'Number of Columns to Freeze')}
+               style={{ width: 84 }}
+               value={frozenColumnIndex}
+-              options={[0, 1, 2, 3].map(count => ({ value: count, label: `${count}개` }))}
++              options={[0, 1, 2, 3].map(count => ({ value: count, label: `${count}${t('개', ' cols')}` }))}
+               onChange={setFrozenColumnIndex}
+@@ -138,8 +138,8 @@ export default function FrozenColumnsExample() {
+           <label className="inline-flex items-center gap-2 font-medium">
+-            <span>고정할 선행 행 수</span>
++            <span>{t('고정할 선행 행 수', 'Number of Rows to Freeze')}</span>
+             <Select<number>
+-              aria-label={t(t('고정할 행 수', 'Number of Rows to Freeze'), 'Number of Rows to Freeze')}
++              aria-label={t('고정할 행 수', 'Number of Rows to Freeze')}
+               style={{ width: 84 }}
+               value={frozenRowCount}
+-              options={[0, 1, 2, 3, 5].map(count => ({ value: count, label: `${count}개` }))}
++              options={[0, 1, 2, 3, 5].map(count => ({ value: count, label: `${count}${t('개', ' rows')}` }))}
+               onChange={setFrozenRowCount}
+@@ -149,3 +149,3 @@ export default function FrozenColumnsExample() {
+             <input
+-              aria-label={t(t('Summary 표시', 'Show Summary'), 'Show Summary')}
++              aria-label={t('Summary 표시', 'Show Summary')}
+               type="checkbox"
+@@ -154,8 +154,8 @@ export default function FrozenColumnsExample() {
+             />
+-            <span>Summary 표시</span>
++            <span>{t('Summary 표시', 'Show Summary')}</span>
+           </label>
+           <label className="inline-flex items-center gap-2 font-medium">
+-            <span>Summary 위치</span>
++            <span>{t('Summary 위치', 'Summary Position')}</span>
+             <Select<'top' | 'bottom'>
+-              aria-label={t(t('Summary 위치', 'Summary Position'), 'Summary Position')}
++              aria-label={t('Summary 위치', 'Summary Position')}
+               style={{ width: 96 }}
+@@ -172,5 +172,5 @@ export default function FrozenColumnsExample() {
+         <p className="m-0 text-slate-600">
+-          {summaryVisible ? `Summary ${summaryPosition === 'top' ? t('상단', 'Top') : t('하단', 'Bottom')} 표시` : t('Summary 숨김', 'Hide Summary')} ·{' '}
++          {summaryVisible ? `Summary ${summaryPosition === 'top' ? t('상단', 'Top') : t('하단', 'Bottom')} ${t('표시', 'Shown')}` : t('Summary 숨김', 'Summary Hidden')} ·{' '}
+           {summaryVisible && summaryPosition === 'top' ? t('Summary 다음 줄부터', 'From next line of Summary') : t('첫 데이터 행부터', 'From First Data Row')} {frozenRowCount}
+-          개 행, 왼쪽 {frozenColumnIndex}개 컬럼을 고정합니다.
++          {t('개 행, 왼쪽', ' rows, left')} {frozenColumnIndex}{t('개 컬럼을 고정합니다.', ' columns are frozen.')}
+         </p>
+diff --git a/examples/GetRowClassName.tsx b/examples/GetRowClassName.tsx
+index fd25540..84135db 100644
+--- a/examples/GetRowClassName.tsx
++++ b/examples/GetRowClassName.tsx
+@@ -15,3 +15,3 @@ interface InventoryRisk {
+
+-const productNames = [t('고속 충전 어댑터 65W', 'Fast Charging Adapter 65W'), t('무선 블루투스 이어폰', 'Wireless Bluetooth Earbuds'), t('강화유리 필름', 'Tempered Glass Film'), t('태블릿 마그네틱 거치대', 'Tablet Magnetic Stand'), 'USB-C 케이블'];
++const productNames = [t('고속 충전 어댑터 65W', 'Fast Charging Adapter 65W'), t('무선 블루투스 이어폰', 'Wireless Bluetooth Earbuds'), t('강화유리 필름', 'Tempered Glass Film'), t('태블릿 마그네틱 거치대', 'Tablet Magnetic Stand'), t('USB-C 케이블', 'USB-C Cable')];
+ const data: BGridDataItem<InventoryRisk>[] = Array.from({ length: 120 }, (_, index) => {
+@@ -23,3 +23,3 @@ const data: BGridDataItem<InventoryRisk>[] = Array.from({ length: 120 }, (_, ind
+       productName: productNames[index % productNames.length],
+-      warehouse: `센터 ${String.fromCharCode(65 + (index % 4))}`,
++      warehouse: `${t('센터', 'Center')} ${String.fromCharCode(65 + (index % 4))}`,
+       stock,
+@@ -36,4 +36,4 @@ export default function GetRowClassName() {
+     { key: 'warehouse', label: t('보관센터', 'Storage Center'), width: 100, align: 'center' },
+-    { key: 'stock', label: t('현재 재고', 'Current Stock'), width: 100, align: 'right', itemRender: ({ values }) => <strong>{values.stock}개</strong> },
+-    { key: 'safetyStock', label: t('안전 재고', 'Safety Stock'), width: 100, align: 'right', itemRender: ({ values }) => <>{values.safetyStock}개</> },
++    { key: 'stock', label: t('현재 재고', 'Current Stock'), width: 100, align: 'right', itemRender: ({ values }) => <strong>{values.stock}{t('개', 'ea')}</strong> },
++    { key: 'safetyStock', label: t('안전 재고', 'Safety Stock'), width: 100, align: 'right', itemRender: ({ values }) => <>{values.safetyStock}{t('개', 'ea')}</> },
+     {
+@@ -43,3 +43,3 @@ export default function GetRowClassName() {
+       align: 'center',
+-      itemRender: ({ values }) => <>{values.stock === 0 ? '품절 · 긴급 발주' : values.inboundDate}</>,
++      itemRender: ({ values }) => <>{values.stock === 0 ? t('품절 · 긴급 발주', 'Out of stock · Emergency order') : values.inboundDate}</>,
+     },
+diff --git a/examples/ItemRenderExample.tsx b/examples/ItemRenderExample.tsx
+index dc72186..f5be640 100644
+--- a/examples/ItemRenderExample.tsx
++++ b/examples/ItemRenderExample.tsx
+@@ -222,3 +222,3 @@ const SparklineCanvas = React.memo(function SparklineCanvas({
+         role='img'
+-        aria-label={`최근 8개 구간 처리량 ${values.join(', ')}`}
++        aria-label={t(`최근 8개 구간 처리량 ${values.join(', ')}`, `Last 8 periods throughput ${values.join(', ')}`)}
+       />
+@@ -270,6 +270,6 @@ const UtilizationCanvas = React.memo(function UtilizationCanvas({ values }: { va
+         role='img'
+-        aria-label={`시간대별 설비 부하 ${values.join(', ')} 퍼센트`}
++        aria-label={t(`시간대별 설비 부하 ${values.join(', ')} 퍼센트`, `Hourly equipment load ${values.join(', ')} percent`)}
+       />
+       <span>
+-        최고 <strong>{peak}%</strong>
++        {t('최고', 'Peak')} <strong>{peak}%</strong>
+       </span>
+@@ -285,3 +285,3 @@ const SlaGauge = React.memo(function SlaGauge({ value }: { value: number }) {
+       role='progressbar'
+-      aria-label={t(t('출고 SLA 달성률', 'Dispatch SLA Achievement Rate'), 'Dispatch SLA Achievement Rate')}
++      aria-label={t('출고 SLA 달성률', 'Dispatch SLA Achievement Rate')}
+       aria-valuemin={0}
+@@ -306,3 +306,3 @@ function ItemRenderExample() {
+   const [onlyAttention, setOnlyAttention] = React.useState(false);
+-  const [selectedCenter, setSelectedCenter] = React.useState('행을 선택하면 센터 정보가 표시됩니다.');
++  const [selectedCenter, setSelectedCenter] = React.useState(t('행을 선택하면 센터 정보가 표시됩니다.', 'Select a row to view center information.'));
+   const containerRef = React.useRef<HTMLDivElement>(null);
+@@ -371,3 +371,3 @@ function ItemRenderExample() {
+               className='item-render-action'
+-              aria-label={`${values.centerName} 알림 ${values.alerts}건 확인 처리`}
++              aria-label={t(`${values.centerName} 알림 ${values.alerts}건 확인 처리`, `Process ${values.alerts} alerts for ${values.centerName}`)}
+               onClick={event => {
+@@ -377,6 +377,6 @@ function ItemRenderExample() {
+             >
+-              알림 {values.alerts}건 확인
++              {t('알림', 'Alert')} {values.alerts}{t('건 확인', 'cases checked')}
+             </button>
+           ) : (
+-            <span className='item-render-clear'>이상 없음</span>
++            <span className='item-render-clear'>{t('이상 없음', 'No Anomaly')}</span>
+           ),
+@@ -399,4 +399,4 @@ function ItemRenderExample() {
+           <span className='item-render-example__eyebrow'>FULFILLMENT CONTROL TOWER</span>
+-          <strong>셀 안에 운영 대시보드를 구성합니다</strong>
+-          <small>Canvas 2종 · 복합 React UI · 행 단위 액션</small>
++          <strong>{t('셀 안에 운영 대시보드를 구성합니다', 'Configure operational dashboard within cells')}</strong>
++          <small>{t('Canvas 2종 · 복합 React UI · 행 단위 액션', '2 Types of Canvas · Complex React UI · Row-level Action')}</small>
+         </div>
+@@ -409,3 +409,3 @@ function ItemRenderExample() {
+           <span aria-hidden='true' />
+-          이상 거점만 보기
++          {t('이상 거점만 보기', 'View only anomalous hubs')}
+           <b>{rows.filter(row => row.values.alerts > 0).length}</b>
+@@ -430,6 +430,6 @@ function ItemRenderExample() {
+           onClick={({ item }) =>
+-            setSelectedCenter(`${item.centerName} · SLA ${item.sla}% · ${item.updatedAt} 갱신`)
++            setSelectedCenter(`${item.centerName} · SLA ${item.sla}% · ${item.updatedAt} ${t('갱신', 'Updated')}`)
+           }
+           status={{
+-            content: `${displayedRows.length}개 거점 · ${onlyAttention ? t('이상 대응 대상', 'Target for Anomaly Response') : t('전체 운영 현황', 'Overall Operating Status')}`,
++            content: `${displayedRows.length}${t('개 거점', 'hubs')} · ${onlyAttention ? t('이상 대응 대상', 'Target for Anomaly Response') : t('전체 운영 현황', 'Overall Operating Status')}`,
+           }}
+diff --git a/examples/LoadingExample.tsx b/examples/LoadingExample.tsx
+index 71766ac..ae1236c 100644
+--- a/examples/LoadingExample.tsx
++++ b/examples/LoadingExample.tsx
+@@ -17,3 +17,3 @@ interface ProductSearchResult {
+ const categories = [t('디지털', 'Digital'), t('오피스', 'Office'), t('생활가전', 'Home Appliances'), t('홈카페', 'Home Cafe')];
+-const productNames = [t('프리미엄 무선 키보드', 'Premium Wireless Keyboard'), t('인체공학 마우스', 'Ergonomic Mouse'), 'USB-C 멀티 허브', t('온도조절 전기포트', 'Temperature Control Electric Kettle'), t('모션 데스크', 'Motion Desk')];
++const productNames = [t('프리미엄 무선 키보드', 'Premium Wireless Keyboard'), t('인체공학 마우스', 'Ergonomic Mouse'), t('USB-C 멀티 허브', 'USB-C Multi Hub'), t('온도조절 전기포트', 'Temperature Control Electric Kettle'), t('모션 데스크', 'Motion Desk')];
+ const products: BGridDataItem<ProductSearchResult>[] = Array.from({ length: 200 }, (_, index) => ({
+@@ -37,4 +37,4 @@ function LoadingExample() {
+     { key: 'category', label: t('카테고리', 'Category'), width: 110, align: 'center' },
+-    { key: 'salePrice', label: t('판매가', 'Selling Price'), width: 120, align: 'right', itemRender: ({ values }) => <>{values.salePrice.toLocaleString()}원</> },
+-    { key: 'availableStock', label: t('판매가능 재고', 'Sellable Stock'), width: 120, align: 'right', itemRender: ({ values }) => <>{values.availableStock}개</> },
++    { key: 'salePrice', label: t('판매가', 'Selling Price'), width: 120, align: 'right', itemRender: ({ values }) => <>{values.salePrice.toLocaleString()}{t('원', 'KRW')}</> },
++    { key: 'availableStock', label: t('판매가능 재고', 'Sellable Stock'), width: 120, align: 'right', itemRender: ({ values }) => <>{values.availableStock}{t('개', 'ea')}</> },
+     { key: 'syncedAt', label: t('최종 동기화', 'Last Synchronized'), width: 150, align: 'center' },
+@@ -47,8 +47,8 @@ function LoadingExample() {
+       <Space wrap style={{ padding: '10px 0' }}>
+-        <Button onClick={() => setLoading(true)}>전체 로딩 시작</Button>
+-        <Button onClick={() => setLoading(false)}>전체 로딩 종료</Button>
+-        <Button onClick={() => setSpinning(true)}>그리드 처리 시작</Button>
+-        <Button onClick={() => setSpinning(false)}>그리드 처리 종료</Button>
+-        <Button onClick={() => setData([])}>빈 검색 결과</Button>
+-        <Button onClick={() => setData(products)}>상품 데이터 복원</Button>
++        <Button onClick={() => setLoading(true)}>{t('전체 로딩 시작', 'Start Full Loading')}</Button>
++        <Button onClick={() => setLoading(false)}>{t('전체 로딩 종료', 'End Full Loading')}</Button>
++        <Button onClick={() => setSpinning(true)}>{t('그리드 처리 시작', 'Start Grid Processing')}</Button>
++        <Button onClick={() => setSpinning(false)}>{t('그리드 처리 종료', 'End Grid Processing')}</Button>
++        <Button onClick={() => setData([])}>{t('빈 검색 결과', 'Empty Search Results')}</Button>
++        <Button onClick={() => setData(products)}>{t('상품 데이터 복원', 'Restore Product Data')}</Button>
+       </Space>
+@@ -65,3 +65,3 @@ function LoadingExample() {
+           spinning={spinning}
+-          msg={{ emptyList: '조회 조건에 일치하는 상품이 없습니다.' }}
++          msg={{ emptyList: t('조회 조건에 일치하는 상품이 없습니다.', 'No products match the search criteria.') }}
+         />
+diff --git a/examples/LookupEditorExample.tsx b/examples/LookupEditorExample.tsx
+index ec90875..211f0fa 100644
+--- a/examples/LookupEditorExample.tsx
++++ b/examples/LookupEditorExample.tsx
+@@ -62,3 +62,3 @@ function CustomerAutocompleteEditor({ value, commit, cancel, getPortalContainer
+     <AutoComplete
+-      aria-label={t(t('고객 자동완성', 'Customer Autocomplete'), 'Customer Autocomplete')}
++      aria-label={t('고객 자동완성', 'Customer Autocomplete')}
+       autoFocus
+@@ -138,7 +138,7 @@ function CustomerLookupModal({ lookup }: CustomerLookupModalProps) {
+       open
+-      title={t(t('고객 선택', 'Select Customer'), 'Select Customer')}
++      title={t('고객 선택', 'Select Customer')}
+       width={720}
+       className='lookup-editor-modal site-grid-theme'
+-      okText={t(t('확인', 'Confirm'), 'Confirm')}
+-      cancelText={t(t('취소', 'Cancelled'), 'Cancelled')}
++      okText={t('확인', 'Confirm')}
++      cancelText={t('취소', 'Cancelled')}
+       okButtonProps={{ disabled: !selectedCode }}
+@@ -152,4 +152,4 @@ function CustomerLookupModal({ lookup }: CustomerLookupModalProps) {
+           autoFocus
+-          aria-label={t(t('고객 검색', 'Search Customer'), 'Search Customer')}
+-          placeholder='고객명, 고객 코드 또는 등급 검색'
++          aria-label={t('고객 검색', 'Search Customer')}
++          placeholder={t('고객명, 고객 코드 또는 등급 검색', 'Search customer name, code or grade')}
+           value={query}
+@@ -175,3 +175,3 @@ function CustomerLookupModal({ lookup }: CustomerLookupModalProps) {
+             variant='vertical-bordered'
+-            msg={{ emptyList: '검색 결과가 없습니다.' }}
++            msg={{ emptyList: t('검색 결과가 없습니다.', 'No search results.') }}
+           />
+@@ -195,3 +195,3 @@ export default function LookupEditorExample() {
+         key: 'customerName',
+-        label: '고객명 · 자동완성/lookup',
++        label: t('고객명 · 자동완성/lookup', 'Customer Name · Autocomplete/Lookup'),
+         width: 240,
+@@ -203,3 +203,3 @@ export default function LookupEditorExample() {
+           render: <SearchIcon />,
+-          ariaLabel: ({ values }) => `${values.orderCode} 고객 lookup 열기`,
++          ariaLabel: ({ values }) => `${values.orderCode} ${t('고객 lookup 열기', 'Open customer lookup')}`,
+           visibility: 'always',
+@@ -222,5 +222,3 @@ export default function LookupEditorExample() {
+       <p className='m-0 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm leading-6 text-slate-700'>
+-        고객명 라벨 영역을 더블클릭하면 Ant Design AutoComplete가 열리고, 같은 셀의 검색 아이콘을 한 번 클릭하면 검색과
+-        단일 선택 그리드를 갖춘 Ant Design Modal을 엽니다. 고객을 확정하면 코드·이름·등급을 하나의 변경 목록으로
+-        원자적으로 저장합니다.
++        {t('고객명 라벨 영역을 더블클릭하면 Ant Design AutoComplete가 열리고, 같은 셀의 검색 아이콘을 한 번 클릭하면 검색과 단일 선택 그리드를 갖춘 Ant Design Modal을 엽니다. 고객을 확정하면 코드·이름·등급을 하나의 변경 목록으로 원자적으로 저장합니다.', 'Double-clicking the customer name label area opens the Ant Design AutoComplete, and clicking the search icon in the same cell opens the Ant Design Modal with search and single-select grid. Confirming the customer atomically saves the code, name, and level as a single change list.')}
+       </p>
+diff --git a/examples/MergedCellEditingExample.tsx b/examples/MergedCellEditingExample.tsx
+index efa6c8f..bf1dde0 100644
+--- a/examples/MergedCellEditingExample.tsx
++++ b/examples/MergedCellEditingExample.tsx
+@@ -30,3 +30,3 @@ const notes = [
+   t('담당자 확인', 'Assignee Confirmation'),
+-  '행 높이를 늘리지 않는 긴 메모 내용이 말줄임으로 표시됩니다.',
++  t('행 높이를 늘리지 않는 긴 메모 내용이 말줄임으로 표시됩니다.', 'Long memo content that does not increase row height is truncated.'),
+ ];
+@@ -47,2 +47,3 @@ const createMergedEditingOrders = (): BGridDataItem<EditingOrder>[] =>
+           deliveryDate: `2026-09-${String((rowIndex % 28) + 1).padStart(2, '0')}`,
++          approved: rowIndex % 2 === 0,
+           quantity,
+@@ -72,3 +73,3 @@ export default function MergedCellEditingExample() {
+         key: 'customerName',
+-        label: '병합 고객명 · 편집',
++        label: t('병합 고객명 · 편집', 'Merged Customer Name · Edit'),
+         width: 240,
+@@ -90,9 +91,9 @@ export default function MergedCellEditingExample() {
+           <p className='m-0'>
+-            24개 행을 3개씩 병합해 세로 스크롤과 일반 병합·고정 경계 병합 편집을 함께 확인합니다.
++            {t('24개 행을 3개씩 병합해 세로 스크롤과 일반 병합·고정 경계 병합 편집을 함께 확인합니다.', 'Merge 24 rows in groups of 3 to check both vertical scrolling and regular/frozen-boundary merged cell editing.')}
+           </p>
+-          <div className='flex flex-wrap items-center gap-3' aria-label={t(t('병합 셀 틀고정 옵션', 'Merged Cell Freeze Option'), 'Merged Cell Freeze Option')}>
++          <div className='flex flex-wrap items-center gap-3' aria-label={t('병합 셀 틀고정 옵션', 'Merged Cell Freeze Option')}>
+             <label className='inline-flex items-center gap-2 font-medium'>
+-              <span>왼쪽 고정 컬럼 수</span>
++              <span>{t('왼쪽 고정 컬럼 수', 'Number of frozen left columns')}</span>
+               <Select<number>
+-                aria-label={t(t('고정할 컬럼 수', 'Number of Columns to Freeze'), 'Number of Columns to Freeze')}
++                aria-label={t('고정할 컬럼 수', 'Number of Columns to Freeze')}
+                 aria-describedby='merged-frozen-column-help'
+@@ -100,3 +101,3 @@ export default function MergedCellEditingExample() {
+                 value={frozenColumnIndex}
+-                options={[0, 1, 2].map(count => ({ value: count, label: `${count}개` }))}
++                options={[0, 1, 2].map(count => ({ value: count, label: t(`${count}개`, `${count} items`) }))}
+                 onChange={setFrozenColumnIndex}
+@@ -105,5 +106,5 @@ export default function MergedCellEditingExample() {
+             <label className='inline-flex items-center gap-2 font-medium'>
+-              <span>위쪽 고정 행 수</span>
++              <span>{t('위쪽 고정 행 수', 'Number of frozen top rows')}</span>
+               <Select<number>
+-                aria-label={t(t('고정할 행 수', 'Number of Rows to Freeze'), 'Number of Rows to Freeze')}
++                aria-label={t('고정할 행 수', 'Number of Rows to Freeze')}
+                 aria-describedby='merged-frozen-row-help'
+@@ -111,3 +112,3 @@ export default function MergedCellEditingExample() {
+                 value={frozenRowCount}
+-                options={[0, 1, 2, 3].map(count => ({ value: count, label: `${count}개` }))}
++                options={[0, 1, 2, 3].map(count => ({ value: count, label: t(`${count}개`, `${count} items`) }))}
+                 onChange={setFrozenRowCount}
+@@ -119,9 +120,6 @@ export default function MergedCellEditingExample() {
+           <p id='merged-frozen-column-help' className='m-0'>
+-            <strong>왼쪽 고정 컬럼 수</strong>는 가로 스크롤 중에도 왼쪽에 남겨 둘 컬럼 수입니다. 1개는 ‘주문
+-            코드’만, 2개는 ‘주문 코드’와 편집 대상인 ‘병합 고객명’을 고정합니다.
++            <strong>{t('왼쪽 고정 컬럼 수', 'Number of frozen left columns')}</strong>{t('는 가로 스크롤 중에도 왼쪽에 남겨 둘 컬럼 수입니다. 1개는 ‘주문 코드’만, 2개는 ‘주문 코드’와 편집 대상인 ‘병합 고객명’을 고정합니다.', ' is the number of columns to keep on the left during horizontal scrolling. 1 freezes only "Order Code", and 2 freezes both "Order Code" and "Merged Customer Name" which is the target for editing.')}
+           </p>
+           <p id='merged-frozen-row-help' className='m-0'>
+-            <strong>위쪽 고정 행 수</strong>는 세로 스크롤 중에도 위쪽에 남겨 둘 실제 데이터 행 수입니다. 1~2개는
+-            첫 3행 병합 셀을 고정·스크롤 영역으로 나누고, 3개는 첫 병합 그룹 전체를 고정합니다. 나뉜 어느 조각을
+-            편집해도 같은 3행이 함께 변경됩니다.
++            <strong>{t('위쪽 고정 행 수', 'Number of frozen top rows')}</strong>{t('는 세로 스크롤 중에도 위쪽에 남겨 둘 실제 데이터 행 수입니다. 1~2개는 첫 3행 병합 셀을 고정·스크롤 영역으로 나누고, 3개는 첫 병합 그룹 전체를 고정합니다. 나뉜 어느 조각을 편집해도 같은 3행이 함께 변경됩니다.', ' is the number of actual data rows to keep on top during vertical scrolling. 1-2 splits the first 3-row merged cell into frozen/scroll areas, and 3 freezes the entire first merged group. Editing any split piece modifies the same 3 rows together.')}
+           </p>
+@@ -131,5 +129,4 @@ export default function MergedCellEditingExample() {
+             <>
+-              <strong>고정 경계 병합</strong> · <code>frozenColumnIndex={frozenColumnIndex}</code>,{' '}
+-              <code>frozenRowCount={frozenRowCount}</code>. 병합 그룹이 행 고정 경계를 가로지르면 각 영역 안에서 다시
+-              병합되며, 어느 조각을 편집해도 세 행이 함께 변경됩니다.
++              <strong>{t('고정 경계 병합', 'Frozen Boundary Merge')}</strong> · <code>frozenColumnIndex={frozenColumnIndex}</code>,{' '}
++              <code>frozenRowCount={frozenRowCount}</code>. {t('병합 그룹이 행 고정 경계를 가로지르면 각 영역 안에서 다시 병합되며, 어느 조각을 편집해도 세 행이 함께 변경됩니다.', 'If a merged group crosses the row freeze boundary, it is merged again within each area, and editing any piece modifies all three rows together.')}
+             </>
+@@ -137,4 +134,3 @@ export default function MergedCellEditingExample() {
+             <>
+-              <strong>일반 병합</strong> · 틀고정 없이 하나의 병합 셀을 직접 편집하며, 병합 그룹의 세 실제 행이 함께
+-              변경됩니다.
++              <strong>{t('일반 병합', 'Regular Merge')}</strong> · {t('틀고정 없이 하나의 병합 셀을 직접 편집하며, 병합 그룹의 세 실제 행이 함께 변경됩니다.', 'Directly edit a single merged cell without frozen panes, and all three actual rows of the merged group are modified together.')}
+             </>
+@@ -143,3 +139,3 @@ export default function MergedCellEditingExample() {
+         <output aria-live='polite' className='mt-1 block text-xs text-blue-700'>
+-          마지막 트랜잭션의 변경 행: {changedRows.length ? changedRows.map(index => index + 1).join(', ') : t('없음', 'None')}
++          {t('마지막 트랜잭션의 변경 행:', 'Modified rows in the last transaction:')} {changedRows.length ? changedRows.map(index => index + 1).join(', ') : t('없음', 'None')}
+         </output>
+diff --git a/examples/ReorderExample.tsx b/examples/ReorderExample.tsx
+index 19c9ff5..9ef8256 100644
+--- a/examples/ReorderExample.tsx
++++ b/examples/ReorderExample.tsx
+@@ -16,3 +16,3 @@ interface BannerPriority {
+ const bannerTitles = [
+-  '여름 시즌 최대 40% 프로모션',
++  t('여름 시즌 최대 40% 프로모션', 'Summer Season Up to 40% Promotion'),
+   t('신규 회원 웰컴 쿠폰 안내', 'New Member Welcome Coupon Guide'),
+diff --git a/examples/ScrollExample.tsx b/examples/ScrollExample.tsx
+index 643e6b1..2255266 100644
+--- a/examples/ScrollExample.tsx
++++ b/examples/ScrollExample.tsx
+@@ -95,5 +95,5 @@ const list = Array.from({ length: ROW_COUNT }, (_, index) => {
+       orderedAt: formatDateTime(orderedTimestamp),
+-      customerName: `${companyNames[index % companyNames.length]} ${regions[(index * 3) % regions.length]} ${
++      customerName: t(`${companyNames[index % companyNames.length]} ${regions[(index * 3) % regions.length]} ${
+         (index % 37) + 1
+-      }호점`,
++      }호점`, `Branch ${index + 1}`),
+       customerTier: customerTiers[(index * 5) % customerTiers.length],
+@@ -187,3 +187,3 @@ const columns: BGridColumn<IOrderItem>[] = [
+       filter: { type: 'number' },
+-      itemRender: ({ value }) => `${formatNumber(value)}원`,
++      itemRender: ({ value }) => t(`${formatNumber(value)}원`, `${formatNumber(value)} KRW`),
+     },
+@@ -197,3 +197,3 @@ const columns: BGridColumn<IOrderItem>[] = [
+       filter: { type: 'number' },
+-      itemRender: ({ value }) => `${formatNumber(value)}원`,
++      itemRender: ({ value }) => t(`${formatNumber(value)}원`, `${formatNumber(value)} KRW`),
+     },
+@@ -217,3 +217,3 @@ const columns: BGridColumn<IOrderItem>[] = [
+       filter: { type: 'number' },
+-      itemRender: ({ value }) => `${formatNumber(value)}원`,
++      itemRender: ({ value }) => t(`${formatNumber(value)}원`, `${formatNumber(value)} KRW`),
+     },
+@@ -295,10 +295,6 @@ function ScrollExample() {
+         error.reason === 'maxClipboardCells'
+-          ? `선택된 셀이 ${formatNumber(error.actual)}개입니다. 최대 ${formatNumber(
+-              error.limit,
+-            )}개까지만 복사할 수 있습니다.`
++          ? `${t('선택된 셀이', 'Selected cells are')} ${formatNumber(error.actual)}${t('개입니다. 최대', 'ea. Up to')} ${formatNumber(error.limit)}${t('개까지만 복사할 수 있습니다.', 'ea can be copied.')}`
+           : error.reason === 'maxClipboardTextLength'
+-          ? `복사할 텍스트가 ${formatNumber(error.actual)}자입니다. 최대 ${formatNumber(
+-              error.limit,
+-            )}자까지만 복사할 수 있습니다.`
+-          : '브라우저가 클립보드 복사를 거부했습니다.';
++          ? `${t('복사할 텍스트가', 'Text to copy is')} ${formatNumber(error.actual)}${t('자입니다. 최대', 'characters long. Up to')} ${formatNumber(error.limit)}${t('자까지만 복사할 수 있습니다.', 'characters can be copied.')}`
++          : t('브라우저가 클립보드 복사를 거부했습니다.', 'The browser denied copying to the clipboard.');
+
+@@ -334,3 +330,3 @@ function ScrollExample() {
+         status={{
+-          content: ({ visibleItems }) => `현재 ${formatNumber(visibleItems)}건 / 전체 ${formatNumber(ROW_COUNT)}건`,
++          content: ({ visibleItems }) => `${t('현재', 'Current')} ${formatNumber(visibleItems)}${t('건 / 전체', 'cases / Total')} ${formatNumber(ROW_COUNT)}${t('건', 'cases')}`,
+         }}
+diff --git a/examples/SearchExample.tsx b/examples/SearchExample.tsx
+index d053398..88aa8e0 100644
+--- a/examples/SearchExample.tsx
++++ b/examples/SearchExample.tsx
+@@ -31,6 +31,6 @@ const data: BGridDataItem<SearchRow>[] = Array.from({ length: 200 }, (_, index)
+     employeeNo: `EMP-${String(index + 1).padStart(4, '0')}`,
+-    name: `구성원 ${index + 1}`,
++    name: `${t('구성원', 'Member')} ${index + 1}`,
+     department: departments[index % departments.length],
+     location: locations[index % locations.length],
+-    project: `프로젝트 ${String.fromCharCode(65 + (index % 8))}`,
++    project: `${t('프로젝트', 'Project')} ${String.fromCharCode(65 + (index % 8))}`,
+     allocationRate: 60 + (index % 5) * 10,
+@@ -84,6 +84,6 @@ export default function SearchExample() {
+           <Button icon={<Search size={15} />} onClick={() => setSearchOpen(true)}>
+-            그리드 검색
++            {t('그리드 검색', 'Search Grid')}
+           </Button>
+           <Select
+-            aria-label={t(t('검색 대상 부서 필터', 'Search Target Department Filter'), 'Search Target Department Filter')}
++            aria-label={t('검색 대상 부서 필터', 'Search Target Department Filter')}
+             value={department}
+@@ -110,5 +110,5 @@ export default function SearchExample() {
+           <Tag color='blue'>Ctrl/Cmd+F</Tag>
+-          <span>또는 셀 우클릭 → 검색</span>
++          <span>{t('또는 셀 우클릭 → 검색', 'Or right-click on cell → Search')}</span>
+         </div>
+-        <span>검색 범위: {department === 'all' ? t('현재 로드된 200개 행', 'Currently Loaded 200 Rows') : `${department} 필터 결과`}</span>
++        <span>{t('검색 범위:', 'Search Scope:')} {department === 'all' ? t('현재 로드된 200개 행', 'Currently Loaded 200 Rows') : `${department} ${t('필터 결과', 'Filter Result')}`}</span>
+       </div>
+@@ -117,4 +117,4 @@ export default function SearchExample() {
+         <div role='status' className='rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600'>
+-          컨텍스트 메뉴 대상: {inspectedCell.values.employeeNo} · {String(inspectedCell.column.label)} ·{' '}
+-          {String(inspectedCell.value)} (표시 {inspectedCell.visibleIndex}, 원본 {inspectedCell.sourceIndex})
++          {t('컨텍스트 메뉴 대상:', 'Context Menu Target:')} {inspectedCell.values.employeeNo} · {String(inspectedCell.column.label)} ·{' '}
++          {String(inspectedCell.value)} ({t('표시', 'Visible')} {inspectedCell.visibleIndex}, {t('원본', 'Source')} {inspectedCell.sourceIndex})
+         </div>
+diff --git a/examples/SortExample.tsx b/examples/SortExample.tsx
+index 0b59695..2403300 100644
+--- a/examples/SortExample.tsx
++++ b/examples/SortExample.tsx
+@@ -1 +1,2 @@
++import { t } from './i18n';
+ import * as React from 'react';
+@@ -21,33 +22,33 @@ interface IListItem {
+ const rawData = [
+-  ['대한민국(15+ LFS)', 44504, 28186, 16090, 12097, 63, 73, 53],
+-  ['아르메니아(15~75 LFS)', 2204, 1563, 780, 783, 70, 76, 66],
+-  ['아제르바이잔(15+ LFS)', 0, 5190, 2664, 2526, 66, 69, 63],
+-  ['부탄(15+ LFS)', 482, 320, 169, 151, 66, 71, 61],
+-  ['브루나이(15+ LFS)', 370, 238, 144, 94, 64, 72, 54],
+-  ['캄보디아(15+ LFS)', 11515, 8756, 4481, 4274, 76, 82, 69],
+-  ['키프로스(15+ LFS)', 712, 448, 236, 212, 63, 68, 57],
+-  ['조지아(15+ LFS)', 3037, 1911, 1025, 886, 62, 72, 54],
+-  ['홍콩(15+ LFS)', 6573, 3988, 1990, 1998, 60, 67, 55],
+-  ['인도네시아(15+ LFS)', 200485, 136808, 82760, 54048, 68, 82, 53],
+-  ['이란(15+ LFS)', 61658, 26940, 21707, 5233, 43, 70, 17],
+-  ['이스라엘(15+ LFS)', 6494, 4124, 2149, 1974, 63, 67, 59],
+-  ['일본(15+ LFS)', 110271, 68377, 37997, 30380, 62, 71, 53],
+-  ['카자흐스탄(15+ LFS)', 13131, 9203, 0, 0, 70, 0, 0],
+-  ['키르기스스탄(15+ LFS)', 4288, 2755, 1620, 1136, 64, 77, 51],
+-  ['레바논(15+ LFS)', 3677, 1798, 1230, 567, 48, 70, 29],
+-  ['마카오(16+ LFS)', 0, 395, 193, 202, 0, 74, 66],
+-  ['말레이시아(15~64 LFS)', 22685, 15582, 9503, 6078, 68, 80, 55],
+-  ['몰디브(15+ HIES)', 317, 202, 116, 86, 63, 78, 50],
+-  ['몽골(15+ LFS)', 2106, 1326, 706, 620, 63, 70, 55],
+-  ['파키스탄(15+ LFS)', 120220, 62030, 47845, 14185, 51, 79, 23],
+-  ['필리핀(15+ LFS )', 73008, 43399, 26527, 16872, 59, 72, 46],
+-  ['카타르(15+ LFS)', 2393, 2108, 1823, 285, 88, 95, 57],
+-  ['사우디아라비아(15+ LFS)', 0, 0, 0, 0, 57, 80, 24],
+-  ['싱가포르(15+ LFS)', 3422, 2329, 1251, 1077, 68, 75, 61],
+-  ['스리랑카(15+ LFS)', 16424, 8581, 5550, 3032, 52, 72, 34],
+-  ['대만(15+ LFS)', 20188, 11946, 6631, 5315, 59, 67, 51],
+-  ['태국(15+ LFS)', 56575, 37885, 20611, 17274, 67, 75, 59],
+-  ['튀르키예(15+ LFS)', 61468, 32524, 21855, 10669, 52, 72, 34],
+-  ['아랍에미리트(15+ LFS)', 9432, 7565, 5693, 1871, 80, 92, 57],
+-  ['베트남(15+ LFS)', 73394, 55507, 29068, 26440, 75, 81, 70],
++  [t('대한민국(15+ LFS)', 'South Korea(15+ LFS)'), 44504, 28186, 16090, 12097, 63, 73, 53],
++  [t('아르메니아(15~75 LFS)', 'Armenia(15~75 LFS)'), 2204, 1563, 780, 783, 70, 76, 66],
++  [t('아제르바이잔(15+ LFS)', 'Azerbaijan(15+ LFS)'), 0, 5190, 2664, 2526, 66, 69, 63],
++  [t('부탄(15+ LFS)', 'Bhutan(15+ LFS)'), 482, 320, 169, 151, 66, 71, 61],
++  [t('브루나이(15+ LFS)', 'Brunei(15+ LFS)'), 370, 238, 144, 94, 64, 72, 54],
++  [t('캄보디아(15+ LFS)', 'Cambodia(15+ LFS)'), 11515, 8756, 4481, 4274, 76, 82, 69],
++  [t('키프로스(15+ LFS)', 'Cyprus(15+ LFS)'), 712, 448, 236, 212, 63, 68, 57],
++  [t('조지아(15+ LFS)', 'Georgia(15+ LFS)'), 3037, 1911, 1025, 886, 62, 72, 54],
++  [t('홍콩(15+ LFS)', 'Hong Kong(15+ LFS)'), 6573, 3988, 1990, 1998, 60, 67, 55],
++  [t('인도네시아(15+ LFS)', 'Indonesia(15+ LFS)'), 200485, 136808, 82760, 54048, 68, 82, 53],
++  [t('이란(15+ LFS)', 'Iran(15+ LFS)'), 61658, 26940, 21707, 5233, 43, 70, 17],
++  [t('이스라엘(15+ LFS)', 'Israel(15+ LFS)'), 6494, 4124, 2149, 1974, 63, 67, 59],
++  [t('일본(15+ LFS)', 'Japan(15+ LFS)'), 110271, 68377, 37997, 30380, 62, 71, 53],
++  [t('카자흐스탄(15+ LFS)', 'Kazakhstan(15+ LFS)'), 13131, 9203, 0, 0, 70, 0, 0],
++  [t('키르기스스탄(15+ LFS)', 'Kyrgyzstan(15+ LFS)'), 4288, 2755, 1620, 1136, 64, 77, 51],
++  [t('레바논(15+ LFS)', 'Lebanon(15+ LFS)'), 3677, 1798, 1230, 567, 48, 70, 29],
++  [t('마카오(16+ LFS)', 'Macau(16+ LFS)'), 0, 395, 193, 202, 0, 74, 66],
++  [t('말레이시아(15~64 LFS)', 'Malaysia(15~64 LFS)'), 22685, 15582, 9503, 6078, 68, 80, 55],
++  [t('몰디브(15+ HIES)', 'Maldives(15+ HIES)'), 317, 202, 116, 86, 63, 78, 50],
++  [t('몽골(15+ LFS)', 'Mongolia(15+ LFS)'), 2106, 1326, 706, 620, 63, 70, 55],
++  [t('파키스탄(15+ LFS)', 'Pakistan(15+ LFS)'), 120220, 62030, 47845, 14185, 51, 79, 23],
++  [t('필리핀(15+ LFS )', 'Philippines(15+ LFS )'), 73008, 43399, 26527, 16872, 59, 72, 46],
++  [t('카타르(15+ LFS)', 'Qatar(15+ LFS)'), 2393, 2108, 1823, 285, 88, 95, 57],
++  [t('사우디아라비아(15+ LFS)', 'Saudi Arabia(15+ LFS)'), 0, 0, 0, 0, 57, 80, 24],
++  [t('싱가포르(15+ LFS)', 'Singapore(15+ LFS)'), 3422, 2329, 1251, 1077, 68, 75, 61],
++  [t('스리랑카(15+ LFS)', 'Sri Lanka(15+ LFS)'), 16424, 8581, 5550, 3032, 52, 72, 34],
++  [t('대만(15+ LFS)', 'Taiwan(15+ LFS)'), 20188, 11946, 6631, 5315, 59, 67, 51],
++  [t('태국(15+ LFS)', 'Thailand(15+ LFS)'), 56575, 37885, 20611, 17274, 67, 75, 59],
++  [t('튀르키예(15+ LFS)', 'Turkey(15+ LFS)'), 61468, 32524, 21855, 10669, 52, 72, 34],
++  [t('아랍에미리트(15+ LFS)', 'UAE(15+ LFS)'), 9432, 7565, 5693, 1871, 80, 92, 57],
++  [t('베트남(15+ LFS)', 'Vietnam(15+ LFS)'), 73394, 55507, 29068, 26440, 75, 81, 70],
+ ];
+diff --git a/examples/SummaryExample.tsx b/examples/SummaryExample.tsx
+index 3780451..1938ae3 100644
+--- a/examples/SummaryExample.tsx
++++ b/examples/SummaryExample.tsx
+@@ -36,3 +36,3 @@ const data: BGridDataItem<SalesOrder>[] = Array.from({ length: 30 }, (_, index)
+
+-const formatWon = (value: number) => `${value.toLocaleString()}원`;
++const formatWon = (value: number) => `${value.toLocaleString()}${t('원', 'KRW')}`;
+ const sumBy = (rows: BGridDataItem<SalesOrder>[], key: 'quantity' | 'supplyAmount' | 'taxAmount' | 'totalAmount') =>
+@@ -47,5 +47,5 @@ const createSummary = (position: 'top' | 'bottom'): BGridProps<SalesOrder>['summ
+       align: 'center',
+-      itemRender: ({ data }) => <strong>{position === 'top' ? t('상단', 'Top') : t('하단', 'Bottom')} 매출 합계 · {data.length}건</strong>,
++      itemRender: ({ data }) => <strong>{position === 'top' ? t('상단', 'Top') : t('하단', 'Bottom')} {t('매출 합계 ·', 'Total Sales ·')} {data.length}{t('건', 'cases')}</strong>,
+     },
+-    { columnIndex: 3, align: 'right', itemRender: ({ data }) => <strong>{sumBy(data, 'quantity')}개</strong> },
++    { columnIndex: 3, align: 'right', itemRender: ({ data }) => <strong>{sumBy(data, 'quantity')}{t('개', 'ea')}</strong> },
+     { columnIndex: 4, align: 'right', itemRender: ({ data }) => <strong>{formatWon(sumBy(data, 'supplyAmount'))}</strong> },
+diff --git a/examples/ThemingExample.tsx b/examples/ThemingExample.tsx
+index 9bebf26..256d89f 100644
+--- a/examples/ThemingExample.tsx
++++ b/examples/ThemingExample.tsx
+@@ -133,3 +133,3 @@ export default function ThemingExample() {
+         <div className='theming-example__intro'>
+-          <strong>같은 데이터 · 같은 컬럼 · 다른 CSS 변수</strong>
++          <strong>{t('같은 데이터 · 같은 컬럼 · 다른 CSS 변수', 'Same Data · Same Column · Different CSS Variables')}</strong>
+           <span>{activeTheme.description}</span>
+@@ -138,3 +138,3 @@ export default function ThemingExample() {
+         <Segmented
+-          aria-label={t(t('데이터그리드 테마 선택', 'Select Data Grid Theme'), 'Select Data Grid Theme')}
++          aria-label={t('데이터그리드 테마 선택', 'Select Data Grid Theme')}
+           value={theme}
+@@ -155,3 +155,3 @@ export default function ThemingExample() {
+         <div className='theming-example__class-name'>
+-          <span>적용 클래스</span>
++          <span>{t('적용 클래스', 'Applied Class')}</span>
+           <code>.bgrid-theme-{theme}</code>
+@@ -183,3 +183,3 @@ export default function ThemingExample() {
+           cellNavigationOptions={{ enabled: true, defaultActiveCell: { rowIndex: 0, columnIndex: 0 } }}
+-          status={{ content: `${services.length}개 서비스 · ${activeTheme.label} 테마` }}
++          status={{ content: `${services.length}${t('개 서비스 · ', ' services · ')}${activeTheme.label} ${t('테마', 'Theme')}` }}
+         />
+@@ -187,3 +187,3 @@ export default function ThemingExample() {
+
+-      <p className='theming-example__hint'>행에 마우스를 올리거나 셀을 클릭하면 hover·선택 색상도 테마에 맞게 바뀝니다.</p>
++      <p className='theming-example__hint'>{t('행에 마우스를 올리거나 셀을 클릭하면 hover·선택 색상도 테마에 맞게 바뀝니다.', 'Hovering over a row or clicking a cell also changes the hover and selection colors according to the theme.')}</p>
+     </div>
+diff --git a/examples/ToolboxExample.tsx b/examples/ToolboxExample.tsx
+index 61902f5..97116f2 100644
+--- a/examples/ToolboxExample.tsx
++++ b/examples/ToolboxExample.tsx
+@@ -24,6 +24,6 @@ const topics = [
+   t('React 18 새로운 기능 살펴보기', 'Exploring New Features in React 18'),
+-  'TypeScript 5.0 마스터 가이드',
+-  'Next.js 14 App Router 실전',
++  t('TypeScript 5.0 마스터 가이드', 'TypeScript 5.0 Master Guide'),
++  t('Next.js 14 App Router 실전', 'Next.js 14 App Router in Practice'),
+   t('Zustand와 Recoil 상태관리 비교', 'Comparison of Zustand and Recoil State Management'),
+-  'Node.js 백엔드 아키텍처 패턴',
++  t('Node.js 백엔드 아키텍처 패턴', 'Node.js Backend Architecture Patterns'),
+   t('PostgreSQL 인덱스 최적화 기법', 'PostgreSQL Index Optimization Techniques'),
+@@ -34,3 +34,3 @@ const topics = [
+   t('Rust 기초부터 웹서버 구현까지', 'Rust from Basics to Web Server Implementation'),
+-  '웹 접근성(A11y) 가이드라인 준수하기',
++  t('웹 접근성(A11y) 가이드라인 준수하기', 'Complying with Web Accessibility (A11y) Guidelines'),
+   t('Redis 분산 캐시 설계 및 활용', 'Redis Distributed Cache Design and Utilization'),
+@@ -39,4 +39,4 @@ const topics = [
+   t('Elasticsearch 검색 엔진 최적화', 'Elasticsearch Search Engine Optimization'),
+-  'OAuth 2.0 및 JWT 인증 아키텍처',
+-  'Microservices Event-driven 아키텍처',
++  t('OAuth 2.0 및 JWT 인증 아키텍처', 'OAuth 2.0 and JWT Authentication Architecture'),
++  t('Microservices Event-driven 아키텍처', 'Microservices Event-driven Architecture'),
+   t('Flutter 크로스 플랫폼 앱 제작', 'Flutter Cross Platform App Development'),
+@@ -59,3 +59,3 @@ const mockData = Array.from({ length: 60 }, (_, index) => {
+       id,
+-      title: index >= topics.length ? `${topic} (심화 #${Math.floor(index / topics.length) + 1})` : topic,
++      title: index >= topics.length ? `${topic} (${t('심화 #', 'Advanced #')}${Math.floor(index / topics.length) + 1})` : topic,
+       category,
+@@ -123,3 +123,3 @@ export default function ToolboxExample() {
+                 navigator.clipboard?.writeText(String(column.label));
+-                alert('컬럼명이 복사되었습니다.');
++                alert(t('컬럼명이 복사되었습니다.', 'Column name copied.'));
+               },
+@@ -169,3 +169,3 @@ export default function ToolboxExample() {
+         key: 'price',
+-        label: '가격 (원)',
++        label: t('가격 (원)', 'Price (KRW)'),
+         width: 120,
+@@ -201,3 +201,3 @@ export default function ToolboxExample() {
+           <span>
+-            <strong>정렬:</strong> {query.sortParams.length}개
++            <strong>{t('정렬:', 'Sort:')}</strong> {query.sortParams.length}{t('개', 'ea')}
+             {query.sortParams.length > 0 && (
+@@ -210,3 +210,3 @@ export default function ToolboxExample() {
+           <span>
+-            <strong>필터:</strong> {query.filterParams.length}개
++            <strong>{t('필터:', 'Filter:')}</strong> {query.filterParams.length}{t('개', 'ea')}
+             {query.filterParams.length > 0 && (
+@@ -221,3 +221,3 @@ export default function ToolboxExample() {
+           <div className='flex items-center gap-2'>
+-            <span className='text-xs text-slate-500 font-medium'>아이콘 스타일:</span>
++            <span className='text-xs text-slate-500 font-medium'>{t('아이콘 스타일:', 'Icon Style:')}</span>
+             <Segmented
+@@ -226,4 +226,4 @@ export default function ToolboxExample() {
+               options={[
+-                { label: 'Lucide 벡터 아이콘 (커스텀)', value: 'lucide' },
+-                { label: '기본 불릿/기호 (Fallback)', value: 'default' },
++                { label: t('Lucide 벡터 아이콘 (커스텀)', 'Lucide Vector Icon (Custom)'), value: 'lucide' },
++                { label: t('기본 불릿/기호 (Fallback)', 'Default Bullet/Symbol (Fallback)'), value: 'default' },
+               ]}
+@@ -232,3 +232,3 @@ export default function ToolboxExample() {
+
+-          <Button onClick={handleResetQuery}>정렬 / 필터 전체 초기화</Button>
++          <Button onClick={handleResetQuery}>{t('정렬 / 필터 전체 초기화', 'Reset All Sort / Filter')}</Button>
+         </div>
+diff --git a/examples/VariantExample.tsx b/examples/VariantExample.tsx
+index 91d4c3e..b225e21 100644
+--- a/examples/VariantExample.tsx
++++ b/examples/VariantExample.tsx
+@@ -22,3 +22,3 @@ const data: BGridDataItem<SalesRow>[] = Array.from({ length: 30 }, (_, index) =>
+     id: `ORD-${String(index + 1).padStart(3, '0')}`,
+-    product: `상품 ${index + 1}`,
++    product: `${t('상품', 'Product')} ${index + 1}`,
+     category: categories[index % categories.length],
+@@ -39,3 +39,3 @@ const columns: BGridColumn<SalesRow>[] = [
+     align: 'right',
+-    itemRender: ({ values }) => `${values.amount.toLocaleString('ko-KR')}원`,
++    itemRender: ({ values }) => `${values.amount.toLocaleString('ko-KR')}${t('원', 'KRW')}`,
+   },
+@@ -44,3 +44,3 @@ const columns: BGridColumn<SalesRow>[] = [
+ const summaryColumns: NonNullable<BGridProps<SalesRow>['summary']>['columns'] = [
+-  { columnIndex: 0, align: 'center', itemRender: () => <strong>합계</strong> },
++  { columnIndex: 0, align: 'center', itemRender: () => <strong>{t('합계', 'Total')}</strong> },
+   {
+@@ -53,3 +53,3 @@ const summaryColumns: NonNullable<BGridProps<SalesRow>['summary']>['columns'] =
+     align: 'right',
+-    itemRender: ({ data }) => `${data.reduce((sum, item) => sum + item.values.amount, 0).toLocaleString('ko-KR')}원`,
++    itemRender: ({ data }) => `${data.reduce((sum, item) => sum + item.values.amount, 0).toLocaleString('ko-KR')}${t('원', 'KRW')}`,
+   },
+@@ -71,4 +71,4 @@ export default function VariantExample() {
+         <div>
+-          <strong className='block text-slate-900'>세로 구분선 Variant</strong>
+-          <span className='text-xs text-slate-500'>본문과 하단 합계 행에서 세로 구분선의 표시 여부를 비교해 보세요.</span>
++          <strong className='block text-slate-900'>{t('세로 구분선 Variant', 'Vertical Border Variant')}</strong>
++          <span className='text-xs text-slate-500'>{t('본문과 하단 합계 행에서 세로 구분선의 표시 여부를 비교해 보세요.', 'Compare whether the vertical border is displayed in the body and bottom summary rows.')}</span>
+         </div>
+@@ -76,3 +76,3 @@ export default function VariantExample() {
+         <Segmented
+-          aria-label={t(t('세로 구분선 variant 선택', 'Select Vertical Separator Variant'), 'Select Vertical Separator Variant')}
++          aria-label={t('세로 구분선 variant 선택', 'Select Vertical Separator Variant')}
+           value={variant}
+@@ -84,3 +84,3 @@ export default function VariantExample() {
+       <p className='m-0 text-xs text-slate-500' aria-live='polite'>
+-        현재 설정: <code>variant=&quot;{variant}&quot;</code> —{' '}
++        {t('현재 설정:', 'Current Setting:')} <code>variant=&quot;{variant}&quot;</code> —{' '}
+         {variantOptions.find(option => option.value === variant)?.description}
+diff --git a/examples/editing/shared.ts b/examples/editing/shared.ts
+index 0434976..f43d926 100644
+--- a/examples/editing/shared.ts
++++ b/examples/editing/shared.ts
+@@ -85,3 +85,3 @@ export const editingOrders: BGridDataItem<EditingOrder>[] = [
+       amount: 45000,
+-      note: '영문 송장',
++      note: t('영문 송장', 'English Invoice'),
+       mergeGroup: 'C',
+@@ -91,3 +91,3 @@ export const editingOrders: BGridDataItem<EditingOrder>[] = [
+
+-export const cloneEditingOrders = () =>
++export const cloneEditingOrders = (): BGridDataItem<EditingOrder>[] =>
+   editingOrders.map(item => ({
+diff --git a/examples/editor-plugins/createShadcnCascaderEditorPlugin.tsx b/examples/editor-plugins/createShadcnCascaderEditorPlugin.tsx
+index d962bf0..dcfe2a2 100644
+--- a/examples/editor-plugins/createShadcnCascaderEditorPlugin.tsx
++++ b/examples/editor-plugins/createShadcnCascaderEditorPlugin.tsx
+@@ -1 +1,2 @@
++import { t } from '../i18n';
+ import * as React from 'react';
+@@ -78,3 +79,3 @@ export function createShadcnCascaderEditorPlugin<T>(
+           >
+-            <span className="truncate">{displayText || '분류 선택'}</span>
++            <span className="truncate">{displayText || t('분류 선택', 'Select Category')}</span>
+             <Layers className="h-4 w-4 opacity-50 shrink-0" />
+@@ -89,3 +90,3 @@ export function createShadcnCascaderEditorPlugin<T>(
+             <div className="text-xs font-semibold text-slate-500 px-2 pt-1 uppercase tracking-wider dark:text-slate-400">
+-              계층 분류 선택
++              {t('계층 분류 선택', 'Select Hierarchical Category')}
+             </div>
+@@ -171,3 +172,3 @@ export function createShadcnCascaderEditorPlugin<T>(
+               <div className="flex items-center justify-between border-t border-slate-100 px-2 pt-2 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
+-                <span>선택 경로: <strong className="text-slate-900 dark:text-slate-100">{selectedPath.join(' > ')}</strong></span>
++                <span>{t('선택 경로', 'Selected Path')}: <strong className="text-slate-900 dark:text-slate-100">{selectedPath.join(' > ')}</strong></span>
+               </div>
+diff --git a/examples/editor-plugins/createShadcnColorPickerEditorPlugin.tsx b/examples/editor-plugins/createShadcnColorPickerEditorPlugin.tsx
+index 6583175..effa059 100644
+--- a/examples/editor-plugins/createShadcnColorPickerEditorPlugin.tsx
++++ b/examples/editor-plugins/createShadcnColorPickerEditorPlugin.tsx
+@@ -1 +1,2 @@
++import { t } from '../i18n';
+ import * as React from 'react';
+@@ -107,3 +108,3 @@ export function createShadcnColorPickerEditorPlugin<T>(
+             <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider dark:text-slate-400">
+-              색상 팔레트
++              {t('색상 팔레트', 'Color Palette')}
+             </div>
+@@ -121,3 +122,3 @@ export function createShadcnColorPickerEditorPlugin<T>(
+                     className="relative flex h-8 w-full items-center justify-center rounded-md border border-black/10 shadow-sm transition-transform hover:scale-105 active:scale-95 cursor-pointer dark:border-white/10"
+-                    aria-label={`색상 ${color}`}
++                    aria-label={`${t('색상', 'Color')} ${color}`}
+                   >
+@@ -136,3 +137,3 @@ export function createShadcnColorPickerEditorPlugin<T>(
+             <form onSubmit={handleApplyCustom} className="flex flex-col gap-1.5 border-t border-slate-100 pt-2 dark:border-slate-800">
+-              <span className="text-xs text-slate-500 font-medium dark:text-slate-400">직접 입력 (HEX)</span>
++              <span className="text-xs text-slate-500 font-medium dark:text-slate-400">{t('직접 입력 (HEX)', 'Direct Input (HEX)')}</span>
+               <div className="flex items-center gap-1.5">
+@@ -150,3 +151,3 @@ export function createShadcnColorPickerEditorPlugin<T>(
+                 >
+-                  적용
++                  {t('적용', 'Apply')}
+                 </Button>
+diff --git a/examples/editor-plugins/createShadcnDatePickerEditorPlugin.tsx b/examples/editor-plugins/createShadcnDatePickerEditorPlugin.tsx
+index 890ba8d..e066bed 100644
+--- a/examples/editor-plugins/createShadcnDatePickerEditorPlugin.tsx
++++ b/examples/editor-plugins/createShadcnDatePickerEditorPlugin.tsx
+@@ -1 +1,2 @@
++import { t } from '../i18n';
+ import * as React from 'react';
+@@ -135,3 +136,3 @@ export function createShadcnDatePickerEditorPlugin<T>(
+           >
+-            <span className="truncate">{formattedValue || '날짜 선택'}</span>
++            <span className="truncate">{formattedValue || t('날짜 선택', 'Select Date')}</span>
+             <CalendarIcon className="h-4 w-4 opacity-50 shrink-0" />
+@@ -148,3 +149,3 @@ export function createShadcnDatePickerEditorPlugin<T>(
+               <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+-                {currentMonth.getFullYear()}년 {currentMonth.getMonth() + 1}월
++                {currentMonth.getFullYear()}{t('년', '')} {currentMonth.getMonth() + 1}{t('월', '')}
+               </span>
+@@ -157,3 +158,3 @@ export function createShadcnDatePickerEditorPlugin<T>(
+                   className="h-7 w-7 bg-transparent opacity-70 hover:opacity-100 dark:border-slate-800"
+-                  aria-label="이전 달"
++                  aria-label={t("이전 달", "Previous Month")}
+                 >
+@@ -167,3 +168,3 @@ export function createShadcnDatePickerEditorPlugin<T>(
+                   className="h-7 w-7 bg-transparent opacity-70 hover:opacity-100 dark:border-slate-800"
+-                  aria-label="다음 달"
++                  aria-label={t("다음 달", "Next Month")}
+                 >
+@@ -176,9 +177,9 @@ export function createShadcnDatePickerEditorPlugin<T>(
+             <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-slate-400 dark:text-slate-500">
+-              <span className="w-8">일</span>
+-              <span className="w-8">월</span>
+-              <span className="w-8">화</span>
+-              <span className="w-8">수</span>
+-              <span className="w-8">목</span>
+-              <span className="w-8">금</span>
+-              <span className="w-8">토</span>
++              <span className="w-8">{t('일', 'Sun')}</span>
++              <span className="w-8">{t('월', 'Mon')}</span>
++              <span className="w-8">{t('화', 'Tue')}</span>
++              <span className="w-8">{t('수', 'Wed')}</span>
++              <span className="w-8">{t('목', 'Thu')}</span>
++              <span className="w-8">{t('금', 'Fri')}</span>
++              <span className="w-8">{t('토', 'Sat')}</span>
+             </div>
+@@ -221,3 +222,3 @@ export function createShadcnDatePickerEditorPlugin<T>(
+               >
+-                오늘
++                {t('오늘', 'Today')}
+               </Button>
+@@ -230,3 +231,3 @@ export function createShadcnDatePickerEditorPlugin<T>(
+               >
+-                내일
++                {t('내일', 'Tomorrow')}
+               </Button>
+@@ -239,3 +240,3 @@ export function createShadcnDatePickerEditorPlugin<T>(
+               >
+-                1주일 후
++                {t('1주일 후', 'In 1 Week')}
+               </Button>
+diff --git a/examples/editor-plugins/createShadcnTimePickerEditorPlugin.tsx b/examples/editor-plugins/createShadcnTimePickerEditorPlugin.tsx
+index 124be33..7a887be 100644
+--- a/examples/editor-plugins/createShadcnTimePickerEditorPlugin.tsx
++++ b/examples/editor-plugins/createShadcnTimePickerEditorPlugin.tsx
+@@ -1 +1,2 @@
++import { t } from '../i18n';
+ import * as React from 'react';
+@@ -80,3 +81,3 @@ export function createShadcnTimePickerEditorPlugin<T>(
+           >
+-            <span className="truncate">{displayText || '시간 선택'}</span>
++            <span className="truncate">{displayText || t('시간 선택', 'Select Time')}</span>
+             <Clock className="h-4 w-4 opacity-50 shrink-0" />
+@@ -92,3 +93,3 @@ export function createShadcnTimePickerEditorPlugin<T>(
+               <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider dark:text-slate-400">
+-                시간 선택
++                {t('시간 선택', 'Select Time')}
+               </span>
+@@ -103,3 +104,3 @@ export function createShadcnTimePickerEditorPlugin<T>(
+               <div className="flex flex-col">
+-                <span className="text-center text-[10px] font-semibold text-slate-400 pb-1 dark:text-slate-500">시</span>
++                <span className="text-center text-[10px] font-semibold text-slate-400 pb-1 dark:text-slate-500">{t('시', 'Hour')}</span>
+                 <div className="bgrid-shadcn-scroll flex max-h-40 flex-col overflow-y-auto pr-1">
+@@ -127,3 +128,3 @@ export function createShadcnTimePickerEditorPlugin<T>(
+               <div className="flex flex-col">
+-                <span className="text-center text-[10px] font-semibold text-slate-400 pb-1 dark:text-slate-500">분</span>
++                <span className="text-center text-[10px] font-semibold text-slate-400 pb-1 dark:text-slate-500">{t('분', 'Minute')}</span>
+                 <div className="bgrid-shadcn-scroll flex max-h-40 flex-col overflow-y-auto pr-1">
+@@ -180,3 +181,3 @@ export function createShadcnTimePickerEditorPlugin<T>(
+               >
+-                취소
++                {t('취소', 'Cancel')}
+               </Button>
+@@ -189,3 +190,3 @@ export function createShadcnTimePickerEditorPlugin<T>(
+               >
+-                확인
++                {t('확인', 'Confirm')}
+               </Button>
+diff --git a/examples/editor-plugins/createShadcnTreeSelectEditorPlugin.tsx b/examples/editor-plugins/createShadcnTreeSelectEditorPlugin.tsx
+index f0e8bf2..b290be1 100644
+--- a/examples/editor-plugins/createShadcnTreeSelectEditorPlugin.tsx
++++ b/examples/editor-plugins/createShadcnTreeSelectEditorPlugin.tsx
+@@ -10,2 +10,3 @@ import {
+ import './shadcnEditorPlugins.css';
++import { t } from '../i18n';
+
+@@ -36,4 +37,4 @@ export function createShadcnTreeSelectEditorPlugin<T>(
+     const [expandedGroups, setExpandedGroups] = React.useState<Record<string, boolean>>({
+-      영업본부: true,
+-      운영본부: true,
++      [t('영업본부', 'Sales Headquarters')]: true,
++      [t('운영본부', 'Operations Headquarters')]: true,
+     });
+@@ -72,3 +73,3 @@ export function createShadcnTreeSelectEditorPlugin<T>(
+         })
+-        .filter((group): group is TreeNode => Boolean(group));
++        .filter(Boolean) as TreeNode[];
+     }, [searchQuery]);
+@@ -96,3 +97,3 @@ export function createShadcnTreeSelectEditorPlugin<T>(
+           >
+-            <span className="truncate">{currentValue || '조직 선택'}</span>
++            <span className="truncate">{currentValue || t('조직 선택', 'Select Organization')}</span>
+             <GitBranch className="h-4 w-4 opacity-50 shrink-0" />
+@@ -107,3 +108,3 @@ export function createShadcnTreeSelectEditorPlugin<T>(
+             <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider dark:text-slate-400">
+-              조직도 선택
++              {t('조직도 선택', 'Select Organization Chart')}
+             </div>
+@@ -117,3 +118,3 @@ export function createShadcnTreeSelectEditorPlugin<T>(
+                 onChange={e => setSearchQuery(e.target.value)}
+-                placeholder="조직 검색..."
++                placeholder={t('조직 검색...', 'Search organization...')}
+                 className="w-full bg-transparent text-xs outline-none border-0 p-0 text-slate-900 placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500"
+diff --git a/examples/editors/DateEditor.tsx b/examples/editors/DateEditor.tsx
+index 24d761f..4b21ff2 100644
+--- a/examples/editors/DateEditor.tsx
++++ b/examples/editors/DateEditor.tsx
+@@ -59,3 +59,3 @@ export const DateEditor = <T,>({ editable, value, handleSave, handleCancel, hand
+         default:
+-          return; // 키 이벤트를 처리하지 않는다면 종료합니다.
++          return; // If you don't handle key events, exit.
+       }
+diff --git a/examples/editors/SelectEditor.tsx b/examples/editors/SelectEditor.tsx
+index 4a3585b..4a74708 100644
+--- a/examples/editors/SelectEditor.tsx
++++ b/examples/editors/SelectEditor.tsx
+@@ -49,3 +49,3 @@ export const SelectEditor = <T,>({ editable, value, handleSave, handleCancel, ha
+         default:
+-          return; // 키 이벤트를 처리하지 않는다면 종료합니다.
++          return; // If you don't handle key events, exit.
+       }
+@@ -76,3 +76,3 @@ export const SelectEditor = <T,>({ editable, value, handleSave, handleCancel, ha
+             { value: 'Y', label: t('사용', 'Used') },
+-            { value: 'N', label: '사용안함' },
++            { value: 'N', label: t('사용안함', 'Unused') },
+           ]}
+diff --git a/examples/useEditorGrid.tsx b/examples/useEditorGrid.tsx
+index 762b4f4..583aa56 100644
+--- a/examples/useEditorGrid.tsx
++++ b/examples/useEditorGrid.tsx
+@@ -171,3 +171,3 @@ export default function useEditorGrid() {
+             key: 'code',
+-            label: '주문 코드 · 내장 text',
++            label: t('주문 코드 · 내장 text', 'Order Code · Built-in text'),
+             width: 170,
+@@ -181,3 +181,3 @@ export default function useEditorGrid() {
+             key: 'customerName',
+-            label: '고객명 · 한글 직접 입력',
++            label: t('고객명 · 한글 직접 입력', 'Customer Name · Direct Korean Input'),
+             width: 190,
+@@ -191,3 +191,3 @@ export default function useEditorGrid() {
+             key: 'useYn',
+-            label: '사용 여부 · 기본 plugin',
++            label: t('사용 여부 · 기본 plugin', 'Usage · Built-in plugin'),
+             width: 160,
+@@ -199,3 +199,3 @@ export default function useEditorGrid() {
+             key: 'deliveryDate',
+-            label: '납기일 · 기본 plugin',
++            label: t('납기일 · 기본 plugin', 'Delivery Date · Built-in plugin'),
+             width: 170,
+@@ -206,3 +206,3 @@ export default function useEditorGrid() {
+             key: 'priority',
+-            label: '우선순위 · AntD plugin',
++            label: t('우선순위 · AntD plugin', 'Priority · AntD plugin'),
+             width: 180,

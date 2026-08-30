@@ -244,7 +244,7 @@ const localizedWhyBGridItems = localize(whyBGridItems);
   <div class="homepage">
     <section class="hero-section">
       <div class="hero-grid-pattern" aria-hidden="true"></div>
-      <div class="container hero-layout">
+      <div class="container hero-layout-text" style="position:relative; z-index:1;">
         <div class="hero-top-row">
           <div class="hero-copy">
             <p class="hero-kicker"><span></span> {t('업무용 애플리케이션을 위한 오픈소스 React Data Grid', 'Open-source React Data Grid for business applications')}</p>
@@ -274,7 +274,8 @@ const localizedWhyBGridItems = localize(whyBGridItems);
             </p>
           </div>
         </div>
-
+      </div>
+      <div class="container hero-layout">
         <div class="hero-visual" aria-label={t('직접 편집하고 정렬할 수 있는 주문 데이터 그리드', 'Editable and sortable order DataGrid')}>
           <div class="hero-grid-stage">
             <div class="hero-grid-loading" data-hero-grid-loading role="status" aria-live="polite">
@@ -1152,13 +1153,11 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   .capability-heading {
     position: relative;
     z-index: 2;
-    width: 100%;
-    max-width: 108rem;
     margin-top: var(--home-space-7);
-    padding-inline: clamp(16px, 2.5vw, 40px);
     display: flex;
     align-items: center;
   }
+  
   .capability-heading::after {
     content: '';
     flex: 1;
@@ -1182,10 +1181,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     display: grid;
     grid-template-columns: 1.35fr 1fr 1fr 1.1fr;
     gap: 0;
-    width: 100%;
-    max-width: 108rem;
-    margin-top: var(--home-space-2);
-    padding-inline: clamp(16px, 2.5vw, 40px);
+    margin-top: var(--home-space-3);
     background: transparent;
     border-top: 1px solid rgba(226, 232, 240, 0.6);
     border-bottom: 1px solid rgba(226, 232, 240, 0.6);

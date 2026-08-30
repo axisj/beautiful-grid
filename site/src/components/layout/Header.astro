@@ -1,5 +1,4 @@
 ---
-import { GitFork } from 'lucide-react';
 import { productFacts } from '../../data/productFacts';
 import { commonMessages, localizePath, normalizeLocale, type Locale } from '../../i18n';
 import SitePreferences from './SitePreferences.astro';
@@ -42,7 +41,6 @@ const navigation = [
   { label: messages.adoptionGuide, koLabel: commonMessages.ko.adoptionGuide, enLabel: commonMessages.en.adoptionGuide, href: localizePath('/product-facts', locale), route: '/product-facts', external: false },
   { label: messages.openSource, koLabel: commonMessages.ko.openSource, enLabel: commonMessages.en.openSource, href: localizePath('/open-source', locale), route: '/open-source', external: false },
   { label: 'Playground', koLabel: 'Playground', enLabel: 'Playground', href: localizePath('/playground', locale), route: '/playground', external: false },
-  { label: messages.github, koLabel: commonMessages.ko.github, enLabel: commonMessages.en.github, href: productFacts.repositoryUrl, route: '', external: true },
 ];
 ---
 <header class="site-header">
@@ -84,7 +82,6 @@ const navigation = [
             rel={item.external ? 'noopener noreferrer' : undefined}
           >
             <span class="nav-label">
-              {item.external && <GitFork className="github-icon" size={15} strokeWidth={2.2} aria-hidden="true" />}
               <span data-shell-label data-ko={item.koLabel} data-en={item.enLabel}>{item.label}</span>
             </span>
             {item.external && <span aria-hidden="true">↗</span>}
@@ -94,7 +91,15 @@ const navigation = [
     </nav>
 
     <div class="header-actions">
-       <div class="desktop-preferences"><SitePreferences locale={locale} idPrefix="desktop" adaptiveLocale={adaptiveLocale} /></div>
+      <a href={productFacts.repositoryUrl} class="github-action-link desktop-only" aria-label="GitHub Repository" target="_blank" rel="noopener noreferrer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="github-icon" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+        <span class="github-stars-badge" style="display: none;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span class="github-stars-count">...</span>
+        </span>
+      </a>
+      <div class="header-divider desktop-only"></div>
+      <div class="desktop-preferences"><SitePreferences locale={locale} idPrefix="desktop" adaptiveLocale={adaptiveLocale} /></div>
       <button class="mobile-menu-btn" type="button" aria-label={messages.openMenu} aria-expanded="false" aria-controls="mobile-nav">
         <span></span><span></span><span></span>
       </button>
@@ -114,20 +119,26 @@ const navigation = [
   .brand-symbol { display: block; width: 36px; height: 24px; flex: 0 0 auto; }
   .brand-name { color: var(--site-text-primary); font-size: 19px; font-weight: 800; line-height: 1; letter-spacing: -0.03em; }
   .brand-name span { color: var(--site-accent-strong); }
-  .version-badge { border: 1px solid var(--site-border); border-radius: 999px; padding: 2px 6px; background: var(--site-surface); color: var(--site-text-muted); font-family: var(--site-font-mono); font-size: 13px; font-weight: 700; }
-  .primary-nav { display: flex; align-items: center; gap: 6px; }
-  .primary-nav a { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: var(--site-radius-sm, 8px); color: var(--site-text-secondary); font-size: 13px; font-weight: 700; line-height: 1.4; transition: color 150ms ease, background-color 150ms ease; white-space: nowrap; }
+  .version-badge { padding: 2px 6px; background: var(--site-control-bg, rgba(15, 23, 42, 0.05)); color: var(--site-text-secondary); border-radius: 6px; font-family: var(--site-font-mono); font-size: 13px; font-weight: 600; letter-spacing: -0.01em; margin-top: 2px; }
+  .primary-nav { display: flex; align-items: center; gap: 16px; }
+  .primary-nav a { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--site-radius-sm, 8px); color: var(--site-text-secondary); font-size: 14px; font-weight: 700; line-height: 1.4; transition: color 150ms ease, background-color 150ms ease; white-space: nowrap; }
   .nav-label { display: inline-flex; align-items: center; gap: 6px; }
-  :global(.github-icon) { display: block; width: 15px; height: 15px; flex: 0 0 auto; }
+  .github-stars-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 6px; background: color-mix(in srgb, var(--site-text-primary) 6%, transparent); color: var(--site-text-primary); font-size: 13px; font-weight: 650; margin-left: 6px; font-variant-numeric: tabular-nums; }
+  .github-stars-badge svg { fill: none; stroke: currentColor; opacity: 0.6; width: 14px; height: 14px; }
+  :global(.github-icon) { display: block; width: 16px; height: 16px; flex: 0 0 auto; opacity: 0.8; }
   .primary-nav a:hover { color: var(--site-text-primary); background-color: var(--site-control-hover-bg, rgba(15, 23, 42, 0.05)); }
   .primary-nav a.active { color: var(--site-accent-strong); background-color: var(--site-accent-soft); font-weight: 750; }
-  .header-actions { display: flex; align-items: center; justify-content: flex-end; }
-  .mobile-menu-btn { display: none; width: 40px; height: 40px; border: 1px solid var(--site-border); border-radius: 10px; padding: 9px; background: var(--site-control-bg); color: var(--site-text-primary); cursor: pointer; }
+  .header-actions { display: flex; align-items: center; justify-content: flex-end; gap: 16px; }
+  .github-action-link { display: inline-flex; align-items: center; color: var(--site-text-secondary); text-decoration: none; transition: color 150ms ease; }
+  .github-action-link:hover { color: var(--site-text-primary); }
+  .header-divider { width: 1px; height: 24px; background: color-mix(in srgb, var(--site-border) 60%, transparent); }
+  .mobile-menu-btn { display: none; width: 44px; height: 44px; border: 1px solid transparent; border-radius: 8px; padding: 11px; background: transparent; color: var(--site-text-primary); cursor: pointer; transition: background-color 150ms ease; }
   .mobile-menu-btn span { display: block; width: 100%; height: 2px; margin: 3px 0; border-radius: 2px; background: currentColor; transition: transform 150ms ease, opacity 150ms ease; }
+  .mobile-menu-btn:hover { background: var(--site-control-hover-bg); }
   .mobile-menu-btn[aria-expanded='true'] span:first-child { transform: translateY(5px) rotate(45deg); }
   .mobile-menu-btn[aria-expanded='true'] span:nth-child(2) { opacity: 0; }
   .mobile-menu-btn[aria-expanded='true'] span:last-child { transform: translateY(-5px) rotate(-45deg); }
-  @media (max-width: 1080px) { .primary-nav { gap: 4px; } .header-inner { gap: 14px; } }
+  @media (max-width: 1080px) { .primary-nav { gap: 8px; } .primary-nav a { padding: 8px 12px; } .header-inner { gap: 14px; } }
   @media (max-width: 960px) { .header-inner { display: flex; justify-content: space-between; } .desktop-only, .desktop-preferences { display: none; } .mobile-menu-btn { display: block; } }
   @media (max-width: 420px) { .brand { gap: 7px; } .brand-lockup { gap: 7px; } .brand-symbol { width: 36px; height: 24px; } .brand-name { font-size: 17px; } .version-badge { display: none; } }
   @media (prefers-reduced-motion: reduce) { .site-header { transition: none; } }
@@ -354,4 +365,16 @@ const navigation = [
   window.matchMedia('(min-width: 961px)').addEventListener('change', (event) => {
     if (event.matches) closeNavigation(false);
   });
+
+  fetch('https://api.github.com/repos/axisj/beautiful-grid')
+    .then(res => res.json())
+    .then(data => {
+      if (data.stargazers_count !== undefined) {
+        document.querySelectorAll('.github-stars-count').forEach(el => {
+          el.textContent = new Intl.NumberFormat('en-US').format(data.stargazers_count);
+          el.parentElement.style.display = 'inline-flex';
+        });
+      }
+    })
+    .catch(e => console.error('Failed to load GitHub stars:', e));
 </script>

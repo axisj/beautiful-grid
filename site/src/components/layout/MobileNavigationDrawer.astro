@@ -43,6 +43,7 @@ const navItems = [
     href: localizePath('/learn', locale),
     route: '/learn',
     isLearn: true,
+    external: false,
   },
   {
     label: 'API',
@@ -51,6 +52,7 @@ const navItems = [
     href: localizePath('/api/props', locale),
     route: '/api/props',
     isLearn: false,
+    external: false,
   },
   {
     label: messages.adoptionGuide,
@@ -59,6 +61,7 @@ const navItems = [
     href: localizePath('/product-facts', locale),
     route: '/product-facts',
     isLearn: false,
+    external: false,
   },
   {
     label: messages.openSource,
@@ -67,6 +70,7 @@ const navItems = [
     href: localizePath('/open-source', locale),
     route: '/open-source',
     isLearn: false,
+    external: false,
   },
   {
     label: 'Playground',
@@ -75,10 +79,12 @@ const navItems = [
     href: localizePath('/playground', locale),
     route: '/playground',
     isLearn: false,
+    external: false,
   },
 ];
 
 const checkActive = (route: string) => {
+  if (!route) return false;
   const localized = localizePath(route, locale);
   if (route === '/learn') {
     return isLearnRoute;
@@ -151,19 +157,23 @@ const checkActive = (route: string) => {
         data-shell-navigation="mobile"
       >
         {navItems.map((item) => {
-          const isActive = checkActive(item.route);
+          const isActive = !item.external && checkActive(item.route);
           return (
             <div class:list={['mobile-nav-group', { 'is-active-group': isActive }]}>
               <a
                 href={item.href}
                 class:list={['mobile-nav-link', { active: isActive && (!item.isLearn || !currentSlug) }]}
-                data-shell-route={item.route}
+                data-shell-route={item.route || undefined}
                 aria-current={isActive && (!item.isLearn || !currentSlug) ? 'page' : undefined}
+                target={item.external ? '_blank' : undefined}
+                rel={item.external ? 'noopener noreferrer' : undefined}
               >
-                <span class="mobile-nav-label" data-shell-label data-ko={item.koLabel} data-en={item.enLabel}>
-                  {item.label}
+                <span class="mobile-nav-label" style="display: flex; align-items: center; gap: 6px;">
+                  <span data-shell-label data-ko={item.koLabel} data-en={item.enLabel}>
+                    {item.label}
+                  </span>
                 </span>
-                <ArrowRight className="mobile-nav-arrow" size={16} strokeWidth={2} aria-hidden="true" />
+                {item.external ? <span aria-hidden="true" style="color: var(--site-text-muted);">↗</span> : <ArrowRight className="mobile-nav-arrow" size={16} strokeWidth={2} aria-hidden="true" />}
               </a>
 
               {item.isLearn && isLearnRoute && groupedLearn.length > 0 && (
@@ -343,14 +353,15 @@ const checkActive = (route: string) => {
   }
 
   .drawer-version-badge {
-    border: 1px solid var(--site-border);
-    border-radius: 999px;
     padding: 2px 6px;
-    background: var(--site-surface);
-    color: var(--site-text-muted);
+    background: var(--site-control-bg, rgba(15, 23, 42, 0.05));
+    color: var(--site-text-secondary);
+    border-radius: 6px;
     font-family: var(--site-font-mono);
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-top: 2px;
   }
 
   .mobile-drawer-close-btn {
@@ -359,17 +370,16 @@ const checkActive = (route: string) => {
     justify-content: center;
     width: 44px;
     height: 44px;
-    border: 1px solid var(--site-border);
-    border-radius: 10px;
-    background: var(--site-control-bg);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
     color: var(--site-text-primary);
     cursor: pointer;
-    transition: background-color 150ms ease, border-color 150ms ease;
+    transition: background-color 150ms ease, color 150ms ease;
   }
 
   .mobile-drawer-close-btn:hover,
   .mobile-drawer-close-btn:focus-visible {
-    border-color: var(--site-border-strong);
     background: var(--site-control-hover-bg);
   }
 
@@ -390,20 +400,22 @@ const checkActive = (route: string) => {
   .mobile-nav-group {
     display: flex;
     flex-direction: column;
-    border-bottom: 1px solid var(--site-border);
-    padding-bottom: 4px;
+    border-bottom: 1px solid color-mix(in srgb, var(--site-border) 60%, transparent);
+    padding-bottom: 8px;
+    margin-bottom: 4px;
   }
 
   .mobile-nav-group:last-child {
     border-bottom: none;
+    margin-bottom: 0;
   }
 
   .mobile-nav-link {
     display: flex;
-    min-height: 44px;
+    min-height: 48px;
     align-items: center;
     justify-content: space-between;
-    padding: 0 10px;
+    padding: 0 14px;
     border-radius: var(--site-radius-sm, 8px);
     color: var(--site-text-primary);
     font-size: 15px;
@@ -433,6 +445,7 @@ const checkActive = (route: string) => {
     color: var(--site-accent-strong);
     transform: translateX(2px);
   }
+
 
   /* Learn Catalog in Drawer */
   .mobile-learn-catalog {
@@ -473,9 +486,9 @@ const checkActive = (route: string) => {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    min-height: 44px;
+    min-height: 48px;
     justify-content: center;
-    padding: 6px 10px;
+    padding: 8px 14px;
     border-radius: var(--site-radius-sm, 6px);
     color: var(--site-text-secondary);
     text-decoration: none;
@@ -484,7 +497,7 @@ const checkActive = (route: string) => {
   }
 
   .mobile-learn-title-en {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 650;
     letter-spacing: -0.01em;
     color: inherit;
@@ -494,6 +507,7 @@ const checkActive = (route: string) => {
     font-size: 13px;
     font-weight: 500;
     color: var(--site-text-muted);
+    margin-top: 2px;
   }
 
   .mobile-learn-link:hover {

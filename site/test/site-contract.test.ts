@@ -52,13 +52,10 @@ describe('site product and navigation contracts', () => {
     expect(header).toContain("href: localizePath('/product-facts', locale), route: '/product-facts', external: false");
     expect(header).toContain("href: localizePath('/open-source', locale), route: '/open-source', external: false");
     expect(header).toContain("href: localizePath('/playground', locale), route: '/playground', external: false");
-    expect(header).toContain("href: productFacts.repositoryUrl, route: '', external: true");
-    expect(header).toContain("import { GitFork } from 'lucide-react'");
-    expect(header).toContain('<GitFork className="github-icon"');
+    expect(header).toContain("href={productFacts.repositoryUrl}");
     expect(header).toContain("class:list={['nav-item', { active: isActive }]}");
     expect(header).toContain("aria-current={isActive ? 'page' : undefined}");
     expect(header).toContain(".primary-nav a.active");
-    expect(header).not.toContain('class="header-actions desktop-only"');
   });
 
   it('structures the mobile navigation drawer with 5 primary items, shared Learn catalog, and 1-row bottom controls', () => {
@@ -172,18 +169,18 @@ describe('site product and navigation contracts', () => {
 
     expect(hero).toContain('Open-source React Data Grid for business applications');
     expect(hero).toContain('아름답게, 강력하게.');
-    expect(hero).toContain('대용량 데이터부터 편집, 병합, 정렬, 필터링, 집계까지.');
-    expect(hero).toContain('Apache-2.0 React Data Grid입니다.');
+    expect(hero).toContain('대용량 가상화부터 실무에 필요한 데이터 기능까지.');
+    expect(hero).toContain('오픈소스 React Data Grid입니다.');
     expect(hero).toContain('>Get Started <');
     expect(hero).toContain('>GitHub ↗</a>');
     expect(hero).not.toContain('Star BeautifulGrid');
     expect(hero).toContain('설치하고 바로 시작하세요.');
     expect(hero).toContain('Install and start building in minutes.');
-    expect(hero).toContain('실제 업무 환경을 위해 만들었습니다.');
-    expect(hero).toContain('Built for real-world applications');
+    expect(hero).toContain('프로덕션 환경을 위한 검증된 지표');
+    expect(hero).toContain('Verified benchmarks for production');
 
     expect(homepage).toContain("id=\"why-bgrid-title\">{t('왜 BeautifulGrid인가요?', 'Why BeautifulGrid?')}</h2>");
-    expect(homepage).toContain('업무용 데이터 화면에 필요한 기능을 오픈소스로 제공합니다.');
+    expect(homepage).toContain('검증된 성능과 풍부한 실무 기능을 누구나 자유롭게 활용할 수 있는 오픈소스로 제공합니다.');
     expect(homepage).toContain("title: 'Apache-2.0'");
     expect(homepage).toContain("title: 'React에 최적화'");
     expect(homepage).toContain("title: '대용량 데이터에 최적화'");
@@ -523,8 +520,8 @@ describe('site product and navigation contracts', () => {
     expect(homepage).toContain("t('업무용 애플리케이션을 위한 오픈소스 React Data Grid', 'Open-source React Data Grid for business applications')");
     expect(homepage).toContain("t('아름답게, 강력하게.', 'Beautiful. Powerful.')");
     expect(homepage).toContain("t('React로 자연스럽게.', 'Naturally React.')");
-    expect(homepage).toContain('대용량 데이터부터 편집, 병합, 정렬, 필터링, 집계까지.');
-    expect(homepage).toContain('복잡한 업무 화면을 빠르고 유연하게 구현할 수 있는 Apache-2.0 React Data Grid입니다.');
+    expect(homepage).toContain('대용량 가상화부터 실무에 필요한 데이터 기능까지.');
+    expect(homepage).toContain('복잡한 비즈니스 UI를 빠르고 유연하게 구축하는 오픈소스 React Data Grid입니다.');
     expect(homepage).toContain('>Get Started <');
     expect(homepage).toContain('>GitHub ↗</a>');
     expect(homepage).toContain("t('도입 전 체크포인트', 'Evaluation Checklist')");

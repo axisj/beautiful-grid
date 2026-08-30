@@ -245,30 +245,34 @@ const localizedWhyBGridItems = localize(whyBGridItems);
     <section class="hero-section">
       <div class="hero-grid-pattern" aria-hidden="true"></div>
       <div class="container hero-layout">
-        <div class="hero-copy">
-          <p class="hero-kicker"><span></span> {t('업무용 애플리케이션을 위한 오픈소스 React Data Grid', 'Open-source React Data Grid for business applications')}</p>
-          <h1>
-            {t('아름답게, 강력하게.', 'Beautiful. Powerful.')}<br />{' '}
-            <span>{t('React로 자연스럽게.', 'Naturally React.')}</span>
-          </h1>
-          <p class="hero-description">
-            <strong>{t('대용량 데이터부터 편집, 병합, 정렬, 필터링, 집계까지.', 'From large datasets to editing, merging, sorting, filtering, and aggregation.')}</strong>
-            <span>{t('복잡한 업무 화면을 빠르고 유연하게 구현할 수 있는 Apache-2.0 React Data Grid입니다.', 'An Apache-2.0 React Data Grid for building complex business applications quickly and flexibly.')}</span>
-          </p>
-          <div class="hero-actions">
-            <a href={localizePath('/learn/getting-started', locale)} class="btn btn-primary btn-large">Get Started <span aria-hidden="true">→</span></a>
-            <a href={productFacts.repositoryUrl} class="btn btn-secondary btn-large" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+        <div class="hero-top-row">
+          <div class="hero-copy">
+            <p class="hero-kicker"><span></span> {t('업무용 애플리케이션을 위한 오픈소스 React Data Grid', 'Open-source React Data Grid for business applications')}</p>
+            <h1>
+              {t('아름답게, 강력하게.', 'Beautiful. Powerful.')}<br />{' '}
+              <span>{t('React로 자연스럽게.', 'Naturally React.')}</span>
+            </h1>
+            <p class="hero-description">
+              <strong>{t('대용량 가상화부터 실무에 필요한 데이터 기능까지.', 'From large-scale virtualization to essential business data features.')}</strong>
+              <span>{t('복잡한 비즈니스 UI를 빠르고 유연하게 구축하는 오픈소스 React Data Grid입니다.', 'An open-source React Data Grid for building complex business UIs quickly and flexibly.')}</span>
+            </p>
           </div>
-          <p class="install-caption">{t('설치하고 바로 시작하세요.', 'Install and start building in minutes.')}</p>
-          <div class="install-command" aria-label={t('npm 설치 명령', 'npm installation command')}>
-            <span class="install-prompt" aria-hidden="true">$</span>
-            <code>npm i {productFacts.packageName}</code>
-            <button type="button" class="copy-command" data-copy-command data-copy-ready={t('복사', 'Copy')} data-copy-success={t('복사됨', 'Copied')} aria-label={t('설치 명령 복사', 'Copy installation command')}>{t('복사', 'Copy')}</button>
+          <div class="hero-actions-container">
+            <div class="hero-actions">
+              <a href={localizePath('/learn/getting-started', locale)} class="btn btn-primary btn-large">Get Started <span aria-hidden="true">→</span></a>
+              <a href={productFacts.repositoryUrl} class="btn btn-secondary btn-large" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+            </div>
+            <p class="install-caption">{t('설치하고 바로 시작하세요.', 'Install and start building in minutes.')}</p>
+            <div class="install-command" aria-label={t('npm 설치 명령', 'npm installation command')}>
+              <span class="install-prompt" aria-hidden="true">$</span>
+              <code>npm i {productFacts.packageName}</code>
+              <button type="button" class="copy-command" data-copy-command data-copy-ready={t('복사', 'Copy')} data-copy-success={t('복사됨', 'Copied')} aria-label={t('설치 명령 복사', 'Copy installation command')}>{t('복사', 'Copy')}</button>
+            </div>
+            <p class="hero-trust-note">
+              <span aria-hidden="true">✓</span>
+              {t('Apache-2.0 오픈소스 · 모든 기능을 실행 예제와 실제 소스로 확인하세요.', 'Apache-2.0 open source · Verify every feature with runnable examples and real source.')}
+            </p>
           </div>
-          <p class="hero-trust-note">
-            <span aria-hidden="true">✓</span>
-            {t('Apache-2.0 오픈소스 · 모든 기능을 실행 예제와 실제 소스로 확인하세요.', 'Apache-2.0 open source · Verify every feature with runnable examples and real source.')}
-          </p>
         </div>
 
         <div class="hero-visual" aria-label={t('직접 편집하고 정렬할 수 있는 주문 데이터 그리드', 'Editable and sortable order DataGrid')}>
@@ -286,7 +290,7 @@ const localizedWhyBGridItems = localize(whyBGridItems);
       </div>
 
       <div class="container capability-heading">
-        <p>{t('실제 업무 환경을 위해 만들었습니다.', 'Built for real-world applications')}</p>
+        <p>{t('프로덕션 환경을 위한 검증된 지표', 'Verified benchmarks for production')}</p>
       </div>
       <div class="container capability-rail" aria-label={t('BeautifulGrid의 검증 가능한 규모와 지원 환경', 'Verified BeautifulGrid scale and support baseline')}>
         <article class="capability-item capability-item-primary">
@@ -340,10 +344,10 @@ const localizedWhyBGridItems = localize(whyBGridItems);
       <div class="container">
         <div class="why-heading">
           <div>
-            <p class="eyebrow">{t('선택 기준을 한눈에', 'The essentials at a glance')}</p>
+            <p class="eyebrow">{t('선택해야 하는 이유', 'Why Choose BeautifulGrid')}</p>
             <h2 id="why-bgrid-title">{t('왜 BeautifulGrid인가요?', 'Why BeautifulGrid?')}</h2>
           </div>
-          <p>{t('업무용 데이터 화면에 필요한 기능을 오픈소스로 제공합니다.', 'Open-source capabilities for the data-heavy screens business applications need.')}</p>
+          <p>{t('검증된 성능과 풍부한 실무 기능을 누구나 자유롭게 활용할 수 있는 오픈소스로 제공합니다.', 'Proven performance and rich business features, freely available as an open-source solution.')}</p>
         </div>
         <div class="why-grid">
           {localizedWhyBGridItems.map((item) => (
@@ -833,6 +837,14 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     padding-inline: clamp(16px, 2.5vw, 40px);
   }
 
+  .hero-top-row {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, auto);
+    align-items: end;
+    gap: 48px;
+  }
+
   .hero-copy,
   .hero-visual,
   .strength-copy,
@@ -853,11 +865,17 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
 
   .hero-copy {
     display: flex;
-    max-width: 1040px;
+    max-width: 820px;
     flex-direction: column;
-    align-items: center;
-    margin-inline: auto;
-    text-align: center;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .hero-actions-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-bottom: 6px;
   }
 
   .hero-kicker {
@@ -916,7 +934,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     gap: var(--home-space-3);
   }
 
-  .hero-actions { justify-content: center; margin-top: var(--home-space-6); }
+  .hero-actions { justify-content: flex-start; }
 
   .btn-large {
     min-height: 50px;
@@ -2905,6 +2923,10 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   }
 
   @media (max-width: 1100px) {
+    .hero-top-row { grid-template-columns: 1fr; gap: var(--home-space-6); justify-items: center; }
+    .hero-copy { align-items: center; text-align: center; margin-inline: auto; }
+    .hero-actions-container { align-items: center; text-align: center; margin-inline: auto; padding-bottom: 0; }
+    .hero-actions { justify-content: center; }
     .capability-rail { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .why-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .why-item:nth-child(3) { border-left: 0; border-top: 1px solid #dce6f2; }

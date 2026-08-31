@@ -3,6 +3,7 @@ import '../styles/globals.css';
 import '../../../beautiful-grid/style.css';
 import { localeAlternates, localeMeta, normalizeLocale, type Locale } from '../i18n';
 import { themeBootstrapScript } from '../i18n/theme';
+import SpeedInsights from '@vercel/speed-insights/astro';
 
 interface Props {
   title: string;
@@ -98,5 +99,6 @@ const llmsUrl = new URL('/llms.txt', siteUrl);
   </head>
   <body>
     <slot />
+    <SpeedInsights />
   </body>
 </html>

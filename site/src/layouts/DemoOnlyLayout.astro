@@ -3,6 +3,7 @@ import 'beautiful-grid/style.css';
 import '../styles/globals.css';
 import { localeMeta, normalizeLocale, type Locale } from '../i18n';
 import { themeBootstrapScript } from '../i18n/theme';
+import SpeedInsights from '@vercel/speed-insights/astro';
 
 interface Props {
   title: string;
@@ -67,5 +68,6 @@ const canonicalUrl = canonicalPath ? new URL(canonicalPath, Astro.site || 'https
     <main>
       <slot />
     </main>
+    <SpeedInsights />
   </body>
 </html>

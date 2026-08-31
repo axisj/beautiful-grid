@@ -421,7 +421,17 @@ const [query, setQuery] = useState({ sortParams: [], filterParams: [] });
         defaultActiveKey={['core', 'body']}
         items={themeColorGroups.map(group => ({
           key: group.key,
-          label: group.label,
+          label: isEn ? group.label : (
+            {
+              'Core & header palette': '코어 & 헤더 팔레트',
+              'Body & interaction palette': '바디 & 상호작용 팔레트',
+              'Borders, selection & edit palette': '테두리, 선택 및 편집 팔레트',
+              'Scrollbar & loading palette': '스크롤바 & 로딩 팔레트',
+              'Classic scrollbar palette': '클래식 스크롤바 팔레트',
+              'Filter & toolbox palette': '필터 & 툴박스 팔레트',
+              'Search & context menu palette': '검색 & 컨텍스트 메뉴 팔레트',
+            }[group.label] || group.label
+          ),
           children: (
             <div className='theme-color-list'>
               {group.fields.map(([key, label]) => (
@@ -454,7 +464,7 @@ const [query, setQuery] = useState({ sortParams: [], filterParams: [] });
     <div className='theme-preview-wrap' style={palette as React.CSSProperties}>
       <div className='theme-preview-head'>
         <div>
-          <h3>Order workspace</h3>
+          <h3>{t('주문 워크스페이스', 'Order workspace')}</h3>
           <p>{t('헤더, 행, 선택, 편집, 요약과 스크롤 색을 한 화면에서 확인합니다.', 'Inspect header, row, selection, editing, summary, and scrollbar colors in one screen.')}</p>
         </div>
         <span className='theme-preview-badge'>{selectedPreset === 'custom' ? 'Custom' : selectedPreset}</span>

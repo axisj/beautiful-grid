@@ -93,6 +93,10 @@
   min-height: 0;
 }
 
+.playground-mobile-workbar {
+  display: none;
+}
+
 .playground-control-panel {
   display: flex;
   flex-direction: column;
@@ -722,8 +726,9 @@
   .playground-shell-header {
     align-items: flex-start;
     flex-direction: column;
-    gap: 6px;
-    padding: 13px 16px 0;
+    gap: 8px;
+    min-height: 94px;
+    padding: 12px 16px 0;
   }
 
   .playground-shell-title span {
@@ -732,20 +737,84 @@
 
   .playground-mode-tabs {
     width: 100%;
-    min-height: 42px;
+    min-height: 44px;
+    gap: 8px;
   }
 
   .playground-mode-tab {
     min-width: 0;
     flex: 1;
+    border-radius: 8px 8px 0 0;
+    padding: 0 8px;
+    font-size: 13px;
   }
 
   .playground-workspace {
     display: flex;
     height: 100%;
     flex-direction: column;
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    overflow: hidden;
+    background: #eef1f5;
+  }
+
+  .playground-mobile-workbar {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    min-height: 60px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border-bottom: 1px solid var(--site-border);
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 8px 20px -20px rgba(15, 23, 42, 0.65);
+  }
+
+  .playground-mobile-pane-tabs {
+    display: grid;
+    min-width: 0;
+    flex: 1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3px;
+    border: 1px solid var(--site-border);
+    border-radius: 10px;
+    padding: 3px;
+    background: var(--site-surface);
+  }
+
+  .playground-mobile-pane-tabs button {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border: 0;
+    border-radius: 7px;
+    padding: 0 12px;
+    background: transparent;
+    color: var(--site-text-secondary);
+    cursor: pointer;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 750;
+  }
+
+  .playground-mobile-pane-tabs button[aria-pressed='true'] {
+    background: var(--site-surface-elevated);
+    color: var(--site-accent-strong);
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.13);
+  }
+
+  .playground-mobile-source-button.ant-btn {
+    min-width: 72px;
+    min-height: 46px;
+    flex: 0 0 auto;
+    border-radius: 10px;
+    color: var(--site-accent-strong);
+    font-size: 13px;
+    font-weight: 750;
   }
 
   .playground-divider {
@@ -753,38 +822,77 @@
   }
 
   .playground-control-panel {
-    max-height: 66vh;
-    border-bottom: 1px solid var(--site-border-strong);
+    display: none;
+    min-height: 0;
+    flex: 1;
+    border: 0;
   }
 
   .playground-preview-panel {
-    min-height: 560px;
+    display: none;
+    min-height: 0;
+    flex: 1;
+    padding: 12px;
+  }
+
+  .playground-workspace[data-mobile-pane='controls'] .playground-control-panel,
+  .playground-workspace[data-mobile-pane='preview'] .playground-preview-panel {
+    display: flex;
+  }
+
+  .playground-panel-header {
+    align-items: center;
+    padding: 14px 16px;
+  }
+
+  .playground-panel-header p {
+    max-width: 520px;
+    margin-top: 3px;
+    line-height: 1.45;
+  }
+
+  .playground-panel-header > .ant-btn {
+    display: none;
+  }
+
+  .playground-control-scroll {
+    overscroll-behavior-y: contain;
+    padding: 14px 16px 28px;
+    scroll-padding-bottom: 24px;
+  }
+
+  .playground-preview-canvas {
+    border-radius: 12px;
     padding: 16px;
+    box-shadow: 0 12px 30px rgba(31, 41, 55, 0.07);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  :root[data-theme='dark'] .playground-workspace {
+    background: var(--site-page-bg);
+  }
+
+  :root[data-theme='dark'] .playground-mobile-workbar {
+    background: color-mix(in srgb, var(--site-surface-elevated) 96%, transparent);
   }
 }
 
 @media (max-width: 560px) {
   .playground-panel-header {
-    align-items: stretch;
-    flex-direction: column;
-    padding: 16px;
-  }
-
-  .playground-panel-header .ant-btn {
-    width: 100%;
+    padding: 12px 14px;
   }
 
   .playground-control-scroll {
-    padding: 12px;
+    padding: 12px 12px calc(24px + env(safe-area-inset-bottom));
   }
 
   .playground-preview-panel {
-    min-height: 500px;
-    padding: 12px;
+    padding: 8px;
   }
 
   .playground-preview-canvas {
-    padding: 14px;
+    border-radius: 10px;
+    padding: 12px;
   }
 
   .playground-field-grid {
@@ -798,12 +906,93 @@
   .theme-preset-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .playground-control-form .ant-collapse > .ant-collapse-item > .ant-collapse-header {
+    min-height: 48px;
+    padding: 12px;
+  }
+
+  .playground-control-form .ant-input-number,
+  .playground-control-form .ant-input,
+  .playground-control-form .ant-select-single,
+  .playground-control-form .ant-select-single .ant-select-selector {
+    min-height: 44px;
+  }
+
+  .playground-control-form .ant-input-number-input {
+    height: 42px;
+  }
+
+  .playground-control-form .ant-select-single .ant-select-selection-item,
+  .playground-control-form .ant-select-single .ant-select-selection-placeholder {
+    line-height: 42px;
+  }
+
+  .playground-toggle-row {
+    min-height: 44px;
+  }
+
+  .theme-preset-card {
+    min-height: 64px;
+  }
+
+  .theme-color-row .ant-color-picker-trigger {
+    min-width: 96px;
+    min-height: 44px;
+  }
+
+  .props-preview-note,
+  .theme-preview-head {
+    margin-bottom: 12px;
+  }
+
+  .props-preview-note {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .theme-preview-head p {
+    max-width: 250px;
+    line-height: 1.45;
+  }
+
+  .playground-source-modal {
+    top: 8px;
+    max-width: calc(100vw - 16px);
+    margin: 0 auto;
+    padding-bottom: 0;
+  }
+
+  .playground-source-modal .ant-modal-content {
+    display: flex;
+    height: calc(100dvh - 16px);
+    flex-direction: column;
+    border-radius: 12px;
+  }
+
+  .playground-source-modal .ant-modal-body {
+    min-height: 0;
+    flex: 1;
+  }
+
+  .playground-source-code {
+    height: 100%;
+    max-height: none;
+    padding: 16px;
+    font-size: 13px;
+  }
+
+  .playground-source-modal .ant-modal-footer .ant-btn {
+    min-height: 44px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .playground-mode-tab,
   .playground-divider,
-  .theme-preset-card {
+  .theme-preset-card,
+  .playground-mobile-pane-tabs button {
     transition: none;
   }
 }

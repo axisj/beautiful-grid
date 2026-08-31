@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CheckOutlined, CopyOutlined } from '@ant-design/icons';
+import { CheckOutlined, CodeOutlined, ControlOutlined, CopyOutlined, EyeOutlined } from '@ant-design/icons';
 import { Button, Modal } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { highlightPlaygroundSource } from './highlightSource';
@@ -32,6 +32,7 @@ export function PlaygroundWorkspace({
 }: PlaygroundWorkspaceProps) {
   const workspaceRef = useRef<HTMLDivElement>(null);
   const [panelWidth, setPanelWidth] = useState(430);
+  const [mobilePane, setMobilePane] = useState<'preview' | 'controls'>('preview');
   const [sourceOpen, setSourceOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -86,8 +87,37 @@ export function PlaygroundWorkspace({
     <div
       ref={workspaceRef}
       className='playground-workspace'
+      data-mobile-pane={mobilePane}
       style={{ '--playground-panel-width': `${panelWidth}px` } as React.CSSProperties}
     >
+      <div className='playground-mobile-workbar'>
+        <div className='playground-mobile-pane-tabs' role='group' aria-label={locale === 'en' ? 'Workspace view' : '작업 화면'}>
+          <button
+            type='button'
+            aria-pressed={mobilePane === 'preview'}
+            onClick={() => setMobilePane('preview')}
+          >
+            <EyeOutlined aria-hidden='true' />
+            {locale === 'en' ? 'Preview' : '미리보기'}
+          </button>
+          <button
+            type='button'
+            aria-pressed={mobilePane === 'controls'}
+            onClick={() => setMobilePane('controls')}
+          >
+            <ControlOutlined aria-hidden='true' />
+            {locale === 'en' ? 'Settings' : '설정'}
+          </button>
+        </div>
+        <Button
+          className='playground-mobile-source-button'
+          icon={<CodeOutlined aria-hidden='true' />}
+          onClick={() => setSourceOpen(true)}
+        >
+          {locale === 'en' ? 'Code' : '코드'}
+        </Button>
+      </div>
+
       <aside className='playground-control-panel' aria-label={`${title} ${locale === 'en' ? 'control panel' : '컨트롤 패널'}`}>
         <header className='playground-panel-header'>
           <div>

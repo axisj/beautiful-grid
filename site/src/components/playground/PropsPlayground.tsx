@@ -397,7 +397,7 @@ export function ProductGrid() {
   const controls = (
     <Form className='playground-control-form' layout='vertical' size='middle'>
       <div className='playground-event-log' aria-live='polite'>
-        <strong>Last event</strong>
+        <strong>{t('마지막 이벤트 (Last event)', 'Last event')}</strong>
         {lastEvent}
       </div>
       <Collapse
@@ -405,37 +405,37 @@ export function ProductGrid() {
         items={[
           {
             key: 'layout',
-            label: 'Layout & dimensions',
+            label: t('레이아웃 및 치수', 'Layout & dimensions'),
             children: (
               <div className='playground-field-grid'>
-                <NumberField label='width' value={width} min={280} max={1600} onChange={setWidth} />
-                <NumberField label='height' value={height} min={240} max={900} onChange={setHeight} />
-                <NumberField label='headerHeight' value={headerHeight} min={24} onChange={setHeaderHeight} />
-                <NumberField label='summaryHeight' value={summaryHeight} min={22} onChange={setSummaryHeight} />
-                <NumberField label='bottomBarHeight' value={bottomBarHeight} min={22} onChange={setBottomBarHeight} />
+                <NumberField label={t('너비 (width)', 'width')} value={width} min={280} max={1600} onChange={setWidth} />
+                <NumberField label={t('높이 (height)', 'height')} value={height} min={240} max={900} onChange={setHeight} />
+                <NumberField label={t('헤더 높이 (headerHeight)', 'headerHeight')} value={headerHeight} min={24} onChange={setHeaderHeight} />
+                <NumberField label={t('요약 행 높이 (summaryHeight)', 'summaryHeight')} value={summaryHeight} min={22} onChange={setSummaryHeight} />
+                <NumberField label={t('하단 바 높이 (bottomBarHeight)', 'bottomBarHeight')} value={bottomBarHeight} min={22} onChange={setBottomBarHeight} />
                 <NumberField
-                  label='footerHeight (deprecated)'
+                  label={t('푸터 높이 (footerHeight - deprecated)', 'footerHeight (deprecated)')}
                   value={footerHeight}
                   min={22}
                   onChange={setFooterHeight}
                 />
-                <NumberField label='itemHeight' value={itemHeight} min={10} onChange={setItemHeight} />
-                <NumberField label='itemPadding' value={itemPadding} min={0} onChange={setItemPadding} />
+                <NumberField label={t('행 높이 (itemHeight)', 'itemHeight')} value={itemHeight} min={10} onChange={setItemHeight} />
+                <NumberField label={t('행 패딩 (itemPadding)', 'itemPadding')} value={itemPadding} min={0} onChange={setItemPadding} />
                 <NumberField
-                  label='frozenColumnIndex'
+                  label={t('틀 고정 열 (frozenColumnIndex)', 'frozenColumnIndex')}
                   value={frozenColumnIndex}
                   min={0}
                   max={6}
                   onChange={setFrozenColumnIndex}
                 />
                 <NumberField
-                  label='frozenRowCount'
+                  label={t('틀 고정 행 (frozenRowCount)', 'frozenRowCount')}
                   value={frozenRowCount}
                   min={0}
                   max={8}
                   onChange={setFrozenRowCount}
                 />
-                <Form.Item className='playground-field-wide' label='variant'>
+                <Form.Item className='playground-field-wide' label={t('테마 변형 (variant)', 'variant')}>
                   <Select
                     value={variant}
                     onChange={setVariant}
@@ -457,10 +457,10 @@ export function ProductGrid() {
           },
           {
             key: 'data',
-            label: 'Data, columns & advanced modes',
+            label: t('데이터, 열 및 고급 모드', 'Data, columns & advanced modes'),
             children: (
               <div className='playground-field-grid'>
-                <Form.Item className='playground-field-wide' label='data'>
+                <Form.Item className='playground-field-wide' label={t('데이터 (data)', 'data')}>
                   <Select
                     value={dataset}
                     onChange={value => {
@@ -469,8 +469,8 @@ export function ProductGrid() {
                       setLastEvent(`data changed: ${value}`);
                     }}
                     options={[
-                      { value: 'primary', label: '500 rows' },
-                      { value: 'compact', label: '40 rows' },
+                      { value: 'primary', label: t('500개 행', '500 rows') },
+                      { value: 'compact', label: t('40개 행', '40 rows') },
                     ]}
                   />
                 </Form.Item>
@@ -479,32 +479,32 @@ export function ProductGrid() {
                     value={groupMode}
                     onChange={setGroupMode}
                     options={[
-                      { value: 'none', label: 'None' },
+                      { value: 'none', label: t('사용 안 함 (None)', 'None') },
                       { value: 'columnGroups', label: 'columnGroups (nested)' },
                       { value: 'columnsGroup', label: 'columnsGroup (deprecated)' },
                     ]}
                   />
                 </Form.Item>
-                <ToggleField label={t('빈 data', 'Empty data')} checked={emptyData} onChange={setEmptyData} />
-                <ToggleField label='pivot' checked={pivotEnabled} onChange={setPivotEnabled} />
-                <ToggleField label='dataControl' checked={dataControlEnabled} onChange={setDataControlEnabled} />
-                <ToggleField label='icons' checked={customIcons} onChange={setCustomIcons} />
+                <ToggleField label={t('빈 데이터 (empty)', 'Empty data')} checked={emptyData} onChange={setEmptyData} />
+                <ToggleField label={t('피벗 (pivot)', 'pivot')} checked={pivotEnabled} onChange={setPivotEnabled} />
+                <ToggleField label={t('데이터 제어 (dataControl)', 'dataControl')} checked={dataControlEnabled} onChange={setDataControlEnabled} />
+                <ToggleField label={t('아이콘 (icons)', 'icons')} checked={customIcons} onChange={setCustomIcons} />
               </div>
             ),
           },
           {
             key: 'state',
-            label: 'State, message & styles',
+            label: t('상태, 메시지 및 스타일', 'State, message & styles'),
             children: (
               <div className='playground-field-grid'>
-                <ToggleField label='loading' checked={loading} onChange={setLoading} />
-                <ToggleField label='spinning' checked={spinning} onChange={setSpinning} />
-                <NumberField label='scrollTop' value={scrollTop} min={0} onChange={setScrollTop} />
-                <NumberField label='scrollLeft' value={scrollLeft} min={0} onChange={setScrollLeft} />
-                <Form.Item className='playground-field-wide' label='msg.emptyList'>
+                <ToggleField label={t('로딩 중 (loading)', 'loading')} checked={loading} onChange={setLoading} />
+                <ToggleField label={t('스피너 (spinning)', 'spinning')} checked={spinning} onChange={setSpinning} />
+                <NumberField label={t('수직 스크롤 위치 (scrollTop)', 'scrollTop')} value={scrollTop} min={0} onChange={setScrollTop} />
+                <NumberField label={t('수평 스크롤 위치 (scrollLeft)', 'scrollLeft')} value={scrollLeft} min={0} onChange={setScrollLeft} />
+                <Form.Item className='playground-field-wide' label={t('빈 목록 메시지 (msg.emptyList)', 'msg.emptyList')}>
                   <Input value={emptyMessage} onChange={event => setEmptyMessage(event.target.value)} />
                 </Form.Item>
-                <Form.Item className='playground-field-wide' label='rowKey / selectedRowKey'>
+                <Form.Item className='playground-field-wide' label={t('행 키 / 선택된 행 키 (rowKey / selectedRowKey)', 'rowKey / selectedRowKey')}>
                   <Select
                     allowClear
                     placeholder={t('선택 행 없음', 'No selected row')}
@@ -513,53 +513,53 @@ export function ProductGrid() {
                     options={data.slice(0, 12).map(item => ({ value: item.values.id, label: item.values.id }))}
                   />
                 </Form.Item>
-                <ToggleField label='className' checked={customClassName} onChange={setCustomClassName} />
-                <ToggleField label='style' checked={customStyle} onChange={setCustomStyle} />
+                <ToggleField label={t('사용자 정의 클래스 (className)', 'className')} checked={customClassName} onChange={setCustomClassName} />
+                <ToggleField label={t('사용자 정의 스타일 (style)', 'style')} checked={customStyle} onChange={setCustomStyle} />
               </div>
             ),
           },
           {
             key: 'bars',
-            label: 'Page, status & scrollbars',
+            label: t('페이지, 상태 및 스크롤바', 'Page, status & scrollbars'),
             children: (
               <div className='playground-field-grid'>
-                <ToggleField label='page' checked={pageEnabled} onChange={setPageEnabled} />
-                <ToggleField label='page.loading' checked={pageLoading} onChange={setPageLoading} />
-                <NumberField label='currentPage' value={currentPage} min={1} onChange={setCurrentPage} />
-                <NumberField label='pageSize' value={pageSize} min={1} onChange={setPageSize} />
-                <NumberField label='totalPages' value={totalPages} min={1} onChange={setTotalPages} />
+                <ToggleField label={t('페이징 (page)', 'page')} checked={pageEnabled} onChange={setPageEnabled} />
+                <ToggleField label={t('페이지 로딩 (page.loading)', 'page.loading')} checked={pageLoading} onChange={setPageLoading} />
+                <NumberField label={t('현재 페이지 (currentPage)', 'currentPage')} value={currentPage} min={1} onChange={setCurrentPage} />
+                <NumberField label={t('페이지 크기 (pageSize)', 'pageSize')} value={pageSize} min={1} onChange={setPageSize} />
+                <NumberField label={t('전체 페이지 (totalPages)', 'totalPages')} value={totalPages} min={1} onChange={setTotalPages} />
                 <NumberField
-                  label='displayPaginationLength'
+                  label={t('표시할 페이지 수 (displayPaginationLength)', 'displayPaginationLength')}
                   value={paginationLength}
                   min={1}
                   onChange={setPaginationLength}
                 />
-                <Form.Item className='playground-field-wide' label='scrollbar.variant'>
+                <Form.Item className='playground-field-wide' label={t('스크롤바 스타일 (scrollbar.variant)', 'scrollbar.variant')}>
                   <Select
                     value={scrollbarVariant}
                     onChange={setScrollbarVariant}
                     options={['native', 'classic', 'modern'].map(value => ({ value, label: value }))}
                   />
                 </Form.Item>
-                <ToggleField label='status.visible' checked={statusVisible} onChange={setStatusVisible} />
-                <ToggleField label='status.content' checked={customStatus} onChange={setCustomStatus} />
-                <ToggleField label='pagination.visible' checked={paginationVisible} onChange={setPaginationVisible} />
+                <ToggleField label={t('상태 표시줄 (status.visible)', 'status.visible')} checked={statusVisible} onChange={setStatusVisible} />
+                <ToggleField label={t('상태 표시줄 내용 (status.content)', 'status.content')} checked={customStatus} onChange={setCustomStatus} />
+                <ToggleField label={t('페이징 표시 (pagination.visible)', 'pagination.visible')} checked={paginationVisible} onChange={setPaginationVisible} />
                 <ToggleField
-                  label='horizontal.visible'
+                  label={t('가로 스크롤 (horizontal.visible)', 'horizontal.visible')}
                   checked={horizontalScrollbar}
                   onChange={setHorizontalScrollbar}
                 />
-                <ToggleField label='vertical.visible' checked={verticalScrollbar} onChange={setVerticalScrollbar} />
-                <ToggleField label='enableLoadMore' checked={loadMoreEnabled} onChange={setLoadMoreEnabled} />
+                <ToggleField label={t('세로 스크롤 (vertical.visible)', 'vertical.visible')} checked={verticalScrollbar} onChange={setVerticalScrollbar} />
+                <ToggleField label={t('더 보기 사용 (enableLoadMore)', 'enableLoadMore')} checked={loadMoreEnabled} onChange={setLoadMoreEnabled} />
               </div>
             ),
           },
           {
             key: 'interaction',
-            label: 'Selection, editing & row behavior',
+            label: t('선택, 편집 및 행 동작', 'Selection, editing & row behavior'),
             children: (
               <div className='playground-field-grid'>
-                <Form.Item className='playground-field-wide' label='rowChecked'>
+                <Form.Item className='playground-field-wide' label={t('행 체크 (rowChecked)', 'rowChecked')}>
                   <Select
                     value={rowCheckedMode}
                     onChange={setRowCheckedMode}
@@ -571,9 +571,9 @@ export function ProductGrid() {
                     ]}
                   />
                 </Form.Item>
-                <ToggleField label='showLineNumber' checked={showLineNumber} onChange={setShowLineNumber} />
-                <ToggleField label='editable' checked={editable} onChange={setEditable} />
-                <Form.Item className='playground-field-wide' label='editTrigger'>
+                <ToggleField label={t('행 번호 표시 (showLineNumber)', 'showLineNumber')} checked={showLineNumber} onChange={setShowLineNumber} />
+                <ToggleField label={t('편집 가능 (editable)', 'editable')} checked={editable} onChange={setEditable} />
+                <Form.Item className='playground-field-wide' label={t('편집 트리거 (editTrigger)', 'editTrigger')}>
                   <Select
                     value={editTrigger}
                     onChange={setEditTrigger}
@@ -583,17 +583,17 @@ export function ProductGrid() {
                     ]}
                   />
                 </Form.Item>
-                <ToggleField label='getRowClassName' checked={rowClassNameEnabled} onChange={setRowClassNameEnabled} />
-                <ToggleField label='cellMergeOptions' checked={cellMergeEnabled} onChange={setCellMergeEnabled} />
-                <ToggleField label='columnSortable' checked={columnSortable} onChange={setColumnSortable} />
-                <ToggleField label='sort.multiSort' checked={multiSort} onChange={setMultiSort} />
-                <ToggleField label='reorder' checked={reorderEnabled} onChange={setReorderEnabled} />
+                <ToggleField label={t('행 클래스 함수 (getRowClassName)', 'getRowClassName')} checked={rowClassNameEnabled} onChange={setRowClassNameEnabled} />
+                <ToggleField label={t('셀 병합 (cellMergeOptions)', 'cellMergeOptions')} checked={cellMergeEnabled} onChange={setCellMergeEnabled} />
+                <ToggleField label={t('열 정렬 (columnSortable)', 'columnSortable')} checked={columnSortable} onChange={setColumnSortable} />
+                <ToggleField label={t('다중 정렬 (sort.multiSort)', 'sort.multiSort')} checked={multiSort} onChange={setMultiSort} />
+                <ToggleField label={t('행 순서 변경 (reorder)', 'reorder')} checked={reorderEnabled} onChange={setReorderEnabled} />
                 <ToggleField
-                  label='reorderingInfo'
+                  label={t('순서 변경 정보 (reorderingInfo)', 'reorderingInfo')}
                   checked={reorderingInfoEnabled}
                   onChange={setReorderingInfoEnabled}
                 />
-                <Form.Item className='playground-field-wide' label='summary'>
+                <Form.Item className='playground-field-wide' label={t('요약 행 (summary)', 'summary')}>
                   <Select
                     value={summaryPosition}
                     onChange={setSummaryPosition}
@@ -609,38 +609,38 @@ export function ProductGrid() {
           },
           {
             key: 'navigation',
-            label: 'Cell navigation & clipboard',
+            label: t('셀 탐색 및 클립보드', 'Cell navigation & clipboard'),
             children: (
               <div className='playground-field-grid'>
                 <ToggleField
-                  label='selection.enabled'
+                  label={t('선택 활성화 (selection.enabled)', 'selection.enabled')}
                   checked={cellSelectionEnabled}
                   onChange={setCellSelectionEnabled}
                 />
-                <ToggleField label='clearOnEscape' checked={clearOnEscape} onChange={setClearOnEscape} />
+                <ToggleField label={t('ESC로 지우기 (clearOnEscape)', 'clearOnEscape')} checked={clearOnEscape} onChange={setClearOnEscape} />
                 <ToggleField
-                  label='clearOnOutsideClick'
+                  label={t('외부 클릭으로 지우기 (clearOnOutsideClick)', 'clearOnOutsideClick')}
                   checked={clearOnOutsideClick}
                   onChange={setClearOnOutsideClick}
                 />
-                <ToggleField label='createRowOnPaste' checked={createRowOnPaste} onChange={setCreateRowOnPaste} />
+                <ToggleField label={t('붙여넣기 시 행 생성 (createRowOnPaste)', 'createRowOnPaste')} checked={createRowOnPaste} onChange={setCreateRowOnPaste} />
                 <NumberField
-                  label='maxClipboardCells'
+                  label={t('최대 클립보드 셀 (maxClipboardCells)', 'maxClipboardCells')}
                   value={maxClipboardCells}
                   min={1}
                   onChange={setMaxClipboardCells}
                 />
                 <NumberField
-                  label='maxClipboardTextLength'
+                  label={t('최대 클립보드 텍스트 (maxClipboardTextLength)', 'maxClipboardTextLength')}
                   value={maxClipboardTextLength}
                   min={1}
                   onChange={setMaxClipboardTextLength}
                 />
-                <ToggleField label='navigation.enabled' checked={navigationEnabled} onChange={setNavigationEnabled} />
-                <ToggleField label='navigation.wrap' checked={navigationWrap} onChange={setNavigationWrap} />
-                <ToggleField label='editOnEnter' checked={editOnEnter} onChange={setEditOnEnter} />
+                <ToggleField label={t('탐색 활성화 (navigation.enabled)', 'navigation.enabled')} checked={navigationEnabled} onChange={setNavigationEnabled} />
+                <ToggleField label={t('탐색 래핑 (navigation.wrap)', 'navigation.wrap')} checked={navigationWrap} onChange={setNavigationWrap} />
+                <ToggleField label={t('엔터로 편집 (editOnEnter)', 'editOnEnter')} checked={editOnEnter} onChange={setEditOnEnter} />
                 <NumberField
-                  label='activeCell.rowIndex'
+                  label={t('활성 셀 행 (activeCell.rowIndex)', 'activeCell.rowIndex')}
                   value={activeCell?.rowIndex ?? 0}
                   min={0}
                   onChange={rowIndex =>
@@ -648,7 +648,7 @@ export function ProductGrid() {
                   }
                 />
                 <NumberField
-                  label='activeCell.columnIndex'
+                  label={t('활성 셀 열 (activeCell.columnIndex)', 'activeCell.columnIndex')}
                   value={activeCell?.columnIndex ?? 0}
                   min={0}
                   max={6}
@@ -667,7 +667,7 @@ export function ProductGrid() {
   const preview = (
     <div className='playground-preview-grid'>
       <div className='props-preview-note'>
-        <strong>Product inventory</strong>
+        <strong>{t('상품 재고 (Product inventory)', 'Product inventory')}</strong>
         <span>
           {width} × {height}px
         </span>

@@ -1487,7 +1487,9 @@ function Table<T>(props: Props<T>) {
         clipboardRow.forEach((clipboardValue, columnOffset) => {
           const columnIndex = startColumnIndex + columnOffset;
           const column = columns[columnIndex];
-          if (!column || column.editable === false) return;
+          // Pasting mutates row data without opening an editor, so only columns
+          // explicitly opted into editing may receive clipboard values.
+          if (!column || column.editable !== true) return;
 
           const logicalCell = resolveLogicalCell(logicalResolutionData, props.cellMergeOptions, {
             rowIndex,

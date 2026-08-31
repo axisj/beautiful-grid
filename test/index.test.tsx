@@ -1088,6 +1088,7 @@ describe('BGrid cell selection', () => {
   });
 
   it('pastes tabular clipboard text from the active cell and reports every changed cell', async () => {
+    const editableColumns = columns.map(column => ({ ...column, editable: true }));
     const pasteData = [
       { values: { id: 1, name: 'one', status: 'ready' } },
       { values: { id: 2, name: 'two', status: 'done' } },
@@ -1097,7 +1098,7 @@ describe('BGrid cell selection', () => {
       <BGrid<Row>
         width={400}
         height={140}
-        columns={columns}
+        columns={editableColumns}
         data={pasteData}
         editable
         onChangeData={onChangeData}
@@ -1126,11 +1127,12 @@ describe('BGrid cell selection', () => {
   it('clipboard payload types ignore image-only data while explicit plain text still pastes', async () => {
     const pasteData = [{ values: { id: 1, name: 'one', status: 'ready' } }];
     const onPasteError = vi.fn();
+    const editableColumns = columns.map(column => ({ ...column, editable: true }));
     const { container } = render(
       <BGrid<Row>
         width={400}
         height={140}
-        columns={columns}
+        columns={editableColumns}
         data={pasteData}
         editable
         cellSelectionOptions={{ onPasteError }}
@@ -1168,6 +1170,7 @@ describe('BGrid cell selection', () => {
         key: 'name',
         label: 'Name',
         width: 100,
+        editable: true,
         editor: { type: 'text', parseValue: text => text.toUpperCase() },
       },
     ];
@@ -1211,15 +1214,54 @@ describe('BGrid cell selection', () => {
     expect(getCell(container, 2, 1)).toHaveClass('bgrid-cell-edited');
   });
 
+  it('only pastes into columns explicitly marked editable', async () => {
+    const pasteColumns: BGridColumn<Row>[] = [
+      { key: 'id', label: 'ID', width: 100, editable: false },
+      { key: 'name', label: 'Name', width: 100 },
+      { key: 'status', label: 'Status', width: 100, editable: true },
+    ];
+    const pasteData = [{ values: { id: 1, name: 'one', status: 'ready' } }];
+    const onChangeData = vi.fn();
+    const { container } = render(
+      <BGrid<Row>
+        width={400}
+        height={140}
+        columns={pasteColumns}
+        data={pasteData}
+        editable
+        onChangeData={onChangeData}
+      />,
+    );
+
+    dragSelect(getCell(container, 0, 0), getCell(container, 0, 0));
+    fireEvent.paste(document, {
+      clipboardData: { getData: vi.fn().mockReturnValue('99\tblocked\topen') },
+    });
+
+    await waitFor(() => expect(getCell(container, 0, 2)).toHaveTextContent('open'));
+    expect(pasteData[0].values).toEqual({ id: 1, name: 'one', status: 'open' });
+    expect(getCell(container, 0, 0)).not.toHaveClass('bgrid-cell-edited');
+    expect(getCell(container, 0, 1)).not.toHaveClass('bgrid-cell-edited');
+    expect(getCell(container, 0, 2)).toHaveClass('bgrid-cell-edited');
+    expect(onChangeData).toHaveBeenCalledTimes(1);
+    expect(onChangeData).toHaveBeenCalledWith(
+      0,
+      2,
+      pasteData[0].values,
+      expect.objectContaining({ key: 'status' }),
+    );
+  });
+
   it('creates missing trailing rows while pasting when createRowOnPaste is provided', async () => {
     const appendColumns: BGridColumn<Row>[] = [
       {
         key: 'id',
         label: 'ID',
         width: 100,
+        editable: true,
         editor: { type: 'text', parseValue: text => Number(text) },
       },
-      { key: 'name', label: 'Name', width: 100 },
+      { key: 'name', label: 'Name', width: 100, editable: true },
     ];
     const appendData = [{ values: { id: 1, name: 'one', status: 'ready' } }];
     const createRowOnPaste = vi.fn(() => ({

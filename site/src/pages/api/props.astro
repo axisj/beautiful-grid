@@ -4,7 +4,7 @@ import { apiMemberId, apiReferenceEntries, apiReferenceGroups, apiTypeId } from 
 import { productFacts } from '../../data/productFacts';
 import { localizePath, normalizeLocale, type Locale } from '../../i18n';
 
-const sourceBase = `${productFacts.repositoryUrl}/blob/master/beautiful-grid/types.ts`;
+const sourceBase = `${productFacts.repositoryUrl}/blob/main/beautiful-grid/types.ts`;
 interface Props { locale?: Locale; }
 const locale = normalizeLocale(Astro.props.locale);
 const isEn = locale === 'en';

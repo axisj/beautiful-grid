@@ -4,6 +4,7 @@ import { getCollection } from 'astro:content';
 import HomeHeroGrid from '../components/home/HomeHeroGrid';
 import { productFacts } from '../data/productFacts';
 import { bundleMetrics } from '../data/bundleMetrics';
+import { aiContextMetrics } from '../data/aiContextMetrics';
 import packageJson from '../../../package.json';
 import { localizePath, normalizeLocale, type Locale } from '../i18n';
 
@@ -85,6 +86,8 @@ const englishCopy: Record<string, string> = {
 };
 
 const t = (ko: string, en?: string) => locale === 'en' ? (en ?? englishCopy[ko] ?? ko) : ko;
+const formatCompactTokens = (tokens: number) => `${(tokens / 1000).toLocaleString(locale === 'en' ? 'en-US' : 'ko-KR', { maximumFractionDigits: 1 })}K`;
+const aiContextMethodUrl = 'https://github.com/axisj/beautiful-grid/blob/main/scripts/measure-ai-context.mjs';
 const localize = <T,>(value: T): T => {
   if (typeof value === 'string') return t(value) as T;
   if (Array.isArray(value)) return value.map(localize) as T;
@@ -614,6 +617,22 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
                 <div><strong>{t('공개 문서', 'Public context')}</strong><p>{t('API와 사용법을 같은 용어로 연결합니다.', 'Connect the API and usage through shared terminology.')}</p></div>
               </li>
             </ol>
+            <div class="ai-token-proof" aria-label={t('문서 컨텍스트 토큰 절감 측정', 'Documentation context token reduction measurement')}>
+              <header>
+                <span>MEASURED / {aiContextMetrics.measurement.tokenizer.toUpperCase()}</span>
+                <a href={aiContextMethodUrl} target="_blank" rel="noopener noreferrer">{t('측정 방법', 'Method')} ↗</a>
+              </header>
+              <div class="ai-token-value">
+                <strong>{aiContextMetrics.tokenSavingsPercent}<small>%</small></strong>
+                <p>{t('문서 컨텍스트 토큰 절감', 'fewer documentation context tokens')}</p>
+              </div>
+              <div class="ai-token-comparison" aria-label={t('HTML과 Markdown 토큰 비교', 'HTML and Markdown token comparison')}>
+                <span><em>HTML</em><strong>{formatCompactTokens(aiContextMetrics.htmlTokens)}</strong></span>
+                <i aria-hidden="true">→</i>
+                <span><em>Markdown</em><strong>{formatCompactTokens(aiContextMetrics.markdownTokens)}</strong></span>
+              </div>
+              <small>{t(`대표 영문 가이드 ${aiContextMetrics.benchmarkGuideCount}개 원문 응답 기준 · 에이전트 추론·출력 토큰 제외`, `${aiContextMetrics.benchmarkGuideCount} representative English guides, raw responses · excludes agent reasoning and output tokens`)}</small>
+            </div>
             <div class="ai-context-files" aria-label={t('AI가 참조할 수 있는 프로젝트 파일', 'Project files available as AI context')}>
               <code>types.ts</code><code>examples/</code><code>llms.txt</code>
             </div>
@@ -2569,6 +2588,54 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     padding-top: 22px;
   }
 
+  .ai-token-proof {
+    display: grid;
+    gap: 14px;
+    margin: 2px 0 22px;
+    border: 1px solid rgba(103, 232, 249, 0.17);
+    border-radius: 16px;
+    padding: 17px;
+    background:
+      linear-gradient(135deg, rgba(14, 116, 144, 0.14), rgba(37, 99, 235, 0.08)),
+      rgba(4, 13, 26, 0.54);
+  }
+
+  .ai-token-proof header,
+  .ai-token-value,
+  .ai-token-comparison,
+  .ai-token-comparison span {
+    display: flex;
+    align-items: center;
+  }
+
+  .ai-token-proof header { justify-content: space-between; gap: 12px; }
+  .ai-token-proof header span {
+    color: #6f8ba8;
+    font-family: var(--site-font-mono);
+    font-size: 13px;
+    font-weight: 760;
+    letter-spacing: 0.08em;
+  }
+  .ai-token-proof header a { color: #8bd7ed; font-size: 13px; font-weight: 760; text-decoration: none; white-space: nowrap; }
+  .ai-token-proof header a:hover { color: #ffffff; }
+  .ai-token-value { align-items: flex-end; gap: 12px; }
+  .ai-token-value strong {
+    color: #a7f3d0;
+    font-family: var(--site-font-mono);
+    font-size: 44px;
+    font-weight: 860;
+    letter-spacing: -0.055em;
+    line-height: 0.92;
+  }
+  .ai-token-value strong small { margin-left: 2px; color: #69d5b1; font-size: 20px; letter-spacing: -0.02em; }
+  .ai-token-value p { margin: 0 0 2px; color: #c5d7e9; font-size: 13px; font-weight: 720; line-height: 1.35; word-break: keep-all; }
+  .ai-token-comparison { gap: 9px; }
+  .ai-token-comparison span { flex: 1; justify-content: space-between; gap: 8px; border-top: 1px solid rgba(148, 163, 184, 0.13); padding-top: 10px; }
+  .ai-token-comparison em { color: #70849c; font-family: var(--site-font-mono); font-size: 13px; font-style: normal; }
+  .ai-token-comparison strong { color: #b6c8da; font-family: var(--site-font-mono); font-size: 13px; }
+  .ai-token-comparison i { color: #4e7194; font-size: 13px; font-style: normal; }
+  .ai-token-proof > small { color: #687e96; font-size: 13px; line-height: 1.55; word-break: keep-all; }
+
   .ai-context-files code {
     border: 1px solid rgba(125, 211, 252, 0.16);
     border-radius: 999px;
@@ -3152,6 +3219,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     .ai-context-list li { grid-template-columns: 1fr; gap: 10px; padding: 0; }
     .ai-context-list li:not(:last-child)::after { display: none; }
     .ai-context-files { margin-top: 28px; }
+    .ai-token-proof { margin-top: 28px; }
     .ai-footer-note { align-items: flex-start; flex-direction: column; gap: 18px; }
     .ai-footer-note nav { justify-content: flex-start; }
     .decision-card { grid-template-columns: 1fr; gap: var(--home-space-8); }
@@ -3228,6 +3296,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     .ai-context-list li { grid-template-columns: 34px minmax(0, 1fr); gap: 14px; padding-bottom: 24px; }
     .ai-context-list li:not(:last-child)::after { display: block; }
     .ai-context-files { margin-top: 0; }
+    .ai-token-proof { margin-top: 2px; }
     .ai-brief-window { margin: 8px; border-radius: 15px; }
     .ai-window-bar { padding-inline: 12px; }
     .ai-window-bar > span { display: none; }

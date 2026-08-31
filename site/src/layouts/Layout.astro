@@ -33,6 +33,13 @@ const inferredAlternates = localeAlternates(canonicalPath);
 const koUrl = new URL(alternatePaths?.ko || inferredAlternates.ko, siteUrl);
 const enUrl = new URL(alternatePaths?.en || inferredAlternates.en, siteUrl);
 const ogImageUrl = ogImage ? new URL(ogImage, siteUrl) : null;
+const normalizedCanonicalPath = canonicalPath.replace(/\/$/, '');
+const markdownPath = /^\/(?:en\/)?learn\/[^/]+$/.test(normalizedCanonicalPath) ||
+    /^\/(?:en\/)?api\/props$/.test(normalizedCanonicalPath)
+  ? `${normalizedCanonicalPath}.md`
+  : null;
+const markdownUrl = markdownPath ? new URL(markdownPath, siteUrl) : null;
+const llmsUrl = new URL('/llms.txt', siteUrl);
 ---
 <!doctype html>
 <html lang={localeMeta[locale].htmlLang}>
@@ -65,6 +72,8 @@ const ogImageUrl = ogImage ? new URL(ogImage, siteUrl) : null;
     <link rel="alternate" hreflang="ko" href={koUrl} />
     <link rel="alternate" hreflang="en" href={enUrl} />
     <link rel="alternate" hreflang="x-default" href={koUrl} />
+    <link rel="describedby" href={llmsUrl} type="text/plain" />
+    {markdownUrl && <link rel="alternate" href={markdownUrl} type="text/markdown" />}
 
     <!-- Open Graph -->
     <meta property="og:title" content={title} />

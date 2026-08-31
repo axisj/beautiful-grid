@@ -11,7 +11,7 @@ describe('self-hosted site deployment contracts', () => {
       'site/astro.config.mjs',
       'site/public/robots.txt',
       'site/src/data/productFacts.ts',
-      'site/src/pages/llms.txt.ts',
+      'site/src/data/aiContext.ts',
       'site/src/layouts/DemoOnlyLayout.astro',
       'site/src/layouts/Layout.astro',
       'site/src/layouts/LegacyRedirectLayout.astro',

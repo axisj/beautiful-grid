@@ -88,8 +88,11 @@
     "site:build": "npm --prefix site run build",
     "site:test": "npm --prefix site run test",
     "site:test:font-size": "node scripts/check-site-font-sizes.mjs",
+    "measure:ai-context": "npm run site:build && node scripts/measure-ai-context.mjs",
+    "update:ai-context-metrics": "npm run site:build && node scripts/measure-ai-context.mjs --write",
+    "test:ai-context-metrics": "npm run site:build && node scripts/measure-ai-context.mjs --check",
     "verify:library": "npm run lint && npm test && npm run test:library:css && npm run test:library:consumers && npm run test:library:bundle && echo 'BeautifulGrid library verification passed'",
-    "verify:site": "npm run site:test:font-size && npm run site:test && npm run site:check && npm run site:build && echo 'BeautifulGrid website verification passed'"
+    "verify:site": "npm run site:test:font-size && npm run site:test && npm run site:check && npm run site:build && node scripts/measure-ai-context.mjs --check && echo 'BeautifulGrid website verification passed'"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -130,6 +133,7 @@
     "eslint": "^10.9.1",
     "eslint-plugin-react-hooks": "^7.1.1",
     "happy-dom": "^20.9.0",
+    "js-tiktoken": "^1.0.21",
     "lucide-react": "^1.34.0",
     "ncp": "^2.0.0",
     "postcss": "^8.5.26",

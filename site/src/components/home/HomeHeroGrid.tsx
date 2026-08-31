@@ -483,7 +483,7 @@ export default function HomeHeroGrid({ locale = 'ko' }: { locale?: Locale }) {
     if (!element) return;
 
     const updateSize = () => {
-      const width = Math.max(Math.floor(element.clientWidth), 280) - 4;
+      const width = Math.max(Math.floor(element.clientWidth), 280);
       setSize({
         width,
         height: width < 520 ? 280 : width < 720 ? 340 : width < 1000 ? 420 : 520,

@@ -473,6 +473,8 @@ describe('site product and navigation contracts', () => {
       "className: column.editable === false ? 'hero-grid-cell-readonly' : 'hero-grid-cell-editable'",
     );
     expect(heroGrid).toContain("variant='vertical-bordered'");
+    expect(heroGrid).toContain('const width = Math.max(Math.floor(element.clientWidth), 280);');
+    expect(heroGrid).not.toContain('Math.max(Math.floor(element.clientWidth), 280) - 4');
     expect(heroGrid).toContain("height: width < 520 ? 280 : width < 720 ? 340 : width < 1000 ? 420 : 520");
     expect(heroGrid).toContain('const mountStartedAtRef = React.useRef(performance.now())');
     expect(heroGrid).toContain("new CustomEvent('bgrid-home-grid-mounted'");

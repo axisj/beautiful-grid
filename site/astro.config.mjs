@@ -37,6 +37,9 @@ export default defineConfig({
     }),
   ],
   vite: {
+    build: {
+      chunkSizeWarningLimit: 2000,
+    },
     optimizeDeps: {
       // Demo modules live outside the site package, so Vite cannot discover
       // their runtime dependencies reliably during the initial dependency scan.

@@ -68,4 +68,13 @@ describe('self-hosted site deployment contracts', () => {
     expect(workflow).toContain('if: ${{ failure() }}');
     expect(workflow).toContain('cp -p "$backup" "$caddyfile"');
   });
+
+  it('serves generated Markdown routes with a Markdown MIME type', () => {
+    const nginxConfig = readRepositoryFile('deploy/site/nginx.conf');
+
+    expect(nginxConfig).toMatch(
+      /location ~ \\\.md\$ \{[\s\S]*?default_type text\/markdown;/,
+    );
+    expect(nginxConfig).toContain('text/markdown');
+  });
 });

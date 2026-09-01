@@ -28,12 +28,14 @@ const {
 } = Astro.props;
 
 const locale = normalizeLocale(localeProp);
+const defaultOgImage = locale === 'en' ? '/og-image-en.png' : '/og-image.png';
+const finalOgImage = ogImage || defaultOgImage;
 const siteUrl = Astro.site || new URL('https://bgrid.axisj.com');
 const canonicalUrl = new URL(canonicalPath, siteUrl);
 const inferredAlternates = localeAlternates(canonicalPath);
 const koUrl = new URL(alternatePaths?.ko || inferredAlternates.ko, siteUrl);
 const enUrl = new URL(alternatePaths?.en || inferredAlternates.en, siteUrl);
-const ogImageUrl = ogImage ? new URL(ogImage, siteUrl) : null;
+const ogImageUrl = finalOgImage ? new URL(finalOgImage, siteUrl) : null;
 const normalizedCanonicalPath = canonicalPath.replace(/\/$/, '');
 const markdownPath = /^\/(?:en\/)?learn\/[^/]+$/.test(normalizedCanonicalPath) ||
     /^\/(?:en\/)?api\/props$/.test(normalizedCanonicalPath)

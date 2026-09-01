@@ -5,7 +5,7 @@
 [![NPM version](https://img.shields.io/npm/v/beautiful-grid.svg?style=flat)](https://npmjs.org/package/beautiful-grid)
 [![NPM downloads](https://img.shields.io/npm/dm/beautiful-grid.svg?style=flat)](https://npmjs.org/package/beautiful-grid)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![Coverage](https://img.shields.io/badge/coverage-84.52%25-brightgreen.svg)](https://github.com/axisj/beautiful-grid/actions/workflows/tests.yml)
+[![Coverage](https://img.shields.io/badge/coverage-85.02%25-brightgreen.svg)](https://github.com/axisj/beautiful-grid/actions/workflows/tests.yml)
 
 BeautifulGrid is a high-performance, feature-packed, and beautifully designed open-source React Data Grid for data-heavy business applications. It combines zero-runtime-CSS styling with virtual scrolling, spreadsheet-like cell selection and clipboard operations, built-in and plugin cell editing, multi-level grouped headers, filtering & sorting toolboxes, server/client pagination, pivot table transforms, row reordering, and flexible theming.
 

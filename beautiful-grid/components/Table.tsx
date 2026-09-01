@@ -29,9 +29,12 @@ import {
   getCellValueByRowKey,
   getFrozenColumnsWidth,
   getVisibleScrollableRowRange,
+  getVirtualScrollWindowMetrics,
+  getVirtualScrollWindowPosition,
   isCheckboxValueChecked,
   markCellEdited,
   markCellValueChanged,
+  rebaseVirtualScrollWindow,
   resolveLogicalCell,
   shouldRenderBottomBar,
 } from '../utils';
@@ -415,6 +418,30 @@ function Table<T>(props: Props<T>) {
   const trHeight = itemHeight + itemPadding * 2;
   const scrollableBodyHeight = Math.max(contentBodyHeight - frozenRowsHeight, 0);
   const mainViewportWidth = Math.max(width - (frozenColumnsWidth ?? 0), 0);
+  const logicalBodyContentHeight = data.length * trHeight;
+  const virtualScrollWindowMetrics = React.useMemo(
+    () =>
+      getVirtualScrollWindowMetrics({
+        logicalContentHeight: logicalBodyContentHeight,
+        viewportHeight: contentBodyHeight,
+        enabled: scrollbar.variant !== 'native',
+      }),
+    [contentBodyHeight, logicalBodyContentHeight, scrollbar.variant],
+  );
+  const [virtualScrollBase, setVirtualScrollBase] = React.useState(0);
+  const virtualScrollBaseRef = useRef(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const searchPopoverRef = useRef<HTMLDivElement>(null);
+  const editorPortalRef = useRef<HTMLDivElement>(null);
+  const bodyContainerRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const logicalVerticalScrollState = React.useMemo(
+    () => ({
+      scrollTop,
+      scrollHeight: virtualScrollWindowMetrics.logicalContentHeight,
+    }),
+    [scrollTop, virtualScrollWindowMetrics.logicalContentHeight],
+  );
   const hasMultiCellSelection = React.useMemo(
     () =>
       cellSelectionRanges.length > 1 ||
@@ -537,6 +564,7 @@ function Table<T>(props: Props<T>) {
           width: leftQuadrant ? frozenColumnsWidth ?? 0 : mainViewportWidth,
           height: topQuadrant ? frozenRowsHeight : scrollableBodyHeight,
         }}
+        offsetTop={!topQuadrant && virtualScrollWindowMetrics.enabled ? virtualScrollBase : 0}
       />
     );
   };
@@ -564,20 +592,19 @@ function Table<T>(props: Props<T>) {
     [visibleScrollableRows.endRowIndex, visibleScrollableRows.startRowIndex],
   );
   const frozenScrollableBodyStyle = React.useMemo<React.CSSProperties>(
-    () => ({ top: visibleScrollableRows.paddingTop }),
-    [visibleScrollableRows.paddingTop],
+    () => ({
+      top: virtualScrollWindowMetrics.enabled
+        ? visibleScrollableRows.paddingTop - virtualScrollBase
+        : visibleScrollableRows.paddingTop,
+    }),
+    [virtualScrollBase, virtualScrollWindowMetrics.enabled, visibleScrollableRows.paddingTop],
   );
-  const containerRef = useRef<HTMLDivElement>(null);
-  const searchPopoverRef = useRef<HTMLDivElement>(null);
   const warnedContextMenuIdsRef = useRef(new Set<string>());
   const warnedContextMenuFactoryRef = useRef(false);
-  const editorPortalRef = useRef<HTMLDivElement>(null);
   const editorPortalContext = React.useMemo(
     () => ({ gridRef: containerRef, portalRef: editorPortalRef }),
     [],
   );
-  const bodyContainerRef = useRef<HTMLDivElement>(null);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const rowReorderController = useRowReorderController<T>({
     containerRef,
     bodyContainerRef,
@@ -696,7 +723,11 @@ function Table<T>(props: Props<T>) {
   const stickyBottomHeight = summary?.position === 'bottom' ? summaryHeight : 0;
   const stickyFixedHeight = stickyTopHeight + stickyBottomHeight;
   const scrollViewportHeight = contentBodyHeight + stickyFixedHeight;
-  const scrollPlaneHeight = stickyFixedHeight + frozenRowsHeight + visibleScrollableRows.scrollContentHeight;
+  const physicalScrollableRowsHeight = Math.max(
+    virtualScrollWindowMetrics.physicalContentHeight - frozenRowsHeight,
+    0,
+  );
+  const scrollPlaneHeight = stickyFixedHeight + virtualScrollWindowMetrics.physicalContentHeight;
   const scrollPlaneContentWidth = (frozenColumnsWidth ?? 0) + scrollableColumnsWidth;
   const scrollPlaneWidth = Math.max(width, scrollPlaneContentWidth);
   const customVerticalScrollbarGutter =
@@ -709,11 +740,26 @@ function Table<T>(props: Props<T>) {
     ? `max(100%, calc(${scrollPlaneContentWidth}px + ${customVerticalScrollbarGutter}))`
     : scrollPlaneWidth;
 
-  const scrollbarMetrics = useScrollbarMetrics(
+  const measuredScrollbarMetrics = useScrollbarMetrics(
     scrollContainerRef,
     [data.length, itemHeight, itemPadding, contentBodyHeight, width],
     scrollPlaneContentWidth,
     stickyFixedHeight,
+  );
+  const scrollbarMetrics = React.useMemo(
+    () =>
+      virtualScrollWindowMetrics.enabled
+        ? {
+            ...measuredScrollbarMetrics,
+            vertical: {
+              viewportSize: contentBodyHeight,
+              contentSize: virtualScrollWindowMetrics.logicalContentHeight,
+              maxScroll: virtualScrollWindowMetrics.logicalMaxScroll,
+              hasOverflow: virtualScrollWindowMetrics.logicalMaxScroll > 1,
+            },
+          }
+        : measuredScrollbarMetrics,
+    [contentBodyHeight, measuredScrollbarMetrics, virtualScrollWindowMetrics],
   );
   const measuredVerticalScrollbarGutter =
     customVerticalScrollbarGutter && scrollbarMetrics.horizontal.hasOverflow
@@ -738,12 +784,6 @@ function Table<T>(props: Props<T>) {
     }
   }, []);
 
-  const handleScrollTopChange = useCallback((offset: number) => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop = offset;
-    }
-  }, []);
-
   const latestScrollRef = useRef({ top: scrollTop, left: scrollLeft });
   const latestCommittedScrollRef = useRef({ top: scrollTop, left: scrollLeft });
   const scrollRafRef = useRef<number | null>(null);
@@ -760,6 +800,7 @@ function Table<T>(props: Props<T>) {
     frozenRowCount,
     frozenColumnsWidth: frozenColumnsWidth ?? 0,
     frozenRowsHeight,
+    scrollTop,
     trHeight,
   });
 
@@ -771,9 +812,10 @@ function Table<T>(props: Props<T>) {
       frozenRowCount,
       frozenColumnsWidth: frozenColumnsWidth ?? 0,
       frozenRowsHeight,
+      scrollTop,
       trHeight,
     };
-  }, [columns, data.length, props.frozenColumnIndex, frozenColumnsWidth, frozenRowCount, frozenRowsHeight, trHeight]);
+  }, [columns, data.length, props.frozenColumnIndex, frozenColumnsWidth, frozenRowCount, frozenRowsHeight, scrollTop, trHeight]);
 
   const markScrollActive = useCallback(() => {
     containerRef.current?.setAttribute('data-bgrid-scrolling', 'true');
@@ -784,6 +826,34 @@ function Table<T>(props: Props<T>) {
     }, SCROLL_IDLE_DELAY);
   }, []);
 
+  const commitScroll = useCallback(
+    (top: number, left: number) => {
+      const scrollContainer = scrollContainerRef.current;
+      if (!scrollContainer) return;
+
+      const position = getVirtualScrollWindowPosition(top, virtualScrollWindowMetrics);
+      if (virtualScrollBaseRef.current !== position.base) {
+        virtualScrollBaseRef.current = position.base;
+        setVirtualScrollBase(position.base);
+      }
+      if (scrollContainer.scrollTop !== position.physicalScrollTop) {
+        scrollContainer.scrollTop = position.physicalScrollTop;
+      }
+      if (scrollContainer.scrollLeft !== left) scrollContainer.scrollLeft = left;
+      latestScrollRef.current = { top: position.logicalScrollTop, left };
+      latestCommittedScrollRef.current = { top: position.logicalScrollTop, left };
+      setScroll(position.logicalScrollTop, left);
+    },
+    [setScroll, virtualScrollWindowMetrics],
+  );
+
+  const handleScrollTopChange = useCallback(
+    (offset: number) => {
+      commitScroll(offset, scrollContainerRef.current?.scrollLeft ?? scrollLeft);
+    },
+    [commitScroll, scrollLeft],
+  );
+
   const scheduleScrollFrame = useCallback(() => {
     if (scrollRafRef.current !== null) return;
 
@@ -792,13 +862,28 @@ function Table<T>(props: Props<T>) {
       const scrollContainer = scrollContainerRef.current;
       if (!scrollContainer) return;
 
-      const { scrollTop, scrollLeft } = scrollContainer;
-      latestScrollRef.current = { top: scrollTop, left: scrollLeft };
+      const { scrollTop: physicalScrollTop, scrollLeft } = scrollContainer;
+      const position = rebaseVirtualScrollWindow(
+        virtualScrollBaseRef.current,
+        physicalScrollTop,
+        virtualScrollWindowMetrics,
+      );
+
+      if (virtualScrollBaseRef.current !== position.base) {
+        virtualScrollBaseRef.current = position.base;
+        setVirtualScrollBase(position.base);
+      }
+      if (physicalScrollTop !== position.physicalScrollTop) {
+        scrollContainer.scrollTop = position.physicalScrollTop;
+      }
+
+      const logicalScrollTop = position.logicalScrollTop;
+      latestScrollRef.current = { top: logicalScrollTop, left: scrollLeft };
 
       const { top: committedTop, left: committedLeft } = latestCommittedScrollRef.current;
-      if (committedTop !== scrollTop || committedLeft !== scrollLeft) {
-        latestCommittedScrollRef.current = { top: scrollTop, left: scrollLeft };
-        setScroll(scrollTop, scrollLeft);
+      if (committedTop !== logicalScrollTop || committedLeft !== scrollLeft) {
+        latestCommittedScrollRef.current = { top: logicalScrollTop, left: scrollLeft };
+        setScroll(logicalScrollTop, scrollLeft);
       }
 
       if (containerRef.current?.hasAttribute('data-bgrid-scrolling')) {
@@ -807,80 +892,22 @@ function Table<T>(props: Props<T>) {
     };
 
     scrollRafRef.current = requestAnimationFrame(pollNativeScrollPosition);
-  }, [setScroll]);
+  }, [setScroll, virtualScrollWindowMetrics]);
 
   const onScroll = useCallback(() => {
     if (scrollContainerRef.current) {
-      const { scrollTop, scrollLeft } = scrollContainerRef.current;
-      latestScrollRef.current = { top: scrollTop, left: scrollLeft };
       markScrollActive();
       scheduleScrollFrame();
     }
   }, [markScrollActive, scheduleScrollFrame]);
 
-  const onWheel: (this: HTMLDivElement, ev: HTMLElementEventMap['wheel']) => any = useCallback(evt => {
+  const resetScrollPosition = useCallback((type: 'all' | 'top' | 'left') => {
     const scrollContainer = scrollContainerRef.current;
     if (!scrollContainer) return;
-
-    const delta = { x: 0, y: 0 };
-
-    if ((evt as any).detail) {
-      delta.y = (evt as any).detail * 10;
-    } else if (typeof evt.deltaY === 'undefined') {
-      delta.y = -(evt as any).wheelDelta;
-      delta.x = 0;
-    } else {
-      delta.y = evt.deltaY;
-      delta.x = evt.deltaX;
-    }
-
-    if (evt.deltaMode === 1) {
-      delta.y = delta.y * 16;
-      delta.x = delta.x * 16;
-    } else if (evt.deltaMode === 2) {
-      delta.y = delta.y * scrollContainer.clientHeight;
-      delta.x = delta.x * scrollContainer.clientWidth;
-    }
-
-    const maxScrollTop = Math.max(scrollContainer.scrollHeight - scrollContainer.clientHeight, 0);
-    const maxScrollLeft = Math.max(scrollContainer.scrollWidth - scrollContainer.clientWidth, 0);
-
-    const nextScrollTop = Math.min(maxScrollTop, Math.max(0, scrollContainer.scrollTop + delta.y));
-    const nextScrollLeft = Math.min(maxScrollLeft, Math.max(0, scrollContainer.scrollLeft + delta.x));
-
-    const didScrollTop = nextScrollTop !== scrollContainer.scrollTop;
-    const didScrollLeft = nextScrollLeft !== scrollContainer.scrollLeft;
-
-    const isVertical = Math.abs(delta.y) > Math.abs(delta.x);
-    if (isVertical) {
-      if (!didScrollTop) return;
-    } else {
-      if (!didScrollLeft) return;
-    }
-
-    evt.preventDefault();
-    if (didScrollTop) scrollContainer.scrollTop = nextScrollTop;
-    if (didScrollLeft) scrollContainer.scrollLeft = nextScrollLeft;
-  }, []);
-
-  const resetScrollPosition = useCallback((type: 'all' | 'top' | 'left') => {
-    if (type === 'all' || type === 'left') scrollContainerRef.current?.scrollTo({ left: 0 });
-    if (type === 'all' || type === 'top') scrollContainerRef.current?.scrollTo({ top: 0 });
-  }, []);
-
-  const commitScroll = useCallback(
-    (top: number, left: number) => {
-      const scrollContainer = scrollContainerRef.current;
-      if (!scrollContainer) return;
-
-      if (scrollContainer.scrollTop !== top) scrollContainer.scrollTop = top;
-      if (scrollContainer.scrollLeft !== left) scrollContainer.scrollLeft = left;
-      latestScrollRef.current = { top, left };
-      latestCommittedScrollRef.current = { top, left };
-      setScroll(top, left);
-    },
-    [setScroll],
-  );
+    const nextTop = type === 'all' || type === 'top' ? 0 : latestScrollRef.current.top;
+    const nextLeft = type === 'all' || type === 'left' ? 0 : scrollContainer.scrollLeft;
+    commitScroll(nextTop, nextLeft);
+  }, [commitScroll]);
 
   useEffect(() => {
     if (!searchOpen || activeSearchMatchIndex === undefined) return;
@@ -907,6 +934,7 @@ function Table<T>(props: Props<T>) {
       frozenRowCount,
       columns,
       rowHeight: trHeight,
+      verticalScrollState: logicalVerticalScrollState,
       viewportInsets,
     });
     if (result.didScroll) commitScroll(result.scrollTop, result.scrollLeft);
@@ -915,6 +943,7 @@ function Table<T>(props: Props<T>) {
     columns,
     commitScroll,
     frozenRowCount,
+    logicalVerticalScrollState,
     props.frozenColumnIndex,
     searchMatches,
     searchOpen,
@@ -1201,12 +1230,12 @@ function Table<T>(props: Props<T>) {
     if (!dragState || !pointer || !scrollContainer || !bodyContainer) return;
 
     const delta = getSelectionAutoScrollDelta(pointer.clientX, pointer.clientY, bodyContainer, scrollContainer);
-    const maxScrollTop = Math.max(scrollContainer.scrollHeight - scrollContainer.clientHeight, 0);
+    const maxScrollTop = virtualScrollWindowMetrics.logicalMaxScroll;
     const maxScrollLeft = Math.max(scrollContainer.scrollWidth - scrollContainer.clientWidth, 0);
-    const nextScrollTop = clamp(scrollContainer.scrollTop + delta.y, 0, maxScrollTop);
+    const nextScrollTop = clamp(latestScrollRef.current.top + delta.y, 0, maxScrollTop);
     const nextScrollLeft = clamp(scrollContainer.scrollLeft + delta.x, 0, maxScrollLeft);
 
-    if (nextScrollTop !== scrollContainer.scrollTop || nextScrollLeft !== scrollContainer.scrollLeft) {
+    if (nextScrollTop !== latestScrollRef.current.top || nextScrollLeft !== scrollContainer.scrollLeft) {
       commitScroll(nextScrollTop, nextScrollLeft);
     }
 
@@ -1215,7 +1244,7 @@ function Table<T>(props: Props<T>) {
     if (cellSelectionDragRef.current && (delta.x !== 0 || delta.y !== 0)) {
       selectionAutoScrollRafRef.current = requestAnimationFrame(runSelectionAutoScroll);
     }
-  }, [commitScroll, updateSelectionByPointer]);
+  }, [commitScroll, updateSelectionByPointer, virtualScrollWindowMetrics.logicalMaxScroll]);
 
   const selectAllCells = useCallback(() => {
     if (!cellSelectionEnabled) return false;
@@ -1951,8 +1980,6 @@ function Table<T>(props: Props<T>) {
     if (scrollContainerRefCurrent) {
       scrollContainerRefCurrent.removeEventListener('scroll', onScroll);
       scrollContainerRefCurrent.addEventListener('scroll', onScroll, { passive: true, capture: true });
-      // scrollContainerRefCurrent.removeEventListener('wheel', onWheel);
-      // scrollContainerRefCurrent.addEventListener('wheel', onWheel, { passive: false, capture: true });
     }
 
     return () => {
@@ -1967,19 +1994,17 @@ function Table<T>(props: Props<T>) {
       containerRefCurrent?.removeAttribute('data-bgrid-scrolling');
       scrollContainerRefCurrent?.removeEventListener('scroll', onScroll);
     };
-  }, [onScroll, onWheel, setInitialized]);
+  }, [onScroll, setInitialized]);
 
   React.useLayoutEffect(() => {
     if (!scrollContainerRef.current) return;
-    if (props.scrollLeft !== undefined) {
-      scrollContainerRef.current.scrollLeft = props.scrollLeft;
-    }
-    if (props.scrollTop !== undefined) {
-      scrollContainerRef.current.scrollTop = props.scrollTop;
-    }
-  }, [props.scrollLeft, props.scrollTop]);
+    const nextTop = props.scrollTop ?? latestScrollRef.current.top;
+    const nextLeft = props.scrollLeft ?? latestScrollRef.current.left;
+    commitScroll(nextTop, nextLeft);
+  }, [commitScroll, props.scrollLeft, props.scrollTop]);
 
   useEffect(() => {
+    latestScrollRef.current = { top: scrollTop, left: scrollLeft };
     latestCommittedScrollRef.current = { top: scrollTop, left: scrollLeft };
   }, [scrollTop, scrollLeft]);
 
@@ -2068,6 +2093,7 @@ function Table<T>(props: Props<T>) {
     searchOpen,
     searchOptions,
     trHeight,
+    verticalScrollState: logicalVerticalScrollState,
     viewportInsets: keyboardViewportInsets,
   });
   keyboardRuntimeRef.current = {
@@ -2100,6 +2126,7 @@ function Table<T>(props: Props<T>) {
     searchOpen,
     searchOptions,
     trHeight,
+    verticalScrollState: logicalVerticalScrollState,
     viewportInsets: keyboardViewportInsets,
   };
 
@@ -2130,6 +2157,7 @@ function Table<T>(props: Props<T>) {
         frozenRowCount,
         moveActiveCell,
         trHeight,
+        verticalScrollState,
         viewportInsets,
       } = keyboardRuntimeRef.current;
       const container = containerRef.current;
@@ -2168,6 +2196,7 @@ function Table<T>(props: Props<T>) {
         frozenRowCount,
         columns,
         rowHeight: trHeight,
+        verticalScrollState,
         viewportInsets,
       });
       if (result.didScroll) {
@@ -2232,6 +2261,7 @@ function Table<T>(props: Props<T>) {
         searchOpen,
         searchOptions,
         trHeight,
+        verticalScrollState,
         viewportInsets,
       } = keyboardRuntimeRef.current;
       const container = containerRef.current;
@@ -2372,6 +2402,7 @@ function Table<T>(props: Props<T>) {
               frozenRowCount,
               columns,
               rowHeight: trHeight,
+              verticalScrollState,
               viewportInsets,
             });
             if (result.didScroll) {
@@ -2416,6 +2447,7 @@ function Table<T>(props: Props<T>) {
               frozenRowCount,
               columns,
               rowHeight: trHeight,
+              verticalScrollState,
               viewportInsets,
             });
             if (result.didScroll) {
@@ -2447,6 +2479,7 @@ function Table<T>(props: Props<T>) {
               frozenRowCount,
               columns,
               rowHeight: trHeight,
+              verticalScrollState,
               viewportInsets,
             });
             if (result.didScroll) {
@@ -2592,7 +2625,14 @@ function Table<T>(props: Props<T>) {
           }
         }}
       >
-        <ScrollPlane style={{ height: scrollPlaneHeight, minWidth: scrollPlaneMinWidth }}>
+        <ScrollPlane
+          style={{ height: scrollPlaneHeight, minWidth: scrollPlaneMinWidth }}
+          data-bgrid-virtual-scroll-window={virtualScrollWindowMetrics.enabled ? 'true' : undefined}
+          data-bgrid-logical-height={virtualScrollWindowMetrics.logicalContentHeight}
+          data-bgrid-physical-height={virtualScrollWindowMetrics.physicalContentHeight}
+          data-bgrid-logical-scroll-top={Math.round(scrollTop)}
+          data-bgrid-virtual-scroll-base={virtualScrollWindowMetrics.enabled ? Math.round(virtualScrollBase) : undefined}
+        >
           <HeaderContainer style={{ height: headerHeight, top: 0 }} role={'rfdg-header-container'}>
             {(frozenColumnsWidth ?? 0) > 0 && (
               <FrozenHeader
@@ -2632,7 +2672,7 @@ function Table<T>(props: Props<T>) {
 
           <div
             className='bgrid-body-scroll-content'
-            style={{ height: frozenRowsHeight + visibleScrollableRows.scrollContentHeight }}
+            style={{ height: virtualScrollWindowMetrics.physicalContentHeight }}
           >
             {frozenRowCount > 0 && (
               <div
@@ -2675,14 +2715,14 @@ function Table<T>(props: Props<T>) {
 
             <div
               className='bgrid-scrollable-rows-layer'
-              style={{ height: visibleScrollableRows.scrollContentHeight }}
+              style={{ height: physicalScrollableRowsHeight }}
               data-bgrid-row-band='scrollable'
             >
               {(frozenColumnsWidth ?? 0) > 0 && (
                 <FrozenScrollContent
                   style={{
                     width: frozenColumnsWidth,
-                    height: visibleScrollableRows.scrollContentHeight,
+                    height: physicalScrollableRowsHeight,
                   }}
                   role={'rfdg-frozen-scroll-container'}
                 >
@@ -2700,8 +2740,10 @@ function Table<T>(props: Props<T>) {
               <ScrollContent
                 style={{
                   left: frozenColumnsWidth,
-                  paddingTop: visibleScrollableRows.paddingTop,
-                  height: visibleScrollableRows.scrollContentHeight,
+                  paddingTop: virtualScrollWindowMetrics.enabled
+                    ? visibleScrollableRows.paddingTop - virtualScrollBase
+                    : visibleScrollableRows.paddingTop,
+                  height: physicalScrollableRowsHeight,
                 }}
               >
                 <TableBody
@@ -2923,6 +2965,7 @@ function getCellPositionFromPointer({
     frozenColumnsWidth: number;
     frozenRowCount: number;
     frozenRowsHeight: number;
+    scrollTop: number;
     trHeight: number;
   };
 }): CellPosition | undefined {
@@ -2937,7 +2980,7 @@ function getCellPositionFromPointer({
       : clamp(
           metrics.frozenRowCount +
             Math.floor(
-              (scrollContainer.scrollTop +
+              (metrics.scrollTop +
                 clamp(clientY - scrollRect.top, 0, Math.max(scrollContainer.clientHeight - 1, 0))) /
                 metrics.trHeight,
             ),

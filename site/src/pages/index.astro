@@ -15,10 +15,10 @@ const canonicalPath = localizePath('/', locale);
 
 const englishCopy: Record<string, string> = {
   '대용량 탐색': 'Large-scale exploration',
-  '55만 행도 필요한 만큼만 그려 빠르게 살펴봅니다.': 'Explore 550,000 rows while rendering only what the screen needs.',
+  '100만행도 필요한 만큼만 그려 빠르게 살펴봅니다.': 'Explore 1M rows while rendering only what the screen needs.',
   '가상 스크롤로 현재 보이는 행만 그리고, 고정 열로 기준 정보를 붙잡습니다. 화면 크기가 달라져도 넓고 긴 데이터를 끊김 없이 살펴볼 수 있습니다.': 'Virtual scrolling renders only visible rows while frozen columns keep reference data in view. Explore wide, long datasets smoothly across screen sizes.',
   '현재 화면에 필요한 셀만 렌더링': 'Render only the cells the viewport needs',
-  '55만 행 예제': '550K-row example',
+  '100만행 예제': '1M-row example',
   '고정 열': 'Frozen columns',
   '리사이즈': 'Resize',
   '셀 편집': 'Cell editing',
@@ -40,8 +40,8 @@ const englishCopy: Record<string, string> = {
   '열 그룹과 셀 병합으로 구조를 드러내고, 요약 행과 피벗으로 필요한 수치를 모읍니다. 행·열 배치와 색상도 업무 기준에 맞게 조정할 수 있습니다.': 'Reveal structure with column groups and merged cells, then collect key figures with summary rows and pivots. Adjust layout and color to your workflow.',
   '업무 기준에 맞춘 묶음·집계·표현': 'Grouping, aggregation, and presentation for real work',
   '셀 병합': 'Cell merge',
-  '55만 행 업무 데이터': '550K-row business dataset',
-  '기본 행 높이를 유지한 채 첫 행부터 550,000번째 행까지 가상 스크롤로 탐색합니다.': 'Virtual-scroll from the first row to row 550,000 at the default row height.',
+  '100만행 업무 데이터': '1M-row business dataset',
+  '기본 행 높이를 유지한 채 첫 행부터 100만행까지 가상 스크롤로 탐색합니다.': 'Virtual-scroll from the first row through 1M rows at the default row height.',
   '텍스트, Select, Date 입력과 저장·취소·이동 규칙을 셀 안에서 실행합니다.': 'Run text, Select, and Date editing with save, cancel, and move rules inside each cell.',
   'UI 연동': 'UI integration',
   'Ant Design 편집 플러그인': 'Ant Design editor plugins',
@@ -105,14 +105,14 @@ const strengthStories = [
   {
     number: '01',
     kicker: '대용량 탐색',
-    title: '55만 행도 필요한 만큼만 그려 빠르게 살펴봅니다.',
+    title: '100만행도 필요한 만큼만 그려 빠르게 살펴봅니다.',
     description:
       '가상 스크롤로 현재 보이는 행만 그리고, 고정 열로 기준 정보를 붙잡습니다. 화면 크기가 달라져도 넓고 긴 데이터를 끊김 없이 살펴볼 수 있습니다.',
     outcome: '현재 화면에 필요한 셀만 렌더링',
     tone: 'blue',
     visual: 'scale',
     links: [
-      { label: '55만 행 예제', href: '/learn/virtual-scroll' },
+      { label: '100만행 예제', href: '/learn/virtual-scroll' },
       { label: '고정 열', href: '/learn/frozen-columns' },
       { label: '리사이즈', href: '/learn/container-resize' },
     ],
@@ -169,8 +169,8 @@ const featuredExamples = [
   {
     index: '01',
     tag: '대용량 탐색',
-    title: '55만 행 업무 데이터',
-    description: '기본 행 높이를 유지한 채 첫 행부터 550,000번째 행까지 가상 스크롤로 탐색합니다.',
+    title: '100만행 업무 데이터',
+    description: '기본 행 높이를 유지한 채 첫 행부터 100만행까지 가상 스크롤로 탐색합니다.',
     href: '/learn/virtual-scroll',
   },
   {
@@ -317,13 +317,15 @@ const localizedWhyBGridItems = localize(whyBGridItems);
       <div class="container capability-rail" aria-label={t('BeautifulGrid의 검증 가능한 규모와 지원 환경', 'Verified BeautifulGrid scale and support baseline')}>
         <article class="capability-item capability-item-primary">
           <div class="capability-card-head"><p>{t('대용량 데이터', 'Large datasets')}</p><span>01</span></div>
-          <strong>550,000</strong>
-          <h2>{t('실행 예제로 검증한 행 수', 'Rows verified in a runnable example')}</h2>
+          <strong>{t('100만행', '1M rows')}</strong>
+          <h2>{t('대용량 가상 스크롤', 'Large-scale virtual scrolling')}</h2>
           <div class="capability-facts" aria-label={t('대용량 예제 검증 조건', 'Large dataset verification details')}>
+            <span><em>{t('지원 버전', 'Available since')}</em><strong>v1.0.3+</strong></span>
             <span><em>{t('기본 행 높이', 'Row height')}</em><strong>29px</strong></span>
-            <span><em>{t('확인 범위', 'Verified range')}</em><strong>1 → 550K</strong></span>
+            <span><em>{t('실행 예제', 'Runnable example')}</em><strong>{t('첫 행 → 100만행', '1 → 1M')}</strong></span>
+            <span><em>{t('지원가능 범위', 'Recommended range')}</em><strong>{t('천만행 이하 권장', 'Up to 10M rows')}</strong></span>
           </div>
-          <span>{t('가상 스크롤로 첫 행부터 마지막 행까지 확인했습니다.', 'Verified from the first row to the last with virtual scrolling.')}</span>
+          <span>{t('실행 예제는 100만행의 첫 행부터 마지막 행까지 확인했으며, 논리 스크롤 좌표는 천만행까지 검증했습니다. 실제 적재 가능 행 수는 데이터 크기와 브라우저 메모리에 따라 달라집니다.', 'The runnable example is verified from the first through the last of 1M rows, while logical-scroll coordinates are verified for 10M rows. Practical in-memory capacity depends on row payload size and available browser memory.')}</span>
         </article>
         <article class="capability-item capability-item-bundle">
           <div class="capability-card-head"><p>{t('번들사이즈', 'Bundle size')}</p><span>02</span></div>
@@ -423,7 +425,7 @@ const localizedWhyBGridItems = localize(whyBGridItems);
                   <>
                     <div class="mini-grid mini-grid-scale"><i></i><i></i><i></i><i></i><i></i><i></i></div>
                     <div class="scale-window"><span>{t('현재 화면', 'Viewport')}</span></div>
-                    <div class="scale-caption"><strong>{t('55만', '550K')}</strong><span>{t('행', 'rows')}</span></div>
+                    <div class="scale-caption"><strong>{t('100만행', '1M rows')}</strong></div>
                   </>
                 )}
                 {story.visual === 'editing' && (
@@ -460,10 +462,10 @@ const localizedWhyBGridItems = localize(whyBGridItems);
           <p class="eyebrow eyebrow-dark">{t('가상 스크롤 최적화', 'Virtual Scroll Optimization')}</p>
           <h2>{t('화면에 필요한 셀만 렌더링', 'Render Only Visible Cells')}</h2>
           <p>
-            {t('55만 행 × 24열이면 셀은 모두 1,320만 개입니다. BeautifulGrid는 이를 한꺼번에 그리지 않고, 지금 보이는 약 20행 × 12열만 화면에 표시합니다.', 'A 550,000 × 24 dataset contains 13.2 million cells. BeautifulGrid does not render them at once; it displays roughly the 20 × 12 cells currently visible.')}
+            {t('100만행 × 24열이면 셀은 모두 2,400만 개입니다. BeautifulGrid는 이를 한꺼번에 그리지 않고, 지금 보이는 약 20행 × 12열만 화면에 표시합니다.', 'A dataset with 1M rows and 24 columns contains 24 million cells. BeautifulGrid does not render them at once; it displays roughly the 20 × 12 cells currently visible.')}
           </p>
           <div class="performance-links">
-            <a href={localizePath('/learn/virtual-scroll', locale)}>{t('55만 행 예제 열기', 'Open the 550K-row example')} <span aria-hidden="true">→</span></a>
+            <a href={localizePath('/learn/virtual-scroll', locale)}>{t('100만행 예제 열기', 'Open the 1M-row example')} <span aria-hidden="true">→</span></a>
             <a href={localizePath('/learn/pagination', locale)}>{t('페이지네이션 보기', 'View pagination')} <span aria-hidden="true">→</span></a>
           </div>
           <p class="performance-disclaimer">
@@ -471,11 +473,11 @@ const localizedWhyBGridItems = localize(whyBGridItems);
           </p>
         </div>
 
-        <div class="render-budget" aria-label={t('전체 1,320만 셀의 데이터 공간 안에서 현재 보이는 약 240셀만 렌더링하는 구조', 'A structure rendering about 240 visible cells from a 13.2-million-cell data space')}>
+        <div class="render-budget" aria-label={t('전체 2,400만 셀의 데이터 공간 안에서 현재 보이는 약 240셀만 렌더링하는 구조', 'A structure rendering about 240 visible cells from a 24-million-cell data space')}>
           <div class="budget-summary">
             <span>{t('전체 데이터 공간', 'Full data space')}</span>
-            <strong>13,200,000<small>{t('셀', 'cells')}</small></strong>
-            <p>550,000 {t('행', 'rows')} × 24 {t('열', 'columns')}</p>
+            <strong>{t('2,400만', '24M')}<small>{t('셀', 'cells')}</small></strong>
+            <p>{t('100만행 × 24열', '1M rows × 24 columns')}</p>
           </div>
           <div class="budget-canvas">
             <div class="budget-grid" aria-hidden="true">
@@ -1315,10 +1317,11 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   .capability-item > strong {
     margin-top: auto;
     color: #0f172a;
-    font-size: clamp(20px, 2vw, 24px);
-    font-weight: 760;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
+    font-size: clamp(34px, 3vw, 44px);
+    font-variant-numeric: tabular-nums;
+    font-weight: 850;
+    line-height: 1;
+    letter-spacing: -0.03em;
   }
 
   .capability-item-primary > strong { color: #1d5fd4; }
@@ -1326,7 +1329,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   .capability-item > strong small {
     margin-left: 3px;
     color: #3978df;
-    font-size: 16px;
+    font-size: clamp(16px, 1.4vw, 20px);
     font-weight: 850;
     letter-spacing: 0;
     vertical-align: super;
@@ -1352,7 +1355,8 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     background: rgba(248, 251, 255, 0.78);
     color: #132039;
     font-family: var(--site-font-mono);
-    font-size: clamp(25px, 2.25vw, 36px);
+    font-size: clamp(34px, 2.75vw, 44px);
+    font-variant-numeric: tabular-nums;
     font-weight: 860;
     letter-spacing: -0.065em;
     line-height: 1;

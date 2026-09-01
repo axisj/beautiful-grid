@@ -33,7 +33,7 @@ interface IOrderItem {
   marginRate: number;
 }
 
-const ROW_COUNT = 550000;
+const ROW_COUNT = 1000000;
 const DAY_MS = 24 * 60 * 60 * 1000;
 const ORDER_START_AT = Date.UTC(2026, 0, 1, 9);
 const companyNames = [

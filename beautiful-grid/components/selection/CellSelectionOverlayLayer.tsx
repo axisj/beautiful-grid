@@ -19,6 +19,7 @@ interface Props {
   activeFill: boolean;
   activeRing: boolean;
   viewport: SelectionViewport;
+  offsetTop?: number;
 }
 
 export function CellSelectionOverlayLayer({
@@ -28,6 +29,7 @@ export function CellSelectionOverlayLayer({
   activeFill,
   activeRing,
   viewport,
+  offsetTop = 0,
 }: Props) {
   const quadrantSelectionFragments = getVisibleFragments(selectionFragments, quadrant, viewport);
   const quadrantActiveFragments = getVisibleFragments(activeFragments, quadrant, viewport);
@@ -46,7 +48,7 @@ export function CellSelectionOverlayLayer({
           data-edge-right={fragment.edges.right ? 'true' : undefined}
           data-edge-bottom={fragment.edges.bottom ? 'true' : undefined}
           data-edge-left={fragment.edges.left ? 'true' : undefined}
-          style={getFragmentStyle(fragment)}
+          style={getFragmentStyle(fragment, offsetTop)}
         />
       ))}
       {(activeFill || activeRing) &&
@@ -57,7 +59,7 @@ export function CellSelectionOverlayLayer({
             data-bgrid-active-fragment='true'
             data-active-fill={activeFill ? 'true' : undefined}
             data-active-ring={activeRing ? 'true' : undefined}
-            style={getFragmentStyle(fragment)}
+            style={getFragmentStyle(fragment, offsetTop)}
           />
         ))}
     </div>
@@ -76,10 +78,10 @@ function getVisibleFragments(
   });
 }
 
-function getFragmentStyle(fragment: BGridSelectionFragment): React.CSSProperties {
+function getFragmentStyle(fragment: BGridSelectionFragment, offsetTop: number): React.CSSProperties {
   return {
     left: fragment.left,
-    top: fragment.top,
+    top: fragment.top - offsetTop,
     width: fragment.width,
     height: fragment.height,
   };

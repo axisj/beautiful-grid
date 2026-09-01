@@ -119,11 +119,20 @@ describe('site product and navigation contracts', () => {
     const homepage = readSiteFile('src/pages/index.astro');
 
     expect(homepage).toContain('BeautifulGrid의 검증 가능한 규모와 지원 환경');
-    expect(homepage).toContain('실행 예제로 검증한 행 수');
-    expect(homepage).toContain('<strong>550,000</strong>');
+    expect(homepage).toContain("t('대용량 가상 스크롤', 'Large-scale virtual scrolling')");
+    expect(homepage).toContain("<strong>{t('100만행', '1M rows')}</strong>");
+    expect(homepage).toContain("t('지원 버전', 'Available since')");
+    expect(homepage).toContain('<strong>v1.0.3+</strong>');
     expect(homepage).toContain("t('기본 행 높이', 'Row height')");
     expect(homepage).toContain('<strong>29px</strong>');
-    expect(homepage).not.toContain('왜 55만 행인가?');
+    expect(homepage).toContain("t('실행 예제', 'Runnable example')");
+    expect(homepage).toContain("t('지원가능 범위', 'Recommended range')");
+    expect(homepage).toContain("t('천만행 이하 권장', 'Up to 10M rows')");
+    expect(homepage).toContain('논리 스크롤 좌표는 천만행까지 검증했습니다');
+    expect(homepage).toContain('font-size: clamp(34px, 3vw, 44px)');
+    expect(homepage).toContain('font-size: clamp(34px, 2.75vw, 44px)');
+    expect(homepage).toContain('font-variant-numeric: tabular-nums');
+    expect(homepage).not.toContain('왜 100만 행인가?');
     expect(homepage).not.toContain('capability-limit-note');
     expect(homepage).toContain('<strong>{liveExampleCount}<small>');
     expect(homepage).toContain('기능별 실행 가이드');
@@ -522,11 +531,14 @@ describe('site product and navigation contracts', () => {
   it('explains verified feature and performance tradeoffs on the homepage', () => {
     const homepage = readSiteFile('src/pages/index.astro');
     const virtualScrollExample = readFileSync(resolve(repositoryRoot, 'examples/ScrollExample.tsx'), 'utf8');
+    const virtualScrollWindow = readFileSync(resolve(repositoryRoot, 'beautiful-grid/utils/virtualScrollWindow.ts'), 'utf8');
+    const virtualScrollGuide = readSiteFile('src/content/learn/virtual-scroll.md');
+    const englishVirtualScrollGuide = readSiteFile('src/content/learn/en/virtual-scroll.md');
 
     expect(homepage).toContain('현재 화면에 필요한 셀만 렌더링');
     expect(homepage).toContain('가상 스크롤 최적화');
-    expect(homepage).toContain('55만 행 × 24열이면 셀은 모두 1,320만 개입니다.');
-    expect(homepage).toContain("<strong>13,200,000<small>{t('셀', 'cells')}</small></strong>");
+    expect(homepage).toContain('100만행 × 24열이면 셀은 모두 2,400만 개입니다.');
+    expect(homepage).toContain("<strong>{t('2,400만', '24M')}<small>{t('셀', 'cells')}</small></strong>");
     expect(homepage).toContain("<strong>≈ 240<small>{t('셀', 'cells')}</small></strong>");
     expect(homepage).toContain('render-budget');
     expect(homepage).toContain('budget-canvas');
@@ -535,22 +547,24 @@ describe('site product and navigation contracts', () => {
     expect(homepage).toContain('budget-grid');
     expect(homepage).toContain("href={localizePath('/learn/virtual-scroll', locale)}");
     expect(homepage).toContain("href={localizePath('/learn/pagination', locale)}");
-    expect(virtualScrollExample).toContain('const ROW_COUNT = 550000');
+    expect(virtualScrollExample).toContain('const ROW_COUNT = 1000000');
     expect(virtualScrollExample).not.toContain('itemHeight={14}');
     expect(virtualScrollExample).not.toContain('itemPadding={6}');
-    expect(550000 * (15 + 7 * 2) + 30).toBe(15_950_030);
-    expect(16_777_216 - (550000 * (15 + 7 * 2) + 30)).toBe(827_186);
-    expect(550000 * (15 + 7 * 2) + 30).toBeLessThan(16_777_216);
-    expect(Math.floor((16_777_216 - 30) / 550000)).toBe(30);
-    expect(550000 * 30 + 30).toBeLessThan(16_777_216);
-    expect(550000 * 31 + 30).toBeGreaterThan(16_777_216);
+    expect(1000000 * (15 + 7 * 2)).toBe(29_000_000);
+    expect(virtualScrollWindow).toContain('BGRID_MAX_PHYSICAL_SCROLL_HEIGHT = 1_000_000');
+    expect(virtualScrollGuide).toContain('실제 DOM 스크롤 높이를 최대 1,000,000px로 제한합니다');
+    expect(virtualScrollGuide).toContain('scrollbar.variant="native"');
+    expect(virtualScrollGuide).toContain('논리 스크롤 좌표는 1,000만 행');
+    expect(englishVirtualScrollGuide).toContain('caps the actual DOM scroll height at 1,000,000 px');
+    expect(englishVirtualScrollGuide).toContain('scrollbar.variant="native"');
+    expect(englishVirtualScrollGuide).toContain('verified for 10,000,000 rows');
     expect(virtualScrollExample).toContain("label: t('주문 번호', 'Order Number')");
     expect(virtualScrollExample).toContain("label: t('거래 위험도', 'Transaction Risk Level')");
     expect(virtualScrollExample).not.toContain('React.useTransition()');
     expect(virtualScrollExample).not.toContain('dataControl={dataControl}');
     expect(virtualScrollExample).toContain('columns={virtualScrollColumns}');
     expect(virtualScrollExample).toContain('toolbox: false as const');
-    expect(homepage).toContain('첫 행부터 550,000번째 행까지 가상 스크롤로 탐색합니다');
+    expect(homepage).toContain('첫 행부터 100만행까지 가상 스크롤로 탐색합니다');
   });
 
   it('keeps the homepage positioning aligned in Korean and English', () => {

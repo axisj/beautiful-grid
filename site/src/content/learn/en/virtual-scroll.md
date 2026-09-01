@@ -9,7 +9,7 @@ demoId: "virtual-scroll"
 features: ["virtual-scrolling", "large-dataset", "performance", "dom-recycling", "itemHeight", "showLineNumber"]
 relatedGuides: ["getting-started", "basic", "scrollbar", "pagination"]
 relatedApi: ["/en/api/props#itemheight", "/en/api/props#height", "/en/api/props#data", "/en/api/props#showlinenumber"]
-lastReviewedAt: "2026-08-25"
+lastReviewedAt: "2026-09-01"
 indexable: true
 draft: false
 ---
@@ -30,18 +30,19 @@ What happens if a standard HTML `<table>` renders more than 10,000 `<tr>` elemen
 
 When a scroll event occurs, BeautifulGrid calculates the render range with the following formulas in O(1) time:
 
-The live demo above uses the default 29 px total row height: `itemHeight` of 15 px plus 7 px of `itemPadding` above and below. For 550,000 rows, the scroll height is approximately 15,950,030 px including the additional area. That is about 827,186 px below the 16,777,216 px single-scroll-area limit observed in desktop Chromium, leaving roughly 4.9% headroom instead of running at the limit. Use the row numbers on the left to confirm that the grid reaches row 550,000.
+The live demo above uses the default 29 px total row height: `itemHeight` of 15 px plus 7 px of `itemPadding` above and below. The logical height of 1,000,000 rows is 29,000,000 px, while the default `modern` scrollbar caps the actual DOM scroll height at 1,000,000 px. BeautifulGrid combines the current physical window with a logical base offset, so the row-number column can still reach row 1,000,000.
 
-For 550,000 rows, the maximum whole-number row height is **30 px**, calculated by rounding down `(16,777,216 px - 30 px of additional area) ÷ 550,000 rows`. With the default `itemPadding={7}`, the largest usable `itemHeight` prop is therefore 16 px (`16 + 7 × 2 = 30 px`). The default `itemHeight={15}` produces a 29 px total row height, leaving 1 px of configuration headroom. This limit was measured in Chromium and can vary by browser and layout.
+When the physical scroll position approaches either edge of its safe window, BeautifulGrid moves the base offset and compensates `scrollTop` in the opposite direction. Their sum—the logical `scrollTop`—does not change, so wheel and trackpad movement remain continuous. The custom scrollbar thumb uses the complete logical height and can be dragged directly from the first row to the last. Explicit `scrollbar.variant="native"` keeps the browser's native scroll range for backward compatibility; use `modern` or `classic` for massive datasets that may exceed browser layout limits.
 
 ```text
-1. Viewport row count: displayItemCount = Math.ceil(height / itemHeight)
-2. Start index: startIndex = Math.floor(scrollTop / itemHeight)
-3. End index: endIndex = startIndex + displayItemCount + 3 (buffer)
-4. Top-offset correction: topPadding = startIndex * itemHeight
+1. Logical position: logicalScrollTop = virtualBase + physicalScrollTop
+2. Start index: startIndex = Math.floor(logicalScrollTop / rowHeight)
+3. End index: endIndex = startIndex + displayItemCount + buffer
+4. Physical render position: renderTop = startIndex * rowHeight - virtualBase
+5. Near an edge, move virtualBase and physicalScrollTop by equal amounts in opposite directions
 ```
 
-Virtualization reduces the number of DOM rows, but the complete source data passed to the grid still remains in memory. For large datasets, measure the initial data-generation and transfer costs, cell-renderer cost, and sorting and filtering costs separately.
+Virtualization reduces the number of DOM rows, but the complete source data passed to the grid still remains in memory. The logical-scroll coordinate mapping is verified for 10,000,000 rows (290,000,000 px at the default row height). However, this does not guarantee that a browser can retain ten million row objects in memory. The practical maximum of the current API depends on row payload size and the browser's available heap. Production systems with several million rows should use server queries, pagination, or a remote data source. Measure initial data-generation and transfer costs, cell-renderer cost, and sorting and filtering costs separately.
 
 ---
 
@@ -179,9 +180,9 @@ If the actual row height differs from `itemHeight`, the grid can appear to jump 
 
 For dashboards that fill the available screen, measure the container instead of using fixed pixel dimensions. Pass the measured `width` and `height` to the grid so the virtual-scroll range is recalculated smoothly when the window changes size.
 
-### 4) Move sorting and filtering for 550,000 rows to the server
+### 4) Move sorting and filtering for 1,000,000 rows to the server
 
-The live demo focuses on verifying consistent virtual-scroll positions across 550,000 rows. Sorting or filtering that many rows in the browser can severely reduce UI responsiveness. In production, use `dataControl.mode: 'manual'` with server-side queries or pagination. See [Sorting and Filtering Toolbox](/en/learn/sorting-filtering) for client-side sorting and filtering on smaller datasets.
+The live demo focuses on verifying consistent virtual-scroll positions across 1,000,000 rows. Sorting or filtering that many rows in the browser can severely reduce UI responsiveness. In production, use `dataControl.mode: 'manual'` with server-side queries or pagination. See [Sorting and Filtering Toolbox](/en/learn/sorting-filtering) for client-side sorting and filtering on smaller datasets.
 
 ---
 

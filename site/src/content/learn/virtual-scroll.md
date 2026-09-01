@@ -9,7 +9,7 @@ demoId: "virtual-scroll"
 features: ["virtual-scrolling", "large-dataset", "performance", "dom-recycling", "itemHeight", "showLineNumber"]
 relatedGuides: ["getting-started", "basic", "scrollbar", "pagination"]
 relatedApi: ["/api/props#itemheight", "/api/props#height", "/api/props#data", "/api/props#showlinenumber"]
-lastReviewedAt: "2026-08-25"
+lastReviewedAt: "2026-09-01"
 indexable: true
 draft: false
 ---
@@ -29,18 +29,19 @@ draft: false
 
 BeautifulGrid는 스크롤 이벤트 발생 시 다음과 같은 공식으로 렌더링할 행의 범위를 O(1) 시간 복잡도로 즉시 계산합니다:
 
-위 라이브 데모는 별도의 행 높이 조정 없이 기본값인 29px(`itemHeight` 15px + 위아래 `itemPadding` 7px)을 사용합니다. 55만 행의 스크롤 높이는 부가 영역을 포함해 약 15,950,030px로, 데스크톱 Chromium에서 확인한 단일 스크롤 영역 상한 16,777,216px보다 약 827,186px 낮습니다. 한계에 맞춘 최대치가 아니라 약 4.9%의 여유를 둔 이유이며, 왼쪽 행 번호로 마지막 550,000번째 행까지 도달했는지 확인할 수 있습니다.
+위 라이브 데모는 별도의 행 높이 조정 없이 기본값인 29px(`itemHeight` 15px + 위아래 `itemPadding` 7px)을 사용합니다. 100만 행의 논리 높이는 29,000,000px이지만, 기본 `modern` 스크롤바는 실제 DOM 스크롤 높이를 최대 1,000,000px로 제한합니다. 현재 물리 구간과 논리 기준점을 합쳐 전체 위치를 계산하므로 왼쪽 행 번호로 마지막 1,000,000번째 행까지 이동할 수 있습니다.
 
-55만 행을 유지할 때 사용할 수 있는 최대 정수 행 높이는 `(16,777,216px - 부가 영역 30px) ÷ 550,000행`을 내림한 **30px**입니다. 기본 `itemPadding={7}`을 유지한다면 `itemHeight` prop은 최대 16px(`16 + 7 × 2 = 30px`)이고, 기본 `itemHeight={15}`는 전체 행 높이 29px이므로 1px의 설정 여유가 있습니다. 이는 Chromium에서 확인한 한계이며 브라우저와 레이아웃 구성에 따라 달라질 수 있습니다.
+물리 스크롤이 안전 구간의 위·아래 경계에 접근하면 BeautifulGrid는 기준점을 옮기고 물리 `scrollTop`을 반대 방향으로 보정합니다. 두 값의 합인 논리 `scrollTop`은 바뀌지 않으므로 화면이나 휠·트랙패드 이동이 점프하지 않습니다. 커스텀 스크롤바의 thumb는 논리 높이 전체를 기준으로 계산되어 처음부터 마지막 행까지 직접 드래그할 수 있습니다. `scrollbar.variant="native"`를 명시하면 하위 호환을 위해 브라우저의 네이티브 스크롤 영역을 그대로 사용하므로, 브라우저 한계를 넘는 초대용량 데이터에는 `modern` 또는 `classic`을 권장합니다.
 
 ```text
-1. 뷰포트 행 개수: displayItemCount = Math.ceil(height / itemHeight)
-2. 시작 인덱스: startIndex = Math.floor(scrollTop / itemHeight)
-3. 종료 인덱스: endIndex = startIndex + displayItemCount + 3 (버퍼 여유분)
-4. 상단 여백 보정: topPadding = startIndex * itemHeight
+1. 논리 위치: logicalScrollTop = virtualBase + physicalScrollTop
+2. 시작 인덱스: startIndex = Math.floor(logicalScrollTop / rowHeight)
+3. 종료 인덱스: endIndex = startIndex + displayItemCount + buffer
+4. 물리 렌더 위치: renderTop = startIndex * rowHeight - virtualBase
+5. 경계 접근 시 virtualBase와 physicalScrollTop을 반대 방향으로 같은 양만큼 이동
 ```
 
-가상화는 DOM 행 수를 줄이지만 전달한 원본 데이터 자체는 메모리에 존재합니다. 대용량 데이터에서는 초기 데이터 생성·전송 비용, 셀 렌더러 비용, 정렬·필터 처리 비용도 별도로 측정해야 합니다.
+가상화는 DOM 행 수를 줄이지만 전달한 원본 데이터 자체는 메모리에 존재합니다. 논리 스크롤 좌표는 1,000만 행(기본 행 높이 기준 290,000,000px)도 안전한 물리 구간으로 매핑하도록 검증되어 있습니다. 다만 이는 1,000만 개의 행 객체를 브라우저 메모리에 한꺼번에 보관할 수 있다는 보장이 아닙니다. 현재 API의 실용적인 최대 행 수는 행 하나의 데이터 크기와 브라우저 메모리에 따라 달라지며, 수백만 행 규모의 실제 서비스에서는 서버 조회·페이지네이션 또는 원격 데이터 소스를 사용해야 합니다. 초기 데이터 생성·전송 비용, 셀 렌더러 비용, 정렬·필터 처리 비용도 별도로 측정하세요.
 
 ---
 
@@ -176,8 +177,8 @@ export default function LargeLogViewer() {
 ### 3) 부모 컨테이너 크기 변경 감지 (`useContainerSize`)
 화면 전체를 채우는 대시보드에서는 고정 픽셀 대신 컨테이너 크기 측정 훅을 사용하여 `width`와 `height`를 전달하면 창 크기 조절 시에도 가상 스크롤 범위가 매끄럽게 재계산됩니다.
 
-### 4) 55만 행의 정렬·필터는 서버 조회로 분리
-위 라이브 데모는 55만 행 전체에서 가상 스크롤의 위치 일관성을 확인하는 데 집중합니다. 이 정도 규모를 브라우저에서 한 번에 정렬·필터하면 UI 응답성이 크게 떨어질 수 있으므로, 실제 업무에서는 `dataControl.mode: 'manual'`과 서버 조회 또는 페이지네이션을 사용하세요. 비교적 작은 클라이언트 데이터의 정렬·필터 구성은 [정렬 및 필터 툴박스](/learn/sorting-filtering)에서 확인할 수 있습니다.
+### 4) 100만 행의 정렬·필터는 서버 조회로 분리
+위 라이브 데모는 100만 행 전체에서 가상 스크롤의 위치 일관성을 확인하는 데 집중합니다. 이 정도 규모를 브라우저에서 한 번에 정렬·필터하면 UI 응답성이 크게 떨어질 수 있으므로, 실제 업무에서는 `dataControl.mode: 'manual'`과 서버 조회 또는 페이지네이션을 사용하세요. 비교적 작은 클라이언트 데이터의 정렬·필터 구성은 [정렬 및 필터 툴박스](/learn/sorting-filtering)에서 확인할 수 있습니다.
 
 ---
 

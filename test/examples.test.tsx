@@ -661,18 +661,23 @@ describe('demo examples render intended grid features', () => {
     });
   });
 
-  it('keeps row indexes consistent while virtualizing the 550K-row example', async () => {
+  it('keeps row indexes consistent while virtualizing the 1M-row example', async () => {
     const { container } = await renderExample(() => import('../examples/ScrollExample'));
 
     expectGridShell(container);
     expect(container).toHaveTextContent('주문 번호');
     expect(container).toHaveTextContent('고객사');
     expect(container).toHaveTextContent('주문 금액');
-    expect(container).toHaveTextContent('전체 550,000건');
+    expect(container).toHaveTextContent('전체 1,000,000건');
     expect(container.querySelector("[role='rfdg-body-frozen'] .bgrid-line-number-cell")).toHaveTextContent('1');
     expect(container.querySelectorAll("[role='rfdg-body'] tr").length).toBeLessThan(100);
 
     const scrollContainer = container.querySelector("[role='rfdg-scroll-container']") as HTMLDivElement;
+    const scrollPlane = container.querySelector('.bgrid-scroll-plane') as HTMLDivElement;
+    expect(scrollPlane).toHaveAttribute('data-bgrid-virtual-scroll-window', 'true');
+    expect(Number(scrollPlane.dataset.bgridPhysicalHeight)).toBeLessThan(Number(scrollPlane.dataset.bgridLogicalHeight));
+    expect(Number(scrollPlane.dataset.bgridPhysicalHeight)).toBeLessThanOrEqual(1_000_000);
+
     scrollContainer.scrollTop = 2900;
     fireEvent.scroll(scrollContainer);
 
@@ -685,6 +690,29 @@ describe('demo examples render intended grid features', () => {
       expect(displayedLineNumber).toBeGreaterThan(1);
       expect(firstVisibleLineNumber).toHaveAttribute('data-row-index', String(displayedLineNumber - 1));
       expect(container.querySelectorAll("[role='rfdg-body'] tr").length).toBeLessThan(100);
+    });
+
+    for (let index = 0; index < 70; index += 1) {
+      const previousBase = Number(scrollPlane.dataset.bgridVirtualScrollBase ?? 0);
+      scrollContainer.scrollTop = 900_000;
+      fireEvent.scroll(scrollContainer);
+
+      await waitFor(() => {
+        expect(Number(scrollPlane.dataset.bgridVirtualScrollBase ?? 0)).toBeGreaterThan(previousBase);
+      });
+    }
+
+    scrollContainer.scrollTop = 1_000_000;
+    fireEvent.scroll(scrollContainer);
+
+    await waitFor(() => {
+      const renderedLineNumbers = Array.from(
+        container.querySelectorAll("[role='rfdg-body-frozen'] .bgrid-line-number-cell"),
+      ).map(cell => Number(cell.textContent));
+
+      expect(renderedLineNumbers).toContain(1_000_000);
+      expect(container.querySelectorAll("[role='rfdg-body'] tr").length).toBeLessThan(100);
+      expect(Number(scrollPlane.dataset.bgridLogicalScrollTop)).toBeGreaterThan(28_000_000);
     });
   }, 30000);
 

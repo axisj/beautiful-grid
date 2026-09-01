@@ -14,6 +14,7 @@ interface Props {
     width: number;
     height: number;
   };
+  offsetTop?: number;
 }
 
 export function CellSelectionOverlay(props: Props) {

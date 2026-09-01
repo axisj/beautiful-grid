@@ -67,6 +67,10 @@ export interface EnsureCellVisibleParams {
   frozenRowCount?: number;
   columns: AppModelColumn<any>[];
   rowHeight: number;
+  verticalScrollState?: {
+    scrollTop: number;
+    scrollHeight: number;
+  };
   viewportInsets?: {
     top?: number;
     right?: number;
@@ -90,9 +94,10 @@ export function ensureCellVisible({
   frozenRowCount = 0,
   columns,
   rowHeight,
+  verticalScrollState,
   viewportInsets,
 }: EnsureCellVisibleParams): EnsureCellVisibleResult {
-  const currentScrollTop = scrollContainer?.scrollTop ?? 0;
+  const currentScrollTop = verticalScrollState?.scrollTop ?? scrollContainer?.scrollTop ?? 0;
   const currentScrollLeft = scrollContainer?.scrollLeft ?? 0;
 
   let nextScrollTop = currentScrollTop;
@@ -104,7 +109,7 @@ export function ensureCellVisible({
     const rowTop = getRowTop(targetRowIndex, rowHeight);
     const rowBottom = getRowBottom(targetRowIndex, rowHeight);
     const clientHeight = scrollContainer.clientHeight;
-    const scrollHeight = scrollContainer.scrollHeight;
+    const scrollHeight = verticalScrollState?.scrollHeight ?? scrollContainer.scrollHeight;
     const maxScrollTop = Math.max(0, scrollHeight - clientHeight);
 
     if (clientHeight > 0) {
@@ -152,7 +157,7 @@ export function ensureCellVisible({
   const didScroll = didScrollTop || didScrollLeft;
 
   if (scrollContainer) {
-    if (didScrollTop) {
+    if (didScrollTop && !verticalScrollState) {
       scrollContainer.scrollTop = nextScrollTop;
     }
     if (didScrollLeft) {

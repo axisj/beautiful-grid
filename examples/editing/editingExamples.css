@@ -1,3 +1,56 @@
+.editing-example-row-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 6px 12px;
+  border: 1px solid var(--site-border-strong, #cbd5e1);
+  border-radius: var(--site-radius-sm, 8px);
+  background: var(--site-control-bg, #ffffff);
+  color: var(--site-text-secondary, #526178);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 150ms, border-color 150ms, color 150ms;
+}
+
+.editing-example-row-button-add {
+  border-color: var(--site-accent, #2563eb);
+  background: var(--site-accent, #2563eb);
+  color: var(--site-accent-contrast, #ffffff);
+}
+
+.editing-example-row-button-add:hover {
+  border-color: var(--site-accent-strong, #1d4ed8);
+  background: var(--site-accent-strong, #1d4ed8);
+}
+
+.editing-example-row-button-delete:not(:disabled) {
+  border-color: #fca5a5;
+  color: #dc2626;
+}
+
+.editing-example-row-button-delete:hover:not(:disabled) {
+  border-color: #ef4444;
+  background: color-mix(in srgb, #ef4444 8%, var(--site-control-bg, #ffffff));
+}
+
+.editing-example-row-button:focus-visible {
+  outline: 2px solid var(--site-focus-ring, #93c5fd);
+  outline-offset: 2px;
+}
+
+.editing-example-row-button:disabled {
+  border-color: var(--site-border, #e1e7ef);
+  background: var(--site-surface, #f7f9fc);
+  color: var(--site-text-muted, #8491a5);
+  cursor: not-allowed;
+}
+
 .editing-example-cell-editable {
   --editing-example-bg: #ffffff;
   --editing-example-hover-bg: #dbeafe;

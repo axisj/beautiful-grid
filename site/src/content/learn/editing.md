@@ -8,8 +8,8 @@ canonicalPath: "/learn/editing"
 demoId: "editing"
 features: ["cell-editing", "editable", "editTrigger", "keyboard", "IME", "text-editor"]
 relatedGuides: ["built-in-editors", "editor-plugins", "editor-icons", "lookup-editor", "editing-events", "editing-merged-cells"]
-relatedApi: ["/api/props#editable", "/api/props#edittrigger", "/api/props#cellnavigationoptions", "/api/props#columns"]
-lastReviewedAt: "2026-08-21"
+relatedApi: ["/api/props#editable", "/api/props#edittrigger", "/api/props#cellnavigationoptions", "/api/props#columns", "/api/props#ref", "/api/props#rowchecked"]
+lastReviewedAt: "2026-09-03"
 indexable: true
 draft: false
 ---
@@ -122,7 +122,62 @@ onChangeData={(sourceIndex, _columnIndex, values, _column, meta) => {
 
 실제 행 데이터는 항상 `BGridDataItem<T>.values`에 있습니다. `meta.dataItem`을 저장하면 직접 편집한 컬럼의 `editedColumnIds`와 값이 변경된 데이터 key의 `changedKeys`가 함께 유지됩니다. 직접 편집한 셀에는 `bgrid-cell-edited`, 같은 key를 공유하는 모든 셀에는 `bgrid-cell-value-changed` 스타일이 적용됩니다.
 
-## 7. 다음 가이드 선택
+## 7. 행 추가·선택 삭제와 스크롤
+
+라이브 예제의 **행추가**는 새 행을 끝에 추가하고 그 위치로 이동합니다. 왼쪽 체크박스로 여러 행을 선택한 다음 **행삭제**를 누르면 선택된 행만 데이터에서 제거합니다. 선택이 없으면 삭제 버튼은 비활성화됩니다. 새 행은 `status: BGridDataItemStatus.new`로 표시하며, 삭제는 서버 저장 없이 예제의 React 상태에서 즉시 처리합니다.
+
+행 추가·삭제는 애플리케이션이 `data`를 갱신하고, 스크롤은 `BGridRef.scrollToRow()`로 명시적으로 요청합니다. 일반적인 데이터 갱신은 현재 스크롤 위치를 유지합니다. 이 예제는 추가할 행의 고유 키를 기억했다가 데이터 반영 후 이동하므로 셀 편집 때마다 다시 스크롤하지 않습니다.
+
+```tsx
+import { useEffect, useRef, useState, type Key } from 'react';
+import { BGrid, type BGridDataItem, type BGridRef } from 'beautiful-grid';
+
+const gridRef = useRef<BGridRef>(null);
+const pendingRowKey = useRef<string | null>(null);
+const [checkedRowKeys, setCheckedRowKeys] = useState<Key[]>([]);
+
+function addRow(item: BGridDataItem<Order>) {
+  pendingRowKey.current = item.values.id;
+  setData(current => [...current, item]);
+}
+
+useEffect(() => {
+  const rowIndex = data.findIndex(item => item.values.id === pendingRowKey.current);
+  if (rowIndex < 0) return;
+  gridRef.current?.scrollToRow(rowIndex, { align: 'end' });
+  pendingRowKey.current = null;
+}, [data]);
+
+function deleteCheckedRows() {
+  const keys = new Set(checkedRowKeys);
+  setData(current => current.filter(item => !keys.has(item.values.id)));
+  setCheckedRowKeys([]);
+}
+
+<BGrid<Order>
+  ref={gridRef}
+  width={720}
+  height={360}
+  data={data}
+  columns={columns}
+  rowKey='id'
+  editable
+  rowChecked={{
+    checkedRowKeys,
+    onChange: (_indexes, keys) => setCheckedRowKeys(keys),
+  }}
+/>
+```
+
+`scrollToRow(rowIndex, { align })`의 인덱스는 **현재 페이지에서 정렬·필터가 적용된 표시 순서의 0 기반 인덱스**입니다. `onChangeData`의 source index와는 다릅니다. 정렬·필터를 사용한다면 표시 데이터에서 행 위치를 구해야 하며, 필터로 숨겨진 행이나 다른 페이지를 자동으로 열지는 않습니다.
+
+- `nearest` (기본값): 행이 이미 보이면 유지하고, 벗어나면 필요한 만큼만 이동합니다.
+- `start` / `center` / `end`: 행을 스크롤 영역의 위 / 가운데 / 아래로 맞추되 스크롤 한계를 넘지 않습니다.
+- 고정 행, 범위 밖 인덱스, 정수가 아닌 인덱스는 무시합니다.
+- 가로 스크롤, 활성 셀과 선택은 변경하지 않습니다. 연속 요청은 마지막 요청을 반영합니다.
+- 같은 이벤트에서 데이터 갱신과 호출을 함께 해도 Grid 내부 데이터 반영 후 처리합니다. 서버 응답 등 비동기 데이터는 도착한 뒤 호출하세요.
+
+## 8. 다음 가이드 선택
 
 | 하고 싶은 일 | 다음 문서 |
 | --- | --- |

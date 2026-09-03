@@ -18,6 +18,7 @@ import {
   BGridDataQuery,
   BGridPage,
   BGridProps,
+  BGridScrollToRowOptions,
   BGridRowChecked,
   BGridSortInfo,
   BGridSortParam,
@@ -68,6 +69,7 @@ const LazyGridOptionalSurfaces = React.lazy(() =>
 );
 
 interface Props<T> {
+  ref?: BGridProps<T>['ref'];
   width?: number;
   height?: number;
   headerHeight?: number;
@@ -786,6 +788,18 @@ function Table<T>(props: Props<T>) {
 
   const latestScrollRef = useRef({ top: scrollTop, left: scrollLeft });
   const latestCommittedScrollRef = useRef({ top: scrollTop, left: scrollLeft });
+  const scrollPropsRef = useRef({ top: props.scrollTop, left: props.scrollLeft });
+  const syncedDataPropRef = useRef(props.data);
+  const [rowScrollRequest, setRowScrollRequest] = React.useState<{
+    rowIndex: number;
+    align: NonNullable<BGridScrollToRowOptions['align']>;
+  } | null>(null);
+
+  React.useImperativeHandle(props.ref, () => ({
+    scrollToRow(rowIndex, options) {
+      setRowScrollRequest({ rowIndex, align: options?.align ?? 'nearest' });
+    },
+  }), []);
   const scrollRafRef = useRef<number | null>(null);
   const scrollIdleTimerRef = useRef<number | null>(null);
   const selectionAutoScrollRafRef = useRef<number | null>(null);
@@ -1804,6 +1818,7 @@ function Table<T>(props: Props<T>) {
         setSourceData(props.sourceData);
       }
     }
+    syncedDataPropRef.current = props.data;
   }, [
     props.data,
     props.sourceData,
@@ -1886,8 +1901,10 @@ function Table<T>(props: Props<T>) {
     setDisplayPaginationLength,
   ]);
 
+  const previousPageRef = useRef(props.page?.currentPage);
   useEffect(() => {
-    resetScrollPosition('top');
+    if (previousPageRef.current !== props.page?.currentPage) resetScrollPosition('top');
+    previousPageRef.current = props.page?.currentPage;
   }, [resetScrollPosition, props.page?.currentPage]);
 
   // [Group 8] Row key & selection
@@ -1978,7 +1995,7 @@ function Table<T>(props: Props<T>) {
     const containerRefCurrent = containerRef.current;
     const scrollContainerRefCurrent = scrollContainerRef?.current;
     if (scrollContainerRefCurrent) {
-      scrollContainerRefCurrent.removeEventListener('scroll', onScroll);
+      scrollContainerRefCurrent.removeEventListener('scroll', onScroll, true);
       scrollContainerRefCurrent.addEventListener('scroll', onScroll, { passive: true, capture: true });
     }
 
@@ -1992,16 +2009,46 @@ function Table<T>(props: Props<T>) {
         scrollIdleTimerRef.current = null;
       }
       containerRefCurrent?.removeAttribute('data-bgrid-scrolling');
-      scrollContainerRefCurrent?.removeEventListener('scroll', onScroll);
+      scrollContainerRefCurrent?.removeEventListener('scroll', onScroll, true);
     };
   }, [onScroll, setInitialized]);
 
   React.useLayoutEffect(() => {
     if (!scrollContainerRef.current) return;
-    const nextTop = props.scrollTop ?? latestScrollRef.current.top;
-    const nextLeft = props.scrollLeft ?? latestScrollRef.current.left;
+    if (props.data !== syncedDataPropRef.current) return;
+    // Resizing or changing the data also changes commitScroll. Only a changed
+    // scroll prop should override the user's current position.
+    const nextTop = props.scrollTop !== scrollPropsRef.current.top
+      ? props.scrollTop ?? latestScrollRef.current.top
+      : latestScrollRef.current.top;
+    const nextLeft = props.scrollLeft !== scrollPropsRef.current.left
+      ? props.scrollLeft ?? latestScrollRef.current.left
+      : latestScrollRef.current.left;
+    scrollPropsRef.current = { top: props.scrollTop, left: props.scrollLeft };
     commitScroll(nextTop, nextLeft);
-  }, [commitScroll, props.scrollLeft, props.scrollTop]);
+  }, [commitScroll, data, props.data, props.scrollLeft, props.scrollTop]);
+
+  React.useLayoutEffect(() => {
+    if (!rowScrollRequest) return;
+    // Prop data reaches the per-grid store in an effect. Wait for that render
+    // so appending a row and requesting it in the same event is supported.
+    if (props.data !== syncedDataPropRef.current) return;
+    setRowScrollRequest(null);
+    const { rowIndex, align } = rowScrollRequest;
+    if (!Number.isInteger(rowIndex) || rowIndex < frozenRowCount || rowIndex >= data.length) return;
+    if (scrollableBodyHeight <= 0) return;
+
+    const rowTop = (rowIndex - frozenRowCount) * trHeight;
+    const rowBottom = rowTop + trHeight;
+    const { top, left } = latestScrollRef.current;
+    let nextTop = top;
+    if (align === 'start') nextTop = rowTop;
+    else if (align === 'center') nextTop = rowTop - (scrollableBodyHeight - trHeight) / 2;
+    else if (align === 'end') nextTop = rowBottom - scrollableBodyHeight;
+    else if (rowTop < top) nextTop = rowTop;
+    else if (rowBottom > top + scrollableBodyHeight) nextTop = rowBottom - scrollableBodyHeight;
+    commitScroll(nextTop, left);
+  }, [commitScroll, data, frozenRowCount, props.data, rowScrollRequest, scrollableBodyHeight, trHeight]);
 
   useEffect(() => {
     latestScrollRef.current = { top: scrollTop, left: scrollLeft };

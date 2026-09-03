@@ -767,7 +767,22 @@ export interface BGridResolvedStatusOptions extends BGridStatusOptions {
 export type BGridResolvedPaginationViewOptions = Required<Pick<BGridPaginationViewOptions, 'visible'>> &
   Omit<BGridPaginationViewOptions, 'visible'>;
 
+export interface BGridScrollToRowOptions {
+  /** Defaults to nearest: scroll only as far as needed to reveal the row. */
+  align?: 'start' | 'center' | 'end' | 'nearest';
+}
+
+export interface BGridRef {
+  /**
+   * Reveal a zero-based row in the displayed (sorted/filtered) data on the current page.
+   * Runs after pending data updates. Invalid indexes and frozen rows are ignored.
+   * Preserves horizontal scroll, cell focus and selection; does not load other pages.
+   */
+  scrollToRow: (rowIndex: number, options?: BGridScrollToRowOptions) => void;
+}
+
 export interface BGridProps<T> {
+  ref?: React.Ref<BGridRef>;
   width: number;
   height: number;
   headerHeight?: number;

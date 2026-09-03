@@ -18,6 +18,7 @@ import {
 import { AppStoreInitialState, AppStoreProvider } from './store';
 
 export function BGrid<T = Record<string, any>>({
+  ref,
   width,
   height,
   headerHeight = 30,
@@ -556,6 +557,7 @@ export function BGrid<T = Record<string, any>>({
   return (
     <AppStoreProvider initialState={initialStoreState}>
       <Table
+        ref={ref}
         {...{
           columns: computedColumns,
           columnsGroup: resolvedColumnsGroup,

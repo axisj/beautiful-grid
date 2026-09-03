@@ -8,8 +8,8 @@ canonicalPath: "/en/learn/editing"
 demoId: "editing"
 features: ["cell-editing", "editable", "editTrigger", "keyboard", "IME", "text-editor"]
 relatedGuides: ["built-in-editors", "editor-plugins", "editor-icons", "lookup-editor", "editing-events", "editing-merged-cells"]
-relatedApi: ["/en/api/props#editable", "/en/api/props#edittrigger", "/en/api/props#cellnavigationoptions", "/en/api/props#columns"]
-lastReviewedAt: "2026-08-21"
+relatedApi: ["/en/api/props#editable", "/en/api/props#edittrigger", "/en/api/props#cellnavigationoptions", "/en/api/props#columns", "/en/api/props#ref", "/en/api/props#rowchecked"]
+lastReviewedAt: "2026-09-03"
 indexable: true
 draft: false
 ---
@@ -122,7 +122,62 @@ onChangeData={(sourceIndex, _columnIndex, values, _column, meta) => {
 
 The actual row data always lives in `BGridDataItem<T>.values`. Saving `meta.dataItem` also preserves the `editedColumnIds` for directly edited columns and the `changedKeys` for changed data fields. Directly edited cells receive the `bgrid-cell-edited` style, while all cells that share a changed key receive `bgrid-cell-value-changed`.
 
-## 7. Choose the next guide
+## 7. Add, select and delete rows, then scroll
+
+**Add Row** appends a new row and scrolls it into view. Use the left checkboxes to select rows, then **Delete Rows** to remove just those rows. Deletion is disabled when nothing is selected. New rows use `status: BGridDataItemStatus.new`; deletion immediately updates the example's React state without saving to a server.
+
+The application owns additions and deletions through `data`, and explicitly requests scrolling through `BGridRef.scrollToRow()`. Ordinary data updates preserve the current scroll position. This example remembers the inserted row's unique key and requests scrolling after the data update, so subsequent cell edits do not trigger another scroll.
+
+```tsx
+import { useEffect, useRef, useState, type Key } from 'react';
+import { BGrid, type BGridDataItem, type BGridRef } from 'beautiful-grid';
+
+const gridRef = useRef<BGridRef>(null);
+const pendingRowKey = useRef<string | null>(null);
+const [checkedRowKeys, setCheckedRowKeys] = useState<Key[]>([]);
+
+function addRow(item: BGridDataItem<Order>) {
+  pendingRowKey.current = item.values.id;
+  setData(current => [...current, item]);
+}
+
+useEffect(() => {
+  const rowIndex = data.findIndex(item => item.values.id === pendingRowKey.current);
+  if (rowIndex < 0) return;
+  gridRef.current?.scrollToRow(rowIndex, { align: 'end' });
+  pendingRowKey.current = null;
+}, [data]);
+
+function deleteCheckedRows() {
+  const keys = new Set(checkedRowKeys);
+  setData(current => current.filter(item => !keys.has(item.values.id)));
+  setCheckedRowKeys([]);
+}
+
+<BGrid<Order>
+  ref={gridRef}
+  width={720}
+  height={360}
+  data={data}
+  columns={columns}
+  rowKey='id'
+  editable
+  rowChecked={{
+    checkedRowKeys,
+    onChange: (_indexes, keys) => setCheckedRowKeys(keys),
+  }}
+/>
+```
+
+The index in `scrollToRow(rowIndex, { align })` is a **zero-based index in the displayed, sorted/filtered data on the current page**. It differs from the source index passed to `onChangeData`. With sorting or filtering, resolve the position in the displayed data; the API does not reveal filtered-out rows or load another page.
+
+- `nearest` (default): keep a visible row in place, otherwise scroll only as far as needed.
+- `start` / `center` / `end`: align the row at the top / center / bottom of the scrollable area, clamped to the scroll limits.
+- Frozen rows, out-of-range indexes and non-integer indexes are ignored.
+- Horizontal scroll, the active cell and selection are preserved. The last of consecutive requests wins.
+- A call in the same event as a data update runs after the Grid synchronizes its data. For asynchronous data, call after the response arrives.
+
+## 8. Choose the next guide
 
 | Goal | Next guide |
 | --- | --- |

@@ -1,6 +1,6 @@
 import { t } from './i18n';
 import * as React from 'react';
-import { BGrid, type BGridCellAddress, type BGridColumn } from 'beautiful-grid';
+import { BGrid, BGridDataItemStatus, type BGridCellAddress, type BGridColumn, type BGridRef } from 'beautiful-grid';
 import DataGridContainer from '../components/DataGridContainer';
 import { useContainerSize } from '../hooks/useContainerSize';
 import {
@@ -12,9 +12,59 @@ import {
 
 export default function BasicEditingExample() {
   const [data, setData] = React.useState(cloneEditingOrders);
-  const [activeCell, setActiveCell] = React.useState<BGridCellAddress>({ rowIndex: 0, columnIndex: 1 });
+  const [activeCell, setActiveCell] = React.useState<BGridCellAddress | null>({ rowIndex: 0, columnIndex: 1 });
+  const [checkedRowKeys, setCheckedRowKeys] = React.useState<React.Key[]>([]);
+  const gridRef = React.useRef<BGridRef>(null);
+  const nextOrderNumber = React.useRef(5);
+  const pendingScrollRowKey = React.useRef<string | null>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
   const { width, height } = useContainerSize(containerRef);
+
+  React.useEffect(() => {
+    const rowIndex = data.findIndex(item => item.values.id === pendingScrollRowKey.current);
+    if (rowIndex < 0) return;
+    gridRef.current?.scrollToRow(rowIndex, { align: 'end' });
+    pendingScrollRowKey.current = null;
+  }, [data]);
+
+  const addRow = () => {
+    const orderNumber = nextOrderNumber.current++;
+    const id = `ORDER-${String(orderNumber).padStart(3, '0')}`;
+    pendingScrollRowKey.current = id;
+    setData(current => [...current, {
+      status: BGridDataItemStatus.new,
+      values: {
+        id,
+        orderCode: `ORD-${2600 + orderNumber}`,
+        customerCode: '',
+        customerName: '',
+        customerGrade: '',
+        status: t('접수', 'Receipt'),
+        deliveryDate: '',
+        approved: false,
+        quantity: 0,
+        unitPrice: 0,
+        amount: 0,
+        note: '',
+        mergeGroup: id,
+      },
+    }]);
+  };
+
+  const deleteRows = () => {
+    const checkedKeys = new Set(checkedRowKeys);
+    const remaining = data.filter(item => !checkedKeys.has(item.values.id));
+    const activeRowKey = activeCell && data[activeCell.rowIndex]?.values.id;
+    const remainingActiveIndex = remaining.findIndex(item => item.values.id === activeRowKey);
+    setData(remaining);
+    setCheckedRowKeys([]);
+    setActiveCell(activeCell && remaining.length ? {
+      ...activeCell,
+      rowIndex: remainingActiveIndex >= 0
+        ? remainingActiveIndex
+        : Math.min(activeCell.rowIndex, remaining.length - 1),
+    } : null);
+  };
 
   const columns = React.useMemo<BGridColumn<EditingOrder>[]>(
     () => withEditingCellClasses<EditingOrder>([
@@ -49,16 +99,40 @@ export default function BasicEditingExample() {
         <strong>{t('키보드:', 'Keyboard:')}</strong> {t('방향키로 셀을 이동하고 바로 입력하면 기존 값을 대체합니다.', 'Moving cells with arrow keys and typing directly replaces existing values.')} <kbd>Enter</kbd> {t('또는', 'or')}{' '}
         <kbd>F2</kbd>{t('는 기존 값을 유지하며 시작하고,', ' starts editing keeping the existing value,')} <kbd>Tab</kbd>{t('은 저장 후 이동,', ' saves and moves,')} <kbd>Escape</kbd>{t('는 취소합니다.', ' cancels.')}
         <output aria-live='polite' className='mt-1 block font-mono text-xs text-blue-700'>
-          {t('활성 셀: 행', 'Active cell: Row')} {activeCell.rowIndex + 1}, {t('열', 'Col')} {activeCell.columnIndex + 1}
+          {activeCell
+            ? `${t('활성 셀: 행', 'Active cell: Row')} ${activeCell.rowIndex + 1}, ${t('열', 'Col')} ${activeCell.columnIndex + 1}`
+            : t('활성 셀: 없음', 'Active cell: None')}
+        </output>
+      </div>
+      <div className='flex flex-wrap items-center gap-2'>
+        <button type='button' onClick={addRow} className='editing-example-row-button editing-example-row-button-add'>
+          <svg aria-hidden='true' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round'>
+            <path d='M12 5v14M5 12h14' />
+          </svg>
+          {t('행추가', 'Add Row')}
+        </button>
+        <button type='button' onClick={deleteRows} disabled={checkedRowKeys.length === 0} className='editing-example-row-button editing-example-row-button-delete'>
+          <svg aria-hidden='true' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.8' strokeLinecap='round' strokeLinejoin='round'>
+            <path d='M3 6h18M9 6V4h6v2M5 6l1 14h12l1-14M10 10v6M14 10v6' />
+          </svg>
+          {t('행삭제', 'Delete Rows')}
+        </button>
+        <output aria-live='polite' className='text-sm text-slate-600'>
+          {t(`선택 ${checkedRowKeys.length}개 / 전체 ${data.length}개`, `${checkedRowKeys.length} selected / ${data.length} total`)}
         </output>
       </div>
       <DataGridContainer ref={containerRef} style={{ height: 340 }}>
         <BGrid<EditingOrder>
+          ref={gridRef}
           width={width}
           height={height}
           data={data}
           columns={columns}
           rowKey='id'
+          rowChecked={{
+            checkedRowKeys,
+            onChange: (_indexes, keys) => setCheckedRowKeys(keys),
+          }}
           editable
           variant='vertical-bordered'
           editTrigger='dblclick'
@@ -68,7 +142,7 @@ export default function BasicEditingExample() {
             enabled: true,
             editOnEnter: true,
             activeCell,
-            onActiveCellChange: cell => cell && setActiveCell(cell),
+            onActiveCellChange: setActiveCell,
           }}
           onChangeData={(sourceIndex, _columnIndex, values, _column, meta) => {
             setData(current => applyEditingDataChange(current, sourceIndex, values, meta));

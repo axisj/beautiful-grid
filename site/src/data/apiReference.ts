@@ -38,6 +38,8 @@ const groupDefinitions = [
 
 const typeMetadata: Record<string, { group: string; summary: string }> = {
   BGridProps: { group: 'core', summary: 'BGrid 컴포넌트에 전달하는 최상위 props입니다.' },
+  BGridRef: { group: 'core', summary: 'ref로 접근하는 Grid API입니다. scrollToRow로 표시 행 위치까지 스크롤합니다.' },
+  BGridScrollToRowOptions: { group: 'layout', summary: '행 스크롤의 정렬 위치를 설정합니다. 기본값은 nearest입니다.' },
   BGridColumn: { group: 'core', summary: '한 개 데이터 컬럼의 키, 제목, 너비, 렌더링 및 편집 동작을 정의합니다.' },
   BGridColumnWithOptionalWidth: {
     group: 'core',
@@ -227,6 +229,8 @@ const memberDescriptions: Record<string, string> = {
   loading: '데이터 로딩 오버레이를 표시합니다.',
   spinning: '로딩 표시의 회전 상태를 제어합니다.',
   scrollTop: '외부에서 지정하는 세로 스크롤 위치입니다.',
+  ref: 'BGridRef를 연결합니다. scrollToRow(rowIndex, { align })으로 현재 페이지의 표시 행까지 이동합니다.',
+  scrollToRow: '정렬·필터 후 0 기반 표시 행 인덱스로 이동합니다. 데이터 반영 후 실행하며 가로 스크롤과 선택은 유지합니다.',
   scrollLeft: '외부에서 지정하는 가로 스크롤 위치입니다.',
   rowChecked: '체크박스 또는 라디오 행 선택을 설정합니다.',
   sort: '제어형 컬럼 정렬 상태를 설정합니다.',

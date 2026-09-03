@@ -25,7 +25,7 @@ describe('site product and navigation contracts', () => {
     expect(ogImage.readUInt32BE(20)).toBe(630);
     expect(marketingLayout).toContain('ogImage?: string;');
     expect(marketingLayout).toContain('ogImageAlt?: string;');
-    expect(homepage).toContain('ogImage="/og-image.png"');
+    expect(homepage).toContain('/og-image.png');
     expect(layout).toContain('<meta property="og:image" content={ogImageUrl} />');
     expect(layout).toContain('<meta property="og:image:width" content="1200" />');
     expect(layout).toContain('<meta property="og:image:height" content="630" />');

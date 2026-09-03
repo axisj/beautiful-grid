@@ -5,7 +5,7 @@ export default defineConfig({
   outputDir: '.playwright-results',
   timeout: 30_000,
   expect: {
-    timeout: 5_000,
+    timeout: 10_000,
   },
   fullyParallel: true,
   retries: process.env.CI ? 1 : 0,

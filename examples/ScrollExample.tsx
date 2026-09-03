@@ -76,34 +76,50 @@ const orderStatuses = [t('주문 접수', 'Order Receipt'), t('상품 준비', '
 const fulfillmentCenters = [t('김포 FC', 'Gimpo FC'), t('용인 FC', 'Yongin FC'), t('이천 FC', 'Icheon FC'), t('대구 FC', 'Daegu FC'), t('부산 FC', 'Busan FC')];
 const shippingMethods = [t('일반 택배', 'General Courier'), t('당일 배송', 'Same-day Delivery'), t('새벽 배송', 'Dawn Delivery'), t('화물 배송', 'Freight Delivery'), t('방문 수령', 'Pick Up in Store')];
 const riskLevels = [t('낮음', 'Low'), t('관찰', 'Observation'), t('주의', 'Caution'), t('높음', 'High')];
+const dateCache = new Map<number, string>();
 function formatDateTime(timestamp: number) {
-  return new Date(timestamp).toISOString().replace('T', ' ').slice(0, 16);
+  let cached = dateCache.get(timestamp);
+  if (!cached) {
+    cached = new Date(timestamp).toISOString().replace('T', ' ').slice(0, 16);
+    dateCache.set(timestamp, cached);
+  }
+  return cached;
 }
 
-const list = Array.from({ length: ROW_COUNT }, (_, index) => {
+const skuCache: string[] = [];
+for (let i = 0; i < 18000; i++) {
+  skuCache[i] = `SKU-${String(i).padStart(5, '0')}`;
+}
+
+const discountRates = [0, 3, 5, 7, 10, 15, 20];
+const editions = ['Basic', 'Plus', 'Pro'];
+const isEnglish = typeof document !== 'undefined' && document.documentElement.lang === 'en';
+
+const list = new Array(ROW_COUNT);
+for (let index = 0; index < ROW_COUNT; index++) {
   const sequence = index + 1;
   const quantity = ((index * 7) % 48) + 1;
   const unitPrice = 39000 + ((index * 7919) % 72) * 12500;
   const grossAmount = quantity * unitPrice;
-  const discountRate = [0, 3, 5, 7, 10, 15, 20][index % 7];
+  const discountRate = discountRates[index % 7];
   const orderedTimestamp = ORDER_START_AT + (index % 234) * DAY_MS + (index % 12) * 60 * 60 * 1000;
   const promisedTimestamp = orderedTimestamp + ((index % 6) + 1) * DAY_MS;
 
-  return {
+  list[index] = {
     values: {
       orderNo: `ORD-2026-${String(sequence).padStart(6, '0')}`,
       orderedAt: formatDateTime(orderedTimestamp),
-      customerName: t(`${companyNames[index % companyNames.length]} ${regions[(index * 3) % regions.length]} ${
-        (index % 37) + 1
-      }호점`, `Branch ${index + 1}`),
+      customerName: isEnglish
+        ? `Branch ${index + 1}`
+        : `${companyNames[index % companyNames.length]} ${regions[(index * 3) % regions.length]} ${(index % 37) + 1}호점`,
       customerTier: customerTiers[(index * 5) % customerTiers.length],
       salesChannel: salesChannels[(index * 7) % salesChannels.length],
       region: regions[(index * 3) % regions.length],
       salesTeam: salesTeams[(index * 11) % salesTeams.length],
       salesRep: salesReps[(index * 13) % salesReps.length],
       category: categories[(index * 5) % categories.length],
-      productName: `${products[index % products.length]} ${2024 + (index % 3)} ${['Basic', 'Plus', 'Pro'][index % 3]}`,
-      sku: `SKU-${String((index * 17) % 18000).padStart(5, '0')}`,
+      productName: `${products[index % products.length]} ${2024 + (index % 3)} ${editions[index % 3]}`,
+      sku: skuCache[(index * 17) % 18000],
       quantity,
       unitPrice,
       grossAmount,
@@ -119,7 +135,7 @@ const list = Array.from({ length: ROW_COUNT }, (_, index) => {
       marginRate: 12 + ((index * 41) % 31),
     },
   };
-});
+}
 
 const columns: BGridColumn<IOrderItem>[] = [
     {

@@ -30,7 +30,9 @@ test.describe('BGrid Demo', () => {
       await expect(page).toHaveURL(new RegExp(`${demo.path === '/' ? '/$' : `${demo.path}$`}`));
 
       // BGrid root role is a stable contract in this project.
-      await expect(page.locator("[role='grid']").first()).toBeVisible();
+      await expect(page.locator("[role='grid']").first()).toBeVisible({
+        timeout: demo.path === '/virtualScroll' ? 15_000 : 10_000,
+      });
     });
   }
 

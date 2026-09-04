@@ -419,6 +419,10 @@ function Table<T>(props: Props<T>) {
 
   const trHeight = itemHeight + itemPadding * 2;
   const scrollableBodyHeight = Math.max(contentBodyHeight - frozenRowsHeight, 0);
+  const scrollOverscanRows = Math.max(
+    KEYBOARD_NAVIGATION_ROW_WINDOW_SIZE,
+    Math.ceil(scrollableBodyHeight / Math.max(trHeight, 1)),
+  );
   const mainViewportWidth = Math.max(width - (frozenColumnsWidth ?? 0), 0);
   const logicalBodyContentHeight = data.length * trHeight;
   const virtualScrollWindowMetrics = React.useMemo(
@@ -441,8 +445,9 @@ function Table<T>(props: Props<T>) {
     () => ({
       scrollTop,
       scrollHeight: virtualScrollWindowMetrics.logicalContentHeight,
+      maxScrollTop: virtualScrollWindowMetrics.logicalMaxScroll,
     }),
-    [scrollTop, virtualScrollWindowMetrics.logicalContentHeight],
+    [scrollTop, virtualScrollWindowMetrics.logicalContentHeight, virtualScrollWindowMetrics.logicalMaxScroll],
   );
   const hasMultiCellSelection = React.useMemo(
     () =>
@@ -578,9 +583,11 @@ function Table<T>(props: Props<T>) {
         rowHeight: trHeight,
         frozenRowCount,
         totalRowCount: data.length,
+        overscan: scrollOverscanRows,
+        leadingOverscan: scrollOverscanRows,
         windowSize: props.reorder?.enabled ? 1 : KEYBOARD_NAVIGATION_ROW_WINDOW_SIZE,
       }),
-    [data.length, frozenRowCount, props.reorder?.enabled, scrollTop, scrollableBodyHeight, trHeight],
+    [data.length, frozenRowCount, props.reorder?.enabled, scrollOverscanRows, scrollTop, scrollableBodyHeight, trHeight],
   );
   const frozenRowRange = React.useMemo(
     () => ({ startRowIndex: 0, endRowIndex: frozenRowCount }),
@@ -2619,7 +2626,13 @@ function Table<T>(props: Props<T>) {
       <Container
       ref={containerRef}
       role={'grid'}
-      style={{ ...style, width, height, borderWidth: `${containerBorderWidth}px` }}
+      style={{
+        ...style,
+        width,
+        height,
+        borderWidth: `${containerBorderWidth}px`,
+        ['--bgrid-virtual-row-height' as string]: `${trHeight}px`,
+      }}
       className={className}
       tabIndex={0}
       onFocus={event => {
@@ -2716,6 +2729,16 @@ function Table<T>(props: Props<T>) {
               </Summary>
             </SummaryContainer>
           )}
+
+          <div
+            className='bgrid-virtual-row-backdrop'
+            aria-hidden='true'
+            style={{
+              top: stickyTopHeight,
+              height: contentBodyHeight,
+              marginBottom: -contentBodyHeight,
+            }}
+          />
 
           <div
             className='bgrid-body-scroll-content'

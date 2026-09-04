@@ -329,6 +329,49 @@ describe('Active Cell & Keyboard Navigation', () => {
     );
   });
 
+  it('scrolls from the penultimate row to reveal the last row', () => {
+    const navigationData = Array.from({ length: 100 }, (_, id) => ({
+      values: { id, name: `Row ${id}`, category: 'A', score: id },
+    }));
+    const { container } = render(
+      <BGrid
+        width={500}
+        height={232}
+        headerHeight={30}
+        itemHeight={20}
+        itemPadding={0}
+        columns={columns}
+        data={navigationData}
+        scrollTop={1770}
+        status={{ visible: false }}
+        scrollbar={{ horizontal: { visible: false } }}
+        cellNavigationOptions={{
+          defaultActiveCell: { rowIndex: 98, columnIndex: 1 },
+          keyRepeat: { enabled: false },
+        }}
+      />,
+    );
+    const scrollContainer = container.querySelector<HTMLElement>('[role="rfdg-scroll-container"]')!;
+    Object.defineProperties(scrollContainer, {
+      clientHeight: { configurable: true, value: 230 },
+      clientWidth: { configurable: true, value: 500 },
+      scrollWidth: { configurable: true, value: 500 },
+    });
+    const gridContainer = container.querySelector<HTMLElement>('[role="grid"]')!;
+    gridContainer.focus();
+
+    fireEvent.keyDown(gridContainer, { key: 'ArrowDown' });
+
+    expect(container.querySelector('.bgrid-scroll-plane')).toHaveAttribute(
+      'data-bgrid-logical-scroll-top',
+      '1800',
+    );
+    expect(container.querySelector('td.bgrid-cell-active[data-column-index="1"]')).toHaveAttribute(
+      'data-bgrid-logical-row-index',
+      '99',
+    );
+  });
+
   it('supports wrap: true navigation at boundaries', () => {
     const onActiveCellChange = vi.fn();
     const { container } = render(

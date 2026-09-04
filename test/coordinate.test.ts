@@ -210,6 +210,30 @@ describe('Coordinate & Viewport Utilities', () => {
       expect(container.scrollTop).toBe(90);
     });
 
+    it('uses the logical maximum when sticky chrome is included in the viewport height', () => {
+      const container = createMockScrollContainer({
+        scrollTop: 1770,
+        clientWidth: 300,
+        clientHeight: 230,
+      });
+
+      const res = ensureCellVisible({
+        cell: { rowIndex: 99, columnIndex: 1 },
+        scrollContainer: container,
+        columns,
+        rowHeight: 20,
+        verticalScrollState: {
+          scrollTop: 1770,
+          scrollHeight: 2000,
+          maxScrollTop: 1800,
+        },
+        viewportInsets: { bottom: 30 },
+      });
+
+      expect(res.didScrollTop).toBe(true);
+      expect(res.scrollTop).toBe(1800);
+    });
+
     it('scrolls up when cell is above the viewport', () => {
       const container = createMockScrollContainer({
         scrollTop: 200,

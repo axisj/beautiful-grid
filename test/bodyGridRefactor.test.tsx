@@ -23,6 +23,22 @@ const data = [
 ];
 
 describe('shared body grid renderer', () => {
+  it('publishes the computed row height for the virtual-scroll fallback grid', () => {
+    const { container } = render(
+      <BGrid<Row>
+        width={420}
+        height={240}
+        columns={columns}
+        data={data}
+        itemHeight={18}
+        itemPadding={6}
+      />,
+    );
+
+    expect(container.querySelector('[role="grid"]')).toHaveStyle({ '--bgrid-virtual-row-height': '30px' });
+    expect(container.querySelector('.bgrid-virtual-row-backdrop')).toHaveAttribute('aria-hidden', 'true');
+  });
+
   it('bounds rendered body columns to the horizontal viewport from the first render', () => {
     const wideData = Array.from({ length: 12 }, (_, rowIndex) => ({
       values: Object.fromEntries(Array.from({ length: 200 }, (_, columnIndex) => [`column-${columnIndex}`, `${rowIndex}:${columnIndex}`])),

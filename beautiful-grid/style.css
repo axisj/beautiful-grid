@@ -1561,6 +1561,25 @@
   background-color: var(--bgrid-body-bg);
 }
 
+/* Safari can advance its native scroll layer before React commits the next
+   virtual-row window. Keep an inexpensive viewport-sized row grid behind the
+   real tables so that compositor gaps retain the table's visual geometry. */
+.bgrid-virtual-row-backdrop {
+  position: sticky;
+  z-index: 0;
+  box-sizing: border-box;
+  min-width: 100%;
+  pointer-events: none;
+  background-color: var(--bgrid-body-bg);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--bgrid-virtual-row-height, 28px) - 1px),
+    var(--bgrid-border-color-base) calc(var(--bgrid-virtual-row-height, 28px) - 1px),
+    var(--bgrid-border-color-base) var(--bgrid-virtual-row-height, 28px)
+  );
+}
+
 .bgrid-footer-container {
   position: relative;
   z-index: 10;

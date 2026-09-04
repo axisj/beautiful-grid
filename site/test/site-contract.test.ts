@@ -472,6 +472,7 @@ describe('site product and navigation contracts', () => {
     expect(heroGrid).toContain('React.useState<React.Key[]>([])');
     expect(heroGrid).toContain('cellSelectionOptions={{ enabled: true }}');
     expect(heroGrid).toContain('cellNavigationOptions={{ enabled: true, editOnEnter: false }}');
+    expect(heroGrid).not.toContain('cellMergeOptions');
     expect(heroGrid).toContain('meta?.dataItem ?? { ...item, values }');
     expect(heroGrid).toContain("import '../../styles/datagrid-theme.css'");
     expect(heroGrid).toContain("className='hero-grid-viewport site-grid-theme'");

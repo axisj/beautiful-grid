@@ -5,6 +5,7 @@ export interface VisibleScrollableRowRangeParams {
   frozenRowCount: number;
   totalRowCount: number;
   overscan?: number;
+  leadingOverscan?: number;
   windowSize?: number;
 }
 
@@ -26,6 +27,7 @@ export function getVisibleScrollableRowRange({
   frozenRowCount,
   totalRowCount,
   overscan = 1,
+  leadingOverscan = 0,
   windowSize = 1,
 }: VisibleScrollableRowRangeParams): VisibleScrollableRowRange {
   const safeRowHeight = Math.max(rowHeight, 1);
@@ -38,12 +40,16 @@ export function getVisibleScrollableRowRange({
   );
   const safeWindowSize = Math.max(Math.floor(windowSize), 1);
   const windowStart = Math.floor(relativeStart / safeWindowSize) * safeWindowSize;
-  const visibleCount = Math.max(Math.ceil(Math.max(viewportHeight, 0) / safeRowHeight) + Math.max(overscan, 0), 0);
+  const renderStart = Math.max(windowStart - Math.max(Math.floor(leadingOverscan), 0), 0);
+  const visibleCount = Math.max(
+    Math.ceil(Math.max(viewportHeight, 0) / safeRowHeight) + Math.max(Math.floor(overscan), 0),
+    0,
+  );
 
   return {
-    startRowIndex: safeFrozen + windowStart,
+    startRowIndex: safeFrozen + renderStart,
     endRowIndex: Math.min(safeFrozen + windowStart + visibleCount + safeWindowSize - 1, safeTotal),
-    paddingTop: windowStart * safeRowHeight,
+    paddingTop: renderStart * safeRowHeight,
     scrollContentHeight: scrollableRowCount * safeRowHeight,
   };
 }

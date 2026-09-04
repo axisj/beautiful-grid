@@ -531,12 +531,6 @@ export default function HomeHeroGrid({ locale = 'ko' }: { locale?: Locale }) {
               status={{
                 content: ({ totalItems }) => locale === 'en' ? `${totalItems} rows` : `총 ${totalItems}개 행`,
               }}
-              cellMergeOptions={{
-                columnsMap: {
-                  11: { mergeBy: 'region' },
-                  1: { mergeBy: 'customer' },
-                }
-              }}
               pagination={{ visible: false }}
               scrollbar={{
                 variant: 'modern',

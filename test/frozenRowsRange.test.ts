@@ -84,4 +84,23 @@ describe('getVisibleScrollableRowRange', () => {
     expect(nextWindow.startRowIndex).toBe(first.startRowIndex + 8);
     expect(nextWindow.paddingTop).toBe(first.paddingTop + 240);
   });
+
+  it('keeps rows mounted above and below the viewport for fast bidirectional scrolling', () => {
+    expect(
+      getVisibleScrollableRowRange({
+        scrollTop: 600,
+        viewportHeight: 300,
+        rowHeight: 30,
+        frozenRowCount: 2,
+        totalRowCount: 500,
+        overscan: 10,
+        leadingOverscan: 10,
+        windowSize: 8,
+      }),
+    ).toMatchObject({
+      startRowIndex: 8,
+      endRowIndex: 45,
+      paddingTop: 180,
+    });
+  });
 });

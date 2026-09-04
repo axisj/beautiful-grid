@@ -70,6 +70,7 @@ export interface EnsureCellVisibleParams {
   verticalScrollState?: {
     scrollTop: number;
     scrollHeight: number;
+    maxScrollTop?: number;
   };
   viewportInsets?: {
     top?: number;
@@ -110,7 +111,10 @@ export function ensureCellVisible({
     const rowBottom = getRowBottom(targetRowIndex, rowHeight);
     const clientHeight = scrollContainer.clientHeight;
     const scrollHeight = verticalScrollState?.scrollHeight ?? scrollContainer.scrollHeight;
-    const maxScrollTop = Math.max(0, scrollHeight - clientHeight);
+    const maxScrollTop = Math.max(
+      0,
+      verticalScrollState?.maxScrollTop ?? scrollHeight - clientHeight,
+    );
 
     if (clientHeight > 0) {
       const topInset = clamp(viewportInsets?.top ?? 0, 0, clientHeight);

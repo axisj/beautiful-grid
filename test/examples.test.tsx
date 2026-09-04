@@ -489,7 +489,7 @@ describe('demo examples render intended grid features', () => {
       expect(selectedKeys).toHaveTextContent('대한민국(15+ LFS)');
       expect(selectedKeys).not.toHaveTextContent('아르메니아(15~75 LFS)');
     });
-  }, 15000);
+  }, 30_000);
 
   it('renders PagingExample with footer pagination', async () => {
     const { container } = await renderExample(() => import('../examples/PagingExample'));

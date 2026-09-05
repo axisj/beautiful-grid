@@ -268,7 +268,10 @@ const localizedWhyBGridItems = localize(whyBGridItems);
       <div class="container hero-layout-text" style="position:relative; z-index:1;">
         <div class="hero-top-row">
           <div class="hero-copy">
-            <p class="hero-kicker"><span></span> {t('업무용 애플리케이션을 위한 오픈소스 React Data Grid', 'Open-source React Data Grid for business applications')}</p>
+            <p class="hero-kicker">
+              <span class="hero-kicker-dot" aria-hidden="true"></span>
+              <span class="hero-kicker-label">{t('업무용 애플리케이션을 위한 오픈소스 React Data Grid', 'Open-source React Data Grid for business applications')}</span>
+            </p>
             <h1>
               {t('아름답게, 강력하게.', 'Beautiful. Powerful.')}<br />{' '}
               <span>{t('React로 자연스럽게.', 'Naturally React.')}</span>
@@ -290,8 +293,8 @@ const localizedWhyBGridItems = localize(whyBGridItems);
               <button type="button" class="copy-command" data-copy-command data-copy-ready={t('복사', 'Copy')} data-copy-success={t('복사됨', 'Copied')} aria-label={t('설치 명령 복사', 'Copy installation command')}>{t('복사', 'Copy')}</button>
             </div>
             <p class="hero-trust-note">
-              <span aria-hidden="true">✓</span>
-              {t('Apache-2.0 오픈소스 · 모든 기능을 실행 예제와 실제 소스로 확인하세요.', 'Apache-2.0 open source · Verify every feature with runnable examples and real source.')}
+              <span class="hero-trust-icon" aria-hidden="true">✓</span>
+              <span class="hero-trust-text">{t('Apache-2.0 오픈소스 · 모든 기능을 실행 예제와 실제 소스로 확인하세요.', 'Apache-2.0 open source · Verify every feature with runnable examples and real source.')}</span>
             </p>
           </div>
         </div>
@@ -927,20 +930,28 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   }
 
   .hero-kicker {
-    display: flex;
-    align-items: center;
+    display: inline-flex;
+    align-items: flex-start;
     gap: var(--home-space-3);
     margin-bottom: var(--home-space-5);
     color: #41516a;
     letter-spacing: 0.09em;
+    text-align: left;
   }
 
-  .hero-kicker > span {
+  .hero-kicker-dot {
+    flex: 0 0 auto;
     width: 7px;
     height: 7px;
+    margin-top: 0.55em;
     border-radius: 50%;
     background: #2563eb;
     box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.1);
+  }
+
+  .hero-kicker-label {
+    min-width: 0;
+    text-wrap: balance;
   }
 
   .hero-copy h1 {
@@ -967,6 +978,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
     font-size: 17px;
     font-weight: 520;
     line-height: 1.85;
+    text-wrap: balance;
     word-break: keep-all;
   }
 
@@ -1051,15 +1063,18 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
 
   .hero-trust-note {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: var(--home-space-2);
     margin: var(--home-space-4) 0 0;
     color: #718097;
     font-size: 13px;
     font-weight: 620;
+    line-height: 1.6;
+    text-align: left;
   }
 
-  .hero-trust-note span { color: #059669; font-weight: 900; }
+  .hero-trust-icon { flex: 0 0 auto; color: #059669; font-weight: 900; }
+  .hero-trust-text { min-width: 0; text-wrap: balance; }
 
   .hero-visual {
     position: relative;
@@ -3015,7 +3030,7 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
   :global(html[data-theme='dark']) .hero-trust-note,
   :global(html[data-theme='dark']) .capability-card-head p,
   :global(html[data-theme='dark']) .speed-values em { color: var(--site-text-muted); }
-  :global(html[data-theme='dark']) .hero-trust-note span { color: #6ee7b7; }
+  :global(html[data-theme='dark']) .hero-trust-icon { color: #6ee7b7; }
   :global(html[data-theme='dark']) .capability-item > strong,
   :global(html[data-theme='dark']) .speed-values > strong { color: var(--site-text-primary); }
   :global(html[data-theme='dark']) .capability-card-head > span,
@@ -3234,17 +3249,44 @@ createRoot(document.getElementById(<span class="code-green">'root'</span>)!).ren
 
   @media (max-width: 620px) {
     .hero-section { padding-top: var(--home-space-6); }
-    .hero-layout,
-    .capability-heading { padding-inline: var(--home-space-2); }
+    .hero-layout { padding-inline: var(--home-space-2); }
     .hero-copy h1 { font-size: 39px; line-height: 1.1; }
     :global(html[lang='en']) .hero-copy h1 { font-size: 35px; }
-    :global(html[lang='en']) .hero-kicker { max-width: 340px; }
+    .hero-kicker {
+      max-width: min(100%, 620px);
+      justify-content: center;
+    }
+    :global(html[lang='en']) .hero-kicker { max-width: min(100%, calc(29ch + 28px)); }
+    :global(html[lang='en']) .hero-kicker-label { max-width: 29ch; }
     .hero-copy h1 br { display: none; }
+    :global(html[lang='en']) .hero-copy h1 br { display: block; }
     .hero-copy h1 span { margin-left: 0.12em; }
-    .hero-description { margin-top: var(--home-space-5); font-size: 15px; }
-    .hero-actions { display: grid; grid-template-columns: 1fr; }
-    .hero-actions .btn { width: 100%; }
+    .hero-description {
+      max-width: 38rem;
+      margin-top: var(--home-space-5);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+    .hero-actions {
+      width: min(100%, 360px);
+      flex-wrap: nowrap;
+    }
+    .hero-actions .btn {
+      min-width: 0;
+      flex: 1 1 0;
+      width: auto;
+      padding-inline: 14px;
+      white-space: nowrap;
+    }
     .install-command { max-width: none; }
+    .hero-trust-note {
+      width: min(100%, 360px);
+      margin-top: var(--home-space-5);
+    }
+    .capability-heading {
+      width: calc(100% - 32px);
+      padding-inline: 0;
+    }
     .capability-rail { width: calc(100% - 32px); grid-template-columns: 1fr; }
     .capability-item,
     .capability-item:first-child {

@@ -1199,6 +1199,74 @@
   flex-shrink: 0;
 }
 
+.bgrid-toolbox-menu-label {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bgrid-toolbox-menu-chevron {
+  flex: none;
+  color: var(--bgrid-toolbox-muted-color);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.bgrid-toolbox-visibility-header {
+  display: flex;
+  min-height: 28px;
+  gap: 6px;
+  align-items: center;
+  margin: -2px 0 4px;
+}
+
+.bgrid-toolbox-visibility-title {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.bgrid-toolbox-icon-button {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--bgrid-toolbox-color);
+  font: inherit;
+  font-size: 19px;
+  line-height: 1;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+}
+
+.bgrid-toolbox-icon-button:hover,
+.bgrid-toolbox-icon-button:focus-visible {
+  background: var(--bgrid-toolbox-hover-bg);
+  outline: 1px solid var(--bgrid-toolbox-focus-ring-color);
+}
+
+.bgrid-toolbox-hidden-list {
+  display: flex;
+  max-height: 220px;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+  scrollbar-color: var(--bgrid-toolbox-scroll-thumb-bg) var(--bgrid-toolbox-scroll-track-bg);
+}
+
+.bgrid-toolbox-show-all {
+  margin-top: 5px;
+  border-top: 1px solid var(--bgrid-border-color-subtle);
+  border-radius: 0 0 4px 4px;
+  padding-top: 7px;
+}
+
 /* Form Controls */
 .bgrid-toolbox-form-row {
   margin-bottom: 6px;

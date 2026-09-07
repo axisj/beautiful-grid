@@ -1,6 +1,17 @@
 import * as React from 'react';
 import Table from './components/Table';
-import { AppModelColumn, BGridDataControl, BGridDataQuery, BGridProps, BGridSortParam, CheckedAll } from './types';
+import {
+  AppModelColumn,
+  BGridColumn,
+  BGridColumnVisibilityChangeEvent,
+  BGridColumnVisibilityState,
+  BGridColumnWithOptionalWidth,
+  BGridDataControl,
+  BGridDataQuery,
+  BGridProps,
+  BGridSortParam,
+  CheckedAll,
+} from './types';
 import {
   createPivotData,
   buildHeaderMatrix,
@@ -10,12 +21,38 @@ import {
   getColumnKeyToken,
   getFrozenColumnsWidth,
   processDataQuery,
+  projectColumnVisibility,
   resolveStatusOptions,
   resolvePaginationViewOptions,
   resolveScrollbarOptions,
   shouldRenderBottomBar,
 } from './utils';
 import { AppStoreInitialState, AppStoreProvider } from './store';
+
+function computeModelColumns<T>(
+  columns: BGridColumnWithOptionalWidth<T>[],
+  frozenColumnIndex: number,
+  duplicateToolboxColumnIds: Set<string>,
+): AppModelColumn<T>[] {
+  let left = 0;
+  let previousWidth = 0;
+
+  return columns.map((column, columnIndex) => {
+    const columnId = getColumnId(column as BGridColumn<T>);
+    if (columnIndex >= frozenColumnIndex) {
+      left += previousWidth;
+      previousWidth = column.width ?? 100;
+    }
+    return {
+      ...column,
+      columnId,
+      keyToken: getColumnKeyToken(column.key),
+      toolbox: duplicateToolboxColumnIds.has(columnId) ? false : column.toolbox,
+      left: columnIndex < frozenColumnIndex ? -1 : left,
+      width: column.width ?? 100,
+    } as AppModelColumn<T>;
+  });
+}
 
 export function BGrid<T = Record<string, any>>({
   ref,
@@ -65,10 +102,16 @@ export function BGrid<T = Record<string, any>>({
   pivot,
   dataControl,
   icons,
+  columnVisibility,
   searchOptions,
   contextMenuOptions,
 }: BGridProps<T>) {
-  const warnedSearchControlledRef = React.useRef({ open: false, query: false, pivotContextMenu: false });
+  const warnedSearchControlledRef = React.useRef({
+    open: false,
+    query: false,
+    pivotContextMenu: false,
+    columnVisibility: false,
+  });
   const pivotData = React.useMemo(() => {
     return createPivotData({
       data,
@@ -76,7 +119,28 @@ export function BGrid<T = Record<string, any>>({
     });
   }, [data, pivot]);
   const pivotEnabled = !!pivotData;
-  const resolvedColumns = pivotData?.columns ?? columns;
+  const resolvedColumns = (pivotData?.columns ?? columns) as BGridColumnWithOptionalWidth<T>[];
+  const visibilityOptions = typeof columnVisibility === 'object' ? columnVisibility : undefined;
+  const visibilityEnabled = columnVisibility === true || (visibilityOptions !== undefined && visibilityOptions.enabled !== false);
+  const [uncontrolledHiddenColumnIds, setUncontrolledHiddenColumnIds] = React.useState<string[]>(() =>
+    Array.from(new Set(visibilityOptions?.defaultHiddenColumnIds ?? [])),
+  );
+  const hiddenColumnIds = React.useMemo(
+    () => {
+      if (!visibilityEnabled) return [];
+      const requestedIds = Array.from(new Set(visibilityOptions?.hiddenColumnIds ?? uncontrolledHiddenColumnIds));
+      if (
+        resolvedColumns.length > 0 &&
+        resolvedColumns.every(column => requestedIds.includes(getColumnId(column as BGridColumn<T>)))
+      ) {
+        const firstColumnId = getColumnId(resolvedColumns[0] as BGridColumn<T>);
+        return requestedIds.filter(columnId => columnId !== firstColumnId);
+      }
+      return requestedIds;
+    },
+    [resolvedColumns, uncontrolledHiddenColumnIds, visibilityEnabled, visibilityOptions?.hiddenColumnIds],
+  );
+  const hiddenColumnIdSet = React.useMemo(() => new Set(hiddenColumnIds), [hiddenColumnIds]);
   const resolvedColumnGroups = React.useMemo(
     () => (pivotEnabled ? [] : columnGroups ?? []),
     [columnGroups, pivotEnabled],
@@ -85,23 +149,46 @@ export function BGrid<T = Record<string, any>>({
     () => pivotData?.columnsGroup ?? (resolvedColumnGroups.length ? [] : columnsGroup ?? []),
     [columnsGroup, pivotData?.columnsGroup, resolvedColumnGroups.length],
   );
+  const visibilityProjection = React.useMemo(
+    () =>
+      projectColumnVisibility<T>({
+        columns: resolvedColumns,
+        hiddenColumnIds: hiddenColumnIdSet,
+        frozenColumnIndex: pivotEnabled ? 0 : frozenColumnIndex,
+        columnsGroup: resolvedColumnsGroup,
+        columnGroups: resolvedColumnGroups,
+        cellMergeOptions: pivotEnabled ? undefined : cellMergeOptions,
+        summary: pivotEnabled ? undefined : summary,
+      }),
+    [
+      cellMergeOptions,
+      frozenColumnIndex,
+      hiddenColumnIdSet,
+      pivotEnabled,
+      resolvedColumnGroups,
+      resolvedColumns,
+      resolvedColumnsGroup,
+      summary,
+    ],
+  );
   const resolvedData = pivotData?.data ?? data;
   const resolvedPage = pivotEnabled ? undefined : page;
-  const resolvedFrozenColumnIndex = pivotEnabled ? 0 : frozenColumnIndex;
+  const resolvedFrozenColumnIndex = visibilityProjection.frozenColumnIndex;
   const resolvedRowChecked = pivotEnabled ? undefined : rowChecked;
   const resolvedSort = pivotEnabled ? undefined : sort;
   const resolvedOnClick = pivotEnabled ? undefined : onClick;
-  const resolvedOnChangeColumns = pivotEnabled ? undefined : onChangeColumns;
+  const baseOnChangeColumns = pivotEnabled ? undefined : onChangeColumns;
   const resolvedOnChangeData = pivotEnabled ? undefined : onChangeData;
   const resolvedRowKey = pivotEnabled ? undefined : rowKey;
   const resolvedSelectedRowKey = pivotEnabled ? undefined : selectedRowKey;
   const resolvedEditable = pivotEnabled ? false : editable;
   const resolvedShowLineNumber = pivotEnabled ? false : showLineNumber;
   const resolvedGetRowClassName = pivotEnabled ? undefined : getRowClassName;
-  const resolvedCellMergeOptions = pivotEnabled ? undefined : cellMergeOptions;
+  const resolvedCellMergeOptions = visibilityProjection.cellMergeOptions;
   const resolvedCellSelectionOptions = cellSelectionOptions;
-  const resolvedSummary = pivotEnabled ? undefined : summary;
-  const resolvedColumnSortable = pivotEnabled ? false : columnSortable;
+  const resolvedSummary = visibilityProjection.summary;
+  const hasHiddenColumns = visibilityProjection.columns.length < resolvedColumns.length;
+  const resolvedColumnSortable = pivotEnabled || hasHiddenColumns ? false : columnSortable;
   const resolvedDataControl = pivotEnabled ? undefined : dataControl;
   const resolvedSearchOptions = pivotEnabled ? undefined : searchOptions;
   const resolvedContextMenuOptions = pivotEnabled ? undefined : contextMenuOptions;
@@ -148,6 +235,17 @@ export function BGrid<T = Record<string, any>>({
         warnedSearchControlledRef.current.pivotContextMenu = true;
         console.warn('[BGrid] contextMenuOptions is disabled while pivot mode is active.');
       }
+      if (hasHiddenColumns && columnSortable) {
+        console.warn('[BGrid] Column reordering is disabled while columns are hidden.');
+      }
+      if (
+        visibilityOptions?.hiddenColumnIds !== undefined &&
+        !visibilityOptions.onChange &&
+        !warnedSearchControlledRef.current.columnVisibility
+      ) {
+        warnedSearchControlledRef.current.columnVisibility = true;
+        console.warn('[BGrid] Controlled columnVisibility.hiddenColumnIds requires onChange to respond to user actions.');
+      }
       if (
         searchOptions?.open !== undefined &&
         !searchOptions.onOpenChange &&
@@ -177,12 +275,19 @@ export function BGrid<T = Record<string, any>>({
     resolvedSort,
     contextMenuOptions,
     searchOptions,
+    columnSortable,
+    hasHiddenColumns,
+    visibilityOptions?.hiddenColumnIds,
+    visibilityOptions?.onChange,
   ]);
 
-  const duplicateToolboxColumnIds = React.useMemo(
-    () => findDuplicateColumnIds(resolvedColumns as any, true),
-    [resolvedColumns],
-  );
+  const duplicateToolboxColumnIds = React.useMemo(() => {
+    const duplicates = findDuplicateColumnIds(resolvedColumns as any, true);
+    if (visibilityEnabled) {
+      findDuplicateColumnIds(resolvedColumns as any).forEach(columnId => duplicates.add(columnId));
+    }
+    return duplicates;
+  }, [resolvedColumns, visibilityEnabled]);
   const warnedDuplicateIdsRef = React.useRef(new Set<string>());
 
   React.useEffect(() => {
@@ -195,50 +300,108 @@ export function BGrid<T = Record<string, any>>({
     console.warn(
       `[BGrid] Duplicate column IDs detected: ${newDuplicateIds.join(
         ', ',
-      )}. Toolbox is disabled for those columns; specify an explicit unique 'id'.`,
+      )}. Toolbox${visibilityEnabled ? ' and column visibility are' : ' is'} disabled for those columns; specify an explicit unique 'id'.`,
     );
-  }, [duplicateToolboxColumnIds]);
+  }, [duplicateToolboxColumnIds, visibilityEnabled]);
+
+  const requestColumnVisibilityChange = React.useCallback(
+    (nextHiddenColumnIds: string[], event: BGridColumnVisibilityChangeEvent<T>) => {
+      const uniqueIds = Array.from(new Set(nextHiddenColumnIds));
+      if (event.type === 'hide') {
+        const visibleCount = resolvedColumns.reduce(
+          (count, column) => count + (uniqueIds.includes(getColumnId(column as any)) ? 0 : 1),
+          0,
+        );
+        if (visibleCount === 0) return;
+      }
+      if (visibilityOptions?.hiddenColumnIds === undefined) {
+        setUncontrolledHiddenColumnIds(uniqueIds);
+      }
+      visibilityOptions?.onChange?.(uniqueIds, event);
+    },
+    [resolvedColumns, visibilityOptions],
+  );
+
+  const columnVisibilityState: BGridColumnVisibilityState<T> | undefined = React.useMemo(
+    () =>
+      visibilityEnabled
+        ? {
+            items: resolvedColumns.map(column => {
+              const columnId = getColumnId(column as any);
+              return {
+                column: column as BGridColumn<T>,
+                columnId,
+                hidden: hiddenColumnIdSet.has(columnId),
+                hideable: column.hideable !== false && !duplicateToolboxColumnIds.has(columnId),
+              };
+            }),
+            hiddenColumnIds,
+            onChange: requestColumnVisibilityChange,
+          }
+        : undefined,
+    [
+      duplicateToolboxColumnIds,
+      hiddenColumnIdSet,
+      hiddenColumnIds,
+      requestColumnVisibilityChange,
+      resolvedColumns,
+      visibilityEnabled,
+    ],
+  );
 
   const computedColumns: AppModelColumn<T>[] = React.useMemo(() => {
-    let left = 0;
-    let prevWidth = 0;
+    return computeModelColumns(visibilityProjection.columns, resolvedFrozenColumnIndex, duplicateToolboxColumnIds);
+  }, [duplicateToolboxColumnIds, resolvedFrozenColumnIndex, visibilityProjection.columns]);
 
-    return [
-      ...resolvedColumns.slice(0, resolvedFrozenColumnIndex).map(column => {
-        const columnId = getColumnId(column as any);
-        return {
-          ...column,
-          columnId,
-          keyToken: getColumnKeyToken(column.key),
-          toolbox: duplicateToolboxColumnIds.has(columnId) ? false : column.toolbox,
-          left: -1,
-          width: column.width ?? 100,
-        };
-      }),
-      ...resolvedColumns.slice(resolvedFrozenColumnIndex).map(column => {
-        left += prevWidth;
-        prevWidth = column.width ?? 100;
-        const columnId = getColumnId(column as any);
-        return {
-          ...column,
-          columnId,
-          keyToken: getColumnKeyToken(column.key),
-          toolbox: duplicateToolboxColumnIds.has(columnId) ? false : column.toolbox,
-          left,
-          width: column.width ?? 100,
-        };
-      }),
-    ] as AppModelColumn<T>[];
-  }, [duplicateToolboxColumnIds, resolvedColumns, resolvedFrozenColumnIndex]);
+  const queryColumns: AppModelColumn<T>[] = React.useMemo(
+    () => computeModelColumns(resolvedColumns, pivotEnabled ? 0 : frozenColumnIndex, duplicateToolboxColumnIds),
+    [duplicateToolboxColumnIds, frozenColumnIndex, pivotEnabled, resolvedColumns],
+  );
+
+  const projectedOnChangeColumns = React.useCallback<NonNullable<BGridProps<T>['onChangeColumns']>>(
+    (visibleColumnIndex, info) => {
+      if (!baseOnChangeColumns) return;
+      if (!hasHiddenColumns) {
+        baseOnChangeColumns(visibleColumnIndex, info);
+        return;
+      }
+
+      const nextColumns = [...resolvedColumns] as BGridColumn<T>[];
+      visibilityProjection.visibleOriginalIndexes.forEach((originalIndex, visibleIndex) => {
+        const updatedColumn = info.columns[visibleIndex];
+        if (updatedColumn) nextColumns[originalIndex] = updatedColumn;
+      });
+      baseOnChangeColumns(
+        visibleColumnIndex === null
+          ? null
+          : visibilityProjection.visibleOriginalIndexes[visibleColumnIndex] ?? null,
+        {
+          ...info,
+          columns: nextColumns,
+          columnsGroup: resolvedColumnsGroup,
+          columnGroups: resolvedColumnGroups,
+        },
+      );
+    },
+    [
+      baseOnChangeColumns,
+      hasHiddenColumns,
+      resolvedColumnGroups,
+      resolvedColumns,
+      resolvedColumnsGroup,
+      visibilityProjection.visibleOriginalIndexes,
+    ],
+  );
+  const resolvedOnChangeColumns = baseOnChangeColumns ? projectedOnChangeColumns : undefined;
 
   const headerMatrixDiagnostics = React.useMemo(
     () =>
       buildHeaderMatrix({
         columns: computedColumns,
-        columnsGroup: resolvedColumnsGroup,
-        columnGroups: resolvedColumnGroups,
+        columnsGroup: visibilityProjection.columnsGroup,
+        columnGroups: visibilityProjection.columnGroups,
       }),
-    [computedColumns, resolvedColumnGroups, resolvedColumnsGroup],
+    [computedColumns, visibilityProjection.columnGroups, visibilityProjection.columnsGroup],
   );
 
   React.useEffect(() => {
@@ -261,7 +424,7 @@ export function BGrid<T = Record<string, any>>({
   const unknownQueryColumnIds = React.useMemo(() => {
     if (!resolvedDataControl) return [] as string[];
 
-    const knownIds = new Set(computedColumns.map(column => column.columnId));
+    const knownIds = new Set(queryColumns.map(column => column.columnId));
     return Array.from(
       new Set(
         [
@@ -270,7 +433,7 @@ export function BGrid<T = Record<string, any>>({
         ].filter((id): id is string => !!id && !knownIds.has(id)),
       ),
     );
-  }, [computedColumns, resolvedDataControl]);
+  }, [queryColumns, resolvedDataControl]);
   const warnedUnknownQueryIdsRef = React.useRef(new Set<string>());
 
   React.useEffect(() => {
@@ -316,7 +479,7 @@ export function BGrid<T = Record<string, any>>({
     if (resolvedDataControl?.mode === 'client') {
       return processDataQuery({
         data: resolvedData as any,
-        columns: computedColumns,
+        columns: queryColumns,
         query: resolvedDataQuery,
         rowKey: resolvedRowKey,
         includeRows: false,
@@ -332,7 +495,7 @@ export function BGrid<T = Record<string, any>>({
       sourceIndexByVisibleIndex,
       visibleIndexBySourceIndex,
     };
-  }, [computedColumns, resolvedData, resolvedDataControl?.mode, resolvedDataQuery, resolvedRowKey]);
+  }, [queryColumns, resolvedData, resolvedDataControl?.mode, resolvedDataQuery, resolvedRowKey]);
 
   const displayData = processedResult.data;
   const resolvedFrozenRowCount = pivotEnabled
@@ -455,8 +618,8 @@ export function BGrid<T = Record<string, any>>({
         reorderable: resolvedReorder?.enabled ?? false,
       }),
       columns: computedColumns,
-      columnsGroup: resolvedColumnsGroup,
-      columnGroups: resolvedColumnGroups,
+      columnsGroup: visibilityProjection.columnsGroup,
+      columnGroups: visibilityProjection.columnGroups,
       data: displayData as any,
       sourceData: resolvedData as any,
       sourceIndexByVisibleIndex: processedResult.sourceIndexByVisibleIndex,
@@ -471,6 +634,7 @@ export function BGrid<T = Record<string, any>>({
       dataQuery: resolvedDataQuery,
       dataControl: resolvedDataControl,
       icons,
+      columnVisibilityState,
       searchOptions: resolvedSearchOptions,
       contextMenuOptions: resolvedContextMenuOptions,
       page: resolvedPage,
@@ -524,13 +688,14 @@ export function BGrid<T = Record<string, any>>({
     resolvedRowChecked,
     computedColumns,
     resolvedReorder,
-    resolvedColumnsGroup,
-    resolvedColumnGroups,
+    visibilityProjection.columnsGroup,
+    visibilityProjection.columnGroups,
     resolvedSort,
     sortParams,
     resolvedDataQuery,
     resolvedDataControl,
     icons,
+    columnVisibilityState,
     resolvedSearchOptions,
     resolvedContextMenuOptions,
     loading,
@@ -560,8 +725,8 @@ export function BGrid<T = Record<string, any>>({
         ref={ref}
         {...{
           columns: computedColumns,
-          columnsGroup: resolvedColumnsGroup,
-          columnGroups: resolvedColumnGroups,
+          columnsGroup: visibilityProjection.columnsGroup,
+          columnGroups: visibilityProjection.columnGroups,
           onChangeColumns: resolvedOnChangeColumns,
           width,
           height,
@@ -589,6 +754,7 @@ export function BGrid<T = Record<string, any>>({
           dataQuery: resolvedDataQuery,
           dataControl: resolvedDataControl,
           icons,
+          columnVisibilityState,
           searchOptions: resolvedSearchOptions,
           contextMenuOptions: resolvedContextMenuOptions,
           page: resolvedPage,

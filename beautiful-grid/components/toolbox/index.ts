@@ -4,3 +4,4 @@ export * from './ToolboxValueFilterSection';
 export * from './ToolboxTextFilterSection';
 export * from './ToolboxNumberFilterSection';
 export * from './ToolboxCustomSection';
+export * from './ToolboxColumnVisibilitySection';

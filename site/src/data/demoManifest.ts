@@ -37,6 +37,11 @@ export const demoManifest: Record<string, DemoManifestItem> = {
     sourceFiles: withContainerSources('ToolboxExample.tsx'),
     minHeight: 520,
   },
+  'column-visibility': {
+    componentFile: 'ColumnVisibilityExample.tsx',
+    sourceFiles: withContainerSources('ColumnVisibilityExample.tsx'),
+    minHeight: 540,
+  },
   search: {
     componentFile: 'SearchExample.tsx',
     sourceFiles: withContainerSources('SearchExample.tsx'),

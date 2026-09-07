@@ -23,3 +23,4 @@ export * from './gridSearch';
 export * from './cellEditTransaction';
 export * from './rowReorder';
 export * from './checkboxEditor';
+export * from './columnVisibility';

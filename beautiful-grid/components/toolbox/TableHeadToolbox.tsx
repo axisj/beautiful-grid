@@ -8,6 +8,7 @@ import { ToolboxValueFilterSection } from './ToolboxValueFilterSection';
 import { ToolboxTextFilterSection } from './ToolboxTextFilterSection';
 import { ToolboxNumberFilterSection } from './ToolboxNumberFilterSection';
 import { ToolboxCustomSection } from './ToolboxCustomSection';
+import { ToolboxColumnVisibilitySection } from './ToolboxColumnVisibilitySection';
 import { EditorPortalContext } from '../EditorPortalRoot';
 
 interface Props<T> {
@@ -91,6 +92,7 @@ export function TableHeadToolbox<T>({
   const popoverRef = useRef<HTMLDivElement>(null);
   const floatingPortal = React.useContext(EditorPortalContext);
   const [position, setPosition] = useState<{ top: number; left: number }>({ top: -9999, left: -9999 });
+  const [visibilityMode, setVisibilityMode] = useState<'menu' | 'hidden'>('menu');
   const toolboxThemeStyle = React.useMemo(() => readToolboxTheme(anchorEl), [anchorEl]);
 
   const toolboxConfig: BGridToolboxConfig<T> | undefined =
@@ -106,6 +108,7 @@ export function TableHeadToolbox<T>({
   const showFilter =
     column.filter !== false &&
     (column.toolbox === true || toolboxConfig?.filter === true);
+  const showColumnVisibility = !!useAppStore(s => s.columnVisibilityState);
 
   // Position calculation with boundary adjustments
   const updatePosition = React.useCallback(() => {
@@ -281,9 +284,9 @@ export function TableHeadToolbox<T>({
       }}
       onClick={e => e.stopPropagation()}
     >
-      {showSort && <ToolboxSortSection column={column} columnId={columnId} />}
+      {visibilityMode === 'menu' && showSort && <ToolboxSortSection column={column} columnId={columnId} />}
 
-      {showFilter && (
+      {visibilityMode === 'menu' && showFilter && (
         <>
           {filterType === 'values' && (
             <ToolboxValueFilterSection column={column} columnId={columnId} />
@@ -297,12 +300,22 @@ export function TableHeadToolbox<T>({
         </>
       )}
 
-      {toolboxConfig && (
+      {visibilityMode === 'menu' && toolboxConfig && (
         <ToolboxCustomSection
           column={column}
           columnId={columnId}
           columnIndex={columnIndex}
           config={toolboxConfig}
+          close={onClose}
+        />
+      )}
+
+      {showColumnVisibility && (
+        <ToolboxColumnVisibilitySection
+          column={column}
+          columnId={columnId}
+          mode={visibilityMode}
+          onModeChange={setVisibilityMode}
           close={onClose}
         />
       )}

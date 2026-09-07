@@ -25,6 +25,7 @@ const ToolboxExample = React.lazy(() => import('../examples/ToolboxExample'));
 const ScrollbarExample = React.lazy(() => import('../examples/ScrollbarExample'));
 const SearchExample = React.lazy(() => import('../examples/SearchExample'));
 const ContextMenuExample = React.lazy(() => import('../examples/ContextMenuExample'));
+const ColumnVisibilityExample = React.lazy(() => import('../examples/ColumnVisibilityExample'));
 
 interface DemoPageProps {
   title: string;
@@ -49,6 +50,7 @@ function DemoPage({ title, children, currentPath, onNavigate }: DemoPageProps) {
 const DEMO_ROUTES: Record<string, { title: string; component: React.LazyExoticComponent<React.ComponentType> }> = {
   '/': { title: 'Basic', component: BasicExample },
   '/toolbox': { title: 'Header Toolbox (Sort & Filter)', component: ToolboxExample },
+  '/column-visibility': { title: 'Column Visibility', component: ColumnVisibilityExample },
   '/lineNumber': { title: 'LineNumber', component: LineNumberExample },
   '/columnGroup': { title: 'ColumnsGroup', component: ColumnsGroupExample },
   '/sort': { title: 'Sort', component: SortExample },

@@ -37,6 +37,7 @@ const learn = defineCollection({
     features: z.array(z.string()),
     relatedGuides: z.array(z.string()).default([]),
     relatedApi: z.array(z.string()).default([]),
+    sinceVersion: z.string().optional(),
     lastReviewedAt: z.string(),
     indexable: z.boolean().default(true),
     draft: z.boolean().default(false),

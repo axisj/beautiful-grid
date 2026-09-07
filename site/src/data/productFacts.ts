@@ -39,6 +39,12 @@ export const productFacts = {
     { id: 'editing', name: { ko: '셀 편집', en: 'Cell Editing' }, supported: true },
     { id: 'cell-navigation', name: { ko: '셀 포커스와 키보드 이동', en: 'Cell Focus & Keyboard Navigation' }, supported: true },
     { id: 'sorting-filtering', name: { ko: '정렬과 필터', en: 'Sorting & Filtering' }, supported: true },
+    {
+      id: 'column-visibility',
+      name: { ko: '컬럼 숨김과 복구', en: 'Column Visibility' },
+      supported: true,
+      note: { ko: 'v1.0.6부터 지원', en: 'Available since v1.0.6' },
+    },
     { id: 'frozen-columns', name: { ko: '고정 열', en: 'Frozen Columns' }, supported: true },
     { id: 'selection', name: { ko: '선택과 체크', en: 'Selection & Check' }, supported: true },
     { id: 'merge', name: { ko: '셀 병합과 Summary', en: 'Cell Merge & Summary' }, supported: true },

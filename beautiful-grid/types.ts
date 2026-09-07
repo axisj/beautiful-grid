@@ -210,6 +210,8 @@ export interface BGridColumn<T> {
   searchable?: boolean;
   getSearchText?: (params: BGridSearchCellParams<T>) => unknown;
   editable?: boolean;
+  /** Prevents users from hiding this column through the built-in visibility menu. @since 1.0.6 */
+  hideable?: boolean;
   toolbox?: boolean | BGridToolboxConfig<T>;
   filter?: false | BGridColumnFilterConfig<T>;
   sortComparator?: (
@@ -393,6 +395,42 @@ export interface BGridToolboxIcons {
   filterBadge?: React.ReactNode;
   dropdown?: React.ReactNode;
   sortClear?: React.ReactNode;
+  /** @since 1.0.6 */
+  hideColumn?: React.ReactNode;
+  /** @since 1.0.6 */
+  showColumn?: React.ReactNode;
+  /** @since 1.0.6 */
+  columns?: React.ReactNode;
+}
+
+/** Describes a column visibility change initiated by a user. @since 1.0.6 */
+export interface BGridColumnVisibilityChangeEvent<T> {
+  type: 'hide' | 'show' | 'showAll';
+  columnId?: string;
+  column?: BGridColumn<T>;
+}
+
+/** Configures controlled or uncontrolled column visibility. @since 1.0.6 */
+export interface BGridColumnVisibilityOptions<T> {
+  enabled?: boolean;
+  /** Controlled list of hidden column IDs. */
+  hiddenColumnIds?: readonly string[];
+  /** Initial hidden column IDs when hiddenColumnIds is uncontrolled. */
+  defaultHiddenColumnIds?: readonly string[];
+  onChange?: (hiddenColumnIds: string[], event: BGridColumnVisibilityChangeEvent<T>) => void;
+}
+
+export interface BGridColumnVisibilityItem<T> {
+  column: BGridColumn<T>;
+  columnId: string;
+  hidden: boolean;
+  hideable: boolean;
+}
+
+export interface BGridColumnVisibilityState<T> {
+  items: BGridColumnVisibilityItem<T>[];
+  hiddenColumnIds: string[];
+  onChange: (hiddenColumnIds: string[], event: BGridColumnVisibilityChangeEvent<T>) => void;
 }
 
 export interface BGridToolboxConfig<T> {
@@ -869,6 +907,8 @@ export interface BGridProps<T> {
   pivot?: BGridPivotOptions<T>;
   dataControl?: BGridDataControl;
   icons?: BGridToolboxIcons;
+  /** Enables the built-in hide and restore controls in each column toolbox. @since 1.0.6 */
+  columnVisibility?: boolean | BGridColumnVisibilityOptions<T>;
   searchOptions?: BGridSearchOptions<T>;
   contextMenuOptions?: BGridContextMenuOptions<T>;
 }
@@ -930,6 +970,7 @@ export interface AppModel<T> extends BGridProps<T> {
   dataQuery?: BGridDataQuery;
   filterDrafts: Record<string, BGridFilterParam | undefined>;
   activeToolboxColumnId: string | null;
+  columnVisibilityState?: BGridColumnVisibilityState<T>;
   searchOptions?: BGridSearchOptions<T>;
   contextMenuOptions?: BGridContextMenuOptions<T>;
   searchOpen: boolean;
@@ -981,6 +1022,7 @@ export interface AppActions<T> {
   applyColumnFilter: (columnId: string) => void;
   clearColumnFilter: (columnId: string) => void;
   setActiveToolbox: (columnId: string | null) => void;
+  setColumnVisibilityState: (state?: BGridColumnVisibilityState<T>) => void;
   setSearchOptions: (options?: BGridSearchOptions<T>) => void;
   setContextMenuOptions: (options?: BGridContextMenuOptions<T>) => void;
   requestSearchOpen: (open: boolean, reason: BGridSearchOpenReason) => void;

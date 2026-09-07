@@ -18,7 +18,7 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/axisj/beautiful-grid/pulls)
 [![Docs](https://img.shields.io/badge/docs-bgrid.axisj.com-blue?logo=googlechrome&logoColor=white)](https://bgrid.axisj.com)
 
-BeautifulGrid is a high-performance, feature-packed, and beautifully designed open-source React Data Grid for data-heavy business applications. It combines zero-runtime-CSS styling with virtual scrolling, spreadsheet-like cell selection and clipboard operations, built-in and plugin cell editing, multi-level grouped headers, filtering & sorting toolboxes, server/client pagination, pivot table transforms, row reordering, and flexible theming.
+BeautifulGrid is a high-performance, feature-packed, and beautifully designed open-source React Data Grid for data-heavy business applications. It combines zero-runtime-CSS styling with virtual scrolling, spreadsheet-like cell selection and clipboard operations, built-in and plugin cell editing, multi-level grouped headers, filtering & sorting toolboxes, recoverable column visibility, server/client pagination, pivot table transforms, row reordering, and flexible theming.
 
 Explore live interactive examples and in-depth documentation at [bgrid.axisj.com](https://bgrid.axisj.com).
 
@@ -44,6 +44,7 @@ Explore live interactive examples and in-depth documentation at [bgrid.axisj.com
   - [11. Summary Row](#11-summary-row)
   - [12. Cell Merging](#12-cell-merging)
   - [13. Pivot Table](#13-pivot-table)
+  - [14. Column Visibility](#14-column-visibility)
 - [Props Reference](#props-reference)
   - [BGridProps](#bgridprops)
   - [BGridColumn](#bgridcolumn)
@@ -857,6 +858,35 @@ const pivotConfig: BGridProps<SalesRecord>['pivot'] = {
 
 ---
 
+### 14. Column Visibility
+
+Available since BeautifulGrid `1.0.6`.
+
+Enable recoverable column hiding through the existing header toolbox. Use controlled state to persist a user's visible-column preferences.
+
+```typescript jsx
+function OrdersGrid({ data, columns }) {
+  const [hiddenColumnIds, setHiddenColumnIds] = React.useState(['owner']);
+
+  return (
+    <BGrid
+      width={800}
+      height={420}
+      data={data}
+      columns={columns}
+      columnVisibility={{
+        hiddenColumnIds,
+        onChange: setHiddenColumnIds,
+      }}
+    />
+  );
+}
+```
+
+Set `hideable: false` on columns that must remain available. The final visible column cannot be hidden, and active sort/filter conditions remain intact while their column is hidden.
+
+---
+
 ## Props Reference
 
 ### BGridProps
@@ -930,6 +960,7 @@ Below is a categorized reference of `<BGrid>` props. For exact TypeScript types,
 | `summary` | `{ position: 'top' \| 'bottom'; columns: BGridSummaryColumn<T>[] }` | Static summary row configuration. |
 | `cellMergeOptions` | `{ columnsMap: Record<number, BGridCellMergeColumn> }` | Vertical cell merge rules. |
 | `pivot` | `BGridPivotOptions<T>` | Pivot table dimensions, aggregation rules, and metrics. |
+| `columnVisibility` | `boolean \| BGridColumnVisibilityOptions<T>` | Enables controlled or uncontrolled column hiding and restore controls (since `1.0.6`). |
 | `loading` | `boolean` | Displays full-grid loading overlay. |
 | `spinning` | `boolean` | Displays body-area spinner. |
 | `msg` | `{ emptyList?: string }` | Custom empty state text. |
@@ -961,6 +992,7 @@ Below is a categorized reference of `<BGrid>` props. For exact TypeScript types,
 | `searchable` | `boolean` | Whether this column participates in grid search (defaults to `true`). |
 | `getSearchText` | `(params: BGridSearchCellParams<T>) => unknown` | Custom string extractor for grid search matching. |
 | `toolbox` | `boolean \| BGridToolboxConfig<T>` | Enables header sort/filter toolbox popup. |
+| `hideable` | `boolean` | Allows this column to be hidden through the visibility menu (defaults to `true`, since `1.0.6`). |
 | `filter` | `false \| BGridColumnFilterConfig<T>` | Column filter configuration (`type: 'values' \| 'text' \| 'number'`). |
 | `sortComparator` | `(a, b, params) => number` | Custom comparator function for sorting. |
 

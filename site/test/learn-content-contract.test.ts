@@ -136,6 +136,19 @@ describe('Learn Content Architecture Contracts', () => {
     expect(publicTypes).toContain('contextMenuOptions?: BGridContextMenuOptions<T>');
   });
 
+  it('documents column visibility as a v1.0.6 toolbox feature in both locales', () => {
+    const koreanGuide = fs.readFileSync(path.join(learnDir, 'column-visibility.md'), 'utf8');
+    const englishGuide = fs.readFileSync(path.join(learnDir, 'en/column-visibility.md'), 'utf8');
+    const example = fs.readFileSync(path.join(examplesDir, 'ColumnVisibilityExample.tsx'), 'utf8');
+
+    expect(koreanGuide).toContain('title: "컬럼 숨김과 복구 (Column Visibility)"');
+    expect(koreanGuide).toContain('sinceVersion: "1.0.6"');
+    expect(englishGuide).toContain('sinceVersion: "1.0.6"');
+    expect(example).toContain('toolbox: true');
+    expect(example).toContain('dataControl={{');
+    expect(example).toContain("data-testid='hidden-column-status'");
+  });
+
   it('keeps the context menu guide aligned with its dedicated live example', () => {
     const contextMenuGuide = fs.readFileSync(path.join(learnDir, 'context-menu.md'), 'utf8');
     const contextMenuExample = fs.readFileSync(path.join(examplesDir, 'ContextMenuExample.tsx'), 'utf8');

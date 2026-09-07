@@ -32,6 +32,7 @@ function TableHeadColumn<T>({ column, columnIndex = 0 }: Props<T>) {
   const activeToolboxColumnId = useAppStore(s => s.activeToolboxColumnId);
   const setActiveToolbox = useAppStore(s => s.setActiveToolbox);
   const globalIcons = useAppStore(s => s.icons);
+  const columnVisibilityState = useAppStore(s => s.columnVisibilityState);
 
   const columnId = column.columnId ?? getColumnId(column as any);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -39,7 +40,11 @@ function TableHeadColumn<T>({ column, columnIndex = 0 }: Props<T>) {
   const triggerId = `bgrid-toolbox-btn-${reactId}`;
   const dialogId = `bgrid-toolbox-dialog-${reactId}`;
 
-  const isToolboxEnabled = !!column.toolbox;
+  const visibilityItem = columnVisibilityState?.items.find(item => item.columnId === columnId);
+  const isVisibilityMenuEnabled = !!columnVisibilityState && (
+    !!visibilityItem?.hideable || columnVisibilityState.items.some(item => item.hidden)
+  );
+  const isToolboxEnabled = !!column.toolbox || isVisibilityMenuEnabled;
   const isToolboxOpen = activeToolboxColumnId === columnId;
   const columnIcons = typeof column.toolbox === 'object' ? column.toolbox.icons : undefined;
   const hasCheckboxHeader = column.editor?.type === 'checkbox' && !!column.editor.header;

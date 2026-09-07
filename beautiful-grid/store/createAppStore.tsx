@@ -135,6 +135,7 @@ export type AppStoreInitialState<T = any> = Partial<
     | 'dataControl'
     | 'filterDrafts'
     | 'activeToolboxColumnId'
+    | 'columnVisibilityState'
     | 'searchOptions'
     | 'contextMenuOptions'
     | 'searchOpen'
@@ -258,6 +259,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
       dataControl: initialState?.dataControl,
       filterDrafts: initialState?.filterDrafts ?? {},
       activeToolboxColumnId: initialState?.activeToolboxColumnId ?? null,
+      columnVisibilityState: initialState?.columnVisibilityState,
       searchOptions: initialState?.searchOptions,
       contextMenuOptions: initialState?.contextMenuOptions,
       searchOpen:
@@ -504,6 +506,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
           ),
         }));
       },
+      setColumnVisibilityState: columnVisibilityState => set({ columnVisibilityState }),
       setSearchOptions: (options?: BGridSearchOptions<T>) =>
         set(state => {
           if (!options || options.enabled === false) {

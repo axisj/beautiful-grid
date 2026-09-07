@@ -7,6 +7,7 @@ interface LearnMarkdownEntry {
     features: string[];
     relatedGuides: string[];
     relatedApi: string[];
+    sinceVersion?: string;
     lastReviewedAt: string;
   };
 }
@@ -22,6 +23,7 @@ export function renderLearnMarkdown(entry: LearnMarkdownEntry) {
     );
   const metadata = [
     `Source page: https://bgrid.axisj.com${data.canonicalPath}`,
+    data.sinceVersion ? `Available since: v${data.sinceVersion}` : '',
     `Last reviewed: ${data.lastReviewedAt}`,
     data.features.length ? `Topics: ${data.features.join(', ')}` : '',
     data.relatedGuides.length ? `Related guides: ${data.relatedGuides.join(', ')}` : '',

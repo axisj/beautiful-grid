@@ -52,6 +52,7 @@ export const taskAiContextLinks: AiContextLink[] = [
   ['Built-in editors', 'built-in-editors', 'Configure text and checkbox editors, header selection, value mapping, and accessibility labels.'],
   ['Editor plugins', 'editor-plugins', 'Connect custom or third-party editors with commit, cancel, movement, and portal contracts.'],
   ['Sorting and filtering', 'sorting-filtering', 'Control multi-sort, value/text/number filters, and server-side query state.'],
+  ['Column visibility', 'column-visibility', 'Hide, restore, and persist columns through controlled or uncontrolled visibility state.'],
   ['Search', 'search', 'Configure grid search, controlled state, keyboard shortcuts, result navigation, and labels.'],
   ['Cell merge', 'cell-merge', 'Merge consecutive values with columnsMap and understand grouping constraints.'],
   ['Summary rows', 'summary', 'Render top or bottom summaries and custom aggregate cells.'],

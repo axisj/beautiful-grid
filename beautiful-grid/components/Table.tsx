@@ -12,6 +12,7 @@ import {
   AppModelColumn,
   BGridColumnGroup,
   BGridColumnGroupNode,
+  BGridColumnVisibilityState,
   BGridDataControl,
   BGridDataItem,
   BGridDataItemStatus,
@@ -106,6 +107,7 @@ interface Props<T> {
   dataQuery?: BGridDataQuery;
   dataControl?: BGridDataControl;
   icons?: BGridProps<T>['icons'];
+  columnVisibilityState?: BGridColumnVisibilityState<T>;
   searchOptions?: BGridProps<T>['searchOptions'];
   contextMenuOptions?: BGridProps<T>['contextMenuOptions'];
   sourceData?: BGridDataItem<T>[];
@@ -307,6 +309,7 @@ function Table<T>(props: Props<T>) {
     setDataQuery,
     setDataControl,
     setIcons,
+    setColumnVisibilityState,
     setActiveToolbox,
     setRowKey,
     setFocusedRowKey,
@@ -325,6 +328,7 @@ function Table<T>(props: Props<T>) {
       setDataQuery: s.setDataQuery,
       setDataControl: s.setDataControl,
       setIcons: s.setIcons,
+      setColumnVisibilityState: s.setColumnVisibilityState,
       setActiveToolbox: s.setActiveToolbox,
       setRowKey: s.setRowKey,
       setFocusedRowKey: s.setSelectedRowKey,
@@ -1853,6 +1857,7 @@ function Table<T>(props: Props<T>) {
     setSortParams(props.sortParams);
     setDataControl(props.dataControl);
     setIcons(props.icons);
+    setColumnVisibilityState(props.columnVisibilityState);
     setSearchOptions(props.searchOptions);
     setContextMenuOptions(props.contextMenuOptions);
   }, [
@@ -1861,6 +1866,7 @@ function Table<T>(props: Props<T>) {
     props.sortParams,
     props.dataControl,
     props.icons,
+    props.columnVisibilityState,
     props.searchOptions,
     props.contextMenuOptions,
     setRowChecked,
@@ -1868,6 +1874,7 @@ function Table<T>(props: Props<T>) {
     setSortParams,
     setDataControl,
     setIcons,
+    setColumnVisibilityState,
     setSearchOptions,
     setContextMenuOptions,
   ]);

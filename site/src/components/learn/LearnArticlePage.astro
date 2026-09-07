@@ -28,6 +28,7 @@ const { Content } = await render(item);
       <p class="learn-header-desc">{item.data.description}</p>
       <div class="learn-meta-bar">
         <div class="learn-tags">{item.data.features.map(feature => <span class="badge">#{feature}</span>)}</div>
+        {item.data.sinceVersion && <span class="badge">{messages.availableSince}: v{item.data.sinceVersion}+</span>}
         <span>{messages.reviewedAt}: {item.data.lastReviewedAt}</span>
         {item.data.relatedApi.length > 0 && (
           <div class="learn-related-api">

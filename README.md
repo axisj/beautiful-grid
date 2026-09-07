@@ -2,10 +2,20 @@
 
 **Beautiful. Powerful. Naturally React.**
 
-[![NPM version](https://img.shields.io/npm/v/beautiful-grid.svg?style=flat)](https://npmjs.org/package/beautiful-grid)
-[![NPM downloads](https://img.shields.io/npm/dm/beautiful-grid.svg?style=flat)](https://npmjs.org/package/beautiful-grid)
+[![NPM version](https://img.shields.io/npm/v/beautiful-grid?logo=npm)](https://npmjs.org/package/beautiful-grid)
+[![NPM downloads](https://img.shields.io/npm/dm/beautiful-grid?color=blue&logo=npm)](https://npmjs.org/package/beautiful-grid)
+[![Bundle size](https://img.shields.io/bundlephobia/minzip/beautiful-grid?color=success&label=minzipped)](https://bundlephobia.com/package/beautiful-grid)
+[![Unpacked size](https://img.shields.io/npm/unpacked-size/beautiful-grid?color=informational)](https://www.npmjs.com/package/beautiful-grid)
+[![Test](https://img.shields.io/github/actions/workflow/status/axisj/beautiful-grid/tests.yml?branch=main&label=tests&logo=github)](https://github.com/axisj/beautiful-grid/actions/workflows/tests.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![Coverage](https://img.shields.io/badge/coverage-85.67%25-brightgreen.svg)](https://github.com/axisj/beautiful-grid/actions/workflows/tests.yml)
+<br />
+[![TypeScript](https://img.shields.io/npm/types/beautiful-grid?logo=typescript&logoColor=white)](https://www.npmjs.com/package/beautiful-grid)
+[![React](https://img.shields.io/badge/React-%5E19.0.0-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![Node](https://img.shields.io/badge/node-%3E%3D22-339933?logo=node.js&logoColor=white)](https://nodejs.org)
+[![GitHub stars](https://img.shields.io/github/stars/axisj/beautiful-grid?logo=github)](https://github.com/axisj/beautiful-grid/stargazers)
+[![Last commit](https://img.shields.io/github/last-commit/axisj/beautiful-grid?logo=git)](https://github.com/axisj/beautiful-grid/commits/main)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/axisj/beautiful-grid/pulls)
+[![Docs](https://img.shields.io/badge/docs-bgrid.axisj.com-blue?logo=googlechrome&logoColor=white)](https://bgrid.axisj.com)
 
 BeautifulGrid is a high-performance, feature-packed, and beautifully designed open-source React Data Grid for data-heavy business applications. It combines zero-runtime-CSS styling with virtual scrolling, spreadsheet-like cell selection and clipboard operations, built-in and plugin cell editing, multi-level grouped headers, filtering & sorting toolboxes, server/client pagination, pivot table transforms, row reordering, and flexible theming.
 

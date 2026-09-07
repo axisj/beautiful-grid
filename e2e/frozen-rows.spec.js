@@ -169,9 +169,9 @@ test.describe('Frozen rows and columns', () => {
     });
 
     await expect.poll(async () => scrollContainer.evaluate(element => element.scrollTop)).toBe(360);
-    // Virtual rows are rendered in stable eight-row windows so held-key navigation
-    // and adjacent scroll events do not remount the body on every row boundary.
-    await expect.poll(async () => bodyMain.locator('tr[data-ri]').first().getAttribute('data-ri')).toBe('10');
+    // Virtual rows keep leading overscan mounted above the viewport so held-key
+    // navigation and adjacent scroll events do not remount the body on every row boundary.
+    await expect.poll(async () => bodyMain.locator('tr[data-ri]').first().getAttribute('data-ri')).toBe('2');
     await expect(bodyMain.locator('tr[data-ri="14"]')).toHaveCount(1);
 
     const topLeftAfter = await topLeft.boundingBox();

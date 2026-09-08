@@ -73,6 +73,7 @@ function Nav({ currentPath, onNavigate }: Props) {
             key: '/pivot',
           },
           { label: `Loading`, key: '/loading' },
+          { label: `Disabled`, key: '/disabled' },
           { label: `Focus`, key: '/focus' },
           { label: `Frozen Columns`, key: '/frozenColumns' },
           { label: `Editor`, key: '/editor' },

@@ -348,6 +348,12 @@ const memberDescriptions: Record<string, string> = {
   aggregate: '피벗 집계 방식 또는 사용자 집계 함수입니다.',
 };
 
+const typeMemberDescriptions: Record<string, Record<string, string>> = {
+  BGridProps: {
+    disabled: '스크롤을 제외한 그리드 UI 상호작용을 비활성화합니다.',
+  },
+};
+
 const typesPathCandidates = [
   path.resolve(process.cwd(), '../beautiful-grid/types.ts'),
   path.resolve(process.cwd(), 'beautiful-grid/types.ts'),
@@ -367,16 +373,20 @@ function memberName(member: ts.TypeElement | ts.EnumMember) {
   return member.name?.getText(sourceFile).replace(/^['"]|['"]$/g, '') || '';
 }
 
-function getMembers(node: ts.InterfaceDeclaration | ts.EnumDeclaration): ApiReferenceMember[] {
+function getMembers(typeName: string, node: ts.InterfaceDeclaration | ts.EnumDeclaration): ApiReferenceMember[] {
   return node.members.map(member => {
     const name = memberName(member);
+    const description =
+      typeMemberDescriptions[typeName]?.[name] ||
+      memberDescriptions[name] ||
+      '타입 시그니처와 연결된 인터페이스를 기준으로 값을 설정합니다.';
     if (ts.isEnumMember(member)) {
       return {
         name,
         type: member.initializer?.getText(sourceFile) || 'number',
         required: true,
         deprecated: false,
-        description: memberDescriptions[name] || '열거형 값입니다.',
+        description: typeMemberDescriptions[typeName]?.[name] || memberDescriptions[name] || '열거형 값입니다.',
       };
     }
     const deprecated = /@deprecated/.test(member.getFullText(sourceFile));
@@ -388,7 +398,7 @@ function getMembers(node: ts.InterfaceDeclaration | ts.EnumDeclaration): ApiRefe
       type,
       required: !member.questionToken,
       deprecated,
-      description: memberDescriptions[name] || '타입 시그니처와 연결된 인터페이스를 기준으로 값을 설정합니다.',
+      description,
     };
   });
 }
@@ -422,7 +432,7 @@ const entries = sourceFile.statements.flatMap<ApiReferenceEntry>(node => {
       group: metadata.group,
       summary: metadata.summary,
       declaration: declarationHeader(node),
-      members: ts.isInterfaceDeclaration(node) || ts.isEnumDeclaration(node) ? getMembers(node) : [],
+      members: ts.isInterfaceDeclaration(node) || ts.isEnumDeclaration(node) ? getMembers(node.name.text, node) : [],
       sourceLine: sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1,
     },
   ];

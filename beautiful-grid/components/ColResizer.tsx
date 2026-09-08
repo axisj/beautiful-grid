@@ -17,17 +17,17 @@ function ColResizer({ container, columnIndex, hideHandle, bordered, frozenBounda
   const setColumnWidth = useAppStore(s => s.setColumnWidth);
   const setColumnResizing = useAppStore(s => s.setColumnResizing);
   const endCellEdit = useAppStore(s => s.endCellEdit);
+  const disabled = useAppStore(s => s.disabled);
   const columnsGroup = useAppStore(s => s.columnsGroup);
 
   const onPointerDownResizerHandle = React.useCallback(
     (evt: React.PointerEvent<HTMLDivElement>, columnIndex: number) => {
+      if (disabled) return;
       evt.preventDefault();
       evt.stopPropagation();
       endCellEdit();
 
-      const columnNode = container.current?.querySelector(
-        `.bgrid-head-cell[data-column-index="${columnIndex}"]`,
-      );
+      const columnNode = container.current?.querySelector(`.bgrid-head-cell[data-column-index="${columnIndex}"]`);
       const columnSX = columnNode?.getBoundingClientRect().left ?? 0;
 
       mouseEventSubscribe(
@@ -49,11 +49,12 @@ function ColResizer({ container, columnIndex, hideHandle, bordered, frozenBounda
         },
       );
     },
-    [container, endCellEdit, setColumnResizing, setColumnWidth],
+    [container, disabled, endCellEdit, setColumnResizing, setColumnWidth],
   );
 
   const onMouseDoubleClick = React.useCallback(
     async (evt: React.MouseEvent<HTMLDivElement, MouseEvent>, columnIndex: number) => {
+      if (disabled) return;
       evt.preventDefault();
       evt.stopPropagation();
       endCellEdit();
@@ -74,9 +75,7 @@ function ColResizer({ container, columnIndex, hideHandle, bordered, frozenBounda
 
         await delay(30);
 
-        const targetTd = targetDiv.querySelector(
-          `tr td.bgrid-head-cell[data-column-index="${columnIndex}"]`,
-        );
+        const targetTd = targetDiv.querySelector(`tr td.bgrid-head-cell[data-column-index="${columnIndex}"]`);
 
         if (targetTd) {
           setColumnWidth(columnIndex, { width: targetTd.getBoundingClientRect().width });
@@ -85,7 +84,7 @@ function ColResizer({ container, columnIndex, hideHandle, bordered, frozenBounda
         targetDiv.remove();
       }
     },
-    [container, endCellEdit, setColumnWidth],
+    [container, disabled, endCellEdit, setColumnWidth],
   );
 
   return (
@@ -98,6 +97,7 @@ function ColResizer({ container, columnIndex, hideHandle, bordered, frozenBounda
         .filter(Boolean)
         .join(' ')}
       data-bgrid-frozen-boundary={frozenBoundary ? 'true' : undefined}
+      data-bgrid-disabled={disabled ? 'true' : undefined}
       style={!hideHandle ? { ['--bgrid-resizer-height' as string]: bordered ? '100%' : '1em' } : undefined}
       onPointerDown={(evt: React.PointerEvent<HTMLDivElement>) => onPointerDownResizerHandle(evt, columnIndex)}
       onDoubleClick={(evt: React.MouseEvent<HTMLDivElement>) => onMouseDoubleClick(evt, columnIndex)}

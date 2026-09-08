@@ -33,6 +33,7 @@ function TableHeadColumn<T>({ column, columnIndex = 0 }: Props<T>) {
   const setActiveToolbox = useAppStore(s => s.setActiveToolbox);
   const globalIcons = useAppStore(s => s.icons);
   const columnVisibilityState = useAppStore(s => s.columnVisibilityState);
+  const disabled = useAppStore(s => s.disabled);
 
   const columnId = column.columnId ?? getColumnId(column as any);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -41,10 +42,9 @@ function TableHeadColumn<T>({ column, columnIndex = 0 }: Props<T>) {
   const dialogId = `bgrid-toolbox-dialog-${reactId}`;
 
   const visibilityItem = columnVisibilityState?.items.find(item => item.columnId === columnId);
-  const isVisibilityMenuEnabled = !!columnVisibilityState && (
-    !!visibilityItem?.hideable || columnVisibilityState.items.some(item => item.hidden)
-  );
-  const isToolboxEnabled = !!column.toolbox || isVisibilityMenuEnabled;
+  const isVisibilityMenuEnabled =
+    !!columnVisibilityState && (!!visibilityItem?.hideable || columnVisibilityState.items.some(item => item.hidden));
+  const isToolboxEnabled = !disabled && (!!column.toolbox || isVisibilityMenuEnabled);
   const isToolboxOpen = activeToolboxColumnId === columnId;
   const columnIcons = typeof column.toolbox === 'object' ? column.toolbox.icons : undefined;
   const hasCheckboxHeader = column.editor?.type === 'checkbox' && !!column.editor.header;
@@ -58,7 +58,8 @@ function TableHeadColumn<T>({ column, columnIndex = 0 }: Props<T>) {
   // Check sort status
   const activeSortParam: BGridSortParam | undefined =
     dataQuery?.sortParams.find(s => (s.columnId ?? s.key) === columnId) ??
-    (sortParams?.[columnId] || (column.key ? sortParams?.[Array.isArray(column.key) ? column.key.join('.') : column.key] : undefined));
+    (sortParams?.[columnId] ||
+      (column.key ? sortParams?.[Array.isArray(column.key) ? column.key.join('.') : column.key] : undefined));
 
   const isAsc = activeSortParam?.orderBy === 'asc';
   const isDesc = activeSortParam?.orderBy === 'desc';
@@ -82,54 +83,52 @@ function TableHeadColumn<T>({ column, columnIndex = 0 }: Props<T>) {
 
   // Resolve icons with hierarchy (column -> global -> default)
   const sortAscIcon = columnIcons?.sortAsc ?? globalIcons?.sortAsc ?? (
-    <svg viewBox="0 0 16 16" width="10" height="10" fill="currentColor">
-      <path d="M3 11.5L8 4l5 7.5H3z" />
+    <svg viewBox='0 0 16 16' width='10' height='10' fill='currentColor'>
+      <path d='M3 11.5L8 4l5 7.5H3z' />
     </svg>
   );
 
   const sortDescIcon = columnIcons?.sortDesc ?? globalIcons?.sortDesc ?? (
-    <svg viewBox="0 0 16 16" width="10" height="10" fill="currentColor">
-      <path d="M3 4.5L8 12l5-7.5H3z" />
+    <svg viewBox='0 0 16 16' width='10' height='10' fill='currentColor'>
+      <path d='M3 4.5L8 12l5-7.5H3z' />
     </svg>
   );
 
   const filterIcon = columnIcons?.filter ?? globalIcons?.filter ?? (
-    <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" className="bgrid-filter-icon">
-      <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.293V13.5a.5.5 0 0 1-.74.439l-2.5-1.5A.5.5 0 0 1 6.5 12V8.293L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2z" />
+    <svg viewBox='0 0 16 16' width='12' height='12' fill='currentColor' className='bgrid-filter-icon'>
+      <path d='M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.293V13.5a.5.5 0 0 1-.74.439l-2.5-1.5A.5.5 0 0 1 6.5 12V8.293L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2z' />
     </svg>
   );
 
   const filterBadgeIcon = columnIcons?.filterBadge ?? globalIcons?.filterBadge ?? (
-    <svg viewBox="0 0 16 16" width="10" height="10" fill="currentColor" className="bgrid-filter-badge-icon">
-      <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.293V13.5a.5.5 0 0 1-.74.439l-2.5-1.5A.5.5 0 0 1 6.5 12V8.293L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2z" />
+    <svg viewBox='0 0 16 16' width='10' height='10' fill='currentColor' className='bgrid-filter-badge-icon'>
+      <path d='M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.293V13.5a.5.5 0 0 1-.74.439l-2.5-1.5A.5.5 0 0 1 6.5 12V8.293L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2z' />
     </svg>
   );
 
   const dropdownIcon = columnIcons?.dropdown ?? globalIcons?.dropdown ?? (
-    <svg viewBox="0 0 16 16" width="10" height="10" fill="currentColor" className="bgrid-dropdown-arrow">
-      <path d="M3 6l5 5 5-5H3z" />
+    <svg viewBox='0 0 16 16' width='10' height='10' fill='currentColor' className='bgrid-dropdown-arrow'>
+      <path d='M3 6l5 5 5-5H3z' />
     </svg>
   );
 
   if (isToolboxEnabled) {
     return (
-      <div className="bgrid-head-cell-wrapper">
-        <span className="bgrid-head-column-label bgrid-column-drag-handle">
-          {headerLabel}
-        </span>
+      <div className='bgrid-head-cell-wrapper'>
+        <span className='bgrid-head-column-label bgrid-column-drag-handle'>{headerLabel}</span>
 
         <button
           ref={buttonRef}
           id={triggerId}
-          type="button"
-          aria-haspopup="dialog"
+          type='button'
+          aria-haspopup='dialog'
           aria-expanded={isToolboxOpen}
           aria-controls={dialogId}
           aria-label={`${String(column.label || columnId)} 컬럼 메뉴`}
           title={tooltip}
-          className={`bgrid-toolbox-trigger-btn ${isToolboxOpen ? 'active' : ''} ${
-            isFiltered ? 'is-filtered' : ''
-          } ${isAsc || isDesc ? 'is-sorted' : ''}`}
+          className={`bgrid-toolbox-trigger-btn ${isToolboxOpen ? 'active' : ''} ${isFiltered ? 'is-filtered' : ''} ${
+            isAsc || isDesc ? 'is-sorted' : ''
+          }`}
           onClick={e => {
             e.preventDefault();
             e.stopPropagation();
@@ -141,7 +140,7 @@ function TableHeadColumn<T>({ column, columnIndex = 0 }: Props<T>) {
         >
           {/* Combined / State-based Icons */}
           {isFiltered && (isAsc || isDesc) ? (
-            <span className="bgrid-icon-combo">
+            <span className='bgrid-icon-combo'>
               {isAsc ? sortAscIcon : sortDescIcon}
               {filterBadgeIcon}
             </span>
@@ -155,7 +154,7 @@ function TableHeadColumn<T>({ column, columnIndex = 0 }: Props<T>) {
             dropdownIcon
           )}
 
-          {sortIndex && <span className="bgrid-sort-index-badge">{sortIndex}</span>}
+          {sortIndex && <span className='bgrid-sort-index-badge'>{sortIndex}</span>}
         </button>
 
         {isToolboxOpen && (
@@ -181,9 +180,7 @@ function TableHeadColumn<T>({ column, columnIndex = 0 }: Props<T>) {
       <div className={'bgrid-head-column'}>
         <span className={'bgrid-head-column-label bgrid-column-drag-handle'}>{headerLabel}</span>
         <span className={'bgrid-sorter'} data-sort={activeSortParam?.orderBy} />
-        {activeSortParam && sortIndex && (
-          <div className={'bgrid-sort-order'}>{sortIndex}</div>
-        )}
+        {activeSortParam && sortIndex && <div className={'bgrid-sort-order'}>{sortIndex}</div>}
       </div>
     );
   }

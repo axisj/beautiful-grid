@@ -81,10 +81,7 @@ export function getVisibleColumnRange(
   }
 
   if (firstVisibleColumnIndex > lastVisibleColumnIndex) {
-    const nearestColumnIndex = Math.min(
-      Math.max(firstVisibleColumnIndex, firstScrollableColumnIndex),
-      lastColumnIndex,
-    );
+    const nearestColumnIndex = Math.min(Math.max(firstVisibleColumnIndex, firstScrollableColumnIndex), lastColumnIndex);
     firstVisibleColumnIndex = nearestColumnIndex;
     lastVisibleColumnIndex = nearestColumnIndex;
   }
@@ -166,10 +163,11 @@ function TableBody({
     );
 
   // [Selector Group 4] Edit State - 편집 상태
-  const { editable, editTrigger, cellInteractionSession } = useAppStore(
+  const { editable, editTrigger, disabled, cellInteractionSession } = useAppStore(
     useShallow(s => ({
       editable: s.editable,
       editTrigger: s.editTrigger,
+      disabled: s.disabled,
       cellInteractionSession: s.cellInteractionSession,
     })),
   );
@@ -194,8 +192,7 @@ function TableBody({
   );
 
   const searchMatchTokens = getSearchMatchTokens(searchMatches);
-  const currentSearchMatch =
-    activeSearchMatchIndex === undefined ? undefined : searchMatches[activeSearchMatchIndex];
+  const currentSearchMatch = activeSearchMatchIndex === undefined ? undefined : searchMatches[activeSearchMatchIndex];
   const currentSearchToken = currentSearchMatch
     ? `${currentSearchMatch.cell.rowIndex}:${currentSearchMatch.cell.columnIndex}`
     : undefined;
@@ -213,14 +210,8 @@ function TableBody({
   const endNumber = rowRange?.endRowIndex ?? Math.min(startIdx + displayItemCount, data.length);
   const mergeColumns = cellMergeOptions?.columnsMap;
 
-  const {
-    dataSet,
-    setItemValue,
-    handleMoveEditFocus,
-    handleChangeChecked,
-    handleChangeCheckedRadio,
-    getRowSpan,
-  } = useBodyData(startIdx, endNumber, data);
+  const { dataSet, setItemValue, handleMoveEditFocus, handleChangeChecked, handleChangeCheckedRadio, getRowSpan } =
+    useBodyData(startIdx, endNumber, data);
 
   const { startCIdx, endCIdx } = React.useMemo(() => {
     if (isLeftRegion) {
@@ -242,10 +233,11 @@ function TableBody({
       endCIdx: endColumnIndex,
     };
   }, [scrollLeft, width, frozenColumnsWidth, columns, frozenColumnIndex, isLeftRegion]);
-  const hasOnClick = !!onClick;
+  const hasOnClick = !!onClick && !disabled;
   const hasRowChecked = !!rowChecked;
   const isRadio = rowChecked?.isRadio;
   const rowReorderEnabled =
+    !disabled &&
     isLeftRegion &&
     allowRowReorder &&
     !!reorder?.enabled &&
@@ -273,28 +265,31 @@ function TableBody({
               ? getCellValueByRowKey(rowKey, item.values) === selectedRowKey
               : false;
           const className = getRowClassName?.(sourceIndex, item) ?? '';
-          const rowReorderRole = reorderingInfo?.fromIndex === undefined || reorderingInfo.toIndex === undefined
-            ? undefined
-            : getRowReorderRole({
-                rowIndex: ri,
-                fromIndex: reorderingInfo.fromIndex,
-                toIndex: reorderingInfo.toIndex,
-              });
-          const rowReorderOffset = reorderingInfo?.fromIndex === undefined || reorderingInfo.toIndex === undefined
-            ? 0
-            : getRowReorderOffset({
-                rowIndex: ri,
-                fromIndex: reorderingInfo.fromIndex,
-                toIndex: reorderingInfo.toIndex,
-                rowHeight: trHeight,
-              });
-          const rowReorderDirection = reorderingInfo?.fromIndex === undefined || reorderingInfo.toIndex === undefined
-            ? undefined
-            : reorderingInfo.toIndex < reorderingInfo.fromIndex
-            ? 'up'
-            : reorderingInfo.toIndex > reorderingInfo.fromIndex
-            ? 'down'
-            : undefined;
+          const rowReorderRole =
+            reorderingInfo?.fromIndex === undefined || reorderingInfo.toIndex === undefined
+              ? undefined
+              : getRowReorderRole({
+                  rowIndex: ri,
+                  fromIndex: reorderingInfo.fromIndex,
+                  toIndex: reorderingInfo.toIndex,
+                });
+          const rowReorderOffset =
+            reorderingInfo?.fromIndex === undefined || reorderingInfo.toIndex === undefined
+              ? 0
+              : getRowReorderOffset({
+                  rowIndex: ri,
+                  fromIndex: reorderingInfo.fromIndex,
+                  toIndex: reorderingInfo.toIndex,
+                  rowHeight: trHeight,
+                });
+          const rowReorderDirection =
+            reorderingInfo?.fromIndex === undefined || reorderingInfo.toIndex === undefined
+              ? undefined
+              : reorderingInfo.toIndex < reorderingInfo.fromIndex
+              ? 'up'
+              : reorderingInfo.toIndex > reorderingInfo.fromIndex
+              ? 'down'
+              : undefined;
 
           return (
             <TableBodyTr
@@ -330,7 +325,7 @@ function TableBody({
                       data-row-reorder-index={ri}
                       data-dragging={reorderingInfo?.fromIndex === ri ? 'true' : undefined}
                       aria-label={`Move row ${ri + 1}`}
-                      disabled={!!cellInteractionSession}
+                      disabled={!!disabled || !!cellInteractionSession}
                       onPointerDown={event => onRowReorderPointerDown?.(event, ri)}
                       onKeyDown={event => onRowReorderKeyDown?.(event, ri)}
                     >
@@ -351,7 +346,7 @@ function TableBody({
               {isLeftRegion && hasRowChecked && (
                 <td className={frozenColumnIndex > 0 ? 'bordered' : ''}>
                   <RowSelector
-                    disabled={rowChecked.disabled?.(sourceIndex, item)}
+                    disabled={!!disabled || rowChecked.disabled?.(sourceIndex, item)}
                     checked={checkedAll === true || checkedIndexesMap.get(sourceIndex)}
                     handleChange={async checked => {
                       if (isRadio) await handleChangeCheckedRadio(ri);
@@ -381,11 +376,7 @@ function TableBody({
                   rowIndex => data[rowIndex]?.status !== BGridDataItemStatus.remove,
                 );
 
-                const tdEditable =
-                  logicalRowsEditable &&
-                  editable &&
-                  column.editable !== false &&
-                  isHostEditing;
+                const tdEditable = logicalRowsEditable && editable && column.editable !== false && isHostEditing;
                 const rowSpan = mergeColumns?.[columnIndex] ? getRowSpan(ri, columnIndex) : 1;
                 if (rowSpan === 0) return null;
 
@@ -468,9 +459,7 @@ function TableBody({
                         cellEditable,
                         interactionEditing: isLogicalEditing,
                         editSession:
-                          tdEditable && cellInteractionSession?.kind === 'editor'
-                            ? cellInteractionSession
-                            : undefined,
+                          tdEditable && cellInteractionSession?.kind === 'editor' ? cellInteractionSession : undefined,
                       }}
                     />
                   </td>
@@ -587,9 +576,7 @@ export function TableBodyTr({
   ...rest
 }: TableBodyTrProps) {
   const clickable = !editable && hasOnClick;
-  const rowClassName = ['bgrid-body-row', active ? 'bgrid-row-active' : '', className ?? '']
-    .filter(Boolean)
-    .join(' ');
+  const rowClassName = ['bgrid-body-row', active ? 'bgrid-row-active' : '', className ?? ''].filter(Boolean).join(' ');
 
   return (
     <tr

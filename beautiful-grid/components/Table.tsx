@@ -97,6 +97,7 @@ interface Props<T> {
 
   loading?: boolean;
   spinning?: boolean;
+  disabled?: boolean;
   scrollTop?: number;
   scrollLeft?: number;
 
@@ -206,19 +207,21 @@ function Table<T>(props: Props<T>) {
   );
 
   // [Selector Group 5] State - 상태
-  const { rowChecked, page, loading, spinning, showLineNumber, summary, scrollbar, status, pagination } = useAppStore(
-    useShallow(s => ({
-      rowChecked: s.rowChecked,
-      page: s.page,
-      loading: s.loading,
-      spinning: s.spinning,
-      showLineNumber: s.showLineNumber,
-      summary: s.summary,
-      scrollbar: s.scrollbar,
-      status: s.status,
-      pagination: s.pagination,
-    })),
-  );
+  const { rowChecked, page, loading, spinning, disabled, showLineNumber, summary, scrollbar, status, pagination } =
+    useAppStore(
+      useShallow(s => ({
+        rowChecked: s.rowChecked,
+        page: s.page,
+        loading: s.loading,
+        spinning: s.spinning,
+        disabled: s.disabled,
+        showLineNumber: s.showLineNumber,
+        summary: s.summary,
+        scrollbar: s.scrollbar,
+        status: s.status,
+        pagination: s.pagination,
+      })),
+    );
 
   const {
     searchOpen,
@@ -256,6 +259,7 @@ function Table<T>(props: Props<T>) {
     setItemPadding,
     setLoading,
     setSpinning,
+    setDisabled,
   } = useAppStore(
     useShallow(s => ({
       setHeight: s.setHeight,
@@ -270,6 +274,7 @@ function Table<T>(props: Props<T>) {
       setItemPadding: s.setItemPadding,
       setLoading: s.setLoading,
       setSpinning: s.setSpinning,
+      setDisabled: s.setDisabled,
     })),
   );
 
@@ -481,40 +486,37 @@ function Table<T>(props: Props<T>) {
       );
     });
   }, [activeLogicalCell, cellSelectionRanges]);
-  const activeCellRanges = React.useMemo<BGridCellSelectionRange[]>(
-    () => {
-      if (!activeLogicalCell) return [];
+  const activeCellRanges = React.useMemo<BGridCellSelectionRange[]>(() => {
+    if (!activeLogicalCell) return [];
 
-      let startRowIndex = activeLogicalCell.rowRange.startRowIndex;
-      let endRowIndex = activeLogicalCell.rowRange.endRowIndex;
-      const hostCell = cellInteractionSession?.hostCell ?? activeCellHost;
+    let startRowIndex = activeLogicalCell.rowRange.startRowIndex;
+    let endRowIndex = activeLogicalCell.rowRange.endRowIndex;
+    const hostCell = cellInteractionSession?.hostCell ?? activeCellHost;
 
-      // A merged cell crossing the frozen-row boundary is rendered as two
-      // physical cells. During editing, draw focus only around the fragment
-      // that owns the editor while keeping the logical edit scope unchanged.
-      if (
-        hostCell &&
-        activeLogicalCell.rowRange.startRowIndex < frozenRowCount &&
-        activeLogicalCell.rowRange.endRowIndex >= frozenRowCount
-      ) {
-        if (hostCell.rowIndex < frozenRowCount) {
-          endRowIndex = frozenRowCount - 1;
-        } else {
-          startRowIndex = frozenRowCount;
-        }
+    // A merged cell crossing the frozen-row boundary is rendered as two
+    // physical cells. During editing, draw focus only around the fragment
+    // that owns the editor while keeping the logical edit scope unchanged.
+    if (
+      hostCell &&
+      activeLogicalCell.rowRange.startRowIndex < frozenRowCount &&
+      activeLogicalCell.rowRange.endRowIndex >= frozenRowCount
+    ) {
+      if (hostCell.rowIndex < frozenRowCount) {
+        endRowIndex = frozenRowCount - 1;
+      } else {
+        startRowIndex = frozenRowCount;
       }
+    }
 
-      return [
-        {
-          startRowIndex,
-          endRowIndex,
-          startColumnIndex: activeLogicalCell.cell.columnIndex,
-          endColumnIndex: activeLogicalCell.cell.columnIndex,
-        },
-      ];
-    },
-    [activeCellHost, activeLogicalCell, cellInteractionSession?.hostCell, frozenRowCount],
-  );
+    return [
+      {
+        startRowIndex,
+        endRowIndex,
+        startColumnIndex: activeLogicalCell.cell.columnIndex,
+        endColumnIndex: activeLogicalCell.cell.columnIndex,
+      },
+    ];
+  }, [activeCellHost, activeLogicalCell, cellInteractionSession?.hostCell, frozenRowCount]);
   const selectionFragments = React.useMemo(
     () =>
       getCellSelectionFragments({
@@ -526,15 +528,7 @@ function Table<T>(props: Props<T>) {
         frozenRowCount,
         frozenColumnsWidth: frozenColumnsWidth ?? 0,
       }),
-    [
-      cellSelectionRanges,
-      columns,
-      data.length,
-      frozenColumnsWidth,
-      frozenRowCount,
-      props.frozenColumnIndex,
-      trHeight,
-    ],
+    [cellSelectionRanges, columns, data.length, frozenColumnsWidth, frozenRowCount, props.frozenColumnIndex, trHeight],
   );
   const activeFragments = React.useMemo(
     () =>
@@ -547,15 +541,7 @@ function Table<T>(props: Props<T>) {
         frozenRowCount,
         frozenColumnsWidth: frozenColumnsWidth ?? 0,
       }),
-    [
-      activeCellRanges,
-      columns,
-      data.length,
-      frozenColumnsWidth,
-      frozenRowCount,
-      props.frozenColumnIndex,
-      trHeight,
-    ],
+    [activeCellRanges, columns, data.length, frozenColumnsWidth, frozenRowCount, props.frozenColumnIndex, trHeight],
   );
   const activeOverlayFill = activeCellSelected;
   const activeOverlayRing = !!activeCell && !hasMultiCellSelection;
@@ -591,12 +577,17 @@ function Table<T>(props: Props<T>) {
         leadingOverscan: props.reorder?.enabled ? 0 : scrollOverscanRows,
         windowSize: props.reorder?.enabled ? 1 : KEYBOARD_NAVIGATION_ROW_WINDOW_SIZE,
       }),
-    [data.length, frozenRowCount, props.reorder?.enabled, scrollOverscanRows, scrollTop, scrollableBodyHeight, trHeight],
+    [
+      data.length,
+      frozenRowCount,
+      props.reorder?.enabled,
+      scrollOverscanRows,
+      scrollTop,
+      scrollableBodyHeight,
+      trHeight,
+    ],
   );
-  const frozenRowRange = React.useMemo(
-    () => ({ startRowIndex: 0, endRowIndex: frozenRowCount }),
-    [frozenRowCount],
-  );
+  const frozenRowRange = React.useMemo(() => ({ startRowIndex: 0, endRowIndex: frozenRowCount }), [frozenRowCount]);
   const scrollableRowRange = React.useMemo(
     () => ({
       startRowIndex: visibleScrollableRows.startRowIndex,
@@ -614,10 +605,7 @@ function Table<T>(props: Props<T>) {
   );
   const warnedContextMenuIdsRef = useRef(new Set<string>());
   const warnedContextMenuFactoryRef = useRef(false);
-  const editorPortalContext = React.useMemo(
-    () => ({ gridRef: containerRef, portalRef: editorPortalRef }),
-    [],
-  );
+  const editorPortalContext = React.useMemo(() => ({ gridRef: containerRef, portalRef: editorPortalRef }), []);
   const rowReorderController = useRowReorderController<T>({
     containerRef,
     bodyContainerRef,
@@ -630,6 +618,7 @@ function Table<T>(props: Props<T>) {
     (searchSurfaceEnabled && searchOptions.contextMenu !== false);
   const openCellContextMenu = React.useCallback(
     (cell: BGridCellAddress, clientX: number, clientY: number, keyboard: boolean) => {
+      if (disabled) return false;
       const logical = resolveLogicalCell(data, props.cellMergeOptions, cell);
       const visibleIndex = logical.cell.rowIndex;
       const columnIndex = logical.cell.columnIndex;
@@ -682,7 +671,8 @@ function Table<T>(props: Props<T>) {
         }
       }
 
-      const builtInSearchEnabled = !!searchOptions && searchOptions.enabled !== false && searchOptions.contextMenu !== false;
+      const builtInSearchEnabled =
+        !!searchOptions && searchOptions.enabled !== false && searchOptions.contextMenu !== false;
       const combined: BGridContextMenuItem<T>[] = [];
       if (builtInSearchEnabled) {
         combined.push({
@@ -714,6 +704,7 @@ function Table<T>(props: Props<T>) {
       columns,
       contextMenuOptions,
       data,
+      disabled,
       openContextMenu,
       props.cellMergeOptions,
       requestSearchOpen,
@@ -726,9 +717,7 @@ function Table<T>(props: Props<T>) {
   );
   const scrollableColumnsWidth = React.useMemo(
     () =>
-      columns
-        .slice(props.frozenColumnIndex ?? 0)
-        .reduce((totalWidth, column) => totalWidth + (column.width ?? 100), 0),
+      columns.slice(props.frozenColumnIndex ?? 0).reduce((totalWidth, column) => totalWidth + (column.width ?? 100), 0),
     [columns, props.frozenColumnIndex],
   );
 
@@ -736,10 +725,7 @@ function Table<T>(props: Props<T>) {
   const stickyBottomHeight = summary?.position === 'bottom' ? summaryHeight : 0;
   const stickyFixedHeight = stickyTopHeight + stickyBottomHeight;
   const scrollViewportHeight = contentBodyHeight + stickyFixedHeight;
-  const physicalScrollableRowsHeight = Math.max(
-    virtualScrollWindowMetrics.physicalContentHeight - frozenRowsHeight,
-    0,
-  );
+  const physicalScrollableRowsHeight = Math.max(virtualScrollWindowMetrics.physicalContentHeight - frozenRowsHeight, 0);
   const scrollPlaneHeight = stickyFixedHeight + virtualScrollWindowMetrics.physicalContentHeight;
   const scrollPlaneContentWidth = (frozenColumnsWidth ?? 0) + scrollableColumnsWidth;
   const scrollPlaneWidth = Math.max(width, scrollPlaneContentWidth);
@@ -747,8 +733,8 @@ function Table<T>(props: Props<T>) {
     scrollbar.vertical.visible && scrollbar.variant === 'classic'
       ? 'var(--bgrid-scrollbar-classic-gutter-size)'
       : scrollbar.vertical.visible && scrollbar.variant === 'modern'
-        ? 'var(--bgrid-scrollbar-modern-gutter-size)'
-        : undefined;
+      ? 'var(--bgrid-scrollbar-modern-gutter-size)'
+      : undefined;
   const scrollPlaneMinWidth: React.CSSProperties['minWidth'] = customVerticalScrollbarGutter
     ? `max(100%, calc(${scrollPlaneContentWidth}px + ${customVerticalScrollbarGutter}))`
     : scrollPlaneWidth;
@@ -806,11 +792,15 @@ function Table<T>(props: Props<T>) {
     align: NonNullable<BGridScrollToRowOptions['align']>;
   } | null>(null);
 
-  React.useImperativeHandle(props.ref, () => ({
-    scrollToRow(rowIndex, options) {
-      setRowScrollRequest({ rowIndex, align: options?.align ?? 'nearest' });
-    },
-  }), []);
+  React.useImperativeHandle(
+    props.ref,
+    () => ({
+      scrollToRow(rowIndex, options) {
+        setRowScrollRequest({ rowIndex, align: options?.align ?? 'nearest' });
+      },
+    }),
+    [],
+  );
   const scrollRafRef = useRef<number | null>(null);
   const scrollIdleTimerRef = useRef<number | null>(null);
   const selectionAutoScrollRafRef = useRef<number | null>(null);
@@ -840,7 +830,16 @@ function Table<T>(props: Props<T>) {
       scrollTop,
       trHeight,
     };
-  }, [columns, data.length, props.frozenColumnIndex, frozenColumnsWidth, frozenRowCount, frozenRowsHeight, scrollTop, trHeight]);
+  }, [
+    columns,
+    data.length,
+    props.frozenColumnIndex,
+    frozenColumnsWidth,
+    frozenRowCount,
+    frozenRowsHeight,
+    scrollTop,
+    trHeight,
+  ]);
 
   const markScrollActive = useCallback(() => {
     containerRef.current?.setAttribute('data-bgrid-scrolling', 'true');
@@ -926,13 +925,16 @@ function Table<T>(props: Props<T>) {
     }
   }, [markScrollActive, scheduleScrollFrame]);
 
-  const resetScrollPosition = useCallback((type: 'all' | 'top' | 'left') => {
-    const scrollContainer = scrollContainerRef.current;
-    if (!scrollContainer) return;
-    const nextTop = type === 'all' || type === 'top' ? 0 : latestScrollRef.current.top;
-    const nextLeft = type === 'all' || type === 'left' ? 0 : scrollContainer.scrollLeft;
-    commitScroll(nextTop, nextLeft);
-  }, [commitScroll]);
+  const resetScrollPosition = useCallback(
+    (type: 'all' | 'top' | 'left') => {
+      const scrollContainer = scrollContainerRef.current;
+      if (!scrollContainer) return;
+      const nextTop = type === 'all' || type === 'top' ? 0 : latestScrollRef.current.top;
+      const nextLeft = type === 'all' || type === 'left' ? 0 : scrollContainer.scrollLeft;
+      commitScroll(nextTop, nextLeft);
+    },
+    [commitScroll],
+  );
 
   useEffect(() => {
     if (!searchOpen || activeSearchMatchIndex === undefined) return;
@@ -946,10 +948,7 @@ function Table<T>(props: Props<T>) {
       ? {
           top: Math.max(0, Math.min(scrollContainer.clientHeight, searchRect.bottom - scrollRect.top + 8)),
           right: Math.max(0, Math.min(scrollContainer.clientWidth, scrollRect.right - searchRect.left + 8)),
-          bottom: Math.max(
-            0,
-            Math.min(scrollContainer.clientHeight, stickyFixedHeight + frozenRowsHeight),
-          ),
+          bottom: Math.max(0, Math.min(scrollContainer.clientHeight, stickyFixedHeight + frozenRowsHeight)),
         }
       : undefined;
     const result = ensureCellVisible({
@@ -1034,8 +1033,7 @@ function Table<T>(props: Props<T>) {
           getAxisSelectionRange({
             axis: dragState.axis,
             startIndex: dragState.startIndex,
-            endIndex:
-              axisTarget.startIndex < dragState.startIndex ? axisTarget.startIndex : axisTarget.endIndex,
+            endIndex: axisTarget.startIndex < dragState.startIndex ? axisTarget.startIndex : axisTarget.endIndex,
             rowCount: data.length,
             columnCount: columns.length,
           }),
@@ -1048,6 +1046,10 @@ function Table<T>(props: Props<T>) {
 
   const onBodyPointerOverCapture = useCallback(
     (evt: React.PointerEvent<HTMLDivElement>) => {
+      if (disabled) {
+        clearHoveredRow();
+        return;
+      }
       const target = evt.target as HTMLElement | null;
       updateAxisSelectionByTarget(target);
       const physicalCellPosition = getCellPosition(target, containerRef.current);
@@ -1082,6 +1084,7 @@ function Table<T>(props: Props<T>) {
     [
       cellSelectionEnabled,
       clearHoveredRow,
+      disabled,
       setCellSelectionRanges,
       setHoveredRows,
       toLogicalCellPosition,
@@ -1091,6 +1094,7 @@ function Table<T>(props: Props<T>) {
 
   const onBodyPointerDownCapture = useCallback(
     (evt: React.PointerEvent<HTMLDivElement>) => {
+      if (disabled) return;
       const navEnabled = cellNavigationOptions?.enabled ?? true;
       if (!cellSelectionEnabled && !navEnabled) return;
       if (evt.button !== 0 || isInteractiveTarget(evt.target)) return;
@@ -1202,6 +1206,7 @@ function Table<T>(props: Props<T>) {
       cellSelectionRanges,
       columns.length,
       data.length,
+      disabled,
       setActiveCell,
       setCellSelecting,
       setCellSelectionRanges,
@@ -1294,8 +1299,7 @@ function Table<T>(props: Props<T>) {
       if (cellSelectionRanges.length === 0) return;
 
       const maxClipboardCells = cellSelectionOptions?.maxClipboardCells ?? DEFAULT_MAX_CLIPBOARD_CELLS;
-      const maxClipboardTextLength =
-        cellSelectionOptions?.maxClipboardTextLength ?? DEFAULT_MAX_CLIPBOARD_TEXT_LENGTH;
+      const maxClipboardTextLength = cellSelectionOptions?.maxClipboardTextLength ?? DEFAULT_MAX_CLIPBOARD_TEXT_LENGTH;
       const onCopyError = cellSelectionOptions?.onCopyError;
       const selectedCellCount = getSelectionCellCount(cellSelectionRanges, data.length, columns.length);
       const notifyCopyError = (params: {
@@ -1434,8 +1438,7 @@ function Table<T>(props: Props<T>) {
       }
 
       const maxClipboardCells = cellSelectionOptions?.maxClipboardCells ?? DEFAULT_MAX_CLIPBOARD_CELLS;
-      const maxClipboardTextLength =
-        cellSelectionOptions?.maxClipboardTextLength ?? DEFAULT_MAX_CLIPBOARD_TEXT_LENGTH;
+      const maxClipboardTextLength = cellSelectionOptions?.maxClipboardTextLength ?? DEFAULT_MAX_CLIPBOARD_TEXT_LENGTH;
       const normalizedClipboardTypes = clipboardTypes.map(type => type.toLowerCase());
       const unsupportedClipboardData =
         normalizedClipboardTypes.length > 0 && !normalizedClipboardTypes.includes('text/plain');
@@ -1774,7 +1777,8 @@ function Table<T>(props: Props<T>) {
   useEffect(() => {
     if (props.loading !== undefined) setLoading(props.loading);
     if (props.spinning !== undefined) setSpinning(props.spinning);
-  }, [props.loading, props.spinning, setLoading, setSpinning]);
+    setDisabled(props.disabled);
+  }, [props.loading, props.spinning, props.disabled, setLoading, setSpinning, setDisabled]);
 
   // [Group 4] Frozen columns
   useEffect(() => {
@@ -1929,9 +1933,13 @@ function Table<T>(props: Props<T>) {
 
   // [Group 9] Edit options
   useEffect(() => {
-    if (props.editable !== undefined) setEditable(props.editable);
+    if (props.disabled) {
+      setEditable(false);
+    } else if (props.editable !== undefined) {
+      setEditable(props.editable);
+    }
     if (props.editTrigger !== undefined) setEditTrigger(props.editTrigger);
-  }, [props.editable, props.editTrigger, setEditable, setEditTrigger]);
+  }, [props.disabled, props.editable, props.editTrigger, setEditable, setEditTrigger]);
 
   // [Group 10] Event callbacks
   useEffect(() => {
@@ -1999,6 +2007,7 @@ function Table<T>(props: Props<T>) {
     props.cellNavigationOptions?.activeCell?.rowIndex,
     props.cellNavigationOptions?.defaultActiveCell?.columnIndex,
     props.cellNavigationOptions?.defaultActiveCell?.rowIndex,
+    disabled,
     syncActiveCellToBounds,
   ]);
 
@@ -2032,12 +2041,14 @@ function Table<T>(props: Props<T>) {
     if (props.data !== syncedDataPropRef.current) return;
     // Resizing or changing the data also changes commitScroll. Only a changed
     // scroll prop should override the user's current position.
-    const nextTop = props.scrollTop !== scrollPropsRef.current.top
-      ? props.scrollTop ?? latestScrollRef.current.top
-      : latestScrollRef.current.top;
-    const nextLeft = props.scrollLeft !== scrollPropsRef.current.left
-      ? props.scrollLeft ?? latestScrollRef.current.left
-      : latestScrollRef.current.left;
+    const nextTop =
+      props.scrollTop !== scrollPropsRef.current.top
+        ? props.scrollTop ?? latestScrollRef.current.top
+        : latestScrollRef.current.top;
+    const nextLeft =
+      props.scrollLeft !== scrollPropsRef.current.left
+        ? props.scrollLeft ?? latestScrollRef.current.left
+        : latestScrollRef.current.left;
     scrollPropsRef.current = { top: props.scrollTop, left: props.scrollLeft };
     commitScroll(nextTop, nextLeft);
   }, [commitScroll, data, props.data, props.scrollLeft, props.scrollTop]);
@@ -2138,6 +2149,7 @@ function Table<T>(props: Props<T>) {
     copySelectedCells,
     dataLength: data.length,
     data,
+    disabled,
     editable,
     editItemIndex,
     endCellSelectionDrag,
@@ -2171,6 +2183,7 @@ function Table<T>(props: Props<T>) {
     copySelectedCells,
     dataLength: data.length,
     data,
+    disabled,
     editable,
     editItemIndex,
     endCellSelectionDrag,
@@ -2307,6 +2320,7 @@ function Table<T>(props: Props<T>) {
         copySelectedCells,
         data,
         dataLength,
+        disabled,
         editable,
         editItemIndex,
         endCellSelectionDrag,
@@ -2328,21 +2342,27 @@ function Table<T>(props: Props<T>) {
       const container = containerRef.current;
       const activeElement = document.activeElement;
       if (!container || (activeElement !== container && !container.contains(activeElement))) return;
+      if (disabled) {
+        stopArrowRepeat();
+        return;
+      }
 
       const isCtrlOrMeta = evt.ctrlKey || evt.metaKey;
       const isFindShortcut = isCtrlOrMeta && evt.key.toLowerCase() === 'f';
       if (isFindShortcut && searchOptions && searchOptions.enabled !== false && searchOptions.shortcut !== false) {
-        const targetInsideSearch =
-          evt.target instanceof HTMLElement && !!evt.target.closest('.bgrid-search-popover');
+        const targetInsideSearch = evt.target instanceof HTMLElement && !!evt.target.closest('.bgrid-search-popover');
         if (!cellInteractionSession && (targetInsideSearch || !isInteractiveTarget(evt.target))) {
           evt.preventDefault();
           evt.stopPropagation();
           requestSearchOpen(true, 'shortcut');
-          setTimeout(() => {
-            const input = container.querySelector<HTMLInputElement>('.bgrid-search-input');
-            input?.focus({ preventScroll: true });
-            input?.select();
-          }, searchOpen ? 0 : 1);
+          setTimeout(
+            () => {
+              const input = container.querySelector<HTMLInputElement>('.bgrid-search-input');
+              input?.focus({ preventScroll: true });
+              input?.select();
+            },
+            searchOpen ? 0 : 1,
+          );
           return;
         }
       }
@@ -2564,6 +2584,7 @@ function Table<T>(props: Props<T>) {
       const container = containerRef.current;
       const activeElement = document.activeElement;
       if (!container || (activeElement !== container && !container.contains(activeElement))) return;
+      if (keyboardRuntimeRef.current.disabled) return;
 
       if (isInteractiveTarget(evt.target)) return;
 
@@ -2575,6 +2596,7 @@ function Table<T>(props: Props<T>) {
       const container = containerRef.current;
       const activeElement = document.activeElement;
       if (!container || (activeElement !== container && !container.contains(activeElement))) return;
+      if (keyboardRuntimeRef.current.disabled) return;
       if (keyboardRuntimeRef.current.editItemIndex !== undefined && keyboardRuntimeRef.current.editItemIndex >= 0) {
         return;
       }
@@ -2631,283 +2653,276 @@ function Table<T>(props: Props<T>) {
   return (
     <EditorPortalContext.Provider value={editorPortalContext}>
       <Container
-      ref={containerRef}
-      role={'grid'}
-      style={{
-        ...style,
-        width,
-        height,
-        borderWidth: `${containerBorderWidth}px`,
-        ['--bgrid-virtual-row-height' as string]: `${trHeight}px`,
-      }}
-      className={className}
-      tabIndex={0}
-      onFocus={event => {
-        if (event.target !== event.currentTarget) return;
-        const gateway = event.currentTarget.querySelector('[data-bgrid-text-editor-gateway="true"]');
-        if (gateway instanceof HTMLInputElement) {
-          gateway.focus({ preventScroll: true });
-        }
-      }}
-      data-scroll-variant={scrollbar.variant}
-      data-vertical-scrollbar={scrollbar.variant !== 'native' && scrollbar.vertical.visible ? 'visible' : 'hidden'}
-      data-bgrid-cell-selection-enabled={cellSelectionEnabled ? 'true' : 'false'}
-      data-bgrid-frozen-columns={(props.frozenColumnIndex ?? 0) > 0 ? 'true' : 'false'}
-    >
-      {scrollbar.variant !== 'native' && scrollbar.vertical.visible && (
-        <div className='bgrid-vertical-scrollbar-gutter' aria-hidden='true' />
-      )}
-      {scrollbar.variant !== 'native' && scrollbar.vertical.visible && (
-        <div
-          className='bgrid-vertical-scrollbar-area'
-          style={{
-            top: 0,
-            bottom: showBottomBar ? bottomBarHeight : 0,
-          }}
-        >
-          <CustomScrollbar
-            orientation='vertical'
-            variant={scrollbar.variant}
-            metrics={scrollbarMetrics.vertical}
-            scrollOffset={scrollTop}
-            onScrollChange={handleScrollTopChange}
-          />
-        </div>
-      )}
-      <ScrollContainer
-        ref={scrollContainerRef}
-        role={'rfdg-scroll-container'}
-        data-bgrid-scroll-plane='sticky'
-        style={{ height: scrollViewportHeight }}
-        onPointerDownCapture={onBodyPointerDownCapture}
-        onPointerOverCapture={onBodyPointerOverCapture}
-        onPointerLeave={onBodyPointerLeave}
-        onContextMenuCapture={event => {
-          if (isInteractiveTarget(event.target)) return;
-          const cell = getCellPosition(event.target as HTMLElement, containerRef.current);
-          if (!cell) return;
-          if (openCellContextMenu(cell, event.clientX, event.clientY, false)) {
-            event.preventDefault();
-            event.stopPropagation();
+        ref={containerRef}
+        role={'grid'}
+        style={{
+          ...style,
+          width,
+          height,
+          borderWidth: `${containerBorderWidth}px`,
+          ['--bgrid-virtual-row-height' as string]: `${trHeight}px`,
+        }}
+        className={className}
+        tabIndex={0}
+        aria-disabled={disabled ? 'true' : undefined}
+        onFocus={event => {
+          if (event.target !== event.currentTarget) return;
+          const gateway = event.currentTarget.querySelector('[data-bgrid-text-editor-gateway="true"]');
+          if (gateway instanceof HTMLInputElement) {
+            gateway.focus({ preventScroll: true });
           }
         }}
+        data-scroll-variant={scrollbar.variant}
+        data-vertical-scrollbar={scrollbar.variant !== 'native' && scrollbar.vertical.visible ? 'visible' : 'hidden'}
+        data-bgrid-cell-selection-enabled={cellSelectionEnabled ? 'true' : 'false'}
+        data-bgrid-frozen-columns={(props.frozenColumnIndex ?? 0) > 0 ? 'true' : 'false'}
+        data-bgrid-disabled={disabled ? 'true' : undefined}
       >
-        <ScrollPlane
-          style={{ height: scrollPlaneHeight, minWidth: scrollPlaneMinWidth }}
-          data-bgrid-virtual-scroll-window={virtualScrollWindowMetrics.enabled ? 'true' : undefined}
-          data-bgrid-logical-height={virtualScrollWindowMetrics.logicalContentHeight}
-          data-bgrid-physical-height={virtualScrollWindowMetrics.physicalContentHeight}
-          data-bgrid-logical-scroll-top={Math.round(scrollTop)}
-          data-bgrid-virtual-scroll-base={virtualScrollWindowMetrics.enabled ? Math.round(virtualScrollBase) : undefined}
-        >
-          <HeaderContainer style={{ height: headerHeight, top: 0 }} role={'rfdg-header-container'}>
-            {(frozenColumnsWidth ?? 0) > 0 && (
-              <FrozenHeader
-                style={{ width: frozenColumnsWidth }}
-                role={'rfdg-frozen-header'}
-              >
-                <TableHeadFrozen container={containerRef} />
-              </FrozenHeader>
-            )}
-            <Header
-              style={{ left: frozenColumnsWidth }}
-              role={'rfdg-header'}
-            >
-              <TableHead container={containerRef} />
-            </Header>
-          </HeaderContainer>
-
-          {summary && summary.position === 'top' && (
-            <SummaryContainer
-              position={'top'}
-              style={{ height: summaryHeight, top: headerHeight }}
-              role={'rfdg-summary-container'}
-            >
-              {(frozenColumnsWidth ?? 0) > 0 && (
-                <FrozenSummary
-                  style={{ width: frozenColumnsWidth }}
-                  role={'rfdg-frozen-summary'}
-                >
-                  <TableSummaryFrozen position={'top'} />
-                </FrozenSummary>
-              )}
-              <Summary style={{ left: frozenColumnsWidth }} role={'rfdg-summary'}>
-                <TableSummary position={'top'} />
-              </Summary>
-            </SummaryContainer>
-          )}
-
+        {scrollbar.variant !== 'native' && scrollbar.vertical.visible && (
+          <div className='bgrid-vertical-scrollbar-gutter' aria-hidden='true' />
+        )}
+        {scrollbar.variant !== 'native' && scrollbar.vertical.visible && (
           <div
-            className='bgrid-virtual-row-backdrop'
-            aria-hidden='true'
+            className='bgrid-vertical-scrollbar-area'
             style={{
-              top: stickyTopHeight,
-              height: contentBodyHeight,
-              marginBottom: -contentBodyHeight,
+              top: 0,
+              bottom: showBottomBar ? bottomBarHeight : 0,
             }}
-          />
-
-          <div
-            className='bgrid-body-scroll-content'
-            style={{ height: virtualScrollWindowMetrics.physicalContentHeight }}
           >
-            {frozenRowCount > 0 && (
-              <div
-                className='bgrid-frozen-rows-layer'
-                style={{ height: frozenRowsHeight, top: stickyTopHeight }}
-                data-bgrid-row-band='frozen'
+            <CustomScrollbar
+              orientation='vertical'
+              variant={scrollbar.variant}
+              metrics={scrollbarMetrics.vertical}
+              scrollOffset={scrollTop}
+              onScrollChange={handleScrollTopChange}
+            />
+          </div>
+        )}
+        <ScrollContainer
+          ref={scrollContainerRef}
+          role={'rfdg-scroll-container'}
+          data-bgrid-scroll-plane='sticky'
+          style={{ height: scrollViewportHeight }}
+          onPointerDownCapture={onBodyPointerDownCapture}
+          onPointerOverCapture={onBodyPointerOverCapture}
+          onPointerLeave={onBodyPointerLeave}
+          onContextMenuCapture={event => {
+            if (disabled) return;
+            if (isInteractiveTarget(event.target)) return;
+            const cell = getCellPosition(event.target as HTMLElement, containerRef.current);
+            if (!cell) return;
+            if (openCellContextMenu(cell, event.clientX, event.clientY, false)) {
+              event.preventDefault();
+              event.stopPropagation();
+            }
+          }}
+        >
+          <ScrollPlane
+            style={{ height: scrollPlaneHeight, minWidth: scrollPlaneMinWidth }}
+            data-bgrid-virtual-scroll-window={virtualScrollWindowMetrics.enabled ? 'true' : undefined}
+            data-bgrid-logical-height={virtualScrollWindowMetrics.logicalContentHeight}
+            data-bgrid-physical-height={virtualScrollWindowMetrics.physicalContentHeight}
+            data-bgrid-logical-scroll-top={Math.round(scrollTop)}
+            data-bgrid-virtual-scroll-base={
+              virtualScrollWindowMetrics.enabled ? Math.round(virtualScrollBase) : undefined
+            }
+          >
+            <HeaderContainer style={{ height: headerHeight, top: 0 }} role={'rfdg-header-container'}>
+              {(frozenColumnsWidth ?? 0) > 0 && (
+                <FrozenHeader style={{ width: frozenColumnsWidth }} role={'rfdg-frozen-header'}>
+                  <TableHeadFrozen container={containerRef} />
+                </FrozenHeader>
+              )}
+              <Header style={{ left: frozenColumnsWidth }} role={'rfdg-header'}>
+                <TableHead container={containerRef} />
+              </Header>
+            </HeaderContainer>
+
+            {summary && summary.position === 'top' && (
+              <SummaryContainer
+                position={'top'}
+                style={{ height: summaryHeight, top: headerHeight }}
+                role={'rfdg-summary-container'}
               >
                 {(frozenColumnsWidth ?? 0) > 0 && (
-                  <div
-                    className='bgrid-frozen-rows-left bgrid-frozen-column-boundary'
-                    style={{ width: frozenColumnsWidth }}
-                    role='rfdg-frozen-rows-left'
-                  >
-                    <TableBodyFrozen
-                      scrollContainerRef={scrollContainerRef}
-                      rowRange={frozenRowRange}
-                      role='rfdg-body-top-frozen'
-                      quadrant='top-left'
-                      allowRowReorder={false}
-                    />
-                    {renderSelectionOverlay('top-left')}
-                  </div>
+                  <FrozenSummary style={{ width: frozenColumnsWidth }} role={'rfdg-frozen-summary'}>
+                    <TableSummaryFrozen position={'top'} />
+                  </FrozenSummary>
                 )}
-                <div
-                  className='bgrid-frozen-rows-main'
-                  style={{ left: frozenColumnsWidth }}
-                  role='rfdg-frozen-rows-main'
-                >
-                  <TableBody
-                    scrollContainerRef={scrollContainerRef}
-                    rowRange={frozenRowRange}
-                    role='rfdg-body-top'
-                    quadrant='top-main'
-                    allowRowReorder={false}
-                  />
-                  {renderSelectionOverlay('top-main')}
-                </div>
-              </div>
+                <Summary style={{ left: frozenColumnsWidth }} role={'rfdg-summary'}>
+                  <TableSummary position={'top'} />
+                </Summary>
+              </SummaryContainer>
             )}
 
             <div
-              className='bgrid-scrollable-rows-layer'
-              style={{ height: physicalScrollableRowsHeight }}
-              data-bgrid-row-band='scrollable'
+              className='bgrid-virtual-row-backdrop'
+              aria-hidden='true'
+              style={{
+                top: stickyTopHeight,
+                height: contentBodyHeight,
+                marginBottom: -contentBodyHeight,
+              }}
+            />
+
+            <div
+              className='bgrid-body-scroll-content'
+              style={{ height: virtualScrollWindowMetrics.physicalContentHeight }}
             >
-              {(frozenColumnsWidth ?? 0) > 0 && (
-                <FrozenScrollContent
+              {frozenRowCount > 0 && (
+                <div
+                  className='bgrid-frozen-rows-layer'
+                  style={{ height: frozenRowsHeight, top: stickyTopHeight }}
+                  data-bgrid-row-band='frozen'
+                >
+                  {(frozenColumnsWidth ?? 0) > 0 && (
+                    <div
+                      className='bgrid-frozen-rows-left bgrid-frozen-column-boundary'
+                      style={{ width: frozenColumnsWidth }}
+                      role='rfdg-frozen-rows-left'
+                    >
+                      <TableBodyFrozen
+                        scrollContainerRef={scrollContainerRef}
+                        rowRange={frozenRowRange}
+                        role='rfdg-body-top-frozen'
+                        quadrant='top-left'
+                        allowRowReorder={false}
+                      />
+                      {renderSelectionOverlay('top-left')}
+                    </div>
+                  )}
+                  <div
+                    className='bgrid-frozen-rows-main'
+                    style={{ left: frozenColumnsWidth }}
+                    role='rfdg-frozen-rows-main'
+                  >
+                    <TableBody
+                      scrollContainerRef={scrollContainerRef}
+                      rowRange={frozenRowRange}
+                      role='rfdg-body-top'
+                      quadrant='top-main'
+                      allowRowReorder={false}
+                    />
+                    {renderSelectionOverlay('top-main')}
+                  </div>
+                </div>
+              )}
+
+              <div
+                className='bgrid-scrollable-rows-layer'
+                style={{ height: physicalScrollableRowsHeight }}
+                data-bgrid-row-band='scrollable'
+              >
+                {(frozenColumnsWidth ?? 0) > 0 && (
+                  <FrozenScrollContent
+                    style={{
+                      width: frozenColumnsWidth,
+                      height: physicalScrollableRowsHeight,
+                    }}
+                    role={'rfdg-frozen-scroll-container'}
+                  >
+                    <TableBodyFrozen
+                      scrollContainerRef={scrollContainerRef}
+                      rowRange={scrollableRowRange}
+                      style={frozenScrollableBodyStyle}
+                      quadrant='body-left'
+                      onRowReorderPointerDown={rowReorderController.onPointerDown}
+                      onRowReorderKeyDown={rowReorderController.onKeyDown}
+                    />
+                    {renderSelectionOverlay('body-left')}
+                  </FrozenScrollContent>
+                )}
+                <ScrollContent
                   style={{
-                    width: frozenColumnsWidth,
+                    left: frozenColumnsWidth,
+                    paddingTop: virtualScrollWindowMetrics.enabled
+                      ? visibleScrollableRows.paddingTop - virtualScrollBase
+                      : visibleScrollableRows.paddingTop,
                     height: physicalScrollableRowsHeight,
                   }}
-                  role={'rfdg-frozen-scroll-container'}
                 >
-                  <TableBodyFrozen
+                  <TableBody
                     scrollContainerRef={scrollContainerRef}
                     rowRange={scrollableRowRange}
-                    style={frozenScrollableBodyStyle}
-                    quadrant='body-left'
-                    onRowReorderPointerDown={rowReorderController.onPointerDown}
-                    onRowReorderKeyDown={rowReorderController.onKeyDown}
+                    quadrant='body-main'
                   />
-                  {renderSelectionOverlay('body-left')}
-                </FrozenScrollContent>
-              )}
-              <ScrollContent
-                style={{
-                  left: frozenColumnsWidth,
-                  paddingTop: virtualScrollWindowMetrics.enabled
-                    ? visibleScrollableRows.paddingTop - virtualScrollBase
-                    : visibleScrollableRows.paddingTop,
-                  height: physicalScrollableRowsHeight,
-                }}
-              >
-                <TableBody
-                  scrollContainerRef={scrollContainerRef}
-                  rowRange={scrollableRowRange}
-                  quadrant='body-main'
-                />
-                {renderSelectionOverlay('body-main')}
-              </ScrollContent>
+                  {renderSelectionOverlay('body-main')}
+                </ScrollContent>
+              </div>
             </div>
-          </div>
 
-          {summary && summary.position === 'bottom' && (
-            <SummaryContainer
-              position={'bottom'}
-              style={{ height: summaryHeight, bottom: 0 }}
-              role={'rfdg-summary-container'}
+            {summary && summary.position === 'bottom' && (
+              <SummaryContainer
+                position={'bottom'}
+                style={{ height: summaryHeight, bottom: 0 }}
+                role={'rfdg-summary-container'}
+              >
+                {(frozenColumnsWidth ?? 0) > 0 && (
+                  <FrozenSummary style={{ width: frozenColumnsWidth }} role={'rfdg-frozen-summary'}>
+                    <TableSummaryFrozen position={'bottom'} />
+                  </FrozenSummary>
+                )}
+                <Summary style={{ left: frozenColumnsWidth }} role={'rfdg-summary'}>
+                  <TableSummary position={'bottom'} />
+                </Summary>
+              </SummaryContainer>
+            )}
+          </ScrollPlane>
+        </ScrollContainer>
+
+        <BodyViewport
+          ref={bodyContainerRef}
+          style={{ top: stickyTopHeight, height: contentBodyHeight }}
+          data-last={!page ? 'true' : undefined}
+        >
+          {rowReorderController.preview?.visible && (
+            <div
+              className='bgrid-row-reorder-preview'
+              data-bgrid-row-reorder-phase={rowReorderController.preview.phase}
+              aria-hidden='true'
             >
-              {(frozenColumnsWidth ?? 0) > 0 && (
-                <FrozenSummary
-                  style={{ width: frozenColumnsWidth }}
-                  role={'rfdg-frozen-summary'}
-                >
-                  <TableSummaryFrozen position={'bottom'} />
-                </FrozenSummary>
-              )}
-              <Summary style={{ left: frozenColumnsWidth }} role={'rfdg-summary'}>
-                <TableSummary position={'bottom'} />
-              </Summary>
-            </SummaryContainer>
+              {rowReorderController.preview.text}
+            </div>
           )}
-        </ScrollPlane>
-      </ScrollContainer>
 
-      <BodyViewport
-        ref={bodyContainerRef}
-        style={{ top: stickyTopHeight, height: contentBodyHeight }}
-        data-last={!page ? 'true' : undefined}
-      >
-        {rowReorderController.preview?.visible && (
-          <div
-            className='bgrid-row-reorder-preview'
-            data-bgrid-row-reorder-phase={rowReorderController.preview.phase}
-            aria-hidden='true'
-          >
-            {rowReorderController.preview.text}
-          </div>
+          <Loading active={!!spinning} size={'small'} />
+        </BodyViewport>
+
+        <div className='bgrid-visually-hidden' role='status' aria-live='polite' aria-atomic='true'>
+          {rowReorderController.announcement}
+        </div>
+
+        <CellTextEditorGateway containerRef={containerRef} />
+        <CellNavigationDomSync
+          containerRef={containerRef}
+          activeCell={activeLogicalCell?.cell}
+          cellSelectionRanges={cellSelectionRanges}
+          hasMultiCellSelection={hasMultiCellSelection}
+          rowCount={data.length}
+          columnCount={columns.length}
+        />
+        {(searchSurfaceEnabled || contextMenuSurfaceEnabled) && (
+          <React.Suspense fallback={null}>
+            <LazyGridOptionalSurfaces
+              gridRef={containerRef}
+              searchPopoverRef={searchPopoverRef}
+              searchEnabled={searchSurfaceEnabled}
+              contextMenuEnabled={contextMenuSurfaceEnabled}
+            />
+          </React.Suspense>
         )}
+        <EditorPortalRoot gridRef={containerRef} portalRef={editorPortalRef} />
 
-        <Loading active={!!spinning} size={'small'} />
-      </BodyViewport>
-
-      <div className='bgrid-visually-hidden' role='status' aria-live='polite' aria-atomic='true'>
-        {rowReorderController.announcement}
-      </div>
-
-      <CellTextEditorGateway containerRef={containerRef} />
-      <CellNavigationDomSync
-        containerRef={containerRef}
-        activeCell={activeLogicalCell?.cell}
-        cellSelectionRanges={cellSelectionRanges}
-        hasMultiCellSelection={hasMultiCellSelection}
-        rowCount={data.length}
-        columnCount={columns.length}
-      />
-      {(searchSurfaceEnabled || contextMenuSurfaceEnabled) && (
-        <React.Suspense fallback={null}>
-          <LazyGridOptionalSurfaces
-            gridRef={containerRef}
-            searchPopoverRef={searchPopoverRef}
-            searchEnabled={searchSurfaceEnabled}
-            contextMenuEnabled={contextMenuSurfaceEnabled}
-          />
-        </React.Suspense>
-      )}
-      <EditorPortalRoot gridRef={containerRef} portalRef={editorPortalRef} />
-
-      {showBottomBar && (
-        <FooterContainer style={{ height: bottomBarHeight }} role={'rfdg-footer-container'}>
-          <TableFooter
-            horizontalMetrics={scrollbarMetrics.horizontal}
-            scrollLeft={scrollLeft}
-            onScrollLeftChange={handleScrollLeftChange}
-          />
-        </FooterContainer>
-      )}
-      <Loading active={loading} />
+        {showBottomBar && (
+          <FooterContainer style={{ height: bottomBarHeight }} role={'rfdg-footer-container'}>
+            <TableFooter
+              horizontalMetrics={scrollbarMetrics.horizontal}
+              scrollLeft={scrollLeft}
+              onScrollLeftChange={handleScrollLeftChange}
+            />
+          </FooterContainer>
+        )}
+        <Loading active={loading} />
       </Container>
     </EditorPortalContext.Provider>
   );
@@ -2954,9 +2969,7 @@ function getAxisSelectionTarget(
     }
   }
 
-  const headerCell = target.closest(
-    '[data-header-cell-type][data-column-index][data-bgrid-axis-selectable="true"]',
-  );
+  const headerCell = target.closest('[data-header-cell-type][data-column-index][data-bgrid-axis-selectable="true"]');
   if (!(headerCell instanceof HTMLTableCellElement) || !container.contains(headerCell)) return undefined;
   if (target.closest('.bgrid-col-resizer, .bgrid-toolbox-trigger-btn')) return undefined;
   if (headerCell.classList.contains('drag-item') && target.closest('.bgrid-column-drag-handle')) return undefined;
@@ -3002,10 +3015,7 @@ function getAxisSelectionRange({
   };
 }
 
-function updateAxisSelectionDragRange(
-  dragState: AxisSelectionDragState,
-  activeRange: BGridCellSelectionRange,
-) {
+function updateAxisSelectionDragRange(dragState: AxisSelectionDragState, activeRange: BGridCellSelectionRange) {
   const nextRanges = [...dragState.baseRanges];
   nextRanges[dragState.activeRangeIndex] = activeRange;
   return nextRanges;
@@ -3057,8 +3067,7 @@ function getCellPositionFromPointer({
       : clamp(
           metrics.frozenRowCount +
             Math.floor(
-              (metrics.scrollTop +
-                clamp(clientY - scrollRect.top, 0, Math.max(scrollContainer.clientHeight - 1, 0))) /
+              (metrics.scrollTop + clamp(clientY - scrollRect.top, 0, Math.max(scrollContainer.clientHeight - 1, 0))) /
                 metrics.trHeight,
             ),
           0,

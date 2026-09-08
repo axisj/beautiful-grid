@@ -72,6 +72,7 @@ export const themeColorGroups = [
       ['--bgrid-loading-bg', 'Loading overlay'],
       ['--bgrid-loading-color', 'Loading indicator track'],
       ['--bgrid-loading-second-color', 'Loading indicator accent'],
+      ['--bgrid-disabled-overlay-bg', 'Disabled overlay'],
     ],
   },
   {
@@ -144,6 +145,7 @@ export const themeColorTokenNames = themeColorGroups.flatMap(group => group.fiel
 export const alphaThemeColorTokens = new Set<string>([
   '--bgrid-loading-bg',
   '--bgrid-loading-color',
+  '--bgrid-disabled-overlay-bg',
   '--bgrid-search-match-bg',
   '--bgrid-search-current-bg',
 ]);

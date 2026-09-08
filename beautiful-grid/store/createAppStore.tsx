@@ -148,6 +148,7 @@ export type AppStoreInitialState<T = any> = Partial<
     | 'page'
     | 'displayPaginationLength'
     | 'loading'
+    | 'disabled'
     | 'spinning'
     | 'scrollTop'
     | 'scrollLeft'
@@ -234,20 +235,23 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
       checkedAll: initialState?.checkedAll ?? false,
       displayPaginationLength: initialState?.displayPaginationLength ?? 0,
       loading: initialState?.loading ?? false,
+      disabled: initialState?.disabled,
       editTrigger: initialState?.editTrigger ?? 'dblclick',
       cellMergeOptions: initialState?.cellMergeOptions,
       variant: initialState?.variant ?? 'default',
       columnSortable: initialState?.columnSortable ?? false,
       reordering: false,
-      activeCell:
-        initialState?.activeCell ??
-        initialState?.cellNavigationOptions?.activeCell ??
-        initialState?.cellNavigationOptions?.defaultActiveCell,
-      activeCellHost:
-        initialState?.activeCellHost ??
-        initialState?.activeCell ??
-        initialState?.cellNavigationOptions?.activeCell ??
-        initialState?.cellNavigationOptions?.defaultActiveCell,
+      activeCell: initialState?.disabled
+        ? undefined
+        : initialState?.activeCell ??
+          initialState?.cellNavigationOptions?.activeCell ??
+          initialState?.cellNavigationOptions?.defaultActiveCell,
+      activeCellHost: initialState?.disabled
+        ? undefined
+        : initialState?.activeCellHost ??
+          initialState?.activeCell ??
+          initialState?.cellNavigationOptions?.activeCell ??
+          initialState?.cellNavigationOptions?.defaultActiveCell,
       cellInteractionSession: initialState?.cellInteractionSession,
       cellNavigationOptions: initialState?.cellNavigationOptions,
       cellSelectionRanges: [],
@@ -263,9 +267,15 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
       searchOptions: initialState?.searchOptions,
       contextMenuOptions: initialState?.contextMenuOptions,
       searchOpen:
-        initialState?.searchOptions?.open ?? initialState?.searchOpen ?? initialState?.searchOptions?.defaultOpen ?? false,
+        initialState?.searchOptions?.open ??
+        initialState?.searchOpen ??
+        initialState?.searchOptions?.defaultOpen ??
+        false,
       searchQuery:
-        initialState?.searchOptions?.query ?? initialState?.searchQuery ?? initialState?.searchOptions?.defaultQuery ?? '',
+        initialState?.searchOptions?.query ??
+        initialState?.searchQuery ??
+        initialState?.searchOptions?.defaultQuery ??
+        '',
       searchStatus: initialState?.searchStatus ?? 'idle',
       searchMatches: initialState?.searchMatches ?? [],
       activeSearchMatchIndex: initialState?.activeSearchMatchIndex,
@@ -371,7 +381,9 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
         }
         const mappingUnchanged =
           state.sourceIndexByVisibleIndex.length === sourceIndexByVisibleIndex.length &&
-          state.sourceIndexByVisibleIndex.every((sourceIndex, index) => sourceIndex === sourceIndexByVisibleIndex[index]);
+          state.sourceIndexByVisibleIndex.every(
+            (sourceIndex, index) => sourceIndex === sourceIndexByVisibleIndex[index],
+          );
         const preservesEditedRows = state.sourceData === sourceData && mappingUnchanged;
         set(
           preservesEditedRows
@@ -391,6 +403,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
       setDataQuery: dataQuery => set({ dataQuery }),
       setDataControl: dataControl => set({ dataControl }),
       setColumnSort: (columnId, order) => {
+        if (get().disabled) return;
         const dataControl = get().dataControl;
         const columns = get().columns;
         const col = columns.find(c => (c.columnId ?? getColumnId(c)) === columnId);
@@ -423,13 +436,18 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
         set({ activeToolboxColumnId: null, filterDrafts: nextDrafts });
       },
       setFilterDraft: (columnId, filter) =>
-        set(s => ({
-          filterDrafts: {
-            ...s.filterDrafts,
-            [columnId]: filter,
-          },
-        })),
+        set(s =>
+          s.disabled
+            ? {}
+            : {
+                filterDrafts: {
+                  ...s.filterDrafts,
+                  [columnId]: filter,
+                },
+              },
+        ),
       applyColumnFilter: columnId => {
+        if (get().disabled) return;
         const dataControl = get().dataControl;
         const draft = get().filterDrafts[columnId];
         if (!dataControl) return;
@@ -452,6 +470,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
         set({ activeToolboxColumnId: null, filterDrafts: nextDrafts });
       },
       clearColumnFilter: columnId => {
+        if (get().disabled) return;
         const dataControl = get().dataControl;
         if (!dataControl) return;
 
@@ -469,6 +488,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
         set({ activeToolboxColumnId: null, filterDrafts: nextDrafts });
       },
       setActiveToolbox: columnId => {
+        if (get().disabled && columnId !== null) return;
         if (columnId === null) {
           set(s => {
             const nextDrafts = { ...s.filterDrafts };
@@ -540,6 +560,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
         }),
       requestSearchOpen: (open: boolean, reason: BGridSearchOpenReason) => {
         const state = get();
+        if (state.disabled && open) return;
         const options = state.searchOptions;
         if (open && (!options || options.enabled === false)) return;
 
@@ -563,6 +584,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
         options?.onOpenChange?.(open, reason);
       },
       setSearchQuery: (query: string) => {
+        if (get().disabled) return;
         const options = get().searchOptions;
         if (options?.query === undefined) {
           set({ searchQuery: query });
@@ -573,16 +595,10 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
       setSearchResults: (matches: BGridSearchMatch[]) =>
         set(state => {
           const previous =
-            state.activeSearchMatchIndex === undefined
-              ? undefined
-              : state.searchMatches[state.activeSearchMatchIndex];
+            state.activeSearchMatchIndex === undefined ? undefined : state.searchMatches[state.activeSearchMatchIndex];
           return {
             searchMatches: matches,
-            activeSearchMatchIndex: findMatchingSearchResultIndex(
-              matches,
-              previous,
-              state.activeSearchMatchIndex,
-            ),
+            activeSearchMatchIndex: findMatchingSearchResultIndex(matches, previous, state.activeSearchMatchIndex),
             searchStatus: 'ready',
           };
         }),
@@ -597,10 +613,10 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
         set({ activeSearchMatchIndex: nextIndex });
         return state.searchMatches[nextIndex];
       },
-      clearSearchResults: () =>
-        set({ searchStatus: 'idle', searchMatches: [], activeSearchMatchIndex: undefined }),
+      clearSearchResults: () => set({ searchStatus: 'idle', searchMatches: [], activeSearchMatchIndex: undefined }),
       openContextMenu: (contextMenuState: BGridContextMenuState<T>) => {
         const state = get();
+        if (state.disabled) return;
         if (state.searchOpen) state.searchOptions?.onOpenChange?.(false, 'surfaceConflict');
         state.contextMenuOptions?.onOpenChange?.(true, contextMenuState.target);
         set({
@@ -644,6 +660,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
         });
       },
       setCheckedIndexes: keys => {
+        if (get().disabled) return;
         const rowKey = get().rowKey;
         const sourceData = get().sourceData.length > 0 ? get().sourceData : get().data;
         const data = get().data;
@@ -683,6 +700,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
         get().rowChecked?.onChange(checkedIndexes, checkedRowKeys, checkedAll);
       },
       setCheckedAll: checkedAll => {
+        if (get().disabled) return;
         const rowKey = get().rowKey;
         const data = get().data;
         const sourceData = get().sourceData.length > 0 ? get().sourceData : get().data;
@@ -756,6 +774,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
         set({ checkedIndexesMap, checkedAll });
       },
       setColumnWidth: (columnIndex, options) => {
+        if (get().disabled) return;
         if (get().cellInteractionSession) {
           get().endCellEdit();
         }
@@ -833,6 +852,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
         set({ columnResizing });
       },
       toggleColumnSort: columnIndex => {
+        if (get().disabled) return;
         const columns = get().columns;
         const column = columns[columnIndex];
         if (!column) return;
@@ -886,6 +906,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
       },
       handleClick: (index, columnIndex) => {
         const state = get();
+        if (state.disabled) return;
         if (columnIndex < 0) return;
         const logicalCell = resolveLogicalCell(state.data, state.cellMergeOptions, {
           rowIndex: index,
@@ -908,6 +929,35 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
       setDisplayItemCount: displayItemCount => set({ displayItemCount }),
       setLoading: loading => set({ loading }),
       setSpinning: spinning => set({ spinning }),
+      setDisabled: disabled =>
+        set(state => {
+          if (!disabled) return { disabled };
+          state.contextMenuOptions?.onOpenChange?.(false, state.contextMenuState?.target);
+          if (state.searchOpen) state.searchOptions?.onOpenChange?.(false, 'surfaceConflict');
+          return {
+            disabled,
+            editable: false,
+            editItemIndex: -1,
+            editItemColIndex: -1,
+            activeToolboxColumnId: null,
+            activeCell: undefined,
+            activeCellHost: undefined,
+            contextMenuState: undefined,
+            cellInteractionSession: undefined,
+            cellSelectionRange: undefined,
+            cellSelectionRanges: [],
+            cellSelecting: false,
+            reorderingInfo: undefined,
+            ...(state.searchOptions?.open === undefined
+              ? {
+                  searchOpen: false,
+                  searchStatus: 'idle' as const,
+                  searchMatches: [],
+                  activeSearchMatchIndex: undefined,
+                }
+              : {}),
+          };
+        }),
 
       setHeaderHeight: headerHeight => set({ headerHeight }),
       setFooterHeight: footerHeight => set({ footerHeight }),
@@ -923,8 +973,8 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
       setRowKey: rowKey => set({ rowKey }),
       setSelectedRowKey: selectedRowKey => set({ selectedRowKey }),
       setEditable: editable =>
-        set(
-          editable
+        set(state =>
+          editable && !state.disabled
             ? { editable }
             : {
                 editable,
@@ -934,6 +984,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
               },
         ),
       setEditItem: (index, columnIndex) => {
+        if (get().disabled && index >= 0 && columnIndex >= 0) return;
         if (index < 0 || columnIndex < 0) {
           get().endCellEdit();
           return;
@@ -942,6 +993,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
       },
       beginCellEdit: (cell, mode = 'preserve', activation = 'cell') => {
         const state = get();
+        if (state.disabled) return;
         const logicalCell = resolveLogicalCell(state.data, state.cellMergeOptions, cell);
         const item = state.data[logicalCell.cell.rowIndex];
         const column = state.columns[logicalCell.cell.columnIndex];
@@ -1010,6 +1062,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
       },
       beginEditorIconInteraction: cell => {
         const state = get();
+        if (state.disabled) return undefined;
         const logicalCell = resolveLogicalCell(state.data, state.cellMergeOptions, cell);
         const item = state.data[logicalCell.cell.rowIndex];
         const column = state.columns[logicalCell.cell.columnIndex];
@@ -1099,6 +1152,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
       isCellInteractionSessionActive: sessionId => get().cellInteractionSession?.id === sessionId,
       requestCellCommit: async (request: BGridCellCommitRequest<T>) => {
         const initialState = get();
+        if (initialState.disabled) return;
         const session = initialState.cellInteractionSession;
         if (!session || session.id !== request.sessionId || session.phase !== 'active') return;
 
@@ -1218,10 +1272,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
           }
         };
 
-        const commit = (
-          finalChanges: BGridCellCommitRequest<T>['changes'],
-          finalOptions = request.options,
-        ) => {
+        const commit = (finalChanges: BGridCellCommitRequest<T>['changes'], finalOptions = request.options) => {
           if (terminal) return commitPromise ?? Promise.resolve();
           terminal = 'commit';
           commitPromise = finalizeCommit(finalChanges, finalOptions);
@@ -1293,6 +1344,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
       },
       commitCheckboxCell: async (rowIndex, columnIndex, checked) => {
         const state = get();
+        if (state.disabled) return;
         const column = state.columns[columnIndex];
         const config = column?.editor?.type === 'checkbox' ? column.editor : undefined;
         if (!column || !config || !state.editable || column.editable === false) return;
@@ -1338,6 +1390,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
       },
       commitCheckboxColumn: async (columnIndex, checked) => {
         const state = get();
+        if (state.disabled) return;
         const column = state.columns[columnIndex];
         const config = column?.editor?.type === 'checkbox' ? column.editor : undefined;
         if (!column || !config || !config.header || !state.editable || column.editable === false) return;
@@ -1394,6 +1447,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
       setSummary: summary => set({ summary }),
       setColumnSortable: columnSortable => set({ columnSortable }),
       sortColumn: (trLevel, oldColumn, newColumn) => {
+        if (get().disabled) return;
         const nestedColumnGroups = get().columnGroups;
         if (nestedColumnGroups.length > 0) {
           const columns = [...get().columns];
@@ -1507,9 +1561,10 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
       setReorder: reorder => set({ reorder }),
       setClassName: className => set({ className }),
       setStyle: style => set({ style }),
-      setReorderingInfo: reorderingInfo => set({ reorderingInfo }),
+      setReorderingInfo: reorderingInfo => set(state => (state.disabled && reorderingInfo ? {} : { reorderingInfo })),
       setActiveCell: (activeCell, hostCell = activeCell) => {
         const state = get();
+        if (state.disabled && activeCell) return;
         const normalizedCell = activeCell
           ? resolveLogicalCell(state.data, state.cellMergeOptions, activeCell).cell
           : undefined;
@@ -1539,6 +1594,10 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
         cellNavigationOptions?.onActiveCellChange?.(normalizedCell);
       },
       setCellNavigationOptions: cellNavigationOptions => {
+        if (get().disabled) {
+          set({ cellNavigationOptions, activeCell: undefined, activeCellHost: undefined });
+          return;
+        }
         const updates: Partial<AppModel<T>> = { cellNavigationOptions };
         if (cellNavigationOptions?.activeCell !== undefined) {
           updates.activeCell = cellNavigationOptions.activeCell;
@@ -1555,6 +1614,10 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
       },
       syncActiveCellToBounds: () => {
         const state = get();
+        if (state.disabled) {
+          if (state.activeCell !== undefined) set({ activeCell: undefined, activeCellHost: undefined });
+          return;
+        }
         const requestedCell =
           state.cellNavigationOptions?.activeCell ?? state.activeCell ?? state.cellNavigationOptions?.defaultActiveCell;
 
@@ -1582,6 +1645,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
       },
       moveActiveCell: (direction, options) => {
         const state = get();
+        if (state.disabled) return;
         const data = state.data;
         const columns = state.columns;
         if (!data || data.length === 0 || !columns || columns.length === 0) return;
@@ -1721,11 +1785,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
         const clamped = clampCellAddress({ rowIndex, columnIndex }, rowCount, colCount);
         const newLogicalCell = resolveLogicalCell(data, state.cellMergeOptions, clamped);
         const newActiveCell: BGridCellAddress = newLogicalCell.cell;
-        const newActiveCellHost = clampCellAddress(
-          { rowIndex: navigationRowIndex, columnIndex },
-          rowCount,
-          colCount,
-        );
+        const newActiveCellHost = clampCellAddress({ rowIndex: navigationRowIndex, columnIndex }, rowCount, colCount);
         activeCellNavigationRowRef.current = newActiveCellHost.rowIndex;
         lastNavigationCellRef.current = newActiveCell;
 
@@ -1786,16 +1846,24 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
         return newActiveCell;
       },
       setCellSelectionRange: cellSelectionRange =>
-        set({
-          cellSelectionRange,
-          cellSelectionRanges: cellSelectionRange ? [cellSelectionRange] : [],
-        }),
+        set(state =>
+          state.disabled
+            ? {}
+            : {
+                cellSelectionRange,
+                cellSelectionRanges: cellSelectionRange ? [cellSelectionRange] : [],
+              },
+        ),
       setCellSelectionRanges: cellSelectionRanges =>
-        set({
-          cellSelectionRange: cellSelectionRanges[cellSelectionRanges.length - 1],
-          cellSelectionRanges,
-        }),
-      setCellSelecting: cellSelecting => set({ cellSelecting }),
+        set(state =>
+          state.disabled
+            ? {}
+            : {
+                cellSelectionRange: cellSelectionRanges[cellSelectionRanges.length - 1],
+                cellSelectionRanges,
+              },
+        ),
+      setCellSelecting: cellSelecting => set(state => (state.disabled && cellSelecting ? {} : { cellSelecting })),
       clearCellSelection: () => set({ cellSelectionRange: undefined, cellSelectionRanges: [], cellSelecting: false }),
     }));
   }

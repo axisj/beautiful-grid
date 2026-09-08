@@ -84,6 +84,7 @@ export function BGrid<T = Record<string, any>>({
   onClick,
   loading = false,
   spinning,
+  disabled,
   rowKey,
   selectedRowKey,
   editable,
@@ -121,25 +122,23 @@ export function BGrid<T = Record<string, any>>({
   const pivotEnabled = !!pivotData;
   const resolvedColumns = (pivotData?.columns ?? columns) as BGridColumnWithOptionalWidth<T>[];
   const visibilityOptions = typeof columnVisibility === 'object' ? columnVisibility : undefined;
-  const visibilityEnabled = columnVisibility === true || (visibilityOptions !== undefined && visibilityOptions.enabled !== false);
+  const visibilityEnabled =
+    columnVisibility === true || (visibilityOptions !== undefined && visibilityOptions.enabled !== false);
   const [uncontrolledHiddenColumnIds, setUncontrolledHiddenColumnIds] = React.useState<string[]>(() =>
     Array.from(new Set(visibilityOptions?.defaultHiddenColumnIds ?? [])),
   );
-  const hiddenColumnIds = React.useMemo(
-    () => {
-      if (!visibilityEnabled) return [];
-      const requestedIds = Array.from(new Set(visibilityOptions?.hiddenColumnIds ?? uncontrolledHiddenColumnIds));
-      if (
-        resolvedColumns.length > 0 &&
-        resolvedColumns.every(column => requestedIds.includes(getColumnId(column as BGridColumn<T>)))
-      ) {
-        const firstColumnId = getColumnId(resolvedColumns[0] as BGridColumn<T>);
-        return requestedIds.filter(columnId => columnId !== firstColumnId);
-      }
-      return requestedIds;
-    },
-    [resolvedColumns, uncontrolledHiddenColumnIds, visibilityEnabled, visibilityOptions?.hiddenColumnIds],
-  );
+  const hiddenColumnIds = React.useMemo(() => {
+    if (!visibilityEnabled) return [];
+    const requestedIds = Array.from(new Set(visibilityOptions?.hiddenColumnIds ?? uncontrolledHiddenColumnIds));
+    if (
+      resolvedColumns.length > 0 &&
+      resolvedColumns.every(column => requestedIds.includes(getColumnId(column as BGridColumn<T>)))
+    ) {
+      const firstColumnId = getColumnId(resolvedColumns[0] as BGridColumn<T>);
+      return requestedIds.filter(columnId => columnId !== firstColumnId);
+    }
+    return requestedIds;
+  }, [resolvedColumns, uncontrolledHiddenColumnIds, visibilityEnabled, visibilityOptions?.hiddenColumnIds]);
   const hiddenColumnIdSet = React.useMemo(() => new Set(hiddenColumnIds), [hiddenColumnIds]);
   const resolvedColumnGroups = React.useMemo(
     () => (pivotEnabled ? [] : columnGroups ?? []),
@@ -176,33 +175,36 @@ export function BGrid<T = Record<string, any>>({
   const resolvedFrozenColumnIndex = visibilityProjection.frozenColumnIndex;
   const resolvedRowChecked = pivotEnabled ? undefined : rowChecked;
   const resolvedSort = pivotEnabled ? undefined : sort;
-  const resolvedOnClick = pivotEnabled ? undefined : onClick;
+  const resolvedDisabled = !!disabled;
+  const resolvedOnClick = pivotEnabled || resolvedDisabled ? undefined : onClick;
   const baseOnChangeColumns = pivotEnabled ? undefined : onChangeColumns;
   const resolvedOnChangeData = pivotEnabled ? undefined : onChangeData;
   const resolvedRowKey = pivotEnabled ? undefined : rowKey;
   const resolvedSelectedRowKey = pivotEnabled ? undefined : selectedRowKey;
-  const resolvedEditable = pivotEnabled ? false : editable;
+  const resolvedEditable = pivotEnabled || resolvedDisabled ? false : editable;
   const resolvedShowLineNumber = pivotEnabled ? false : showLineNumber;
   const resolvedGetRowClassName = pivotEnabled ? undefined : getRowClassName;
   const resolvedCellMergeOptions = visibilityProjection.cellMergeOptions;
-  const resolvedCellSelectionOptions = cellSelectionOptions;
+  const resolvedCellSelectionOptions = resolvedDisabled
+    ? { ...cellSelectionOptions, enabled: false }
+    : cellSelectionOptions;
   const resolvedSummary = visibilityProjection.summary;
   const hasHiddenColumns = visibilityProjection.columns.length < resolvedColumns.length;
-  const resolvedColumnSortable = pivotEnabled || hasHiddenColumns ? false : columnSortable;
+  const resolvedColumnSortable = pivotEnabled || hasHiddenColumns || resolvedDisabled ? false : columnSortable;
   const resolvedDataControl = pivotEnabled ? undefined : dataControl;
-  const resolvedSearchOptions = pivotEnabled ? undefined : searchOptions;
-  const resolvedContextMenuOptions = pivotEnabled ? undefined : contextMenuOptions;
+  const resolvedSearchOptions = pivotEnabled || resolvedDisabled ? undefined : searchOptions;
+  const resolvedContextMenuOptions = pivotEnabled || resolvedDisabled ? undefined : contextMenuOptions;
   const hasActiveClientQuery =
     resolvedDataControl?.mode === 'client' &&
     (resolvedDataControl.query.sortParams.length > 0 || resolvedDataControl.query.filterParams.length > 0);
   const resolvedReorder = React.useMemo(
     () =>
-      pivotEnabled
+      pivotEnabled || resolvedDisabled
         ? undefined
         : (hasActiveClientQuery || frozenRowCount > 0) && reorder
         ? { ...reorder, enabled: false }
         : reorder,
-    [frozenRowCount, hasActiveClientQuery, pivotEnabled, reorder],
+    [frozenRowCount, hasActiveClientQuery, pivotEnabled, reorder, resolvedDisabled],
   );
 
   // Development warnings
@@ -244,13 +246,11 @@ export function BGrid<T = Record<string, any>>({
         !warnedSearchControlledRef.current.columnVisibility
       ) {
         warnedSearchControlledRef.current.columnVisibility = true;
-        console.warn('[BGrid] Controlled columnVisibility.hiddenColumnIds requires onChange to respond to user actions.');
+        console.warn(
+          '[BGrid] Controlled columnVisibility.hiddenColumnIds requires onChange to respond to user actions.',
+        );
       }
-      if (
-        searchOptions?.open !== undefined &&
-        !searchOptions.onOpenChange &&
-        !warnedSearchControlledRef.current.open
-      ) {
+      if (searchOptions?.open !== undefined && !searchOptions.onOpenChange && !warnedSearchControlledRef.current.open) {
         warnedSearchControlledRef.current.open = true;
         console.warn('[BGrid] Controlled searchOptions.open requires onOpenChange to respond to user actions.');
       }
@@ -298,9 +298,9 @@ export function BGrid<T = Record<string, any>>({
 
     newDuplicateIds.forEach(id => warnedDuplicateIdsRef.current.add(id));
     console.warn(
-      `[BGrid] Duplicate column IDs detected: ${newDuplicateIds.join(
-        ', ',
-      )}. Toolbox${visibilityEnabled ? ' and column visibility are' : ' is'} disabled for those columns; specify an explicit unique 'id'.`,
+      `[BGrid] Duplicate column IDs detected: ${newDuplicateIds.join(', ')}. Toolbox${
+        visibilityEnabled ? ' and column visibility are' : ' is'
+      } disabled for those columns; specify an explicit unique 'id'.`,
     );
   }, [duplicateToolboxColumnIds, visibilityEnabled]);
 
@@ -372,9 +372,7 @@ export function BGrid<T = Record<string, any>>({
         if (updatedColumn) nextColumns[originalIndex] = updatedColumn;
       });
       baseOnChangeColumns(
-        visibleColumnIndex === null
-          ? null
-          : visibilityProjection.visibleOriginalIndexes[visibleColumnIndex] ?? null,
+        visibleColumnIndex === null ? null : visibilityProjection.visibleOriginalIndexes[visibleColumnIndex] ?? null,
         {
           ...info,
           columns: nextColumns,
@@ -558,9 +556,7 @@ export function BGrid<T = Record<string, any>>({
 
   React.useEffect(() => {
     if (process.env.NODE_ENV !== 'production' && bottomBarHeight !== undefined && footerHeight !== undefined) {
-      console.warn(
-        '[BGrid] Both bottomBarHeight and footerHeight were provided. bottomBarHeight takes precedence.',
-      );
+      console.warn('[BGrid] Both bottomBarHeight and footerHeight were provided. bottomBarHeight takes precedence.');
     }
   }, [bottomBarHeight, footerHeight]);
 
@@ -640,6 +636,7 @@ export function BGrid<T = Record<string, any>>({
       page: resolvedPage,
       displayPaginationLength: resolvedPage ? resolvedPage.displayPaginationLength ?? 5 : 0,
       loading,
+      disabled: resolvedDisabled,
       spinning,
       scrollTop,
       scrollLeft,
@@ -699,6 +696,7 @@ export function BGrid<T = Record<string, any>>({
     resolvedSearchOptions,
     resolvedContextMenuOptions,
     loading,
+    resolvedDisabled,
     spinning,
     scrollTop,
     scrollLeft,
@@ -733,6 +731,7 @@ export function BGrid<T = Record<string, any>>({
           className,
           style,
           loading,
+          disabled: resolvedDisabled,
           spinning,
           scrollLeft,
           scrollTop,

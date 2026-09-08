@@ -7,28 +7,30 @@ interface Props {}
 
 function Pagination(props: Props) {
   // [Selector Group 1] Pagination State - 페이지네이션 상태
-  const { page, displayPaginationLength } = useAppStore(
+  const { page, displayPaginationLength, disabled } = useAppStore(
     useShallow(s => ({
       page: s.page,
       displayPaginationLength: s.displayPaginationLength,
-    }))
+      disabled: s.disabled,
+    })),
   );
 
   // [Selector Group 2] Pagination Actions - 페이지네이션 액션
   const { setPage } = useAppStore(
     useShallow(s => ({
       setPage: s.setPage,
-    }))
+    })),
   );
 
   const onClickPageNo = React.useCallback(
     (pageNo: number) => {
+      if (disabled) return;
       if (page) {
         setPage({ ...page, currentPage: pageNo });
         page?.onChange?.(pageNo, page?.pageSize);
       }
     },
-    [page, setPage],
+    [disabled, page, setPage],
   );
 
   if (page && page.totalPages !== undefined && page.currentPage !== undefined && page.totalPages > 0) {
@@ -44,7 +46,12 @@ function Pagination(props: Props) {
       <div className={'bgrid-pagination'}>
         {pageStartNumber > 1 && (
           <>
-            <span role={'page-number'} className={'bgrid-page-no'} onClick={() => onClickPageNo(1)}>
+            <span
+              role={'page-number'}
+              className={'bgrid-page-no'}
+              aria-disabled={disabled ? 'true' : undefined}
+              onClick={() => onClickPageNo(1)}
+            >
               1
             </span>
             {pageStartNumber > 2 && '...'}
@@ -59,6 +66,7 @@ function Pagination(props: Props) {
                 key={num}
                 className={'bgrid-page-no'}
                 data-active={page.currentPage === num}
+                aria-disabled={disabled ? 'true' : undefined}
                 onClick={() => onClickPageNo(num)}
               >
                 {toMoney(num)}
@@ -69,7 +77,12 @@ function Pagination(props: Props) {
         {page.totalPages && pageNumber < page.totalPages && (
           <>
             {pageNumber < page.totalPages - 1 && '...'}
-            <span role={'page-number'} className={'bgrid-page-no'} onClick={() => onClickPageNo(page.totalPages ?? 0)}>
+            <span
+              role={'page-number'}
+              className={'bgrid-page-no'}
+              aria-disabled={disabled ? 'true' : undefined}
+              onClick={() => onClickPageNo(page.totalPages ?? 0)}
+            >
               {toMoney(page.totalPages)}
             </span>
           </>

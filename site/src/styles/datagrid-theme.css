@@ -60,6 +60,7 @@
   --bgrid-loading-bg: rgba(48, 115, 241, 0.08);
   --bgrid-loading-color: rgba(48, 115, 241, 0.18);
   --bgrid-loading-second-color: #64748b;
+  --bgrid-disabled-overlay-bg: rgba(248, 250, 252, 0.48);
   --bgrid-toolbox-bg: #ffffff;
   --bgrid-toolbox-color: #334155;
   --bgrid-toolbox-muted-color: #64748b;
@@ -164,6 +165,7 @@
   --bgrid-loading-bg: rgba(110, 168, 255, 0.1);
   --bgrid-loading-color: rgba(110, 168, 255, 0.22);
   --bgrid-loading-second-color: #94a3b8;
+  --bgrid-disabled-overlay-bg: rgba(17, 26, 44, 0.48);
   --bgrid-toolbox-bg: #151f33;
   --bgrid-toolbox-color: #dbe5f4;
   --bgrid-toolbox-muted-color: #94a3b8;

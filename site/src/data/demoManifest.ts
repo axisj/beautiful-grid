@@ -202,6 +202,11 @@ export const demoManifest: Record<string, DemoManifestItem> = {
     sourceFiles: withContainerSources('LoadingExample.tsx'),
     minHeight: 450,
   },
+  disabled: {
+    componentFile: 'DisabledExample.tsx',
+    sourceFiles: withContainerSources('DisabledExample.tsx'),
+    minHeight: 620,
+  },
   focus: {
     componentFile: 'FocusExample.tsx',
     sourceFiles: withContainerSources('FocusExample.tsx'),

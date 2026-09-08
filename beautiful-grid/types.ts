@@ -89,8 +89,7 @@ export interface BGridEditorIconParams<T> {
   active: boolean;
 }
 
-export interface BGridEditorIconClickParams<T>
-  extends BGridEditorIconParams<T>, BGridCellCommitController<T> {}
+export interface BGridEditorIconClickParams<T> extends BGridEditorIconParams<T>, BGridCellCommitController<T> {}
 
 export type BGridEditorIconClickHandler<T> = (
   params: BGridEditorIconClickParams<T>,
@@ -862,6 +861,8 @@ export interface BGridProps<T> {
 
   loading?: boolean;
   spinning?: boolean;
+  /** Disables every user interaction in the grid while keeping rendering and scrolling available. */
+  disabled?: boolean;
   scrollTop?: number;
   scrollLeft?: number;
 
@@ -981,6 +982,7 @@ export interface AppModel<T> extends BGridProps<T> {
   contextMenuState?: BGridContextMenuState<T>;
   displayPaginationLength?: number;
   loading: boolean;
+  disabled?: boolean;
   editItemIndex?: number;
   editItemColIndex?: number;
   cellInteractionSession?: BGridCellInteractionSession;
@@ -1053,6 +1055,7 @@ export interface AppActions<T> {
   setDisplayItemCount: (displayItemCount: number) => void;
   setLoading: (loading: boolean) => void;
   setSpinning: (spinning: boolean) => void;
+  setDisabled: (disabled?: boolean) => void;
   setHeaderHeight: (headerHeight: number) => void;
   setFooterHeight: (footerHeight: number) => void;
   setBottomBarHeight: (bottomBarHeight: number) => void;

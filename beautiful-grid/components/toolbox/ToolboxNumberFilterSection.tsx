@@ -9,6 +9,7 @@ interface Props<T> {
 }
 
 export function ToolboxNumberFilterSection<T>({ column, columnId }: Props<T>) {
+  const toolboxMsg = useAppStore(s => s.msg?.toolbox);
   const dataQuery = useAppStore(s => s.dataQuery);
   const filterDrafts = useAppStore(s => s.filterDrafts);
   const setFilterDraft = useAppStore(s => s.setFilterDraft);
@@ -103,7 +104,7 @@ export function ToolboxNumberFilterSection<T>({ column, columnId }: Props<T>) {
 
   return (
     <div className="bgrid-toolbox-section bgrid-toolbox-number-filter-section">
-      <div className="bgrid-toolbox-section-title">숫자 필터</div>
+      <div className="bgrid-toolbox-section-title">{toolboxMsg?.numberFilter ?? '숫자 필터'}</div>
 
       <div className="bgrid-toolbox-form-row">
         <select
@@ -111,13 +112,13 @@ export function ToolboxNumberFilterSection<T>({ column, columnId }: Props<T>) {
           value={operator}
           onChange={e => setOperator(e.target.value as any)}
         >
-          <option value="equals">일치 (=)</option>
-          <option value="notEquals">불일치 (≠)</option>
-          <option value="gt">초과 (&gt;)</option>
-          <option value="gte">이상 (&ge;)</option>
-          <option value="lt">미만 (&lt;)</option>
-          <option value="lte">이하 (&le;)</option>
-          <option value="between">범위 (Between)</option>
+          <option value="equals">{toolboxMsg?.numberEquals ?? '일치 (=)'}</option>
+          <option value="notEquals">{toolboxMsg?.numberNotEquals ?? '불일치 (≠)'}</option>
+          <option value="gt">{toolboxMsg?.greaterThan ?? '초과 (>)'}</option>
+          <option value="gte">{toolboxMsg?.greaterThanOrEqual ?? '이상 (≥)'}</option>
+          <option value="lt">{toolboxMsg?.lessThan ?? '미만 (<)'}</option>
+          <option value="lte">{toolboxMsg?.lessThanOrEqual ?? '이하 (≤)'}</option>
+          <option value="between">{toolboxMsg?.between ?? '범위 (Between)'}</option>
         </select>
       </div>
 
@@ -126,7 +127,7 @@ export function ToolboxNumberFilterSection<T>({ column, columnId }: Props<T>) {
           <input
             type="number"
             className="bgrid-toolbox-input"
-            placeholder="최소값"
+            placeholder={toolboxMsg?.minimumPlaceholder ?? '최소값'}
             value={minStr}
             onChange={e => setMinStr(e.target.value)}
             onKeyDown={handleApplyKeyDown}
@@ -135,7 +136,7 @@ export function ToolboxNumberFilterSection<T>({ column, columnId }: Props<T>) {
           <input
             type="number"
             className="bgrid-toolbox-input"
-            placeholder="최대값"
+            placeholder={toolboxMsg?.maximumPlaceholder ?? '최대값'}
             value={maxStr}
             onChange={e => setMaxStr(e.target.value)}
             onKeyDown={handleApplyKeyDown}
@@ -146,7 +147,7 @@ export function ToolboxNumberFilterSection<T>({ column, columnId }: Props<T>) {
           <input
             type="number"
             className="bgrid-toolbox-input"
-            placeholder="숫자 입력..."
+            placeholder={toolboxMsg?.numberPlaceholder ?? '숫자 입력...'}
             value={valStr}
             onChange={e => setValStr(e.target.value)}
             onKeyDown={handleApplyKeyDown}
@@ -155,7 +156,7 @@ export function ToolboxNumberFilterSection<T>({ column, columnId }: Props<T>) {
       )}
 
       {isBetweenInvalid && (
-        <div className="bgrid-toolbox-error-text">최소값이 최대값보다 클 수 없습니다.</div>
+        <div className="bgrid-toolbox-error-text">{toolboxMsg?.invalidRange ?? '최소값이 최대값보다 클 수 없습니다.'}</div>
       )}
 
       <div className="bgrid-toolbox-button-row">
@@ -164,7 +165,7 @@ export function ToolboxNumberFilterSection<T>({ column, columnId }: Props<T>) {
           className="bgrid-toolbox-btn bgrid-toolbox-btn-clear"
           onClick={handleClear}
         >
-          초기화
+          {toolboxMsg?.clear ?? '초기화'}
         </button>
         <button
           type="button"
@@ -172,7 +173,7 @@ export function ToolboxNumberFilterSection<T>({ column, columnId }: Props<T>) {
           disabled={!isValid}
           onClick={handleApply}
         >
-          적용
+          {toolboxMsg?.apply ?? '적용'}
         </button>
       </div>
     </div>

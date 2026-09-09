@@ -10,6 +10,7 @@ interface Props<T> {
 }
 
 export function ToolboxValueFilterSection<T>({ column, columnId }: Props<T>) {
+  const toolboxMsg = useAppStore(s => s.msg?.toolbox);
   const sourceData = useAppStore(s => (s.sourceData.length > 0 ? s.sourceData : s.data));
   const columns = useAppStore(s => s.columns);
   const dataQuery = useAppStore(s => s.dataQuery);
@@ -113,14 +114,14 @@ export function ToolboxValueFilterSection<T>({ column, columnId }: Props<T>) {
     return distinctValues.filter(val => {
       const displayStr =
         val === null || val === undefined
-          ? '(빈 값)'
+          ? (toolboxMsg?.emptyValue ?? '(빈 값)')
           : filterConfig?.formatValue
           ? String(filterConfig.formatValue(val))
           : String(val);
 
       return displayStr.toLowerCase().includes(query);
     });
-  }, [debouncedSearch, distinctValues, filterConfig]);
+  }, [debouncedSearch, distinctValues, filterConfig, toolboxMsg?.emptyValue]);
 
   const handleToggleValue = (val: unknown) => {
     const next = new Set(selectedSet);
@@ -185,8 +186,8 @@ export function ToolboxValueFilterSection<T>({ column, columnId }: Props<T>) {
   if (isManual && distinctValues.length === 0) {
     return (
       <div className="bgrid-toolbox-section">
-        <div className="bgrid-toolbox-section-title">필터</div>
-        <div className="bgrid-toolbox-empty-notice">사용 가능한 값 목록이 없습니다.</div>
+        <div className="bgrid-toolbox-section-title">{toolboxMsg?.filter ?? '필터'}</div>
+        <div className="bgrid-toolbox-empty-notice">{toolboxMsg?.noValues ?? '사용 가능한 값 목록이 없습니다.'}</div>
       </div>
     );
   }
@@ -199,13 +200,13 @@ export function ToolboxValueFilterSection<T>({ column, columnId }: Props<T>) {
 
   return (
     <div className="bgrid-toolbox-section bgrid-toolbox-values-filter-section">
-      <div className="bgrid-toolbox-section-title">값 필터</div>
+      <div className="bgrid-toolbox-section-title">{toolboxMsg?.valueFilter ?? '값 필터'}</div>
 
       <div className="bgrid-toolbox-search-box">
         <input
           type="text"
           className="bgrid-toolbox-search-input"
-          placeholder="검색..."
+          placeholder={toolboxMsg?.searchPlaceholder ?? '검색...'}
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
         />
@@ -222,7 +223,7 @@ export function ToolboxValueFilterSection<T>({ column, columnId }: Props<T>) {
               }}
               onChange={e => handleSelectAll(e.target.checked)}
             />
-            <span>(전체 선택)</span>
+            <span>{toolboxMsg?.selectAll ?? '(전체 선택)'}</span>
           </label>
         </div>
 
@@ -232,7 +233,7 @@ export function ToolboxValueFilterSection<T>({ column, columnId }: Props<T>) {
             const isChecked = selectedSet.has(norm);
             const display =
               val === null || val === undefined ? (
-                <span className="bgrid-toolbox-empty-value">(빈 값)</span>
+                <span className="bgrid-toolbox-empty-value">{toolboxMsg?.emptyValue ?? '(빈 값)'}</span>
               ) : filterConfig?.formatValue ? (
                 filterConfig.formatValue(val)
               ) : (
@@ -252,12 +253,12 @@ export function ToolboxValueFilterSection<T>({ column, columnId }: Props<T>) {
           })}
 
           {filteredDistinctValues.length === 0 && (
-            <div className="bgrid-toolbox-empty-notice">검색 결과가 없습니다.</div>
+            <div className="bgrid-toolbox-empty-notice">{toolboxMsg?.noResults ?? '검색 결과가 없습니다.'}</div>
           )}
 
           {isListCapped && (
             <div className="bgrid-toolbox-capped-notice">
-              +{filteredDistinctValues.length - maxDisplayItems}개 항목이 더 있습니다. 검색을 이용하세요.
+              {toolboxMsg?.moreValues?.(filteredDistinctValues.length - maxDisplayItems) ?? `+${filteredDistinctValues.length - maxDisplayItems}개 항목이 더 있습니다. 검색을 이용하세요.`}
             </div>
           )}
         </div>
@@ -269,14 +270,14 @@ export function ToolboxValueFilterSection<T>({ column, columnId }: Props<T>) {
           className="bgrid-toolbox-btn bgrid-toolbox-btn-clear"
           onClick={handleClear}
         >
-          초기화
+          {toolboxMsg?.clear ?? '초기화'}
         </button>
         <button
           type="button"
           className="bgrid-toolbox-btn bgrid-toolbox-btn-apply"
           onClick={handleApply}
         >
-          적용
+          {toolboxMsg?.apply ?? '적용'}
         </button>
       </div>
     </div>

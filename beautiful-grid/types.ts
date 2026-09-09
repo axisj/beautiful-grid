@@ -818,6 +818,54 @@ export interface BGridRef {
   scrollToRow: (rowIndex: number, options?: BGridScrollToRowOptions) => void;
 }
 
+export interface BGridToolboxMessages {
+  sort?: string;
+  sortAscending?: string;
+  sortDescending?: string;
+  clearSort?: string;
+  filterApplied?: string;
+  openColumnOptions?: string;
+  filter?: string;
+  textFilter?: string;
+  valueFilter?: string;
+  numberFilter?: string;
+  contains?: string;
+  equals?: string;
+  notEquals?: string;
+  numberEquals?: string;
+  numberNotEquals?: string;
+  greaterThan?: string;
+  greaterThanOrEqual?: string;
+  lessThan?: string;
+  lessThanOrEqual?: string;
+  between?: string;
+  searchPlaceholder?: string;
+  textPlaceholder?: string;
+  numberPlaceholder?: string;
+  minimumPlaceholder?: string;
+  maximumPlaceholder?: string;
+  invalidRange?: string;
+  clear?: string;
+  apply?: string;
+  emptyValue?: string;
+  selectAll?: string;
+  noValues?: string;
+  noResults?: string;
+  extraMenu?: string;
+  columns?: string;
+  hiddenColumns?: string;
+  showAllColumns?: string;
+  hideThisColumn?: string;
+  lastVisibleColumn?: string;
+  hiddenColumnCount?: (count: number) => string;
+  moreValues?: (count: number) => string;
+}
+
+export interface BGridMessages {
+  emptyList?: string;
+  toolbox?: BGridToolboxMessages;
+}
+
 export interface BGridProps<T> {
   ref?: React.Ref<BGridRef>;
   width: number;
@@ -870,9 +918,7 @@ export interface BGridProps<T> {
   sort?: BGridSortInfo;
   onClick?: (params: BGridClickParams<T>) => void;
 
-  msg?: {
-    emptyList?: string;
-  };
+  msg?: BGridMessages;
 
   rowKey?: React.Key | React.Key[];
   selectedRowKey?: React.Key | React.Key[];

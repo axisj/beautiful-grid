@@ -4,9 +4,9 @@ export const bundleMetrics = {
   "initialJsGzipKiB": 55.9,
   "cssGzipKiB": 8.5,
   "columnReorderJsGzipKiB": 12.8,
-  "toolboxJsGzipKiB": 5.7,
+  "toolboxJsGzipKiB": 5.9,
   "gridOptionalSurfacesJsGzipKiB": 2.9,
-  "fullFeatureTotalGzipKiB": 85.7,
+  "fullFeatureTotalGzipKiB": 86,
   "initialBundleBudgetGzipKiB": 70,
   "measurement": {
     "format": "ESM",

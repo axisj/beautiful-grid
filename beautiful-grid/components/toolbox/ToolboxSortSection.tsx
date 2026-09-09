@@ -8,6 +8,7 @@ interface Props<T> {
 }
 
 export function ToolboxSortSection<T>({ column, columnId }: Props<T>) {
+  const toolboxMsg = useAppStore(s => s.msg?.toolbox);
   const dataQuery = useAppStore(s => s.dataQuery);
   const sortParams = useAppStore(s => s.sortParams);
   const setColumnSort = useAppStore(s => s.setColumnSort);
@@ -42,7 +43,7 @@ export function ToolboxSortSection<T>({ column, columnId }: Props<T>) {
 
   return (
     <div className="bgrid-toolbox-section bgrid-toolbox-sort-section">
-      <div className="bgrid-toolbox-section-title">정렬</div>
+      <div className="bgrid-toolbox-section-title">{toolboxMsg?.sort ?? '정렬'}</div>
       <div className="bgrid-toolbox-menu-list">
         <button
           type="button"
@@ -50,7 +51,7 @@ export function ToolboxSortSection<T>({ column, columnId }: Props<T>) {
           onClick={() => setColumnSort(columnId, 'asc')}
         >
           <span className="bgrid-toolbox-icon-wrapper">{sortAscIcon}</span>
-          <span>오름차순 정렬</span>
+          <span>{toolboxMsg?.sortAscending ?? '오름차순 정렬'}</span>
         </button>
 
         <button
@@ -59,7 +60,7 @@ export function ToolboxSortSection<T>({ column, columnId }: Props<T>) {
           onClick={() => setColumnSort(columnId, 'desc')}
         >
           <span className="bgrid-toolbox-icon-wrapper">{sortDescIcon}</span>
-          <span>내림차순 정렬</span>
+          <span>{toolboxMsg?.sortDescending ?? '내림차순 정렬'}</span>
         </button>
 
         {activeSortParam && (
@@ -69,7 +70,7 @@ export function ToolboxSortSection<T>({ column, columnId }: Props<T>) {
             onClick={() => setColumnSort(columnId, null)}
           >
             <span className="bgrid-toolbox-icon-wrapper">{sortClearIcon}</span>
-            <span>정렬 초기화</span>
+            <span>{toolboxMsg?.clearSort ?? '정렬 초기화'}</span>
           </button>
         )}
       </div>

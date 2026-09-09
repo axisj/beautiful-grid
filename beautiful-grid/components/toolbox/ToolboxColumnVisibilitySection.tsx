@@ -21,6 +21,7 @@ export function ToolboxColumnVisibilitySection<T>({
   onModeChange,
   close,
 }: Props<T>) {
+  const toolboxMsg = useAppStore(s => s.msg?.toolbox);
   const visibility = useAppStore(s => s.columnVisibilityState);
   const globalIcons = useAppStore(s => s.icons);
   const columnIcons = typeof column.toolbox === 'object' ? column.toolbox.icons : undefined;
@@ -67,7 +68,7 @@ export function ToolboxColumnVisibilitySection<T>({
           >
             <span aria-hidden='true'>‹</span>
           </button>
-          <span className='bgrid-toolbox-visibility-title'>숨긴 컬럼</span>
+          <span className='bgrid-toolbox-visibility-title'>{toolboxMsg?.hiddenColumns ?? '숨긴 컬럼'}</span>
         </div>
         <div className='bgrid-toolbox-hidden-list'>
           {hiddenItems.map(item => {
@@ -100,7 +101,7 @@ export function ToolboxColumnVisibilitySection<T>({
           }}
         >
           <span className='bgrid-toolbox-icon-wrapper'>{columnsIcon}</span>
-          <span>모두 표시</span>
+          <span>{toolboxMsg?.showAllColumns ?? '모두 표시'}</span>
         </button>
       </div>
     );
@@ -108,14 +109,14 @@ export function ToolboxColumnVisibilitySection<T>({
 
   return (
     <div className='bgrid-toolbox-section bgrid-toolbox-visibility-section'>
-      <div className='bgrid-toolbox-section-title'>컬럼</div>
+      <div className='bgrid-toolbox-section-title'>{toolboxMsg?.columns ?? '컬럼'}</div>
       <div className='bgrid-toolbox-menu-list'>
         <button
           type='button'
           className='bgrid-toolbox-menu-item'
           disabled={!canHideCurrent}
           aria-label={`${accessibleLabel(column.label, columnId)} 컬럼 숨기기`}
-          title={!canHideCurrent && visibleCount <= 1 ? '최소 한 개의 컬럼은 표시해야 합니다.' : undefined}
+          title={!canHideCurrent && visibleCount <= 1 ? (toolboxMsg?.lastVisibleColumn ?? '최소 한 개의 컬럼은 표시해야 합니다.') : undefined}
           onClick={() => {
             if (!canHideCurrent) return;
             visibility.onChange(
@@ -126,7 +127,7 @@ export function ToolboxColumnVisibilitySection<T>({
           }}
         >
           <span className='bgrid-toolbox-icon-wrapper'>{hideIcon}</span>
-          <span>이 컬럼 숨기기</span>
+          <span>{toolboxMsg?.hideThisColumn ?? '이 컬럼 숨기기'}</span>
         </button>
         {hiddenItems.length > 0 && (
           <button
@@ -136,7 +137,7 @@ export function ToolboxColumnVisibilitySection<T>({
             onClick={() => onModeChange('hidden')}
           >
             <span className='bgrid-toolbox-icon-wrapper'>{columnsIcon}</span>
-            <span className='bgrid-toolbox-menu-label'>숨긴 컬럼 {hiddenItems.length}개</span>
+            <span className='bgrid-toolbox-menu-label'>{toolboxMsg?.hiddenColumnCount?.(hiddenItems.length) ?? `숨긴 컬럼 ${hiddenItems.length}개`}</span>
             <span className='bgrid-toolbox-menu-chevron' aria-hidden='true'>›</span>
           </button>
         )}

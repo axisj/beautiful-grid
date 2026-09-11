@@ -1,6 +1,26 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Row Checked E2E', () => {
+  test('centers header and body selectors independently of the inline baseline', async ({ page }) => {
+    await page.goto('/radioBox');
+
+    const selectors = [
+      page.locator('[role="rfdg-head-frozen"] .bgrid-row-selector').first(),
+      page.locator('[role="rfdg-body-frozen"] .bgrid-row-selector').first(),
+    ];
+
+    for (const selector of selectors) {
+      await expect(selector).toBeVisible();
+      const centerOffset = await selector.evaluate(element => {
+        const selectorRect = element.getBoundingClientRect();
+        const cellRect = element.closest('td').getBoundingClientRect();
+        return selectorRect.top + selectorRect.height / 2 - (cellRect.top + cellRect.height / 2);
+      });
+
+      expect(Math.abs(centerOffset)).toBeLessThanOrEqual(0.5);
+    }
+  });
+
   test('supports checkbox and radio selection modes', async ({ page }) => {
     await page.goto('/radioBox');
 

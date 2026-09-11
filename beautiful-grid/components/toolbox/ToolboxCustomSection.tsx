@@ -11,6 +11,7 @@ interface Props<T> {
 }
 
 export function ToolboxCustomSection<T>({ column, columnId, columnIndex, config, close }: Props<T>) {
+  const toolboxMsg = useAppStore(s => s.msg?.toolbox);
   if (config.render) {
     const CustomRender = config.render;
     return (
@@ -28,7 +29,7 @@ export function ToolboxCustomSection<T>({ column, columnId, columnIndex, config,
   if (config.extraItems && config.extraItems.length > 0) {
     return (
       <div className="bgrid-toolbox-section bgrid-toolbox-custom-section">
-        <div className="bgrid-toolbox-section-title">추가 메뉴</div>
+        <div className="bgrid-toolbox-section-title">{toolboxMsg?.extraMenu ?? '추가 메뉴'}</div>
         <div className="bgrid-toolbox-menu-list">
           {config.extraItems.map(item => (
             <button

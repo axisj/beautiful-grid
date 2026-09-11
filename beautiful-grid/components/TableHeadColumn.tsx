@@ -26,6 +26,7 @@ interface Props<T> {
 }
 
 function TableHeadColumn<T>({ column, columnIndex = 0 }: Props<T>) {
+  const toolboxMsg = useAppStore(s => s.msg?.toolbox);
   const sort = useAppStore(s => s.sort);
   const sortParams = useAppStore(s => s.sortParams);
   const dataQuery = useAppStore(s => s.dataQuery);
@@ -76,10 +77,10 @@ function TableHeadColumn<T>({ column, columnIndex = 0 }: Props<T>) {
 
   // Tooltip
   const tooltipParts: string[] = [];
-  if (isAsc) tooltipParts.push('오름차순 정렬');
-  if (isDesc) tooltipParts.push('내림차순 정렬');
-  if (isFiltered) tooltipParts.push('필터 적용됨');
-  const tooltip = tooltipParts.length > 0 ? tooltipParts.join(', ') : '컬럼 옵션 열기';
+  if (isAsc) tooltipParts.push(toolboxMsg?.sortAscending ?? '오름차순 정렬');
+  if (isDesc) tooltipParts.push(toolboxMsg?.sortDescending ?? '내림차순 정렬');
+  if (isFiltered) tooltipParts.push(toolboxMsg?.filterApplied ?? '필터 적용됨');
+  const tooltip = tooltipParts.length > 0 ? tooltipParts.join(', ') : (toolboxMsg?.openColumnOptions ?? '컬럼 옵션 열기');
 
   // Resolve icons with hierarchy (column -> global -> default)
   const sortAscIcon = columnIcons?.sortAsc ?? globalIcons?.sortAsc ?? (

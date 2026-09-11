@@ -9,6 +9,7 @@ interface Props<T> {
 }
 
 export function ToolboxTextFilterSection<T>({ column, columnId }: Props<T>) {
+  const toolboxMsg = useAppStore(s => s.msg?.toolbox);
   const dataQuery = useAppStore(s => s.dataQuery);
   const filterDrafts = useAppStore(s => s.filterDrafts);
   const setFilterDraft = useAppStore(s => s.setFilterDraft);
@@ -65,7 +66,7 @@ export function ToolboxTextFilterSection<T>({ column, columnId }: Props<T>) {
 
   return (
     <div className="bgrid-toolbox-section bgrid-toolbox-text-filter-section">
-      <div className="bgrid-toolbox-section-title">텍스트 필터</div>
+      <div className="bgrid-toolbox-section-title">{toolboxMsg?.textFilter ?? '텍스트 필터'}</div>
 
       <div className="bgrid-toolbox-form-row">
         <select
@@ -73,9 +74,9 @@ export function ToolboxTextFilterSection<T>({ column, columnId }: Props<T>) {
           value={operator}
           onChange={e => setOperator(e.target.value as any)}
         >
-          <option value="contains">포함</option>
-          <option value="equals">일치</option>
-          <option value="notEquals">불일치</option>
+          <option value="contains">{toolboxMsg?.contains ?? '포함'}</option>
+          <option value="equals">{toolboxMsg?.equals ?? '일치'}</option>
+          <option value="notEquals">{toolboxMsg?.notEquals ?? '불일치'}</option>
         </select>
       </div>
 
@@ -83,7 +84,7 @@ export function ToolboxTextFilterSection<T>({ column, columnId }: Props<T>) {
         <input
           type="text"
           className="bgrid-toolbox-input"
-          placeholder="검색어 입력..."
+          placeholder={toolboxMsg?.textPlaceholder ?? '검색어 입력...'}
           value={value}
           onChange={e => setValue(e.target.value)}
           onKeyDown={handleApplyKeyDown}
@@ -96,14 +97,14 @@ export function ToolboxTextFilterSection<T>({ column, columnId }: Props<T>) {
           className="bgrid-toolbox-btn bgrid-toolbox-btn-clear"
           onClick={handleClear}
         >
-          초기화
+          {toolboxMsg?.clear ?? '초기화'}
         </button>
         <button
           type="button"
           className="bgrid-toolbox-btn bgrid-toolbox-btn-apply"
           onClick={handleApply}
         >
-          적용
+          {toolboxMsg?.apply ?? '적용'}
         </button>
       </div>
     </div>

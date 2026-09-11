@@ -24,6 +24,7 @@ function TableHead({ container }: Props) {
     frozenColumnIndex,
     columnResizing,
     columnSortable,
+    disabled,
   } = useAppStore(
     useShallow(s => ({
       sort: s.sort,
@@ -35,6 +36,7 @@ function TableHead({ container }: Props) {
       frozenColumnIndex: s.frozenColumnIndex,
       columnResizing: s.columnResizing,
       columnSortable: s.columnSortable,
+      disabled: s.disabled,
     })),
   );
 
@@ -64,7 +66,7 @@ function TableHead({ container }: Props) {
   const handleSorted = React.useCallback(() => setSorted(true), []);
 
   useColumnSortable({
-    enabled: !!columnSortable && !sorted,
+    enabled: !disabled && !!columnSortable && !sorted,
     tbodyRef,
     columnsTable,
     nestedGroupsActive,
@@ -98,7 +100,7 @@ function TableHead({ container }: Props) {
                       data-bgrid-axis-selectable='true'
                       colSpan={c.colSpan}
                       className={[
-                        columnSortable && !nestedGroupsActive ? 'drag-item' : '',
+                        !disabled && columnSortable && !nestedGroupsActive ? 'drag-item' : '',
                         c.className ?? '',
                       ]
                         .filter(Boolean)
@@ -112,7 +114,7 @@ function TableHead({ container }: Props) {
                     </HeadGroupTd>
                   );
                 }
-                const sortEnabled = !c.column?.sortDisable && (!!sort || !!dataControl);
+                const sortEnabled = !disabled && !c.column?.sortDisable && (!!sort || !!dataControl);
                 return (
                   <HeadTd
                     data-column-index={c.columnIndex}
@@ -126,10 +128,7 @@ function TableHead({ container }: Props) {
                       ...c.headerStyle,
                       textAlign: c.headerAlign ?? c.headerStyle?.textAlign ?? 'center',
                     }}
-                    className={[
-                      columnSortable ? 'drag-item' : '',
-                      c.className ?? '',
-                    ]
+                    className={[!disabled && columnSortable ? 'drag-item' : '', c.className ?? '']
                       .filter(Boolean)
                       .join(' ')}
                     hasOnClick={sortEnabled}

@@ -72,6 +72,7 @@ export const siteGridThemePalette: ThemePalette = {
   '--bgrid-loading-bg': 'rgba(48, 115, 241, 0.08)',
   '--bgrid-loading-color': 'rgba(48, 115, 241, 0.18)',
   '--bgrid-loading-second-color': '#64748b',
+  '--bgrid-disabled-overlay-bg': 'rgba(248, 250, 252, 0.48)',
   '--bgrid-toolbox-bg': '#ffffff',
   '--bgrid-toolbox-color': '#334155',
   '--bgrid-toolbox-muted-color': '#64748b',
@@ -156,6 +157,9 @@ export const createGridTheme = (overrides: ThemePalette): ThemePalette => {
       overrides['--bgrid-loading-color'] ??
       withAlpha(theme['--bgrid-primary-color'], 0.18, siteGridThemePalette['--bgrid-loading-color']),
     '--bgrid-loading-second-color': overrides['--bgrid-loading-second-color'] ?? theme['--bgrid-primary-color'],
+    '--bgrid-disabled-overlay-bg':
+      overrides['--bgrid-disabled-overlay-bg'] ??
+      withAlpha(theme['--bgrid-body-bg'], 0.48, siteGridThemePalette['--bgrid-disabled-overlay-bg']),
     '--bgrid-search-bg': overrides['--bgrid-search-bg'] ?? theme['--bgrid-toolbox-bg'],
     '--bgrid-search-color': overrides['--bgrid-search-color'] ?? theme['--bgrid-toolbox-color'],
     '--bgrid-search-border-color':

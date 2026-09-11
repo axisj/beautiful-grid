@@ -9,6 +9,7 @@ const CellNavigationExample = React.lazy(() => import('../examples/CellNavigatio
 const CheckedExample = React.lazy(() => import('../examples/CheckedExample'));
 const ColumnsGroupExample = React.lazy(() => import('../examples/ColumnsGroupExample'));
 const ColumnSortExample = React.lazy(() => import('../examples/ColumnSortExample'));
+const DisabledExample = React.lazy(() => import('../examples/DisabledExample'));
 const EditorExample = React.lazy(() => import('../examples/EditorExample'));
 const FocusExample = React.lazy(() => import('../examples/FocusExample'));
 const FrozenColumnsExample = React.lazy(() => import('../examples/FrozenColumnsExample'));
@@ -58,6 +59,7 @@ const DEMO_ROUTES: Record<string, { title: string; component: React.LazyExoticCo
   '/paging': { title: 'Paging', component: PagingExample },
   '/pivot': { title: 'Pivot', component: PivotExample },
   '/loading': { title: 'Loading', component: LoadingExample },
+  '/disabled': { title: 'Disabled', component: DisabledExample },
   '/focus': { title: 'Focus', component: FocusExample },
   '/frozenColumns': { title: 'Frozen Columns', component: FrozenColumnsExample },
   '/editor': { title: 'Editor', component: EditorExample },

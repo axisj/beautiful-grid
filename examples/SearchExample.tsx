@@ -1,4 +1,4 @@
-import { t } from './i18n';
+import { t, exampleMsg } from './i18n';
 import * as React from 'react';
 import { Button, Select, Tag } from 'antd';
 import { ChevronDown, ChevronUp, Search, X } from 'lucide-react';
@@ -126,6 +126,7 @@ export default function SearchExample() {
           height={height}
           data={data}
           columns={columns}
+          msg={exampleMsg}
           rowKey='employeeNo'
           frozenColumnIndex={2}
           frozenRowCount={2}

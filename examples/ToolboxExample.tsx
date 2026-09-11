@@ -1,4 +1,4 @@
-import { t } from './i18n';
+import { t, exampleMsg } from './i18n';
 import * as React from 'react';
 import { useState, useCallback, useMemo } from 'react';
 import { BGrid, BGridColumn } from 'beautiful-grid';
@@ -240,6 +240,7 @@ export default function ToolboxExample() {
           height={containerHeight}
           data={data}
           columns={columns}
+          msg={exampleMsg}
           columnSortable
           frozenColumnIndex={1}
           dataControl={dataControl}

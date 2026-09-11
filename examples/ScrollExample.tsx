@@ -1,4 +1,4 @@
-import { t } from './i18n';
+import { t, exampleMsg } from './i18n';
 import * as React from 'react';
 import { notification } from 'antd';
 import { BGrid, BGridColumn } from 'beautiful-grid';
@@ -331,6 +331,7 @@ function ScrollExample() {
         height={containerHeight}
         data={list}
         columns={virtualScrollColumns}
+        msg={exampleMsg}
         rowKey='orderNo'
         showLineNumber
         cellSelectionOptions={{

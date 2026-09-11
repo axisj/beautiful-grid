@@ -6,7 +6,7 @@ import { BGrid } from 'beautiful-grid';
 import type { BGridColumn, BGridColumnGroupNode, BGridDataQuery } from 'beautiful-grid';
 import DataGridContainer from '../components/DataGridContainer';
 import { useContainerSize } from '../hooks/useContainerSize';
-import { t } from './i18n';
+import { t, exampleMsg } from './i18n';
 
 interface OrderRow {
   orderNo: string;
@@ -161,6 +161,7 @@ export default function ColumnVisibilityExample() {
           height={height}
           data={rows}
           columns={columns}
+          msg={exampleMsg}
           columnGroups={groups}
           headerHeight={54}
           frozenColumnIndex={2}

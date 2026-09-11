@@ -11,6 +11,7 @@ import 'beautiful-grid/style.css';
 import '../../styles/datagrid-theme.css';
 import './HomeHeroGrid.css';
 import type { Locale } from '../../i18n';
+import { englishMessages } from '../../../../examples/i18n';
 import { useSiteDarkTheme } from '../useSiteDarkTheme';
 
 interface OrderRow {
@@ -507,6 +508,7 @@ export default function HomeHeroGrid({ locale = 'ko' }: { locale?: Locale }) {
               height={size.height}
               data={gridData}
               columns={locale === 'en' ? englishColumns : columns}
+              msg={locale === 'en' ? englishMessages : undefined}
               itemHeight={15}
               itemPadding={7}
               editable

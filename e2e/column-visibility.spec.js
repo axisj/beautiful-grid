@@ -9,8 +9,8 @@ test.describe('Column visibility', () => {
     await expect(page.getByText('Hidden 1')).toBeVisible();
 
     await page.getByRole('button', { name: 'Customer 컬럼 메뉴' }).click();
-    await expect(page.getByText('오름차순 정렬')).toBeVisible();
-    await expect(page.getByText('필터')).toBeVisible();
+    await expect(page.getByText(/오름차순 정렬|Sort ascending/)).toBeVisible();
+    await expect(page.getByText(/필터|Filter/)).toBeVisible();
     await expect(page.getByRole('button', { name: 'Customer 컬럼 숨기기' })).toBeVisible();
     await page.getByRole('button', { name: '숨긴 컬럼 1개 관리' }).click();
     await page.getByRole('button', { name: 'Owner 컬럼 표시' }).click();
@@ -26,7 +26,7 @@ test.describe('Column visibility', () => {
     await page.getByRole('button', { name: 'Order No. 컬럼 메뉴' }).click();
     await expect(page.getByRole('button', { name: 'Order No. 컬럼 숨기기' })).toBeDisabled();
     await page.getByRole('button', { name: '숨긴 컬럼 1개 관리' }).click();
-    await page.getByRole('button', { name: '모두 표시' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: /모두 표시|Show all/ }).click();
 
     await expect(page.getByRole('button', { name: 'Region 컬럼 메뉴' })).toBeVisible();
     await expect(page.getByText('Hidden 0')).toBeVisible();

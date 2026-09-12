@@ -52,17 +52,17 @@ test.describe('Header Toolbox E2E', () => {
     await triggerButtons.nth(1).click();
     await expect(dialog).toBeVisible();
 
-    const input = dialog.locator('input[placeholder="검색어 입력..."]');
+    const input = dialog.locator('input[placeholder="검색어 입력..."], input[placeholder="Enter search text..."]');
     await input.fill('React');
 
-    const applyButton = dialog.getByRole('button', { name: '적용' });
+    const applyButton = dialog.getByRole('button', { name: /적용|Apply/ });
     await applyButton.click();
 
     // Dialog closes or remains, query summary updates
     await expect(page.getByText('col_title(text)')).toBeVisible();
 
     // 5. Test Icon switcher
-    const defaultIconBtn = page.getByRole('tab', { name: '기본 불릿/기호 (Fallback)' });
+    const defaultIconBtn = page.getByRole('tab', { name: /기본 불릿\/기호 \(Fallback\)|Default Bullet\/Symbol \(Fallback\)/ });
     if (await defaultIconBtn.isVisible()) {
       await defaultIconBtn.click();
       await expect(page.locator('.bgrid-toolbox-trigger-btn svg')).toBeVisible();
@@ -87,8 +87,8 @@ test.describe('Header Toolbox E2E', () => {
     await expect(trigger).toHaveAttribute('aria-controls', dialogId);
     await expect(dialog).toHaveAttribute('aria-labelledby', triggerId);
 
-    const sortAsc = dialog.getByRole('button', { name: '오름차순 정렬' });
-    const sortDesc = dialog.getByRole('button', { name: '내림차순 정렬' });
+    const sortAsc = dialog.getByRole('button', { name: /오름차순 정렬|Sort ascending/ });
+    const sortDesc = dialog.getByRole('button', { name: /내림차순 정렬|Sort descending/ });
     await expect(sortAsc).toBeFocused();
     await page.keyboard.press('ArrowDown');
     await expect(sortDesc).toBeFocused();

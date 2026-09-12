@@ -654,6 +654,8 @@ describe('site product and navigation contracts', () => {
     expect(homepage).toContain("href: '/learn/row-selection'");
     expect(homepage).toContain("href: '/learn/frozen-columns'");
     expect(featuredExampleDefinition.match(/index: '0[1-8]'/g)).toHaveLength(8);
+    expect(homepage).toContain("'선택과 일괄 처리': 'Selection and batch actions'");
+    expect(homepage).toContain("'고정 열과 가로 탐색': 'Frozen columns and horizontal exploration'");
     expect(homepage).toContain('class="example-grid"');
     expect(homepage).toContain('class="example-row"');
     expect(homepage).toContain('localizedFeaturedExamples.slice(0, 4)');

@@ -18,14 +18,34 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/axisj/beautiful-grid/pulls)
 [![Docs](https://img.shields.io/badge/docs-bgrid.axisj.com-blue?logo=googlechrome&logoColor=white)](https://bgrid.axisj.com)
 
+<p align="center">
+  <a href="https://bgrid.axisj.com">
+    <img src="https://raw.githubusercontent.com/axisj/beautiful-grid/main/site/public/og-image-en.png" alt="BeautifulGrid — Beautiful, Powerful Open-Source React Data Grid" width="100%" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://bgrid.axisj.com"><strong>🌐 Interactive Docs & Live Demos</strong></a>&nbsp;&nbsp;•&nbsp;&nbsp;
+  <a href="https://youtu.be/BBq4hPsNDNI"><strong>▶️ Watch 1-Min Walkthrough (YouTube)</strong></a>
+</p>
+
 BeautifulGrid is a high-performance, feature-packed, and beautifully designed open-source React Data Grid for data-heavy business applications. It combines zero-runtime-CSS styling with virtual scrolling, spreadsheet-like cell selection and clipboard operations, built-in and plugin cell editing, multi-level grouped headers, filtering & sorting toolboxes, recoverable column visibility, server/client pagination, pivot table transforms, row reordering, and flexible theming.
 
 Explore live interactive examples and in-depth documentation at [bgrid.axisj.com](https://bgrid.axisj.com).
 
 ---
 
+## Video Walkthrough
+
+Watch 1-million row virtual scrolling, keyboard navigation, and interactive cell editing in action (1 min):
+
+[![BeautifulGrid 1-Minute Walkthrough](https://img.youtube.com/vi/BBq4hPsNDNI/maxresdefault.jpg)](https://youtu.be/BBq4hPsNDNI)
+
+---
+
 ## Table of Contents
 
+- [Video Walkthrough](#video-walkthrough)
 - [Install](#install)
 - [Quick Start](#quick-start)
 - [Core Concepts](#core-concepts)

@@ -113,6 +113,37 @@ describe('BGrid empty state row', () => {
     expect(emptyRow?.style.getPropertyValue('--bgrid-item-line-height')).toBe('30px');
     expect(emptyRow?.style.getPropertyValue('--bgrid-item-cell-height')).toBe('46px');
   });
+
+  it('does not render a text node inside the empty row when emptyList is an empty string', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    try {
+      const { container } = render(
+        <BGrid<{ id: number }>
+          width={300}
+          height={120}
+          columns={[{ key: 'id', label: 'ID', width: 100 }]}
+          data={[]}
+          msg={{ emptyList: '' }}
+        />,
+      );
+
+      const emptyRow = await waitFor(() => {
+        const row = container.querySelector('.bgrid-empty-row');
+        expect(row).not.toBeNull();
+        return row as HTMLTableRowElement;
+      });
+
+      expect(emptyRow.childNodes).toHaveLength(0);
+      expect(
+        consoleError.mock.calls.filter(call =>
+          call.some(arg => typeof arg === 'string' && arg.includes('cannot be a child of')),
+        ),
+      ).toEqual([]);
+    } finally {
+      consoleError.mockRestore();
+    }
+  });
 });
 
 describe('BGrid column resize', () => {

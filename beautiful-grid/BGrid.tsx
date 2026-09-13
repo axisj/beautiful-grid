@@ -16,6 +16,7 @@ import {
   createPivotData,
   createRowHeightMetrics,
   buildHeaderMatrix,
+  countVisibleCheckedIndexes,
   findDuplicateColumnIds,
   getCellValueByRowKey,
   getColumnId,
@@ -486,14 +487,11 @@ export function BGrid<T = Record<string, any>>({
       });
     }
 
-    const sourceIndexByVisibleIndex = resolvedData.map((_, i) => i);
-    const visibleIndexBySourceIndex = new Map(resolvedData.map((_, i) => [i, i]));
-
     return {
       rows: [],
       data: resolvedData as any,
-      sourceIndexByVisibleIndex,
-      visibleIndexBySourceIndex,
+      sourceIndexByVisibleIndex: undefined,
+      visibleIndexBySourceIndex: undefined,
     };
   }, [queryColumns, resolvedData, resolvedDataControl?.mode, resolvedDataQuery, resolvedRowKey]);
 
@@ -508,15 +506,18 @@ export function BGrid<T = Record<string, any>>({
 
   const checkedIndexesMap: Map<number, any> = React.useMemo(() => {
     if (resolvedRowChecked?.checkedRowKeys && resolvedRowKey) {
+      const remainingKeys = new Set(resolvedRowChecked.checkedRowKeys);
       const map: Map<number, any> = new Map();
-      resolvedRowChecked.checkedRowKeys.forEach(key => {
-        const fIndex = resolvedData?.findIndex((item, index, obj) => {
-          return getCellValueByRowKey(resolvedRowKey, item.values) === key;
-        });
-        if (fIndex > -1) {
-          map.set(fIndex, true);
+      if (remainingKeys.size > 0 && resolvedData) {
+        for (let i = 0; i < resolvedData.length; i++) {
+          const itemKey = getCellValueByRowKey(resolvedRowKey, resolvedData[i].values);
+          if (remainingKeys.has(itemKey)) {
+            map.set(i, true);
+            remainingKeys.delete(itemKey);
+            if (remainingKeys.size === 0) break;
+          }
         }
-      });
+      }
       return map;
     }
     if (resolvedRowChecked?.checkedIndexes) {
@@ -582,9 +583,10 @@ export function BGrid<T = Record<string, any>>({
           )
         : 0;
     const displayItemCount = contentBodyHeight > 0 ? Math.ceil(contentBodyHeight / (itemHeight + itemPadding * 2)) : 0;
-    const visibleCheckedCount = processedResult.sourceIndexByVisibleIndex.reduce(
-      (count, sourceIndex) => count + (checkedIndexesMap.has(sourceIndex) ? 1 : 0),
-      0,
+    const visibleCheckedCount = countVisibleCheckedIndexes(
+      displayData.length,
+      checkedIndexesMap,
+      processedResult.sourceIndexByVisibleIndex,
     );
     const checkedAll: CheckedAll =
       displayData.length === 0

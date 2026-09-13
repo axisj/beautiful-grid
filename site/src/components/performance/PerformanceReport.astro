@@ -1,0 +1,232 @@
+---
+import { Activity, ArrowRight, Database, Gauge, GitCompareArrows, Info, Monitor, TriangleAlert } from 'lucide-react';
+import MarketingLayout from '../../layouts/MarketingLayout.astro';
+import SupportNav from '../support/SupportNav.astro';
+import { localizePath, normalizeLocale, type Locale } from '../../i18n';
+import { productFacts } from '../../data/productFacts';
+import {
+  formatMebibytes,
+  formatMilliseconds,
+  formatPercent,
+  getPerformanceScenario,
+  performanceReport,
+  roundedDate,
+} from '../../data/performance/report';
+
+interface Props { locale?: Locale; }
+const locale = normalizeLocale(Astro.props.locale);
+const isKo = locale === 'ko';
+const t = (ko: string, en: string) => isKo ? ko : en;
+const million = getPerformanceScenario('fixed-1m');
+const tenThousand = getPerformanceScenario('fixed-10k');
+const frozen = getPerformanceScenario('frozen-100-columns');
+const measuredAt = roundedDate(performanceReport.generatedAt);
+const currentTarget = performanceReport.targets.current;
+const baselineTarget = performanceReport.targets.baseline;
+const scenarioLabels: Record<string, { ko: string; en: string; noteKo: string; noteEn: string }> = {
+  'fixed-10k': { ko: '1만 행 · 20열', en: '10K rows · 20 columns', noteKo: '일반 업무 화면 규모', noteEn: 'Typical business screen scale' },
+  'fixed-100k': { ko: '10만 행 · 20열', en: '100K rows · 20 columns', noteKo: '중간 규모 가상 스크롤', noteEn: 'Mid-scale virtual scrolling' },
+  'fixed-1m': { ko: '100만 행 · 20열', en: '1M rows · 20 columns', noteKo: '대용량 기본 경로', noteEn: 'Large fixed-height path' },
+  'frozen-100-columns': { ko: '1만 행 · 100열', en: '10K rows · 100 columns', noteKo: 'Frozen 3열 · 가로 스크롤', noteEn: '3 frozen columns · horizontal scroll' },
+};
+const title = t('렌더링 성능 리포트', 'Rendering performance report');
+const description = t(
+  'BeautifulGrid v1.0.10과 현재 미출시 작업 트리를 동일한 Chromium fixture에서 비교한 렌더링 성능 측정 결과입니다.',
+  'A rendering performance comparison of BeautifulGrid v1.0.10 and the current unreleased working tree using identical Chromium fixtures.',
+);
+
+function relativeWidth(value: number, comparison: number): string {
+  return `${Math.max(8, (value / Math.max(value, comparison)) * 100).toFixed(1)}%`;
+}
+---
+
+<MarketingLayout title={`${title} | BeautifulGrid`} description={description} canonicalPath={localizePath('/performance', locale)} locale={locale}>
+  <SupportNav locale={locale} current="performance" />
+
+  <section class="performance-hero">
+    <div class="container performance-hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow"><span></span>PERFORMANCE LAB · {measuredAt}</p>
+        <h1>{t('100만 행의 첫 화면을', 'The first view of one million rows,')}<br /><em>{formatPercent(million.comparison.mountMedianImprovementPct)} {t('더 빠르게', 'faster')}</em></h1>
+        <p class="hero-description">{description}</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#results">{t('측정 결과 보기', 'View results')} <ArrowRight size={16} aria-hidden="true" /></a>
+          <a class="btn btn-outline" href="/performance/results.json">{t('원시 JSON 열기', 'Open raw JSON')}</a>
+        </div>
+        <p class="unreleased-note"><Info size={16} aria-hidden="true" /> {t('비교 대상은 아직 npm에 배포되지 않은 현재 작업 트리입니다.', 'The comparison target is the current working tree and has not been published to npm.')}</p>
+      </div>
+
+      <div class="hero-result-card" aria-label={t('100만 행 마운트 비교', 'One-million-row mount comparison')}>
+        <div class="result-card-head"><span>{t('최초 렌더 median', 'Initial render median')}</span><Gauge size={20} aria-hidden="true" /></div>
+        <div class="result-number">−{formatPercent(million.comparison.mountMedianImprovementPct)}</div>
+        <div class="result-bars">
+          <div><span><strong>{baselineTarget.label}</strong><em>{formatMilliseconds(million.targets.baseline.summary.mountMsMedian)}</em></span><i class="baseline" style={`width:${relativeWidth(million.targets.baseline.summary.mountMsMedian, million.targets.current.summary.mountMsMedian)}`}></i></div>
+          <div><span><strong>{t('현재 작업 트리', 'Current working tree')}</strong><em>{formatMilliseconds(million.targets.current.summary.mountMsMedian)}</em></span><i class="current" style={`width:${relativeWidth(million.targets.current.summary.mountMsMedian, million.targets.baseline.summary.mountMsMedian)}`}></i></div>
+        </div>
+        <div class="result-card-foot"><Activity size={16} aria-hidden="true" /><span>{t(`${performanceReport.environment.cpuThrottle}× CPU 제한 · 워밍업 ${performanceReport.environment.warmupRuns}회 · 측정 ${performanceReport.environment.measuredRuns}회`, `${performanceReport.environment.cpuThrottle}× CPU throttle · ${performanceReport.environment.warmupRuns} warm-up · ${performanceReport.environment.measuredRuns} measured runs`)}</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container metric-strip" aria-label={t('핵심 측정 결과', 'Key results')}>
+    <article><Database size={20} aria-hidden="true" /><div><span>{t('100만 행 heap', '1M-row heap')}</span><strong>−{formatPercent(million.comparison.heapMedianImprovementPct)}</strong><small>{formatMebibytes(million.targets.baseline.summary.heapUsedBytesMedian)} → {formatMebibytes(million.targets.current.summary.heapUsedBytesMedian)}</small></div></article>
+    <article><Activity size={20} aria-hidden="true" /><div><span>{t('스크롤 p95', 'Scroll p95')}</span><strong>{formatMilliseconds(million.targets.current.summary.frameGapP95)}</strong><small>{formatPercent(Math.abs(million.comparison.frameGapP95ImprovementPct))} {t('차이', 'difference')}</small></div></article>
+    <article><Gauge size={20} aria-hidden="true" /><div><span>{t('1만 행 마운트', '10K-row mount')}</span><strong>−{formatPercent(tenThousand.comparison.mountMedianImprovementPct)}</strong><small>{t('현재본이 빠름', 'faster in current')}</small></div></article>
+    <article><Gauge size={20} aria-hidden="true" /><div><span>{t('Frozen 마운트', 'Frozen mount')}</span><strong>−{formatPercent(frozen.comparison.mountMedianImprovementPct)}</strong><small>{t('현재본이 빠름', 'faster in current')}</small></div></article>
+  </section>
+
+  <section id="results" class="results-section">
+    <div class="container">
+      <div class="section-heading">
+        <div><p class="eyebrow">01 · MOUNT</p><h2>{t('데이터가 커질수록 달라지는 최초 렌더', 'Initial rendering changes with data scale')}</h2></div>
+        <p>{t('현재 작업 트리는 기본 경로에서 전체 행 수만큼 만들던 identity index 자료구조를 제거했습니다. 측정된 모든 구성에서 최초 렌더가 빨라졌고, 데이터가 커질수록 개선 폭이 크게 나타났습니다.', 'The current working tree removes identity-index structures that previously scaled with every row on the default path. Initial rendering improved in every measured configuration, with the largest gains appearing as the data set grows.')}</p>
+      </div>
+
+      <div class="scenario-list">
+        {performanceReport.scenarios.map(scenario => {
+          const copy = scenarioLabels[scenario.id];
+          const baseline = scenario.targets.baseline.summary.mountMsMedian;
+          const current = scenario.targets.current.summary.mountMsMedian;
+          const improved = scenario.comparison.mountMedianImprovementPct > 0;
+          return (
+            <article class="scenario-row">
+              <div class="scenario-label"><strong>{isKo ? copy.ko : copy.en}</strong><span>{isKo ? copy.noteKo : copy.noteEn}</span></div>
+              <div class="scenario-bars">
+                <div><span>v1.0.10</span><i><b class="baseline" style={`width:${relativeWidth(baseline, current)}`}></b></i><em>{formatMilliseconds(baseline)}</em></div>
+                <div><span>{t('현재', 'Current')}</span><i><b class="current" style={`width:${relativeWidth(current, baseline)}`}></b></i><em>{formatMilliseconds(current)}</em></div>
+              </div>
+              <div class:list={['scenario-change', { improved, regressed: !improved }]}>{improved ? '−' : '+'}{formatPercent(scenario.comparison.mountMedianImprovementPct)}</div>
+            </article>
+          );
+        })}
+      </div>
+
+      <div class="finding-grid">
+        <article class="finding-positive"><span>FINDING 01</span><h3>{t('대용량 초기화 비용은 구조적으로 감소', 'Large-scale initialization cost is structurally lower')}</h3><p>{t(`100만 행에서 최초 렌더 median은 ${formatMilliseconds(million.targets.baseline.summary.mountMsMedian)}에서 ${formatMilliseconds(million.targets.current.summary.mountMsMedian)}로 줄었습니다. 같은 fixture의 heap도 ${formatMebibytes(million.targets.baseline.summary.heapUsedBytesMedian)}에서 ${formatMebibytes(million.targets.current.summary.heapUsedBytesMedian)}로 감소했습니다.`, `At one million rows, median initial rendering falls from ${formatMilliseconds(million.targets.baseline.summary.mountMsMedian)} to ${formatMilliseconds(million.targets.current.summary.mountMsMedian)}. Heap use in the same fixture falls from ${formatMebibytes(million.targets.baseline.summary.heapUsedBytesMedian)} to ${formatMebibytes(million.targets.current.summary.heapUsedBytesMedian)}.`)}</p></article>
+        <article class="finding-positive"><span>FINDING 02</span><h3>{t('측정한 모든 구성에서 최초 렌더 개선', 'Initial rendering improved in every measured configuration')}</h3><p>{t(`1만 행 기본 fixture는 ${formatPercent(tenThousand.comparison.mountMedianImprovementPct)}, Frozen 100열 fixture는 ${formatPercent(frozen.comparison.mountMedianImprovementPct)} 빨라졌습니다. 10만 행에서는 개선 폭이 ${formatPercent(getPerformanceScenario('fixed-100k').comparison.mountMedianImprovementPct)}까지 커집니다.`, `The 10K-row fixture is ${formatPercent(tenThousand.comparison.mountMedianImprovementPct)} faster, and the 100-column frozen fixture is ${formatPercent(frozen.comparison.mountMedianImprovementPct)} faster. At 100K rows, the gain rises to ${formatPercent(getPerformanceScenario('fixed-100k').comparison.mountMedianImprovementPct)}.`)}</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="scroll-section">
+    <div class="container scroll-grid">
+      <div><p class="eyebrow">02 · SCROLL</p><h2>{t('스크롤 p95는 사실상 비슷한 범위', 'Scroll p95 stays in a similar range')}</h2><p>{t(`${performanceReport.environment.scrollSteps} 프레임 동안 처음에서 끝까지 이동한 뒤 되돌아오는 테스트에서 p95 프레임 간격은 모든 시나리오가 약 10ms였습니다. 이번 개선의 주효과는 스크롤 FPS가 아니라 대용량 최초 렌더와 메모리입니다.`, `Across ${performanceReport.environment.scrollSteps}-frame down-and-back scroll tests, p95 frame gaps remain around 10ms in every scenario. The primary benefit measured here is large-scale initial rendering and memory—not higher scrolling FPS.`)}</p></div>
+      <div class="scroll-table-wrap"><table><thead><tr><th>{t('시나리오', 'Scenario')}</th><th>v1.0.10</th><th>{t('현재', 'Current')}</th><th>{t('차이', 'Difference')}</th></tr></thead><tbody>{performanceReport.scenarios.map(scenario => { const copy = scenarioLabels[scenario.id]; const difference = scenario.comparison.frameGapP95ImprovementPct; return <tr><th>{isKo ? copy.ko : copy.en}</th><td>{formatMilliseconds(scenario.targets.baseline.summary.frameGapP95)}</td><td>{formatMilliseconds(scenario.targets.current.summary.frameGapP95)}</td><td>{difference > 0 ? '−' : '+'}{formatPercent(difference)}</td></tr>; })}</tbody></table></div>
+    </div>
+  </section>
+
+  <section class="method-section">
+    <div class="container">
+      <div class="section-heading"><div><p class="eyebrow">03 · METHOD</p><h2>{t('같은 조건, 공개된 원시 결과', 'Same conditions, inspectable raw results')}</h2></div><p>{t('숫자는 특정 머신의 절대 성능 보증이 아니라 두 소스 상태의 상대 비교입니다. 실제 프로젝트에서는 셀 renderer, 데이터 형태, 브라우저와 하드웨어에 따라 달라집니다.', 'These numbers are a relative comparison of two source states, not an absolute performance guarantee for every machine. Cell renderers, data shape, browser, and hardware will change real-world results.')}</p></div>
+      <div class="method-grid">
+        <article><Monitor size={20} aria-hidden="true" /><span>ENVIRONMENT</span><strong>{performanceReport.environment.browser} · macOS arm64</strong><p>{performanceReport.environment.viewport.width}×{performanceReport.environment.viewport.height} viewport · {performanceReport.environment.grid.width}×{performanceReport.environment.grid.height} grid · {performanceReport.environment.cpuThrottle}× CPU throttle</p></article>
+        <article><GitCompareArrows size={20} aria-hidden="true" /><span>SOURCES</span><strong>{baselineTarget.label} ↔ {currentTarget.label}</strong><p><code>{baselineTarget.gitSha.slice(0, 7)}</code> ↔ <code>{currentTarget.gitSha.slice(0, 7)}+{currentTarget.libraryDiffFingerprint}</code></p></article>
+        <article><Activity size={20} aria-hidden="true" /><span>RUNS</span><strong>{t(`시나리오당 ${performanceReport.environment.measuredRuns}회 median`, `${performanceReport.environment.measuredRuns}-run median per scenario`)}</strong><p>{t(`워밍업 ${performanceReport.environment.warmupRuns}회 제외 · 기준선/현재본 교차 실행 · 실행마다 새 탭`, `${performanceReport.environment.warmupRuns} discarded warm-up · alternating targets · fresh tab for every run`)}</p></article>
+      </div>
+      <div class="limitations"><TriangleAlert size={19} aria-hidden="true" /><div><strong>{t('해석 범위', 'Scope and limitations')}</strong><p>{t('두 버전에 공통인 고정 행 높이, 세로 가상 스크롤, Frozen 열만 비교했습니다. 편집기, 정렬·필터, 가변 행 높이와 애플리케이션 데이터 생성 시간은 이번 결과에 포함되지 않습니다. 현재 대상은 미출시 작업 트리이므로 이후 변경되면 다시 측정해야 합니다.', 'Only fixed row height, vertical virtualization, and frozen columns shared by both versions are compared. Editors, sorting/filtering, variable row height, and application data-generation time are outside this report. Because the current target is unreleased, the benchmark must be rerun if its source changes.')}</p></div></div>
+      <div class="report-actions"><a class="btn btn-primary" href="/performance/results.json">{t('원시 측정 결과 보기', 'View raw measurements')} <ArrowRight size={16} aria-hidden="true" /></a><a class="btn btn-outline" href={`${productFacts.repositoryUrl}/tree/${baselineTarget.gitSha}`} target="_blank" rel="noopener noreferrer">v1.0.10 source ↗</a></div>
+    </div>
+  </section>
+</MarketingLayout>
+
+<style>
+  h1,h2,h3,p { margin-top: 0; }
+  h1,h2 { color: var(--site-text-primary); letter-spacing: -.055em; word-break: keep-all; }
+  h1 { margin-bottom: 24px; font-size: clamp(43px,5vw,72px); line-height: 1.07; }
+  h1 em { color: var(--site-accent-strong); font-style: normal; }
+  h2 { margin-bottom: 0; font-size: clamp(34px,4vw,52px); line-height: 1.12; }
+  .eyebrow { margin-bottom: 22px; color: var(--site-accent-strong); font-size: 13px; font-weight: 850; letter-spacing: .13em; text-transform: uppercase; }
+  .performance-hero { overflow: hidden; padding: 100px 0 90px; background: radial-gradient(circle at 82% 18%,color-mix(in srgb,var(--site-accent) 18%,transparent),transparent 32%),linear-gradient(180deg,var(--site-surface-subtle),var(--site-page-bg)); }
+  .performance-hero-grid { display: grid; grid-template-columns: minmax(0,1.05fr) minmax(390px,.75fr); gap: clamp(42px,7vw,100px); align-items: center; }
+  .hero-description { max-width: 720px; color: var(--site-text-secondary); font-size: 17px; line-height: 1.8; }
+  .hero-actions,.report-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+  .unreleased-note { display: flex; gap: 8px; align-items: center; margin: 24px 0 0; color: var(--site-text-muted); font-size: 13px; }
+  .hero-result-card { overflow: hidden; border: 1px solid #293754; border-radius: 24px; padding: 24px; background: #111a2c; color: #f8fafc; box-shadow: 0 34px 80px -48px rgba(15,23,42,.9); }
+  .result-card-head,.result-card-foot { display: flex; align-items: center; justify-content: space-between; color: #9aabc3; font-size: 13px; font-weight: 750; }
+  .result-card-head svg { color: #78a8ff; }
+  .result-number { margin: 24px 0; color: #83b4ff; font-size: clamp(48px,6vw,72px); font-weight: 900; letter-spacing: -.07em; line-height: 1; }
+  .result-bars { display: grid; gap: 19px; }
+  .result-bars div { display: grid; gap: 8px; }
+  .result-bars span { display: flex; justify-content: space-between; gap: 20px; color: #a9b6c9; font-size: 13px; }
+  .result-bars em { color: #f8fafc; font-family: var(--site-font-mono); font-style: normal; font-weight: 750; }
+  .result-bars i { display: block; height: 9px; border-radius: 99px; }
+  .result-bars .baseline { background: #56657d; }
+  .result-bars .current { background: linear-gradient(90deg,#2563eb,#60a5fa); }
+  .result-card-foot { justify-content: flex-start; gap: 8px; margin: 25px -24px -24px; border-top: 1px solid rgba(148,163,184,.18); padding: 15px 24px; background: rgba(255,255,255,.025); }
+  .metric-strip { display: grid; grid-template-columns: repeat(4,1fr); margin-top: -34px; position: relative; z-index: 2; }
+  .metric-strip article { display: grid; grid-template-columns: 24px 1fr; gap: 11px; min-height: 140px; border: 1px solid var(--site-border); border-right: 0; padding: 24px; background: var(--site-surface-elevated); }
+  .metric-strip article:first-child { border-radius: 18px 0 0 18px; }
+  .metric-strip article:last-child { border-right: 1px solid var(--site-border); border-radius: 0 18px 18px 0; }
+  .metric-strip svg { color: #059669; }
+  .metric-strip div { display: grid; }
+  .metric-strip span,.metric-strip small { color: var(--site-text-muted); font-size: 13px; }
+  .metric-strip strong { margin: 4px 0; color: var(--site-text-primary); font-size: 25px; letter-spacing: -.04em; }
+  .results-section,.method-section { padding: 112px 0; }
+  .section-heading { display: grid; grid-template-columns: minmax(0,1fr) minmax(320px,.72fr); gap: clamp(40px,7vw,110px); align-items: end; }
+  .section-heading > p,.scroll-grid > div > p:not(.eyebrow) { margin: 0; color: var(--site-text-secondary); font-size: 16px; line-height: 1.8; }
+  .scenario-list { margin-top: 60px; border-top: 1px solid var(--site-border); }
+  .scenario-row { display: grid; grid-template-columns: 220px minmax(0,1fr) 88px; gap: 28px; align-items: center; border-bottom: 1px solid var(--site-border); padding: 25px 0; }
+  .scenario-label { display: grid; }
+  .scenario-label strong { color: var(--site-text-primary); font-size: 15px; }
+  .scenario-label span { margin-top: 3px; color: var(--site-text-muted); font-size: 13px; }
+  .scenario-bars { display: grid; gap: 9px; }
+  .scenario-bars > div { display: grid; grid-template-columns: 55px minmax(0,1fr) 75px; gap: 12px; align-items: center; }
+  .scenario-bars span,.scenario-bars em { color: var(--site-text-muted); font-size: 13px; font-style: normal; }
+  .scenario-bars em { color: var(--site-text-secondary); font-family: var(--site-font-mono); text-align: right; }
+  .scenario-bars i { display: block; height: 8px; border-radius: 99px; background: var(--site-surface); }
+  .scenario-bars b { display: block; height: 100%; border-radius: inherit; }
+  .scenario-bars .baseline { background: #9aa8ba; }
+  .scenario-bars .current { background: #3b82f6; }
+  .scenario-change { justify-self: end; border-radius: 999px; padding: 5px 10px; font-family: var(--site-font-mono); font-size: 13px; font-weight: 800; }
+  .scenario-change.improved { background: #ecfdf5; color: #047857; }
+  .scenario-change.regressed { background: #fff7ed; color: #c2410c; }
+  .finding-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin-top: 46px; }
+  .finding-grid article { border: 1px solid var(--site-border); border-radius: 18px; padding: 26px; background: var(--site-surface-elevated); }
+  .finding-grid span { color: var(--site-text-muted); font-family: var(--site-font-mono); font-size: 13px; font-weight: 800; letter-spacing: .08em; }
+  .finding-grid h3 { margin: 14px 0 10px; color: var(--site-text-primary); font-size: 20px; letter-spacing: -.035em; }
+  .finding-grid p { margin: 0; color: var(--site-text-secondary); font-size: 14px; line-height: 1.75; }
+  .finding-positive { box-shadow: inset 3px 0 #10b981; }
+  .scroll-section { padding: 104px 0; background: var(--site-surface); }
+  .scroll-grid { display: grid; grid-template-columns: minmax(0,.8fr) minmax(500px,1.2fr); gap: clamp(44px,7vw,100px); align-items: center; }
+  .scroll-table-wrap { overflow: hidden; border: 1px solid var(--site-border); border-radius: 18px; background: var(--site-surface-elevated); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th,td { border-bottom: 1px solid var(--site-border); padding: 15px 17px; text-align: right; }
+  thead th { background: var(--site-surface-subtle); color: var(--site-text-muted); font-size: 13px; }
+  th:first-child { text-align: left; }
+  tbody th { color: var(--site-text-primary); }
+  tbody td { color: var(--site-text-secondary); font-family: var(--site-font-mono); }
+  tbody tr:last-child th,tbody tr:last-child td { border-bottom: 0; }
+  .method-section { background: #10192b; color: #e7edf7; }
+  .method-section h2 { color: #f8fafc; }
+  .method-section .section-heading > p { color: #9eabc0; }
+  .method-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-top: 54px; }
+  .method-grid article { display: grid; min-height: 205px; border: 1px solid #2a3954; border-radius: 18px; padding: 23px; background: #151f33; }
+  .method-grid svg { color: #78a8ff; }
+  .method-grid span { margin-top: 25px; color: #72819a; font-family: var(--site-font-mono); font-size: 13px; font-weight: 800; letter-spacing: .08em; }
+  .method-grid strong { margin-top: 7px; color: #f8fafc; font-size: 15px; }
+  .method-grid p { margin: 8px 0 0; color: #9eabc0; font-size: 13px; line-height: 1.6; }
+  .method-grid code { border-color: #33425c; background: #111a2c; color: #b9c8de; }
+  .limitations { display: flex; gap: 13px; margin-top: 16px; border: 1px solid #3c3a36; border-radius: 16px; padding: 20px; background: rgba(245,158,11,.07); }
+  .limitations svg { flex: 0 0 auto; margin-top: 2px; color: #fbbf24; }
+  .limitations strong { color: #f8fafc; }
+  .limitations p { margin: 4px 0 0; color: #a8b3c5; font-size: 13px; line-height: 1.7; }
+  .method-section .btn-outline { border-color: #43506a; color: #dbe7f7; }
+  @media (max-width: 960px) {
+    .performance-hero-grid,.section-heading,.scroll-grid { grid-template-columns: 1fr; }
+    .hero-result-card { max-width: 640px; }
+    .metric-strip { grid-template-columns: repeat(2,1fr); }
+    .metric-strip article:nth-child(2) { border-right: 1px solid var(--site-border); border-radius: 0 18px 0 0; }
+    .metric-strip article:first-child { border-radius: 18px 0 0 0; }
+    .metric-strip article:nth-child(3) { border-radius: 0 0 0 18px; }
+    .metric-strip article:last-child { border-radius: 0 0 18px 0; }
+  }
+  @media (max-width: 720px) {
+    .performance-hero { padding: 72px 0 68px; }
+    .metric-strip { margin-top: 0; padding-inline: 0; }
+    .scenario-row { grid-template-columns: 1fr auto; gap: 15px; }
+    .scenario-bars { grid-column: 1 / -1; grid-row: 2; }
+    .finding-grid,.method-grid { grid-template-columns: 1fr; }
+    .scroll-table-wrap { overflow-x: auto; }
+    table { min-width: 620px; }
+  }
+</style>

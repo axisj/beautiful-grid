@@ -1,9 +1,10 @@
 import * as React from 'react';
-import TableBody, { BGridBodyRowRange } from './TableBody';
+import TableBody, { BGridBodyRowRange, RowKeyRegistry } from './TableBody';
 import type { BGridRowHeightMetrics } from '../utils';
 
 interface Props {
   scrollContainerRef: React.RefObject<HTMLDivElement | null>;
+  rowKeyRegistry: RowKeyRegistry;
   style?: React.CSSProperties;
   rowRange?: BGridBodyRowRange;
   role?: string;
@@ -18,6 +19,7 @@ function TableBodyFrozen(props: Props) {
   return (
     <TableBody
       scrollContainerRef={props.scrollContainerRef}
+      rowKeyRegistry={props.rowKeyRegistry}
       region='left'
       style={props.style}
       rowRange={props.rowRange}

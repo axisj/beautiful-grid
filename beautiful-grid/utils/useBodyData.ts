@@ -1,4 +1,4 @@
-import { useAppStore } from '../store';
+import { useAppStore, useAppStoreApi } from '../store';
 import * as React from 'react';
 import { BGridColumn, BGridDataItem, DIRC_MAP, MoveDirection } from '../types';
 import { getCellValueByRowKey } from './getCellValue';
@@ -75,15 +75,13 @@ function computeMergeRowSpans(
 }
 
 export function useBodyData(startIdx: number, endNumber: number, data: BGridDataItem<any>[]) {
+  const store = useAppStoreApi();
   const columns = useAppStore(s => s.columns);
   const cellMergeOptions = useAppStore(s => s.cellMergeOptions);
-  const setData = useAppStore(s => s.setData);
   const setEditItem = useAppStore(s => s.setEditItem);
   const setActiveCell = useAppStore(s => s.setActiveCell);
   const selectedKeyMap = useAppStore(s => s.checkedIndexesMap);
   const setSelectedKeys = useAppStore(s => s.setCheckedIndexes);
-  const cellInteractionSession = useAppStore(s => s.cellInteractionSession);
-  const requestCellCommit = useAppStore(s => s.requestCellCommit);
   const sourceIndexByVisibleIndex = useAppStore(s => s.sourceIndexByVisibleIndex);
 
   const mergeColumns = React.useMemo(() => {
@@ -129,14 +127,16 @@ export function useBodyData(startIdx: number, endNumber: number, data: BGridData
 
   const setItemValue = React.useCallback(
     async (_ri: number, _ci: number, column: BGridColumn<any>, newValue: any) => {
-      if (cellInteractionSession?.kind !== 'editor') return;
-      await requestCellCommit({
-        sessionId: cellInteractionSession.id,
+      const state = store.getState();
+      const session = state.cellInteractionSession;
+      if (session?.kind !== 'editor') return;
+      await state.requestCellCommit({
+        sessionId: session.id,
         source: 'itemRender',
         changes: [{ columnId: getColumnId(column), value: newValue }],
       });
     },
-    [cellInteractionSession, requestCellCommit],
+    [store],
   );
 
   const handleMoveEditFocus = React.useCallback(
@@ -167,31 +167,35 @@ export function useBodyData(startIdx: number, endNumber: number, data: BGridData
   const handleChangeChecked = React.useCallback(
     async (index: number, checked: boolean) => {
       const sourceIndex = sourceIndexByVisibleIndex?.[index] ?? index;
+      const sourceItem = store.getState().sourceData[sourceIndex];
+      if (sourceItem && sourceItem !== data[index]) sourceItem.checked = checked;
+      if (data[index]) data[index].checked = checked;
       if (checked) {
-        data[index].checked = true;
         selectedKeyMap.set(sourceIndex, true);
       } else {
-        data[index].checked = false;
         selectedKeyMap.delete(sourceIndex);
       }
       setSelectedKeys([...selectedKeyMap.keys()]);
-      setData([...data]);
     },
-    [data, selectedKeyMap, setData, setSelectedKeys, sourceIndexByVisibleIndex],
+    [data, selectedKeyMap, setSelectedKeys, sourceIndexByVisibleIndex, store],
   );
 
   const handleChangeCheckedRadio = React.useCallback(
     async (index: number) => {
       const sourceIndex = sourceIndexByVisibleIndex?.[index] ?? index;
+      const sourceData = store.getState().sourceData;
+      for (const previousSourceIndex of selectedKeyMap.keys()) {
+        const previousItem = sourceData[previousSourceIndex];
+        if (previousItem) previousItem.checked = false;
+      }
       selectedKeyMap.clear();
       selectedKeyMap.set(sourceIndex, true);
+      const sourceItem = sourceData[sourceIndex];
+      if (sourceItem && sourceItem !== data[index]) sourceItem.checked = true;
+      if (data[index]) data[index].checked = true;
       setSelectedKeys([sourceIndex]);
-      data.forEach((n, idx) => {
-        n.checked = idx === index;
-      });
-      setData([...data]);
     },
-    [data, selectedKeyMap, setData, setSelectedKeys, sourceIndexByVisibleIndex],
+    [data, selectedKeyMap, setSelectedKeys, sourceIndexByVisibleIndex, store],
   );
 
   return {

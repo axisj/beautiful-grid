@@ -14,7 +14,8 @@ import {
   useBodyData,
 } from '../utils';
 import { TableBodyCell } from './TableBodyCell';
-import { AppModelColumn, BGridDataItemStatus, BGridProps, BGridSearchMatch } from '../types';
+import { TableBodyRow } from './TableBodyRow';
+import { AppModelColumn, BGridDataItem, BGridDataItemStatus, BGridProps, BGridSearchMatch } from '../types';
 import RowSelector from './RowSelector';
 import { GripVertical } from './GripVertical';
 
@@ -95,6 +96,26 @@ export function getVisibleColumnRange(
 
 const searchMatchTokenCache = new WeakMap<BGridSearchMatch[], ReadonlySet<string>>();
 
+export interface RowKeyRegistry {
+  firstSourceIndexByValue: Map<string, number>;
+  warnedDuplicateValues: Set<string>;
+  warnedMissingValue: boolean;
+}
+
+function encodeKeyPart(value: unknown): string {
+  const valueType = typeof value;
+  const stringValue = String(value);
+  return `${valueType}:${stringValue.length}:${stringValue}`;
+}
+
+export function createRowKeyRegistry(): RowKeyRegistry {
+  return {
+    firstSourceIndexByValue: new Map(),
+    warnedDuplicateValues: new Set(),
+    warnedMissingValue: false,
+  };
+}
+
 function getSearchMatchTokens(matches: BGridSearchMatch[]) {
   const cached = searchMatchTokenCache.get(matches);
   if (cached) return cached;
@@ -105,6 +126,7 @@ function getSearchMatchTokens(matches: BGridSearchMatch[]) {
 
 interface Props {
   scrollContainerRef: React.RefObject<HTMLDivElement | null>;
+  rowKeyRegistry: RowKeyRegistry;
   region?: BGridBodyRegion;
   rowRange?: BGridBodyRowRange;
   style?: React.CSSProperties;
@@ -116,7 +138,44 @@ interface Props {
   rowHeightMetrics?: BGridRowHeightMetrics;
 }
 
+function getRowReactKey<T>(
+  item: BGridDataItem<T> | undefined,
+  sourceIndex: number,
+  rowKey: React.Key | React.Key[] | undefined,
+  registry: RowKeyRegistry,
+): React.Key {
+  if (rowKey !== undefined && item?.values) {
+    const rawValue = getCellValueByRowKey(rowKey, item.values);
+    if (rawValue !== undefined && rawValue !== null) {
+      const encodedValue = encodeKeyPart(rawValue);
+      const firstSourceIndex = registry.firstSourceIndexByValue.get(encodedValue);
+      if (firstSourceIndex === undefined) {
+        registry.firstSourceIndexByValue.set(encodedValue, sourceIndex);
+        return `bgrid-row-key:${encodedValue}`;
+      }
+      if (firstSourceIndex === sourceIndex) return `bgrid-row-key:${encodedValue}`;
+
+      if (process.env.NODE_ENV !== 'production' && !registry.warnedDuplicateValues.has(encodedValue)) {
+        registry.warnedDuplicateValues.add(encodedValue);
+        console.warn(
+          `[BGrid] Duplicate rowKey detected: "${String(
+            rawValue,
+          )}". Falling back to a source-index key for duplicates.`,
+        );
+      }
+      return `bgrid-row-key:${encodedValue}:duplicate-source:${sourceIndex}`;
+    }
+
+    if (process.env.NODE_ENV !== 'production' && !registry.warnedMissingValue) {
+      registry.warnedMissingValue = true;
+      console.warn('[BGrid] Missing rowKey value detected. Falling back to a source-index key.');
+    }
+  }
+  return `bgrid-row-source:${sourceIndex}`;
+}
+
 function TableBody({
+  rowKeyRegistry,
   region = 'main',
   rowRange,
   style,
@@ -256,13 +315,6 @@ function TableBody({
           const resolvedRowHeight = rowHeightMetrics?.heights[ri] ?? trHeight;
           const rowStatus = getRowStatusLabel(item.status);
           const sourceIndex = sourceIndexByVisibleIndex?.[ri] ?? ri;
-          const trProps: Record<string, any> = {
-            editable,
-          };
-
-          if (!mergeColumns) {
-            trProps.odd = ri % 2 === 0;
-          }
 
           const active =
             rowKey !== undefined && selectedRowKey !== undefined
@@ -295,184 +347,64 @@ function TableBody({
               ? 'down'
               : undefined;
 
+          const isRowEditing =
+            cellInteractionSession?.kind === 'editor' &&
+            (cellInteractionSession.cell.rowIndex === ri || cellInteractionSession.hostCell.rowIndex === ri);
+
+          const rowReactKey = getRowReactKey(item, sourceIndex, rowKey, rowKeyRegistry);
+
           return (
-            <TableBodyTr
-              key={ri}
+            <TableBodyRow
+              key={rowReactKey}
+              item={item}
+              data={data}
+              ri={ri}
+              sourceIndex={sourceIndex}
+              columns={columns}
+              startCIdx={startCIdx}
+              endCIdx={endCIdx}
+              frozenColumnIndex={frozenColumnIndex}
+              isLeftRegion={isLeftRegion}
+              showLineNumber={showLineNumber ?? false}
+              hasRowChecked={hasRowChecked}
+              isRadio={Boolean(isRadio)}
+              checked={checkedAll === true || checkedIndexesMap.get(sourceIndex)}
+              rowCheckedDisabled={Boolean(disabled || rowChecked?.disabled?.(sourceIndex, item))}
+              rowStatus={rowStatus}
+              active={active}
+              className={className}
+              resolvedRowHeight={resolvedRowHeight}
               itemHeight={itemHeight}
               itemPadding={itemPadding}
-              rowHeight={resolvedRowHeight}
-              active={active}
+              editable={Boolean(editable)}
+              disabled={Boolean(disabled)}
+              editTrigger={editTrigger}
               hasOnClick={hasOnClick}
-              className={className + (active ? ' active' : '')}
-              data-ri={ri}
-              data-bgrid-row-reorder-role={rowReorderRole}
-              data-bgrid-row-reorder-phase={rowReorderRole ? reorderingInfo?.phase : undefined}
-              data-bgrid-row-reorder-direction={rowReorderRole ? rowReorderDirection : undefined}
-              style={
-                rowReorderRole && rowReorderRole !== 'source'
-                  ? ({ ['--bgrid-row-reorder-offset-y' as string]: `${rowReorderOffset}px` } as React.CSSProperties)
-                  : undefined
-              }
-              {...trProps}
-            >
-              {isLeftRegion &&
-                showLineNumber &&
-                (rowReorderEnabled ? (
-                  <LineNumberTd
-                    bordered={!hasRowChecked && frozenColumnIndex > 0 && variant !== 'vertical-bordered'}
-                    className='bgrid-line-number-drag'
-                    rowStatus={rowStatus}
-                    rowIndex={ri}
-                  >
-                    <button
-                      type='button'
-                      className='bgrid-row-reorder-handle drag-handle'
-                      data-row-reorder-index={ri}
-                      data-dragging={reorderingInfo?.fromIndex === ri ? 'true' : undefined}
-                      aria-label={`Move row ${ri + 1}`}
-                      disabled={!!disabled || !!cellInteractionSession}
-                      onPointerDown={event => onRowReorderPointerDown?.(event, ri)}
-                      onKeyDown={event => onRowReorderKeyDown?.(event, ri)}
-                    >
-                      {reorder?.handleIcon ?? <GripVertical />}
-                    </button>
-                    <span className='bgrid-line-number-value'>{rowStatus ?? ri + 1}</span>
-                  </LineNumberTd>
-                ) : (
-                  <LineNumberTd
-                    bordered={!hasRowChecked && frozenColumnIndex > 0 && variant !== 'vertical-bordered'}
-                    rowStatus={rowStatus}
-                    rowIndex={ri}
-                  >
-                    {rowStatus ?? ri + 1}
-                  </LineNumberTd>
-                ))}
-
-              {isLeftRegion && hasRowChecked && (
-                <td className={frozenColumnIndex > 0 ? 'bordered' : ''}>
-                  <RowSelector
-                    disabled={!!disabled || rowChecked.disabled?.(sourceIndex, item)}
-                    checked={checkedAll === true || checkedIndexesMap.get(sourceIndex)}
-                    handleChange={async checked => {
-                      if (isRadio) await handleChangeCheckedRadio(ri);
-                      else await handleChangeChecked(ri, checked);
-                    }}
-                    isRadio={isRadio}
-                  />
-                </td>
-              )}
-
-              {!isLeftRegion && startCIdx > frozenColumnIndex && <td colSpan={startCIdx - frozenColumnIndex} />}
-              {Array.from({ length: Math.max(0, endCIdx - startCIdx + 1) }, (_, cidx) => {
-                const columnIndex = startCIdx + cidx;
-                const column = columns[columnIndex];
-                const logicalCell = resolveLogicalCell(data, cellMergeOptions, { rowIndex: ri, columnIndex });
-                const canonicalIndex = logicalCell.cell.rowIndex;
-                const canonicalItem = data[canonicalIndex] ?? item;
-                const isLogicalEditing =
-                  cellInteractionSession?.kind === 'editor' &&
-                  cellInteractionSession.cell.rowIndex === canonicalIndex &&
-                  cellInteractionSession.cell.columnIndex === columnIndex;
-                const isHostEditing =
-                  isLogicalEditing &&
-                  cellInteractionSession.hostCell.rowIndex === ri &&
-                  cellInteractionSession.hostCell.columnIndex === columnIndex;
-                const logicalRowsEditable = logicalCell.rowIndexes.every(
-                  rowIndex => data[rowIndex]?.status !== BGridDataItemStatus.remove,
-                );
-
-                const tdEditable = logicalRowsEditable && editable && column.editable !== false && isHostEditing;
-                const rowSpan = mergeColumns?.[columnIndex] ? getRowSpan(ri, columnIndex) : 1;
-                if (rowSpan === 0) return null;
-
-                const tdProps: Record<string, any> = {};
-                const cellEditable = logicalRowsEditable && editable && column.editable !== false;
-                const isCheckboxEditor = column.editor?.type === 'checkbox';
-                const resolvedEditTrigger = column.editTrigger ?? editTrigger ?? 'dblclick';
-                if (cellEditable && !isCheckboxEditor) {
-                  if (resolvedEditTrigger === 'dblclick') {
-                    tdProps.onDoubleClick = () => setEditItem(ri, columnIndex);
-                    tdProps.onClick = () => handleClick(canonicalIndex, columnIndex);
-                  } else {
-                    tdProps.onClick = () => {
-                      setEditItem(ri, columnIndex);
-                      handleClick(canonicalIndex, columnIndex);
-                    };
-                  }
-                } else {
-                  tdProps.onClick = () => handleClick(canonicalIndex, columnIndex);
-                }
-
-                const edited = isCellEdited(canonicalItem, column);
-                const valueChanged = isCellValueChanged(canonicalItem, column);
-                const editingType = isCheckboxEditor ? 'checkbox' : tdEditable ? column.editor?.type : undefined;
-                const searchToken = `${canonicalIndex}:${columnIndex}`;
-                const isSearchMatch = searchMatchTokens.has(searchToken);
-                const isCurrentSearchMatch = currentSearchToken === searchToken;
-                tdProps.className = [
-                  column.getClassName ? column.getClassName(canonicalItem) : column.className ?? '',
-                  mergeColumns?.[columnIndex] ? 'merged' : '',
-                  valueChanged ? 'bgrid-cell-value-changed' : '',
-                  edited ? 'bgrid-cell-edited' : '',
-                  tdEditable ? 'bgrid-cell-editing' : '',
-                  isSearchMatch ? 'bgrid-cell-search-match' : '',
-                  isCurrentSearchMatch ? 'bgrid-cell-search-current' : '',
-                  editingType === 'text' ? 'bgrid-cell-editing-text' : '',
-                  isCheckboxEditor ? 'bgrid-cell-checkbox' : '',
-                ]
-                  .filter(Boolean)
-                  .join(' ');
-
-                return (
-                  <td
-                    key={columnIndex}
-                    data-bgrid-cell={'true'}
-                    data-bgrid-logical-row-index={canonicalIndex}
-                    data-bgrid-cell-value-changed={valueChanged ? 'true' : undefined}
-                    data-bgrid-cell-edited={edited ? 'true' : undefined}
-                    data-bgrid-cell-editing={tdEditable ? 'true' : undefined}
-                    data-bgrid-search-match={isSearchMatch ? 'true' : undefined}
-                    data-bgrid-search-current={isCurrentSearchMatch ? 'true' : undefined}
-                    data-bgrid-editor-type={editingType}
-                    data-row-index={ri}
-                    data-column-index={columnIndex}
-                    style={{
-                      textAlign: column.align,
-                    }}
-                    rowSpan={rowSpan > 1 ? rowSpan : undefined}
-                    {...tdProps}
-                  >
-                    <TableBodyCell
-                      index={canonicalIndex}
-                      hostIndex={ri}
-                      columnIndex={columnIndex}
-                      column={column}
-                      item={canonicalItem}
-                      valueByRowKey={getCellValueByRowKey(column.key, canonicalItem.values)}
-                      {...{
-                        handleSave: async (newValue, columnDirection, rowDirection) => {
-                          await setItemValue(ri, columnIndex, column, newValue);
-                          await handleMoveEditFocus(ri, columnIndex, columnDirection, rowDirection);
-                        },
-                        handleCancel: async () => {
-                          setEditItem(-1, -1);
-                        },
-                        handleMove: async (columnDirection, rowDirection) => {
-                          await handleMoveEditFocus(ri, columnIndex, columnDirection, rowDirection);
-                        },
-                        editable: tdEditable,
-                        cellEditable,
-                        interactionEditing: isLogicalEditing,
-                        editSession:
-                          tdEditable && cellInteractionSession?.kind === 'editor' ? cellInteractionSession : undefined,
-                      }}
-                    />
-                  </td>
-                );
-              })}
-
-              {!isLeftRegion && <td data-none onClick={() => handleClick(ri, -1)} />}
-            </TableBodyTr>
+              cellMergeOptions={cellMergeOptions}
+              mergeColumns={mergeColumns}
+              odd={!mergeColumns ? ri % 2 === 0 : undefined}
+              variant={variant}
+              rowReorderEnabled={rowReorderEnabled}
+              rowReorderRole={rowReorderRole}
+              rowReorderPhase={reorderingInfo?.phase}
+              rowReorderDirection={rowReorderDirection}
+              rowReorderOffset={rowReorderOffset}
+              reorder={reorder}
+              reorderingInfo={reorderingInfo}
+              searchMatchTokens={searchMatchTokens}
+              currentSearchToken={currentSearchToken}
+              isRowEditing={isRowEditing}
+              cellInteractionSession={isRowEditing ? cellInteractionSession : undefined}
+              handleClick={handleClick}
+              setEditItem={setEditItem}
+              setItemValue={setItemValue}
+              handleMoveEditFocus={handleMoveEditFocus}
+              handleChangeChecked={handleChangeChecked}
+              handleChangeCheckedRadio={handleChangeCheckedRadio}
+              getRowSpan={getRowSpan}
+              onRowReorderPointerDown={onRowReorderPointerDown}
+              onRowReorderKeyDown={onRowReorderKeyDown}
+            />
           );
         })}
 

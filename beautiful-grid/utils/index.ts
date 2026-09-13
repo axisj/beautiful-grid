@@ -25,3 +25,4 @@ export * from './cellEditTransaction';
 export * from './rowReorder';
 export * from './checkboxEditor';
 export * from './columnVisibility';
+export * from './checkedIndexes';

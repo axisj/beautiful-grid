@@ -44,7 +44,7 @@ import {
 } from '../utils';
 import { clamp, ensureCellVisible } from '../utils/coordinate';
 import Loading from './Loading';
-import TableBody from './TableBody';
+import TableBody, { createRowKeyRegistry } from './TableBody';
 import TableBodyFrozen from './TableBodyFrozen';
 import TableFooter from './TableFooter';
 import { useScrollbarMetrics, CustomScrollbar } from './scrollbar';
@@ -142,6 +142,23 @@ interface Props<T> {
 function Table<T>(props: Props<T>) {
   const { cellSelectionOptions, onChangeData, sourceIndexByVisibleIndex } = props;
   const cellSelectionEnabled = cellSelectionOptions?.enabled ?? true;
+  const rowKeyRegistryState = useRef({
+    sourceData: props.sourceData ?? props.data,
+    rowKey: props.rowKey,
+    registry: createRowKeyRegistry(),
+  });
+  const currentSourceData = props.sourceData ?? props.data;
+  if (
+    rowKeyRegistryState.current.sourceData !== currentSourceData ||
+    rowKeyRegistryState.current.rowKey !== props.rowKey
+  ) {
+    rowKeyRegistryState.current = {
+      sourceData: currentSourceData,
+      rowKey: props.rowKey,
+      registry: createRowKeyRegistry(),
+    };
+  }
+  const rowKeyRegistry = rowKeyRegistryState.current.registry;
 
   // [Selector Group 1] Layout & Dimensions - 레이아웃 차원
   const { width, height, containerBorderWidth, className, style, itemHeight, itemPadding } = useAppStore(
@@ -671,7 +688,7 @@ function Table<T>(props: Props<T>) {
         }
       }
 
-      const sourceIndex = storeSourceIndexByVisibleIndex[visibleIndex] ?? visibleIndex;
+      const sourceIndex = storeSourceIndexByVisibleIndex?.[visibleIndex] ?? visibleIndex;
       const target: BGridContextMenuTarget<T> = {
         cell: logical.cell,
         visibleIndex,
@@ -1855,12 +1872,7 @@ function Table<T>(props: Props<T>) {
 
   // [Group 5] Data & columns
   useEffect(() => {
-    if (
-      props.data !== undefined &&
-      props.sourceData !== undefined &&
-      props.sourceIndexByVisibleIndex !== undefined &&
-      props.visibleIndexBySourceIndex !== undefined
-    ) {
+    if (props.data !== undefined && props.sourceData !== undefined) {
       setProcessedData({
         data: props.data,
         sourceData: props.sourceData,
@@ -2842,6 +2854,7 @@ function Table<T>(props: Props<T>) {
                       role='rfdg-frozen-rows-left'
                     >
                       <TableBodyFrozen
+                        rowKeyRegistry={rowKeyRegistry}
                         rowHeightMetrics={rowHeightMetrics}
                         scrollContainerRef={scrollContainerRef}
                         rowRange={frozenRowRange}
@@ -2858,6 +2871,7 @@ function Table<T>(props: Props<T>) {
                     role='rfdg-frozen-rows-main'
                   >
                     <TableBody
+                      rowKeyRegistry={rowKeyRegistry}
                       rowHeightMetrics={rowHeightMetrics}
                       scrollContainerRef={scrollContainerRef}
                       rowRange={frozenRowRange}
@@ -2884,6 +2898,7 @@ function Table<T>(props: Props<T>) {
                     role={'rfdg-frozen-scroll-container'}
                   >
                     <TableBodyFrozen
+                      rowKeyRegistry={rowKeyRegistry}
                       rowHeightMetrics={rowHeightMetrics}
                       scrollContainerRef={scrollContainerRef}
                       rowRange={scrollableRowRange}
@@ -2905,6 +2920,7 @@ function Table<T>(props: Props<T>) {
                   }}
                 >
                   <TableBody
+                    rowKeyRegistry={rowKeyRegistry}
                     rowHeightMetrics={rowHeightMetrics}
                     scrollContainerRef={scrollContainerRef}
                     rowRange={scrollableRowRange}

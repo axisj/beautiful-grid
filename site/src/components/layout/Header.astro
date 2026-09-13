@@ -31,6 +31,9 @@ const checkActive = (route: string) => {
       pathname.startsWith('/en/api/')
     );
   }
+  if (route === '/product-facts') {
+    return pathname === localizePath('/product-facts', locale) || pathname === localizePath('/performance', locale);
+  }
   const localized = localizePath(route, locale);
   return pathname === localized || pathname.startsWith(`${localized}/`);
 };

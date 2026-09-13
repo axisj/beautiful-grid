@@ -1052,8 +1052,8 @@ export interface AppModel<T> extends BGridProps<T> {
   columnGroups: BGridColumnGroupNode[];
   data: BGridDataItem<T>[];
   sourceData: BGridDataItem<T>[];
-  sourceIndexByVisibleIndex: number[];
-  visibleIndexBySourceIndex: Map<number, number>;
+  sourceIndexByVisibleIndex?: number[];
+  visibleIndexBySourceIndex?: Map<number, number>;
   columnResizing: boolean;
   containerBorderWidth: number;
   contentBodyHeight: number;
@@ -1108,8 +1108,8 @@ export interface AppActions<T> {
   setProcessedData: (params: {
     data: BGridDataItem<T>[];
     sourceData: BGridDataItem<T>[];
-    sourceIndexByVisibleIndex: number[];
-    visibleIndexBySourceIndex: Map<number, number>;
+    sourceIndexByVisibleIndex?: number[];
+    visibleIndexBySourceIndex?: Map<number, number>;
   }) => void;
   setDataQuery: (dataQuery: BGridDataQuery) => void;
   setDataControl: (dataControl?: BGridDataControl) => void;

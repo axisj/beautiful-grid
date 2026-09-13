@@ -1,6 +1,7 @@
 ---
 import { ArrowRight, Check, CheckCircle2, Code2, Globe2, Monitor, PackageCheck, Server, ShieldAlert, Smartphone } from 'lucide-react';
 import MarketingLayout from '../layouts/MarketingLayout.astro';
+import SupportNav from '../components/support/SupportNav.astro';
 import { productFacts } from '../data/productFacts';
 import { localizePath, normalizeLocale, type Locale } from '../i18n';
 
@@ -42,6 +43,7 @@ const deploymentChecks = [
 ---
 
 <MarketingLayout title={t('실행 환경 및 도입 안내 | BeautifulGrid', 'Runtime & Adoption Guide | BeautifulGrid')} description={t('BeautifulGrid를 도입하기 전 확인할 React·Node.js·브라우저 환경과 클라이언트 렌더링, 배포 점검 사항을 안내합니다.', 'Review the React, Node.js, browser, client-rendering, and deployment baseline before adopting BeautifulGrid.')} canonicalPath={localizePath('/product-facts', locale)} locale={locale}>
+  <SupportNav locale={locale} current="environment" />
   <section class="environment-hero">
     <div class="container">
       <div class="environment-hero-grid">
@@ -52,6 +54,7 @@ const deploymentChecks = [
           <div class="hero-actions">
             <a href={localizePath('/learn/getting-started', locale)} class="btn btn-primary">{t('시작 가이드 보기', 'Open getting started')} <ArrowRight size={16} aria-hidden="true" /></a>
             <a href={localizePath('/playground', locale)} class="btn btn-outline">{t('Playground에서 검증', 'Validate in Playground')}</a>
+            <a href={localizePath('/performance', locale)} class="btn btn-outline">{t('성능 리포트', 'Performance report')}</a>
           </div>
         </div>
 

@@ -13,13 +13,13 @@ const copy = locale === 'ko' ? {
   intro: 'AXISJ가 만드는 BeautifulGrid.',
   description: 'React 업무 화면에서 복잡한 데이터를 빠르게 탐색하고 편집하는 TypeScript 데이터 그리드 프로젝트입니다.',
   product: 'Product', developers: 'Developers', projects: 'AXISJ Projects',
-  documentation: '문서', learn: '가이드 & 예제', adoption: '도입 안내', apiReference: 'API 레퍼런스', license: '라이선스', issues: '이슈', review: '환경 안내 검토일',
+  documentation: '문서', learn: '가이드 & 예제', adoption: '지원 환경', performance: '성능 리포트', apiReference: 'API 레퍼런스', license: '라이선스', issues: '이슈', review: '환경 안내 검토일',
 } : {
   axisjLabel: 'Visit AXISJ.com',
   intro: 'BeautifulGrid, built by AXISJ.',
   description: 'A TypeScript DataGrid project for navigating and editing complex data in React business applications.',
   product: 'Product', developers: 'Developers', projects: 'AXISJ Projects',
-  documentation: 'Documentation', learn: 'Examples / Learn', adoption: 'Product Facts', apiReference: 'API Reference', license: 'License', issues: 'Issues', review: 'Product facts reviewed',
+  documentation: 'Documentation', learn: 'Examples / Learn', adoption: 'Support', performance: 'Performance report', apiReference: 'API Reference', license: 'License', issues: 'Issues', review: 'Support facts reviewed',
 };
 ---
 <footer class="site-footer">
@@ -37,7 +37,8 @@ const copy = locale === 'ko' ? {
         <a href={localizePath('/learn/getting-started', locale)} data-footer-route="/learn/getting-started" data-footer-copy="documentation" data-ko="문서" data-en="Documentation">{copy.documentation}</a>
         <a href={localizePath('/learn', locale)} data-footer-route="/learn" data-footer-copy="learn" data-ko="가이드 & 예제" data-en="Examples / Learn">{copy.learn}</a>
         <a href={localizePath('/playground', locale)} data-footer-route="/playground">Playground</a>
-        <a href={localizePath('/product-facts', locale)} data-footer-route="/product-facts" data-footer-copy="adoption" data-ko="도입 안내" data-en="Product Facts">{copy.adoption}</a>
+        <a href={localizePath('/product-facts', locale)} data-footer-route="/product-facts" data-footer-copy="adoption" data-ko="지원 환경" data-en="Support">{copy.adoption}</a>
+        <a href={localizePath('/performance', locale)} data-footer-route="/performance" data-footer-copy="performance" data-ko="성능 리포트" data-en="Performance report">{copy.performance}</a>
       </div>
       <div class="link-column">
         <h2>{copy.developers}</h2>

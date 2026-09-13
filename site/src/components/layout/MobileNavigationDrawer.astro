@@ -89,6 +89,9 @@ const checkActive = (route: string) => {
   if (route === '/learn') {
     return isLearnRoute;
   }
+  if (route === '/product-facts') {
+    return pathname === localizePath('/product-facts', locale) || pathname === localizePath('/performance', locale);
+  }
   return pathname === localized || pathname.startsWith(`${localized}/`);
 };
 ---

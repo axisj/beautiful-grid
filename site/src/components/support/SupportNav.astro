@@ -1,0 +1,55 @@
+---
+import { Gauge, MonitorCheck } from 'lucide-react';
+import { localizePath, normalizeLocale, type Locale } from '../../i18n';
+
+interface Props { locale?: Locale; current: 'environment' | 'performance'; }
+const locale = normalizeLocale(Astro.props.locale);
+const current = Astro.props.current;
+const links = locale === 'ko'
+  ? [
+      { id: 'environment', label: '환경 및 호환성', description: '브라우저·런타임·배포 조건', href: '/product-facts', icon: MonitorCheck },
+      { id: 'performance', label: '성능 리포트', description: 'v1.0.10 대비 현재 작업 트리', href: '/performance', icon: Gauge },
+    ]
+  : [
+      { id: 'environment', label: 'Environment & compatibility', description: 'Browser, runtime, and deployment', href: '/product-facts', icon: MonitorCheck },
+      { id: 'performance', label: 'Performance report', description: 'v1.0.10 vs current working tree', href: '/performance', icon: Gauge },
+    ];
+---
+
+<nav class="support-nav" aria-label={locale === 'ko' ? '지원 환경 메뉴' : 'Support navigation'}>
+  <div class="container support-nav-inner">
+    <span class="support-nav-title">{locale === 'ko' ? '지원 환경' : 'Support'}</span>
+    <div class="support-nav-links">
+      {links.map(link => (
+        <a href={localizePath(link.href, locale)} class:list={['support-nav-link', { active: current === link.id }]} aria-current={current === link.id ? 'page' : undefined}>
+          <link.icon size={17} aria-hidden="true" />
+          <span><strong>{link.label}</strong><small>{link.description}</small></span>
+        </a>
+      ))}
+    </div>
+  </div>
+</nav>
+
+<style>
+  .support-nav { border-bottom: 1px solid var(--site-border); background: color-mix(in srgb, var(--site-surface-elevated) 94%, transparent); }
+  .support-nav-inner { display: flex; min-height: 74px; align-items: center; gap: 28px; }
+  .support-nav-title { flex: 0 0 auto; color: var(--site-text-muted); font-size: 13px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+  .support-nav-links { display: flex; align-self: stretch; gap: 4px; }
+  .support-nav-link { position: relative; display: flex; align-items: center; gap: 10px; min-width: 220px; padding: 12px 16px; color: var(--site-text-secondary); text-decoration: none; }
+  .support-nav-link::after { position: absolute; right: 16px; bottom: -1px; left: 16px; height: 2px; border-radius: 2px 2px 0 0; background: var(--site-accent); content: ''; opacity: 0; }
+  .support-nav-link:hover { background: var(--site-control-hover-bg); color: var(--site-text-primary); text-decoration: none; }
+  .support-nav-link.active { color: var(--site-accent-strong); }
+  .support-nav-link.active::after { opacity: 1; }
+  .support-nav-link > svg { flex: 0 0 auto; }
+  .support-nav-link span { display: grid; line-height: 1.35; }
+  .support-nav-link strong { font-size: 13px; }
+  .support-nav-link small { margin-top: 2px; color: var(--site-text-muted); font-size: 13px; }
+  @media (max-width: 720px) {
+    .support-nav-inner { display: block; padding-block: 13px; }
+    .support-nav-title { display: block; margin-bottom: 8px; }
+    .support-nav-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .support-nav-link { min-width: 0; border: 1px solid transparent; border-radius: 10px; padding: 10px; }
+    .support-nav-link.active { border-color: var(--site-border); background: var(--site-accent-soft); }
+    .support-nav-link::after, .support-nav-link small { display: none; }
+  }
+</style>

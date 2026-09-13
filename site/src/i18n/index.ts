@@ -77,7 +77,7 @@ export const commonMessages = {
     openMenu: 'Open menu',
     closeMenu: 'Close menu',
     guideExamples: 'Learn & Examples',
-    adoptionGuide: 'Product Facts',
+    adoptionGuide: 'Support',
     openSource: 'Open Source',
     theme: 'Theme',
     themeMenu: 'Choose theme',

@@ -47,7 +47,7 @@ function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
 export interface FindGridSearchMatchesParams<T> {
   data: BGridDataItem<T>[];
   columns: AppModelColumn<T>[];
-  sourceIndexByVisibleIndex: number[];
+  sourceIndexByVisibleIndex?: number[];
   rowKey?: React.Key | React.Key[];
   cellMergeOptions?: BGridProps<T>['cellMergeOptions'];
   searchOptions?: BGridSearchOptions<T>;
@@ -91,7 +91,7 @@ export function findGridSearchMatches<T>({
       const item = data[canonicalVisibleIndex];
       if (!item) continue;
 
-      const sourceIndex = sourceIndexByVisibleIndex[canonicalVisibleIndex] ?? canonicalVisibleIndex;
+      const sourceIndex = sourceIndexByVisibleIndex?.[canonicalVisibleIndex] ?? canonicalVisibleIndex;
       const value = getCellValueByRowKey(column.key, item.values);
       const params: BGridSearchCellParams<T> = {
         cell: logical.cell,

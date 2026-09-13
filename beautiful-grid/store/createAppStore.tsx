@@ -30,6 +30,7 @@ import {
   applyChangesToItem,
   applySortToQuery,
   clearFilterFromQuery,
+  countVisibleCheckedIndexes,
   createNextValues,
   createCheckboxEditorContext,
   getCellValueByRowKey,
@@ -225,8 +226,8 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
       columnGroups: initialState?.columnGroups ?? [],
       data: initialState?.data ?? [],
       sourceData: initialState?.sourceData ?? initialState?.data ?? [],
-      sourceIndexByVisibleIndex: initialState?.sourceIndexByVisibleIndex ?? [],
-      visibleIndexBySourceIndex: initialState?.visibleIndexBySourceIndex ?? new Map(),
+      sourceIndexByVisibleIndex: initialState?.sourceIndexByVisibleIndex,
+      visibleIndexBySourceIndex: initialState?.visibleIndexBySourceIndex,
       columnResizing: false,
       containerBorderWidth: 1,
       contentBodyHeight: initialState?.contentBodyHeight ?? 0,
@@ -380,10 +381,13 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
           state.contextMenuOptions?.onOpenChange?.(false, state.contextMenuState.target);
         }
         const mappingUnchanged =
-          state.sourceIndexByVisibleIndex.length === sourceIndexByVisibleIndex.length &&
-          state.sourceIndexByVisibleIndex.every(
-            (sourceIndex, index) => sourceIndex === sourceIndexByVisibleIndex[index],
-          );
+          state.sourceIndexByVisibleIndex === sourceIndexByVisibleIndex ||
+          (state.sourceIndexByVisibleIndex !== undefined &&
+            sourceIndexByVisibleIndex !== undefined &&
+            state.sourceIndexByVisibleIndex.length === sourceIndexByVisibleIndex.length &&
+            state.sourceIndexByVisibleIndex.every(
+              (sourceIndex, index) => sourceIndex === sourceIndexByVisibleIndex[index],
+            ));
         const preservesEditedRows = state.sourceData === sourceData && mappingUnchanged;
         set(
           preservesEditedRows
@@ -681,11 +685,11 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
           }
         });
 
-        let visibleCheckedCount = 0;
-        data.forEach((_, vi) => {
-          const si = sourceIndexByVisibleIndex[vi] ?? vi;
-          if (checkedIndexesMap.has(si)) visibleCheckedCount++;
-        });
+        const visibleCheckedCount = countVisibleCheckedIndexes(
+          data.length,
+          checkedIndexesMap,
+          sourceIndexByVisibleIndex,
+        );
 
         const checkedAll: CheckedAll =
           data.length === 0
@@ -710,13 +714,13 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
         if (checkedAll === true) {
           data.forEach((v, vi) => {
             v.checked = true;
-            const si = sourceIndexByVisibleIndex[vi] ?? vi;
+            const si = sourceIndexByVisibleIndex?.[vi] ?? vi;
             checkedIndexesMap.set(si, true);
           });
         } else {
           data.forEach((v, vi) => {
             v.checked = false;
-            const si = sourceIndexByVisibleIndex[vi] ?? vi;
+            const si = sourceIndexByVisibleIndex?.[vi] ?? vi;
             checkedIndexesMap.delete(si);
           });
         }
@@ -731,11 +735,11 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
           }
         });
 
-        let visibleCheckedCount = 0;
-        data.forEach((_, vi) => {
-          const si = sourceIndexByVisibleIndex[vi] ?? vi;
-          if (checkedIndexesMap.has(si)) visibleCheckedCount++;
-        });
+        const visibleCheckedCount = countVisibleCheckedIndexes(
+          data.length,
+          checkedIndexesMap,
+          sourceIndexByVisibleIndex,
+        );
 
         const nextCheckedAll: CheckedAll =
           data.length === 0
@@ -756,11 +760,11 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
         const data = get().data;
         const sourceIndexByVisibleIndex = get().sourceIndexByVisibleIndex;
 
-        let visibleCheckedCount = 0;
-        data.forEach((_, vi) => {
-          const si = sourceIndexByVisibleIndex[vi] ?? vi;
-          if (checkedIndexesMap.has(si)) visibleCheckedCount++;
-        });
+        const visibleCheckedCount = countVisibleCheckedIndexes(
+          data.length,
+          checkedIndexesMap,
+          sourceIndexByVisibleIndex,
+        );
 
         const checkedAll: CheckedAll =
           data.length === 0

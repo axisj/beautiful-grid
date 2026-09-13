@@ -481,14 +481,14 @@ function TableBody({
             <NoDataTr itemHeight={itemHeight} itemPadding={itemPadding} />
           ) : (
             <NoDataTr itemHeight={itemHeight} itemPadding={itemPadding}>
-              {msg?.emptyList && (
+              {msg?.emptyList ? (
                 <>
                   <td className={'bgrid-empty-cell'} colSpan={columns.slice(frozenColumnIndex).length}>
-                    {msg?.emptyList}
+                    {msg.emptyList}
                   </td>
                   <td data-none />
                 </>
-              )}
+              ) : null}
             </NoDataTr>
           ))}
       </tbody>

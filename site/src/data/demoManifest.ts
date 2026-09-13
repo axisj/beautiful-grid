@@ -57,6 +57,11 @@ export const demoManifest: Record<string, DemoManifestItem> = {
     sourceFiles: withContainerSources('ScrollExample.tsx'),
     minHeight: 500,
   },
+  'variable-row-height': {
+    componentFile: 'VariableRowHeightExample.tsx',
+    sourceFiles: withContainerSources('VariableRowHeightExample.tsx'),
+    minHeight: 500,
+  },
   editing: {
     componentFile: 'BasicEditingExample.tsx',
     sourceFiles: [...withContainerSources('BasicEditingExample.tsx'), ...editingExampleSources],

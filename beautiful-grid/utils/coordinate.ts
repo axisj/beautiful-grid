@@ -4,11 +4,7 @@ export function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
 
-export function clampCellAddress(
-  address: BGridCellAddress,
-  rowCount: number,
-  columnCount: number,
-): BGridCellAddress {
+export function clampCellAddress(address: BGridCellAddress, rowCount: number, columnCount: number): BGridCellAddress {
   const maxRow = Math.max(0, rowCount - 1);
   const maxCol = Math.max(0, columnCount - 1);
 
@@ -18,10 +14,7 @@ export function clampCellAddress(
   };
 }
 
-export function getColumnLeft(
-  columnIndex: number,
-  columns: AppModelColumn<any>[],
-): number {
+export function getColumnLeft(columnIndex: number, columns: AppModelColumn<any>[]): number {
   if (!columns || columnIndex <= 0 || columnIndex >= columns.length) {
     return 0;
   }
@@ -38,10 +31,7 @@ export function getColumnLeft(
   return left;
 }
 
-export function getColumnRight(
-  columnIndex: number,
-  columns: AppModelColumn<any>[],
-): number {
+export function getColumnRight(columnIndex: number, columns: AppModelColumn<any>[]): number {
   if (!columns || columnIndex < 0 || columnIndex >= columns.length) {
     return 0;
   }
@@ -67,6 +57,7 @@ export interface EnsureCellVisibleParams {
   frozenRowCount?: number;
   columns: AppModelColumn<any>[];
   rowHeight: number;
+  rowOffsets?: ArrayLike<number>;
   verticalScrollState?: {
     scrollTop: number;
     scrollHeight: number;
@@ -95,6 +86,7 @@ export function ensureCellVisible({
   frozenRowCount = 0,
   columns,
   rowHeight,
+  rowOffsets,
   verticalScrollState,
   viewportInsets,
 }: EnsureCellVisibleParams): EnsureCellVisibleResult {
@@ -107,14 +99,16 @@ export function ensureCellVisible({
   // Vertical scroll calculation
   if (cell.rowIndex >= frozenRowCount && scrollContainer && rowHeight > 0) {
     const targetRowIndex = cell.rowIndex - frozenRowCount;
-    const rowTop = getRowTop(targetRowIndex, rowHeight);
-    const rowBottom = getRowBottom(targetRowIndex, rowHeight);
+    const frozenOffset = rowOffsets?.[frozenRowCount] ?? 0;
+    const rowTop = rowOffsets
+      ? (rowOffsets[cell.rowIndex] ?? frozenOffset) - frozenOffset
+      : getRowTop(targetRowIndex, rowHeight);
+    const rowBottom = rowOffsets
+      ? (rowOffsets[cell.rowIndex + 1] ?? rowTop + frozenOffset + rowHeight) - frozenOffset
+      : getRowBottom(targetRowIndex, rowHeight);
     const clientHeight = scrollContainer.clientHeight;
     const scrollHeight = verticalScrollState?.scrollHeight ?? scrollContainer.scrollHeight;
-    const maxScrollTop = Math.max(
-      0,
-      verticalScrollState?.maxScrollTop ?? scrollHeight - clientHeight,
-    );
+    const maxScrollTop = Math.max(0, verticalScrollState?.maxScrollTop ?? scrollHeight - clientHeight);
 
     if (clientHeight > 0) {
       const topInset = clamp(viewportInsets?.top ?? 0, 0, clientHeight);

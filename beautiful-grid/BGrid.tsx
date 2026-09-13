@@ -14,6 +14,7 @@ import {
 } from './types';
 import {
   createPivotData,
+  createRowHeightMetrics,
   buildHeaderMatrix,
   findDuplicateColumnIds,
   getCellValueByRowKey,
@@ -63,6 +64,7 @@ export function BGrid<T = Record<string, any>>({
   summaryHeight = 30,
   itemHeight = 15,
   itemPadding = 7,
+  getRowHeight,
   columns,
   columnsGroup,
   columnGroups,
@@ -496,6 +498,10 @@ export function BGrid<T = Record<string, any>>({
   }, [queryColumns, resolvedData, resolvedDataControl?.mode, resolvedDataQuery, resolvedRowKey]);
 
   const displayData = processedResult.data;
+  const rowHeightMetrics = React.useMemo(
+    () => createRowHeightMetrics(displayData, itemHeight + itemPadding * 2, getRowHeight),
+    [displayData, getRowHeight, itemHeight, itemPadding],
+  );
   const resolvedFrozenRowCount = pivotEnabled
     ? 0
     : Math.min(Math.max(Math.floor(frozenRowCount), 0), displayData.length);
@@ -603,7 +609,8 @@ export function BGrid<T = Record<string, any>>({
       itemPadding,
       frozenColumnIndex: resolvedFrozenColumnIndex,
       frozenRowCount: resolvedFrozenRowCount,
-      frozenRowsHeight: resolvedFrozenRowCount * (itemHeight + itemPadding * 2),
+      frozenRowsHeight:
+        rowHeightMetrics.offsets[resolvedFrozenRowCount] ?? resolvedFrozenRowCount * (itemHeight + itemPadding * 2),
       frozenColumnsWidth: getFrozenColumnsWidth({
         showLineNumber: resolvedShowLineNumber,
         rowChecked: resolvedRowChecked,
@@ -672,6 +679,7 @@ export function BGrid<T = Record<string, any>>({
     summaryHeight,
     itemHeight,
     itemPadding,
+    rowHeightMetrics,
     resolvedPage,
     resolvedSummary,
     checkedIndexesMap,
@@ -744,6 +752,7 @@ export function BGrid<T = Record<string, any>>({
           summaryHeight,
           itemHeight,
           itemPadding,
+          rowHeightMetrics,
           frozenColumnIndex: resolvedFrozenColumnIndex,
           frozenRowCount: resolvedFrozenRowCount,
           rowChecked: resolvedRowChecked,

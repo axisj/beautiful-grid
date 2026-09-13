@@ -27,6 +27,7 @@ export interface BGridSelectionGeometryParams {
   frozenColumnCount: number;
   frozenRowCount: number;
   frozenColumnsWidth: number;
+  rowOffsets?: ArrayLike<number>;
 }
 
 interface IndexSegment {
@@ -42,6 +43,7 @@ export function getCellSelectionFragments({
   frozenColumnCount,
   frozenRowCount,
   frozenColumnsWidth,
+  rowOffsets,
 }: BGridSelectionGeometryParams): BGridSelectionFragment[] {
   const safeRowCount = Math.max(0, Math.floor(rowCount));
   const safeColumnCount = columns.length;
@@ -91,9 +93,10 @@ export function getCellSelectionFragments({
           selectedRows,
           selectedColumns,
           rowHeight: safeRowHeight,
+          rowOffsets,
           left: frozenDataOffset + getColumnsWidth(columns, 0, leftColumns.start - 1),
           width: getColumnsWidth(columns, leftColumns.start, leftColumns.end),
-          top: topRows.start * safeRowHeight,
+          top: getRowsTop(topRows.start, 0, safeRowHeight, rowOffsets),
         }),
       );
     }
@@ -108,10 +111,12 @@ export function getCellSelectionFragments({
           selectedRows,
           selectedColumns,
           rowHeight: safeRowHeight,
+          rowOffsets,
           left: getMainColumnLeft(columns, mainColumns.start, safeFrozenColumnCount),
-          width: getMainColumnRight(columns, mainColumns.end, safeFrozenColumnCount) -
+          width:
+            getMainColumnRight(columns, mainColumns.end, safeFrozenColumnCount) -
             getMainColumnLeft(columns, mainColumns.start, safeFrozenColumnCount),
-          top: topRows.start * safeRowHeight,
+          top: getRowsTop(topRows.start, 0, safeRowHeight, rowOffsets),
         }),
       );
     }
@@ -126,9 +131,10 @@ export function getCellSelectionFragments({
           selectedRows,
           selectedColumns,
           rowHeight: safeRowHeight,
+          rowOffsets,
           left: frozenDataOffset + getColumnsWidth(columns, 0, leftColumns.start - 1),
           width: getColumnsWidth(columns, leftColumns.start, leftColumns.end),
-          top: (bodyRows.start - safeFrozenRowCount) * safeRowHeight,
+          top: getRowsTop(bodyRows.start, safeFrozenRowCount, safeRowHeight, rowOffsets),
         }),
       );
     }
@@ -143,10 +149,12 @@ export function getCellSelectionFragments({
           selectedRows,
           selectedColumns,
           rowHeight: safeRowHeight,
+          rowOffsets,
           left: getMainColumnLeft(columns, mainColumns.start, safeFrozenColumnCount),
-          width: getMainColumnRight(columns, mainColumns.end, safeFrozenColumnCount) -
+          width:
+            getMainColumnRight(columns, mainColumns.end, safeFrozenColumnCount) -
             getMainColumnLeft(columns, mainColumns.start, safeFrozenColumnCount),
-          top: (bodyRows.start - safeFrozenRowCount) * safeRowHeight,
+          top: getRowsTop(bodyRows.start, safeFrozenRowCount, safeRowHeight, rowOffsets),
         }),
       );
     }
@@ -202,6 +210,7 @@ function createFragment({
   selectedRows,
   selectedColumns,
   rowHeight,
+  rowOffsets,
   left,
   top,
   width,
@@ -213,6 +222,7 @@ function createFragment({
   selectedRows: IndexSegment;
   selectedColumns: IndexSegment;
   rowHeight: number;
+  rowOffsets?: ArrayLike<number>;
   left: number;
   top: number;
   width: number;
@@ -223,7 +233,9 @@ function createFragment({
     left,
     top,
     width,
-    height: (rows.end - rows.start + 1) * rowHeight,
+    height: rowOffsets
+      ? (rowOffsets[rows.end + 1] ?? 0) - (rowOffsets[rows.start] ?? 0)
+      : (rows.end - rows.start + 1) * rowHeight,
     edges: {
       top: rows.start === selectedRows.start,
       right: columns.end === selectedColumns.end,
@@ -231,6 +243,10 @@ function createFragment({
       left: columns.start === selectedColumns.start,
     },
   };
+}
+
+function getRowsTop(start: number, base: number, rowHeight: number, rowOffsets?: ArrayLike<number>) {
+  return rowOffsets ? (rowOffsets[start] ?? 0) - (rowOffsets[base] ?? 0) : (start - base) * rowHeight;
 }
 
 function intersectIndexSegment(left: IndexSegment, right: IndexSegment): IndexSegment | undefined {
@@ -248,21 +264,13 @@ function getColumnsWidth(columns: readonly AppModelColumn<any>[], start: number,
   return width;
 }
 
-function getMainColumnLeft(
-  columns: readonly AppModelColumn<any>[],
-  columnIndex: number,
-  frozenColumnCount: number,
-) {
+function getMainColumnLeft(columns: readonly AppModelColumn<any>[], columnIndex: number, frozenColumnCount: number) {
   const column = columns[columnIndex];
   if (column && column.left >= 0) return column.left;
   return getColumnsWidth(columns, frozenColumnCount, columnIndex - 1);
 }
 
-function getMainColumnRight(
-  columns: readonly AppModelColumn<any>[],
-  columnIndex: number,
-  frozenColumnCount: number,
-) {
+function getMainColumnRight(columns: readonly AppModelColumn<any>[], columnIndex: number, frozenColumnCount: number) {
   return getMainColumnLeft(columns, columnIndex, frozenColumnCount) + (columns[columnIndex]?.width ?? 100);
 }
 

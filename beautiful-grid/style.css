@@ -1675,6 +1675,10 @@
   );
 }
 
+.bgrid-root[data-bgrid-variable-row-height='true'] .bgrid-virtual-row-backdrop {
+  background-image: none;
+}
+
 .bgrid-footer-container {
   position: relative;
   z-index: 10;

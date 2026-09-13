@@ -877,6 +877,11 @@ export interface BGridProps<T> {
   summaryHeight?: number;
   itemHeight?: number;
   itemPadding?: number;
+  /**
+   * Returns the complete rendered height of a displayed row in pixels.
+   * Invalid values fall back to itemHeight + itemPadding * 2.
+   */
+  getRowHeight?: (row: T, index: number) => number;
   frozenColumnIndex?: number;
   /** Number of leading rows fixed below an optional top summary row. */
   frozenRowCount?: number;

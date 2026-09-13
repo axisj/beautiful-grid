@@ -51,6 +51,15 @@ afterEach(() => {
 });
 
 describe('demo examples render intended grid features', () => {
+  it('renders explicit variable row heights from getRowHeight', async () => {
+    const { container } = await renderExample(() => import('../examples/VariableRowHeightExample'));
+
+    expect(container.querySelector('[role="grid"]')).toHaveAttribute('data-bgrid-variable-row-height', 'true');
+    expect(container.querySelector('tr[data-ri="0"]')).toHaveStyle({ '--bgrid-item-cell-height': '52px' });
+    expect(container.querySelector('tr[data-ri="1"]')).toHaveStyle({ '--bgrid-item-cell-height': '29px' });
+    expect(container.querySelector('tr[data-ri="4"]')).toHaveStyle({ '--bgrid-item-cell-height': '40px' });
+  });
+
   it.each(editingExamples)('%s distinguishes editable cells with vertical borders', async (_name, load) => {
     const { container } = await renderExample(load);
 

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import TableBody, { BGridBodyRowRange } from './TableBody';
+import type { BGridRowHeightMetrics } from '../utils';
 
 interface Props {
   scrollContainerRef: React.RefObject<HTMLDivElement | null>;
@@ -10,6 +11,7 @@ interface Props {
   allowRowReorder?: boolean;
   onRowReorderPointerDown?: (event: React.PointerEvent<HTMLButtonElement>, rowIndex: number) => void;
   onRowReorderKeyDown?: (event: React.KeyboardEvent<HTMLButtonElement>, rowIndex: number) => void;
+  rowHeightMetrics?: BGridRowHeightMetrics;
 }
 
 function TableBodyFrozen(props: Props) {
@@ -24,6 +26,7 @@ function TableBodyFrozen(props: Props) {
       allowRowReorder={props.allowRowReorder}
       onRowReorderPointerDown={props.onRowReorderPointerDown}
       onRowReorderKeyDown={props.onRowReorderKeyDown}
+      rowHeightMetrics={props.rowHeightMetrics}
     />
   );
 }

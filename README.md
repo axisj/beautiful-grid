@@ -200,6 +200,33 @@ export default function OrderGridPage() {
 5. **No Runtime CSS-in-JS**:
    - High performance and zero runtime overhead using static `.bgrid-*` classes and `--bgrid-*` CSS custom properties.
 
+### Variable Row Heights
+
+Use `getRowHeight(row, index)` when rows need explicit, data-driven heights. The callback receives the row's
+`values` object and its current displayed index (after client-side sorting or filtering), and returns the complete
+row height in pixels:
+
+```tsx
+<BGrid
+  itemHeight={20}
+  itemPadding={5}
+  getRowHeight={(row, index) => {
+    if (row.type === 'group') return 48;
+    if (index === 0) return 40;
+    return 30;
+  }}
+  {...props}
+/>
+```
+
+BeautifulGrid caches all returned heights and cumulative offsets when the displayed data, callback, or fixed-height
+fallback changes. Scrolling then finds rows with binary search and does not call `getRowHeight` again. Keep the
+callback reference stable (for example with `useCallback`) to avoid rebuilding the cache on parent renders.
+
+Automatic content-based row height measurement is intentionally not supported, because DOM measurement would make
+large virtualized datasets less predictable. When `getRowHeight` is omitted—or returns a non-finite or non-positive
+value—the existing `itemHeight + itemPadding * 2` fixed height is used.
+
 ---
 
 ## Styling & Theming
@@ -940,6 +967,7 @@ Below is a categorized reference of `<BGrid>` props. For exact TypeScript types,
 | `summaryHeight` | `number` | `30` | Summary row height in pixels. |
 | `itemHeight` | `number` | `15` | Body row content height. |
 | `itemPadding` | `number` | `7` | Body row top/bottom padding (total row height = `itemHeight + itemPadding * 2`). |
+| `getRowHeight` | `(row: T, index: number) => number` | — | Complete rendered height for each displayed row. Invalid values fall back to `itemHeight + itemPadding * 2`. |
 | `frozenColumnIndex` | `number` | `0` | Pinned column boundary index (columns `< frozenColumnIndex` are fixed). |
 | `frozenRowCount` | `number` | `0` | Number of leading rows pinned below the top summary row. |
 | `showLineNumber` | `boolean` | `false` | Shows row index numbers and reorder handles on the left. |

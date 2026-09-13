@@ -30,6 +30,7 @@ import {
 import {
   getCellValueByRowKey,
   getFrozenColumnsWidth,
+  getRowIndexAtOffset,
   getVisibleScrollableRowRange,
   getVirtualScrollWindowMetrics,
   getVirtualScrollWindowPosition,
@@ -39,6 +40,7 @@ import {
   rebaseVirtualScrollWindow,
   resolveLogicalCell,
   shouldRenderBottomBar,
+  type BGridRowHeightMetrics,
 } from '../utils';
 import { clamp, ensureCellVisible } from '../utils/coordinate';
 import Loading from './Loading';
@@ -82,6 +84,7 @@ interface Props<T> {
   summaryHeight?: number;
   itemHeight?: number;
   itemPadding?: number;
+  rowHeightMetrics: BGridRowHeightMetrics;
   frozenColumnIndex?: number;
   frozenRowCount?: number;
 
@@ -427,13 +430,15 @@ function Table<T>(props: Props<T>) {
   );
 
   const trHeight = itemHeight + itemPadding * 2;
+  const rowHeightMetrics = props.rowHeightMetrics;
+  const variableRowOffsets = rowHeightMetrics.variable ? rowHeightMetrics.offsets : undefined;
   const scrollableBodyHeight = Math.max(contentBodyHeight - frozenRowsHeight, 0);
   const scrollOverscanRows = Math.max(
     KEYBOARD_NAVIGATION_ROW_WINDOW_SIZE,
     Math.ceil(scrollableBodyHeight / Math.max(trHeight, 1)),
   );
   const mainViewportWidth = Math.max(width - (frozenColumnsWidth ?? 0), 0);
-  const logicalBodyContentHeight = data.length * trHeight;
+  const logicalBodyContentHeight = rowHeightMetrics.totalHeight;
   const virtualScrollWindowMetrics = React.useMemo(
     () =>
       getVirtualScrollWindowMetrics({
@@ -524,11 +529,21 @@ function Table<T>(props: Props<T>) {
         columns,
         rowCount: data.length,
         rowHeight: trHeight,
+        rowOffsets: variableRowOffsets,
         frozenColumnCount: props.frozenColumnIndex ?? 0,
         frozenRowCount,
         frozenColumnsWidth: frozenColumnsWidth ?? 0,
       }),
-    [cellSelectionRanges, columns, data.length, frozenColumnsWidth, frozenRowCount, props.frozenColumnIndex, trHeight],
+    [
+      cellSelectionRanges,
+      columns,
+      data.length,
+      frozenColumnsWidth,
+      frozenRowCount,
+      props.frozenColumnIndex,
+      trHeight,
+      variableRowOffsets,
+    ],
   );
   const activeFragments = React.useMemo(
     () =>
@@ -537,11 +552,21 @@ function Table<T>(props: Props<T>) {
         columns,
         rowCount: data.length,
         rowHeight: trHeight,
+        rowOffsets: variableRowOffsets,
         frozenColumnCount: props.frozenColumnIndex ?? 0,
         frozenRowCount,
         frozenColumnsWidth: frozenColumnsWidth ?? 0,
       }),
-    [activeCellRanges, columns, data.length, frozenColumnsWidth, frozenRowCount, props.frozenColumnIndex, trHeight],
+    [
+      activeCellRanges,
+      columns,
+      data.length,
+      frozenColumnsWidth,
+      frozenRowCount,
+      props.frozenColumnIndex,
+      trHeight,
+      variableRowOffsets,
+    ],
   );
   const activeOverlayFill = activeCellSelected;
   const activeOverlayRing = !!activeCell && !hasMultiCellSelection;
@@ -576,6 +601,7 @@ function Table<T>(props: Props<T>) {
         overscan: props.reorder?.enabled ? 1 : scrollOverscanRows,
         leadingOverscan: props.reorder?.enabled ? 0 : scrollOverscanRows,
         windowSize: props.reorder?.enabled ? 1 : KEYBOARD_NAVIGATION_ROW_WINDOW_SIZE,
+        rowOffsets: variableRowOffsets,
       }),
     [
       data.length,
@@ -585,6 +611,7 @@ function Table<T>(props: Props<T>) {
       scrollTop,
       scrollableBodyHeight,
       trHeight,
+      variableRowOffsets,
     ],
   );
   const frozenRowRange = React.useMemo(() => ({ startRowIndex: 0, endRowIndex: frozenRowCount }), [frozenRowCount]);
@@ -817,6 +844,7 @@ function Table<T>(props: Props<T>) {
     frozenRowsHeight,
     scrollTop,
     trHeight,
+    rowOffsets: variableRowOffsets,
   });
 
   useEffect(() => {
@@ -829,6 +857,7 @@ function Table<T>(props: Props<T>) {
       frozenRowsHeight,
       scrollTop,
       trHeight,
+      rowOffsets: variableRowOffsets,
     };
   }, [
     columns,
@@ -839,6 +868,7 @@ function Table<T>(props: Props<T>) {
     frozenRowsHeight,
     scrollTop,
     trHeight,
+    variableRowOffsets,
   ]);
 
   const markScrollActive = useCallback(() => {
@@ -958,6 +988,7 @@ function Table<T>(props: Props<T>) {
       frozenRowCount,
       columns,
       rowHeight: trHeight,
+      rowOffsets: variableRowOffsets,
       verticalScrollState: logicalVerticalScrollState,
       viewportInsets,
     });
@@ -974,6 +1005,7 @@ function Table<T>(props: Props<T>) {
     stickyFixedHeight,
     frozenRowsHeight,
     trHeight,
+    variableRowOffsets,
   ]);
 
   const clearHoveredRow = useCallback(() => {
@@ -1810,8 +1842,16 @@ function Table<T>(props: Props<T>) {
     const rowCount = props.data?.length ?? data.length;
     const nextFrozenRowCount = Math.min(Math.max(Math.floor(props.frozenRowCount ?? 0), 0), rowCount);
     setFrozenRowCount(nextFrozenRowCount);
-    setFrozenRowsHeight(nextFrozenRowCount * trHeight);
-  }, [data.length, props.data?.length, props.frozenRowCount, setFrozenRowCount, setFrozenRowsHeight, trHeight]);
+    setFrozenRowsHeight(rowHeightMetrics.offsets[nextFrozenRowCount] ?? nextFrozenRowCount * trHeight);
+  }, [
+    data.length,
+    props.data?.length,
+    props.frozenRowCount,
+    rowHeightMetrics,
+    setFrozenRowCount,
+    setFrozenRowsHeight,
+    trHeight,
+  ]);
 
   // [Group 5] Data & columns
   useEffect(() => {
@@ -2063,17 +2103,28 @@ function Table<T>(props: Props<T>) {
     if (!Number.isInteger(rowIndex) || rowIndex < frozenRowCount || rowIndex >= data.length) return;
     if (scrollableBodyHeight <= 0) return;
 
-    const rowTop = (rowIndex - frozenRowCount) * trHeight;
-    const rowBottom = rowTop + trHeight;
+    const frozenOffset = rowHeightMetrics.offsets[frozenRowCount] ?? frozenRowCount * trHeight;
+    const rowTop = (rowHeightMetrics.offsets[rowIndex] ?? rowIndex * trHeight) - frozenOffset;
+    const rowHeight = rowHeightMetrics.heights[rowIndex] ?? trHeight;
+    const rowBottom = rowTop + rowHeight;
     const { top, left } = latestScrollRef.current;
     let nextTop = top;
     if (align === 'start') nextTop = rowTop;
-    else if (align === 'center') nextTop = rowTop - (scrollableBodyHeight - trHeight) / 2;
+    else if (align === 'center') nextTop = rowTop - (scrollableBodyHeight - rowHeight) / 2;
     else if (align === 'end') nextTop = rowBottom - scrollableBodyHeight;
     else if (rowTop < top) nextTop = rowTop;
     else if (rowBottom > top + scrollableBodyHeight) nextTop = rowBottom - scrollableBodyHeight;
     commitScroll(nextTop, left);
-  }, [commitScroll, data, frozenRowCount, props.data, rowScrollRequest, scrollableBodyHeight, trHeight]);
+  }, [
+    commitScroll,
+    data,
+    frozenRowCount,
+    props.data,
+    rowHeightMetrics,
+    rowScrollRequest,
+    scrollableBodyHeight,
+    trHeight,
+  ]);
 
   useEffect(() => {
     latestScrollRef.current = { top: scrollTop, left: scrollLeft };
@@ -2166,6 +2217,7 @@ function Table<T>(props: Props<T>) {
     searchOpen,
     searchOptions,
     trHeight,
+    rowOffsets: variableRowOffsets,
     verticalScrollState: logicalVerticalScrollState,
     viewportInsets: keyboardViewportInsets,
   });
@@ -2200,6 +2252,7 @@ function Table<T>(props: Props<T>) {
     searchOpen,
     searchOptions,
     trHeight,
+    rowOffsets: variableRowOffsets,
     verticalScrollState: logicalVerticalScrollState,
     viewportInsets: keyboardViewportInsets,
   };
@@ -2231,6 +2284,7 @@ function Table<T>(props: Props<T>) {
         frozenRowCount,
         moveActiveCell,
         trHeight,
+        rowOffsets,
         verticalScrollState,
         viewportInsets,
       } = keyboardRuntimeRef.current;
@@ -2270,6 +2324,7 @@ function Table<T>(props: Props<T>) {
         frozenRowCount,
         columns,
         rowHeight: trHeight,
+        rowOffsets,
         verticalScrollState,
         viewportInsets,
       });
@@ -2336,6 +2391,7 @@ function Table<T>(props: Props<T>) {
         searchOpen,
         searchOptions,
         trHeight,
+        rowOffsets,
         verticalScrollState,
         viewportInsets,
       } = keyboardRuntimeRef.current;
@@ -2483,6 +2539,7 @@ function Table<T>(props: Props<T>) {
               frozenRowCount,
               columns,
               rowHeight: trHeight,
+              rowOffsets,
               verticalScrollState,
               viewportInsets,
             });
@@ -2528,6 +2585,7 @@ function Table<T>(props: Props<T>) {
               frozenRowCount,
               columns,
               rowHeight: trHeight,
+              rowOffsets,
               verticalScrollState,
               viewportInsets,
             });
@@ -2560,6 +2618,7 @@ function Table<T>(props: Props<T>) {
               frozenRowCount,
               columns,
               rowHeight: trHeight,
+              rowOffsets,
               verticalScrollState,
               viewportInsets,
             });
@@ -2677,6 +2736,7 @@ function Table<T>(props: Props<T>) {
         data-bgrid-cell-selection-enabled={cellSelectionEnabled ? 'true' : 'false'}
         data-bgrid-frozen-columns={(props.frozenColumnIndex ?? 0) > 0 ? 'true' : 'false'}
         data-bgrid-disabled={disabled ? 'true' : undefined}
+        data-bgrid-variable-row-height={rowHeightMetrics.variable ? 'true' : undefined}
       >
         {scrollbar.variant !== 'native' && scrollbar.vertical.visible && (
           <div className='bgrid-vertical-scrollbar-gutter' aria-hidden='true' />
@@ -2782,6 +2842,7 @@ function Table<T>(props: Props<T>) {
                       role='rfdg-frozen-rows-left'
                     >
                       <TableBodyFrozen
+                        rowHeightMetrics={rowHeightMetrics}
                         scrollContainerRef={scrollContainerRef}
                         rowRange={frozenRowRange}
                         role='rfdg-body-top-frozen'
@@ -2797,6 +2858,7 @@ function Table<T>(props: Props<T>) {
                     role='rfdg-frozen-rows-main'
                   >
                     <TableBody
+                      rowHeightMetrics={rowHeightMetrics}
                       scrollContainerRef={scrollContainerRef}
                       rowRange={frozenRowRange}
                       role='rfdg-body-top'
@@ -2822,6 +2884,7 @@ function Table<T>(props: Props<T>) {
                     role={'rfdg-frozen-scroll-container'}
                   >
                     <TableBodyFrozen
+                      rowHeightMetrics={rowHeightMetrics}
                       scrollContainerRef={scrollContainerRef}
                       rowRange={scrollableRowRange}
                       style={frozenScrollableBodyStyle}
@@ -2842,6 +2905,7 @@ function Table<T>(props: Props<T>) {
                   }}
                 >
                   <TableBody
+                    rowHeightMetrics={rowHeightMetrics}
                     scrollContainerRef={scrollContainerRef}
                     rowRange={scrollableRowRange}
                     quadrant='body-main'
@@ -3054,6 +3118,7 @@ function getCellPositionFromPointer({
     frozenRowsHeight: number;
     scrollTop: number;
     trHeight: number;
+    rowOffsets?: ArrayLike<number>;
   };
 }): CellPosition | undefined {
   if (!bodyContainer || !scrollContainer || metrics.columns.length === 0 || metrics.dataLength === 0) return undefined;
@@ -3063,13 +3128,27 @@ function getCellPositionFromPointer({
   const frozenRowsBottom = bodyRect.top + metrics.frozenRowsHeight;
   const rowIndex =
     metrics.frozenRowCount > 0 && clientY < frozenRowsBottom
-      ? clamp(Math.floor((clientY - bodyRect.top) / metrics.trHeight), 0, metrics.frozenRowCount - 1)
+      ? clamp(
+          metrics.rowOffsets
+            ? getRowIndexAtOffset(metrics.rowOffsets, clientY - bodyRect.top)
+            : Math.floor((clientY - bodyRect.top) / metrics.trHeight),
+          0,
+          metrics.frozenRowCount - 1,
+        )
       : clamp(
-          metrics.frozenRowCount +
-            Math.floor(
-              (metrics.scrollTop + clamp(clientY - scrollRect.top, 0, Math.max(scrollContainer.clientHeight - 1, 0))) /
-                metrics.trHeight,
-            ),
+          metrics.rowOffsets
+            ? getRowIndexAtOffset(
+                metrics.rowOffsets,
+                (metrics.rowOffsets[metrics.frozenRowCount] ?? 0) +
+                  metrics.scrollTop +
+                  clamp(clientY - scrollRect.top, 0, Math.max(scrollContainer.clientHeight - 1, 0)),
+              )
+            : metrics.frozenRowCount +
+                Math.floor(
+                  (metrics.scrollTop +
+                    clamp(clientY - scrollRect.top, 0, Math.max(scrollContainer.clientHeight - 1, 0))) /
+                    metrics.trHeight,
+                ),
           0,
           metrics.dataLength - 1,
         );

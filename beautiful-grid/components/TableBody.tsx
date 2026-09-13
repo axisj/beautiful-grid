@@ -10,6 +10,7 @@ import {
   isCellEdited,
   isCellValueChanged,
   resolveLogicalCell,
+  type BGridRowHeightMetrics,
   useBodyData,
 } from '../utils';
 import { TableBodyCell } from './TableBodyCell';
@@ -112,6 +113,7 @@ interface Props {
   allowRowReorder?: boolean;
   onRowReorderPointerDown?: (event: React.PointerEvent<HTMLButtonElement>, rowIndex: number) => void;
   onRowReorderKeyDown?: (event: React.KeyboardEvent<HTMLButtonElement>, rowIndex: number) => void;
+  rowHeightMetrics?: BGridRowHeightMetrics;
 }
 
 function TableBody({
@@ -123,6 +125,7 @@ function TableBody({
   allowRowReorder = true,
   onRowReorderPointerDown,
   onRowReorderKeyDown,
+  rowHeightMetrics,
 }: Props) {
   const isLeftRegion = region === 'left';
   // [Selector Group 1] Scroll & Dimensions - 스크롤 및 차원
@@ -250,6 +253,7 @@ function TableBody({
       <tbody role={role ?? (isLeftRegion ? 'rfdg-body-frozen' : 'rfdg-body')}>
         {dataSet.map((item, i) => {
           const ri = startIdx + i;
+          const resolvedRowHeight = rowHeightMetrics?.heights[ri] ?? trHeight;
           const rowStatus = getRowStatusLabel(item.status);
           const sourceIndex = sourceIndexByVisibleIndex?.[ri] ?? ri;
           const trProps: Record<string, any> = {
@@ -296,6 +300,7 @@ function TableBody({
               key={ri}
               itemHeight={itemHeight}
               itemPadding={itemPadding}
+              rowHeight={resolvedRowHeight}
               active={active}
               hasOnClick={hasOnClick}
               className={className + (active ? ' active' : '')}
@@ -557,6 +562,7 @@ export function BodyTable({ variant, className, children, ...rest }: BodyTablePr
 interface TableBodyTrProps extends React.HTMLAttributes<HTMLTableRowElement> {
   itemHeight: number;
   itemPadding: number;
+  rowHeight?: number;
   active?: boolean;
   editable?: boolean;
   odd?: boolean;
@@ -566,6 +572,7 @@ interface TableBodyTrProps extends React.HTMLAttributes<HTMLTableRowElement> {
 export function TableBodyTr({
   itemHeight,
   itemPadding,
+  rowHeight,
   active,
   editable,
   odd,
@@ -585,7 +592,7 @@ export function TableBodyTr({
       data-clickable={clickable ? 'true' : undefined}
       style={{
         ['--bgrid-item-line-height' as string]: `${itemHeight}px`,
-        ['--bgrid-item-cell-height' as string]: `${itemHeight + itemPadding * 2}px`,
+        ['--bgrid-item-cell-height' as string]: `${rowHeight ?? itemHeight + itemPadding * 2}px`,
         ...style,
       }}
       {...rest}

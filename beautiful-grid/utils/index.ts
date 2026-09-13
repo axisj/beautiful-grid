@@ -16,6 +16,7 @@ export * from './number';
 export * from './buildHeaderMatrix';
 export * from './getVisibleScrollableRowRange';
 export * from './virtualScrollWindow';
+export * from './rowHeightMetrics';
 export * from './cellEditState';
 export * from './getCellSelectionAxisState';
 export * from './mergedCells';

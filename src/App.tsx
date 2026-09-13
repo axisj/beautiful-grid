@@ -21,6 +21,7 @@ const PivotExample = React.lazy(() => import('../examples/PivotExample'));
 const ReorderExample = React.lazy(() => import('../examples/ReorderExample'));
 const SortExample = React.lazy(() => import('../examples/SortExample'));
 const ScrollExample = React.lazy(() => import('../examples/ScrollExample'));
+const VariableRowHeightExample = React.lazy(() => import('../examples/VariableRowHeightExample'));
 const SummaryExample = React.lazy(() => import('../examples/SummaryExample'));
 const ToolboxExample = React.lazy(() => import('../examples/ToolboxExample'));
 const ScrollbarExample = React.lazy(() => import('../examples/ScrollbarExample'));
@@ -65,6 +66,7 @@ const DEMO_ROUTES: Record<string, { title: string; component: React.LazyExoticCo
   '/editor': { title: 'Editor', component: EditorExample },
   '/cellNavigation': { title: 'Cell Navigation', component: CellNavigationExample },
   '/virtualScroll': { title: 'VirtualScroll', component: ScrollExample },
+  '/variableRowHeight': { title: 'Variable Row Height', component: VariableRowHeightExample },
   '/getRowClassName': { title: 'GetRowClassName', component: GetRowClassName },
   '/cellMerge': { title: 'CellMerge', component: CellMergeExample },
   '/summary': { title: 'Summary', component: SummaryExample },

@@ -17,6 +17,7 @@ import {
 import { TableBodyCell } from './TableBodyCell';
 import RowSelector from './RowSelector';
 import { GripVertical } from './GripVertical';
+import { useTreeContext } from './TreeContext';
 
 export interface TableBodyRowProps<T> {
   item: BGridDataItem<T>;
@@ -61,7 +62,12 @@ export interface TableBodyRowProps<T> {
   handleClick: (rowIndex: number, columnIndex: number) => void;
   setEditItem: (rowIndex: number, columnIndex: number) => void;
   setItemValue: (rowIndex: number, columnIndex: number, column: any, value: any) => Promise<void>;
-  handleMoveEditFocus: (rowIndex: number, columnIndex: number, columnDirection?: any, rowDirection?: any) => Promise<void>;
+  handleMoveEditFocus: (
+    rowIndex: number,
+    columnIndex: number,
+    columnDirection?: any,
+    rowDirection?: any,
+  ) => Promise<void>;
   handleChangeChecked: (rowIndex: number, checked: boolean) => Promise<void>;
   handleChangeCheckedRadio: (rowIndex: number) => Promise<void>;
   getRowSpan: (rowIndex: number, columnIndex: number) => number;
@@ -92,7 +98,12 @@ interface CellItemProps<T> {
   handleClick: (rowIndex: number, columnIndex: number) => void;
   setEditItem: (rowIndex: number, columnIndex: number) => void;
   setItemValue: (rowIndex: number, columnIndex: number, column: any, value: any) => Promise<void>;
-  handleMoveEditFocus: (rowIndex: number, columnIndex: number, columnDirection?: any, rowDirection?: any) => Promise<void>;
+  handleMoveEditFocus: (
+    rowIndex: number,
+    columnIndex: number,
+    columnDirection?: any,
+    rowDirection?: any,
+  ) => Promise<void>;
 }
 
 function TableBodyCellItemInner<T>({
@@ -262,6 +273,9 @@ function TableBodyRowInner<T>({
   onRowReorderPointerDown,
   onRowReorderKeyDown,
 }: TableBodyRowProps<T>) {
+  const tree = useTreeContext();
+  const treeRowKey = tree?.getRowKey(item.values);
+  const treeMeta = treeRowKey === undefined ? undefined : tree?.metaByRowKey.get(treeRowKey);
   const clickable = !editable && hasOnClick;
   const rowClassName = ['bgrid-body-row', active ? 'bgrid-row-active' : '', className].filter(Boolean).join(' ');
 
@@ -269,6 +283,11 @@ function TableBodyRowInner<T>({
     <tr
       className={rowClassName}
       data-ri={ri}
+      data-bgrid-tree-row={treeMeta ? 'true' : undefined}
+      aria-level={treeMeta ? treeMeta.depth + 1 : undefined}
+      aria-posinset={treeMeta ? treeMeta.siblingIndex + 1 : undefined}
+      aria-setsize={treeMeta?.siblingCount}
+      aria-expanded={treeMeta?.hasChildren ? treeMeta.expanded : undefined}
       data-odd={!mergeColumns && odd ? 'true' : undefined}
       data-clickable={clickable ? 'true' : undefined}
       data-bgrid-row-reorder-role={rowReorderRole}

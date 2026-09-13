@@ -25,10 +25,10 @@ describe('Frozen boundary styles', () => {
       /\.bgrid-frozen-body-boundary::after,\s*\.bgrid-frozen-column-boundary::after\s*\{[^}]*width:\s*1px;[^}]*background-color:\s*var\(--bgrid-border-color-base\);/s,
     );
     expect(libraryCss).toMatch(
-      /\[role='grid'\]\[data-bgrid-frozen-columns='true'\]\s*\.bgrid-frozen-column-boundary::after\s*\{[^}]*width:\s*var\(--bgrid-frozen-boundary-width\);[^}]*background-color:\s*var\(--bgrid-frozen-boundary-color\);/s,
+      /:is\(\[role='grid'\], \[role='treegrid'\]\)\[data-bgrid-frozen-columns='true'\]\s*\.bgrid-frozen-column-boundary::after\s*\{[^}]*width:\s*var\(--bgrid-frozen-boundary-width\);[^}]*background-color:\s*var\(--bgrid-frozen-boundary-color\);/s,
     );
     expect(libraryCss).toMatch(
-      /\[role='grid'\]\[data-bgrid-frozen-columns='true'\]\s*\.bgrid-frozen-column-boundary\s*\{[^}]*box-shadow:\s*var\(--bgrid-frozen-boundary-shadow\);/s,
+      /:is\(\[role='grid'\], \[role='treegrid'\]\)\[data-bgrid-frozen-columns='true'\]\s*\.bgrid-frozen-column-boundary\s*\{[^}]*box-shadow:\s*var\(--bgrid-frozen-boundary-shadow\);/s,
     );
   });
 

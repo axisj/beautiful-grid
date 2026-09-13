@@ -54,7 +54,7 @@ function Nav({ currentPath, onNavigate }: Props) {
           {
             label: (
               <Space>
-                Header Toolbox<Tag color="blue">v1.12+</Tag>
+                Header Toolbox<Tag color='blue'>v1.12+</Tag>
               </Space>
             ),
             key: '/toolbox',
@@ -112,10 +112,11 @@ function Nav({ currentPath, onNavigate }: Props) {
             ),
             key: '/reorder',
           },
+          { label: `Tree Folding`, key: '/treeFolding' },
           {
             label: (
               <Space>
-                Scrollbar<Tag color="blue">v1.12+</Tag>
+                Scrollbar<Tag color='blue'>v1.12+</Tag>
               </Space>
             ),
             key: '/scrollbar',
@@ -123,7 +124,7 @@ function Nav({ currentPath, onNavigate }: Props) {
           {
             label: (
               <Space>
-                Search<Tag color="blue">v1.12+</Tag>
+                Search<Tag color='blue'>v1.12+</Tag>
               </Space>
             ),
             key: '/search',
@@ -131,7 +132,7 @@ function Nav({ currentPath, onNavigate }: Props) {
           {
             label: (
               <Space>
-                Context Menu<Tag color="blue">v1.12+</Tag>
+                Context Menu<Tag color='blue'>v1.12+</Tag>
               </Space>
             ),
             key: '/contextMenu',

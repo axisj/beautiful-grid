@@ -28,6 +28,7 @@ const ScrollbarExample = React.lazy(() => import('../examples/ScrollbarExample')
 const SearchExample = React.lazy(() => import('../examples/SearchExample'));
 const ContextMenuExample = React.lazy(() => import('../examples/ContextMenuExample'));
 const ColumnVisibilityExample = React.lazy(() => import('../examples/ColumnVisibilityExample'));
+const TreeFoldingExample = React.lazy(() => import('../examples/TreeFoldingExample'));
 
 interface DemoPageProps {
   title: string;
@@ -75,6 +76,7 @@ const DEMO_ROUTES: Record<string, { title: string; component: React.LazyExoticCo
   '/scrollbar': { title: 'Scrollbar', component: ScrollbarExample },
   '/search': { title: 'Grid Search & Context Menu', component: SearchExample },
   '/contextMenu': { title: 'Cell Context Menu', component: ContextMenuExample },
+  '/treeFolding': { title: 'Tree Folding', component: TreeFoldingExample },
 };
 
 function App() {

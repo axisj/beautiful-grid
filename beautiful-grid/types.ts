@@ -1007,6 +1007,57 @@ export interface BGridProps<T> {
   columnVisibility?: boolean | BGridColumnVisibilityOptions<T>;
   searchOptions?: BGridSearchOptions<T>;
   contextMenuOptions?: BGridContextMenuOptions<T>;
+  /** Enables hierarchical rows from flat data related by rowKey and parentRowKey. */
+  tree?: BGridTreeOptions<T>;
+}
+
+export interface BGridTreeIcons {
+  expanded?: React.ReactNode;
+  collapsed?: React.ReactNode;
+  leaf?: React.ReactNode;
+}
+
+export interface BGridTreeRowMeta {
+  rowKey: React.Key;
+  parentRowKey?: React.Key;
+  depth: number;
+  hasChildren: boolean;
+  expanded: boolean;
+  sourceIndex: number;
+  parentSourceIndex?: number;
+  siblingIndex: number;
+  siblingCount: number;
+}
+
+export interface BGridTreeOptions<T> {
+  enabled?: boolean;
+  /** Field containing the parent row's rowKey value. */
+  parentRowKey: React.Key | React.Key[];
+  /** Column ID that renders indentation and the folding control. Defaults to the first visible column. */
+  treeColumnId?: string;
+  expandedRowKeys?: readonly React.Key[];
+  defaultExpandedRowKeys?: readonly React.Key[];
+  onExpandedRowKeysChange?: (
+    keys: React.Key[],
+    event: {
+      rowKey: React.Key;
+      expanded: boolean;
+      item: BGridDataItem<T>;
+      sourceIndex: number;
+    },
+  ) => void;
+  indentSize?: number;
+  icons?: BGridTreeIcons;
+  expandAriaLabel?: string;
+  collapseAriaLabel?: string;
+}
+
+export interface BGridTreeChangeDataMeta {
+  rowKey: React.Key;
+  parentRowKey?: React.Key;
+  sourceIndex: number;
+  depth: number;
+  path: readonly React.Key[];
 }
 
 export type CheckedAll = true | false | 'indeterminate';
@@ -1021,6 +1072,8 @@ export interface BGridChangeDataMeta<T> {
    * item to preserve cell and value change state after synchronizing `data`.
    */
   dataItem: BGridDataItem<T>;
+  /** Tree identity for the edited row. Undefined in flat mode. */
+  tree?: BGridTreeChangeDataMeta;
   transaction: {
     merged: boolean;
     canonicalCell: BGridCellAddress;
@@ -1033,6 +1086,8 @@ export interface AppModelColumn<T> extends BGridColumn<T> {
   columnId: string;
   keyToken?: string;
   left: number;
+  /** @internal Marks the single column that hosts tree indentation and folding controls. */
+  treeCell?: boolean;
 }
 
 export interface AppModel<T> extends BGridProps<T> {

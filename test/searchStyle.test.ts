@@ -36,7 +36,7 @@ describe('Grid search and context menu style contracts', () => {
       /td\.bgrid-cell-editing\.bgrid-cell-search-match::before\s*\{[^}]*background:\s*transparent/s,
     );
     expect(libraryCss).toMatch(
-      /td\.bgrid-cell-search-match > \.bgrid-cell-content\s*\{[^}]*z-index:\s*3/s,
+      /td\.bgrid-cell-search-match[\s\S]*> \.bgrid-cell-content\s*\{[^}]*z-index:\s*3/s,
     );
     expect(libraryCss).toMatch(/\.bgrid-cell-selection-overlay-layer\s*\{[^}]*z-index:\s*2/s);
   });

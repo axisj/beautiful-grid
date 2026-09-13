@@ -137,6 +137,7 @@ interface Props<T> {
   reorder?: BGridProps<T>['reorder'];
   className?: BGridProps<T>['className'];
   style?: BGridProps<T>['style'];
+  treeEnabled?: boolean;
 }
 
 function Table<T>(props: Props<T>) {
@@ -2725,7 +2726,7 @@ function Table<T>(props: Props<T>) {
     <EditorPortalContext.Provider value={editorPortalContext}>
       <Container
         ref={containerRef}
-        role={'grid'}
+        role={props.treeEnabled ? 'treegrid' : 'grid'}
         style={{
           ...style,
           width,

@@ -144,17 +144,26 @@ const columns: BGridColumn<OrderItem>[] = [
     width: 120,
     align: 'center',
     itemRender: ({ value }) => (
-      <span style={{ color: value === 'DELIVERED' ? '#16a34a' : '#ea580c', fontWeight: 600 }}>
-        {value}
-      </span>
+      <span style={{ color: value === 'DELIVERED' ? '#16a34a' : '#ea580c', fontWeight: 600 }}>{value}</span>
     ),
   },
 ];
 
 const sampleData: BGridDataItem<OrderItem>[] = [
-  { values: { id: 'ORD-001', customer: 'Acme Corp', product: 'Sensor A1', qty: 12, amount: 1440, status: 'DELIVERED' } },
+  {
+    values: { id: 'ORD-001', customer: 'Acme Corp', product: 'Sensor A1', qty: 12, amount: 1440, status: 'DELIVERED' },
+  },
   { values: { id: 'ORD-002', customer: 'Global Tech', product: 'Module X', qty: 5, amount: 850, status: 'PENDING' } },
-  { values: { id: 'ORD-003', customer: 'Logi Systems', product: 'Gateway V2', qty: 20, amount: 3200, status: 'SHIPPED' } },
+  {
+    values: {
+      id: 'ORD-003',
+      customer: 'Logi Systems',
+      product: 'Gateway V2',
+      qty: 20,
+      amount: 3200,
+      status: 'SHIPPED',
+    },
+  },
 ];
 
 export default function OrderGridPage() {
@@ -168,7 +177,7 @@ export default function OrderGridPage() {
         height={380}
         data={sampleData}
         columns={columnsState}
-        rowKey="id"
+        rowKey='id'
         showLineNumber
         rowChecked={{
           checkedRowKeys,
@@ -415,12 +424,12 @@ function ProductTable({ data }: { data: BGridDataItem<Product>[] }) {
       height={400}
       data={data}
       columns={columns}
-      rowKey="id"
+      rowKey='id'
       dataControl={{
         mode: 'client', // 'client' performs in-memory filtering & sorting; 'manual' delegates to server
         multiSort: true,
         query,
-        onChange: (nextQuery) => setQuery(nextQuery),
+        onChange: nextQuery => setQuery(nextQuery),
       }}
     />
   );
@@ -476,8 +485,8 @@ const columnGroups: BGridColumnGroupNode[] = [
   columns={columns}
   columnGroups={columnGroups}
   data={data}
-  rowKey="orderNo"
-/>
+  rowKey='orderNo'
+/>;
 ```
 
 ---
@@ -522,14 +531,14 @@ const columns: BGridColumn<Item>[] = [
   width={720}
   height={380}
   editable
-  editTrigger="dblclick" // 'click' | 'dblclick'
+  editTrigger='dblclick' // 'click' | 'dblclick'
   columns={columns}
   data={data}
-  rowKey="id"
+  rowKey='id'
   onChangeData={(rowIndex, colIndex, item, column, meta) => {
     console.log('Cell updated:', rowIndex, colIndex, item, meta);
   }}
-/>
+/>;
 ```
 
 #### Plugin Editors (Select, Date, Custom)
@@ -612,14 +621,14 @@ Configure active cell handling and keyboard behavior with `cellNavigationOptions
   height={400}
   columns={columns}
   data={data}
-  rowKey="id"
+  rowKey='id'
   cellNavigationOptions={{
     enabled: true,
     defaultActiveCell: { rowIndex: 0, columnIndex: 0 },
     wrap: false,
     editOnEnter: true,
     keyRepeat: { enabled: true, interval: 16 },
-    onActiveCellChange: (cell) => {
+    onActiveCellChange: cell => {
       console.log('Active cell moved to:', cell?.rowIndex, cell?.columnIndex);
     },
   }}
@@ -648,15 +657,15 @@ Cell range selection and clipboard copy/paste are enabled by default.
   height={400}
   columns={columns}
   data={data}
-  rowKey="id"
+  rowKey='id'
   cellSelectionOptions={{
     enabled: true,
     clearOnEscape: true,
     clearOnOutsideClick: true,
     maxClipboardCells: 100000,
     maxClipboardTextLength: 8 * 1024 * 1024,
-    onCopyError: (error) => console.warn('Copy skipped:', error),
-    onPasteError: (error) => console.warn('Paste failed:', error),
+    onCopyError: error => console.warn('Copy skipped:', error),
+    onPasteError: error => console.warn('Paste failed:', error),
     createRowOnPaste: ({ rowIndex, clipboardRow, columns }) => ({
       values: createNewRowModel(clipboardRow),
     }),
@@ -680,14 +689,14 @@ Built-in full-text search across loaded store data and right-click context menus
   height={420}
   columns={columns}
   data={data}
-  rowKey="id"
+  rowKey='id'
   searchOptions={{
     enabled: true,
     shortcut: true, // Cmd+F / Ctrl+F
   }}
   contextMenuOptions={{
     enabled: true,
-    items: (target) => [
+    items: target => [
       {
         id: 'view-details',
         label: 'View Row Details',
@@ -720,7 +729,7 @@ BeautifulGrid provides customizable scrollbars and unified bottom bar controls:
   height={400}
   columns={columns}
   data={data}
-  rowKey="id"
+  rowKey='id'
   bottomBarHeight={34}
   scrollbar={{
     variant: 'modern', // 'modern' (sleek overlay) | 'classic' (win-style) | 'native'
@@ -730,7 +739,9 @@ BeautifulGrid provides customizable scrollbars and unified bottom bar controls:
   status={{
     visible: true,
     content: ({ visibleItems, totalItems }) => (
-      <span>Showing {visibleItems} of {totalItems} entries</span>
+      <span>
+        Showing {visibleItems} of {totalItems} entries
+      </span>
     ),
   }}
 />
@@ -754,13 +765,13 @@ function PaginatedGrid() {
       height={450}
       columns={columns}
       data={pageData}
-      rowKey="id"
+      rowKey='id'
       page={{
         currentPage,
         pageSize,
         totalElements,
         totalPages: Math.ceil(totalElements / pageSize),
-        onChange: (newPage) => setCurrentPage(newPage),
+        onChange: newPage => setCurrentPage(newPage),
       }}
     />
   );
@@ -778,10 +789,10 @@ Fix leading columns and top rows while the remaining area scrolls smoothly:
   width={900}
   height={500}
   frozenColumnIndex={2} // Columns 0 and 1 are pinned to the left
-  frozenRowCount={3}    // First 3 data rows are pinned to the top
+  frozenRowCount={3} // First 3 data rows are pinned to the top
   columns={columns}
   data={data}
-  rowKey="id"
+  rowKey='id'
 />
 ```
 
@@ -797,11 +808,11 @@ Enable drag-and-drop or keyboard row sorting:
   height={400}
   columns={columns}
   data={data}
-  rowKey="id"
+  rowKey='id'
   showLineNumber // Line number handle hosts the reorder grip
   reorder={{
     enabled: true,
-    onReorder: (nextData) => {
+    onReorder: nextData => {
       setData(nextData);
       return true; // Return false to roll back
     },
@@ -823,7 +834,7 @@ Add top or bottom summary/aggregation rows:
   height={400}
   columns={columns}
   data={data}
-  rowKey="id"
+  rowKey='id'
   summary={{
     position: 'bottom', // 'top' | 'bottom'
     columns: [
@@ -832,9 +843,7 @@ Add top or bottom summary/aggregation rows:
         columnIndex: 3,
         align: 'right',
         itemRender: ({ data }) => (
-          <strong>
-            ${data.reduce((sum, item) => sum + (item.values.amount || 0), 0).toLocaleString()}
-          </strong>
+          <strong>${data.reduce((sum, item) => sum + (item.values.amount || 0), 0).toLocaleString()}</strong>
         ),
       },
     ],
@@ -854,7 +863,7 @@ Merge consecutive identical cells vertically:
   height={400}
   columns={columns}
   data={data}
-  rowKey="id"
+  rowKey='id'
   cellMergeOptions={{
     columnsMap: {
       0: { mergeBy: 'department' }, // Column index 0 merges based on department field
@@ -899,8 +908,8 @@ const pivotConfig: BGridProps<SalesRecord>['pivot'] = {
   columns={baseColumns}
   data={salesData}
   pivot={pivotConfig}
-  variant="vertical-bordered"
-/>
+  variant='vertical-bordered'
+/>;
 ```
 
 ---
@@ -934,6 +943,32 @@ Set `hideable: false` on columns that must remain available. The final visible c
 
 ---
 
+### 15. Tree Grid
+
+Add the `tree` prop to `<BGrid>` for flat parent/child data. `rowKey` identifies each row and `tree.parentRowKey` names the field containing its parent's key. `tree.treeColumnId` selects the column that renders indentation and the folding icon. Expansion can be uncontrolled with `defaultExpandedRowKeys` or controlled with `expandedRowKeys`.
+
+```typescript jsx
+const [expandedRowKeys, setExpandedRowKeys] = React.useState(['group-a']);
+
+<BGrid
+  width={800}
+  height={420}
+  columns={columns}
+  data={rows}
+  rowKey='id'
+  tree={{
+    parentRowKey: 'parentId',
+    treeColumnId: 'name',
+    expandedRowKeys,
+    onExpandedRowKeysChange: setExpandedRowKeys,
+  }}
+/>;
+```
+
+Rows whose parent is missing are treated as roots. Cycles are contained, the source row order is retained, and edit callbacks receive the original source index even when ancestors are collapsed.
+
+---
+
 ## Props Reference
 
 ### BGridProps
@@ -942,107 +977,108 @@ Below is a categorized reference of `<BGrid>` props. For exact TypeScript types,
 
 #### Required Props
 
-| Prop | Type | Description |
-|---|---|---|
-| `width` | `number` | Total pixel width of the grid container (required for virtualization). |
-| `height` | `number` | Total pixel height of the grid container (required for virtualization). |
-| `columns` | `BGridColumn<T>[]` | Array of column definitions (`width` defaults to 100 if omitted). |
+| Prop      | Type               | Description                                                             |
+| --------- | ------------------ | ----------------------------------------------------------------------- |
+| `width`   | `number`           | Total pixel width of the grid container (required for virtualization).  |
+| `height`  | `number`           | Total pixel height of the grid container (required for virtualization). |
+| `columns` | `BGridColumn<T>[]` | Array of column definitions (`width` defaults to 100 if omitted).       |
 
 #### Data & Selection
 
-| Prop | Type | Description |
-|---|---|---|
-| `data` | `BGridDataItem<T>[]` | Array of row data wrapped in `{ values: T }`. |
-| `rowKey` | `React.Key \| React.Key[]` | Unique identifier field in `item.values` (string or array path). |
-| `selectedRowKey` | `React.Key \| React.Key[]` | Key of the currently focused/highlighted row. |
-| `rowChecked` | `BGridRowChecked<T>` | Checkbox / radio row selection configuration. |
-| `getRowClassName` | `(ri: number, item: BGridDataItem<T>) => string \| undefined` | Custom row class name generator. |
+| Prop              | Type                                                          | Description                                                      |
+| ----------------- | ------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `data`            | `BGridDataItem<T>[]`                                          | Array of row data wrapped in `{ values: T }`.                    |
+| `rowKey`          | `React.Key \| React.Key[]`                                    | Unique identifier field in `item.values` (string or array path). |
+| `selectedRowKey`  | `React.Key \| React.Key[]`                                    | Key of the currently focused/highlighted row.                    |
+| `rowChecked`      | `BGridRowChecked<T>`                                          | Checkbox / radio row selection configuration.                    |
+| `getRowClassName` | `(ri: number, item: BGridDataItem<T>) => string \| undefined` | Custom row class name generator.                                 |
 
 #### Layout & Sizing
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `headerHeight` | `number` | `30` | Header row height in pixels. |
-| `bottomBarHeight` | `number` | `30` | Bottom bar (pagination / status) height in pixels. |
-| `summaryHeight` | `number` | `30` | Summary row height in pixels. |
-| `itemHeight` | `number` | `15` | Body row content height. |
-| `itemPadding` | `number` | `7` | Body row top/bottom padding (total row height = `itemHeight + itemPadding * 2`). |
-| `getRowHeight` | `(row: T, index: number) => number` | — | Complete rendered height for each displayed row. Invalid values fall back to `itemHeight + itemPadding * 2`. |
-| `frozenColumnIndex` | `number` | `0` | Pinned column boundary index (columns `< frozenColumnIndex` are fixed). |
-| `frozenRowCount` | `number` | `0` | Number of leading rows pinned below the top summary row. |
-| `showLineNumber` | `boolean` | `false` | Shows row index numbers and reorder handles on the left. |
-| `variant` | `'default' \| 'vertical-bordered'` | `'default'` | Visual border styling variant. |
+| Prop                | Type                                | Default     | Description                                                                                                  |
+| ------------------- | ----------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------ |
+| `headerHeight`      | `number`                            | `30`        | Header row height in pixels.                                                                                 |
+| `bottomBarHeight`   | `number`                            | `30`        | Bottom bar (pagination / status) height in pixels.                                                           |
+| `summaryHeight`     | `number`                            | `30`        | Summary row height in pixels.                                                                                |
+| `itemHeight`        | `number`                            | `15`        | Body row content height.                                                                                     |
+| `itemPadding`       | `number`                            | `7`         | Body row top/bottom padding (total row height = `itemHeight + itemPadding * 2`).                             |
+| `getRowHeight`      | `(row: T, index: number) => number` | —           | Complete rendered height for each displayed row. Invalid values fall back to `itemHeight + itemPadding * 2`. |
+| `frozenColumnIndex` | `number`                            | `0`         | Pinned column boundary index (columns `< frozenColumnIndex` are fixed).                                      |
+| `frozenRowCount`    | `number`                            | `0`         | Number of leading rows pinned below the top summary row.                                                     |
+| `showLineNumber`    | `boolean`                           | `false`     | Shows row index numbers and reorder handles on the left.                                                     |
+| `variant`           | `'default' \| 'vertical-bordered'`  | `'default'` | Visual border styling variant.                                                                               |
 
 #### Columns & Headers
 
-| Prop | Type | Description |
-|---|---|---|
-| `columnGroups` | `BGridColumnGroupNode[]` | Tree-based multi-level grouped header configuration. |
-| `columnSortable` | `boolean` | Enables dragging header columns to reorder. |
-| `onChangeColumns` | `(columnIndex: number \| null, info: BGridChangeColumnsInfo<T>) => void` | Callback fired when column widths or orders change. |
+| Prop              | Type                                                                     | Description                                          |
+| ----------------- | ------------------------------------------------------------------------ | ---------------------------------------------------- |
+| `columnGroups`    | `BGridColumnGroupNode[]`                                                 | Tree-based multi-level grouped header configuration. |
+| `columnSortable`  | `boolean`                                                                | Enables dragging header columns to reorder.          |
+| `onChangeColumns` | `(columnIndex: number \| null, info: BGridChangeColumnsInfo<T>) => void` | Callback fired when column widths or orders change.  |
 
 #### Editing & Interactivity
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `editable` | `boolean` | `false` | Master switch for cell editing. |
-| `editTrigger` | `'click' \| 'dblclick'` | `'dblclick'` | User event that activates inline editors. |
-| `onChangeData` | `(index, columnIndex, item, column, meta) => void` | - | Callback fired after a cell edit commits. |
-| `onClick` | `(params: BGridClickParams<T>) => void` | - | Cell click callback. |
-| `cellNavigationOptions` | `BGridCellNavigationOptions` | - | Active cell focus, arrow key navigation, and repeat options. |
-| `cellSelectionOptions` | `BGridCellSelectionOptions` | - | Range drag selection and clipboard copy/paste options. |
+| Prop                    | Type                                               | Default      | Description                                                  |
+| ----------------------- | -------------------------------------------------- | ------------ | ------------------------------------------------------------ |
+| `editable`              | `boolean`                                          | `false`      | Master switch for cell editing.                              |
+| `editTrigger`           | `'click' \| 'dblclick'`                            | `'dblclick'` | User event that activates inline editors.                    |
+| `onChangeData`          | `(index, columnIndex, item, column, meta) => void` | -            | Callback fired after a cell edit commits.                    |
+| `onClick`               | `(params: BGridClickParams<T>) => void`            | -            | Cell click callback.                                         |
+| `cellNavigationOptions` | `BGridCellNavigationOptions`                       | -            | Active cell focus, arrow key navigation, and repeat options. |
+| `cellSelectionOptions`  | `BGridCellSelectionOptions`                        | -            | Range drag selection and clipboard copy/paste options.       |
 
 #### Additional Features & Overlays
 
-| Prop | Type | Description |
-|---|---|---|
-| `dataControl` | `BGridDataControl` | Controlled sort & filter state (`mode: 'client' \| 'manual'`). |
-| `sort` | `BGridSortInfo` | Simple sorting state and callback (superseded by `dataControl` when present). |
-| `page` | `BGridPage` | Pagination state, totals, and page change callback. |
-| `scrollbar` | `BGridScrollbarOptions` | Scrollbar variant (`'modern' \| 'classic' \| 'native'`) and visibility. |
-| `status` | `BGridStatusOptions` | Bottom bar status text / custom render function. |
-| `pagination` | `BGridPaginationViewOptions` | Bottom bar pagination element visibility. |
-| `searchOptions` | `BGridSearchOptions<T>` | Grid in-memory search UI, shortcuts (`Cmd+F`), and highlights. |
-| `contextMenuOptions` | `BGridContextMenuOptions<T>` | Right-click and `Shift+F10` cell context menu items. |
-| `reorder` | `BGridReorderInfo<T>` | Drag and keyboard row reordering configuration. |
-| `summary` | `{ position: 'top' \| 'bottom'; columns: BGridSummaryColumn<T>[] }` | Static summary row configuration. |
-| `cellMergeOptions` | `{ columnsMap: Record<number, BGridCellMergeColumn> }` | Vertical cell merge rules. |
-| `pivot` | `BGridPivotOptions<T>` | Pivot table dimensions, aggregation rules, and metrics. |
-| `columnVisibility` | `boolean \| BGridColumnVisibilityOptions<T>` | Enables controlled or uncontrolled column hiding and restore controls (since `1.0.6`). |
-| `loading` | `boolean` | Displays full-grid loading overlay. |
-| `spinning` | `boolean` | Displays body-area spinner. |
-| `msg` | `{ emptyList?: string }` | Custom empty state text. |
+| Prop                 | Type                                                                | Description                                                                            |
+| -------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `dataControl`        | `BGridDataControl`                                                  | Controlled sort & filter state (`mode: 'client' \| 'manual'`).                         |
+| `sort`               | `BGridSortInfo`                                                     | Simple sorting state and callback (superseded by `dataControl` when present).          |
+| `page`               | `BGridPage`                                                         | Pagination state, totals, and page change callback.                                    |
+| `scrollbar`          | `BGridScrollbarOptions`                                             | Scrollbar variant (`'modern' \| 'classic' \| 'native'`) and visibility.                |
+| `status`             | `BGridStatusOptions`                                                | Bottom bar status text / custom render function.                                       |
+| `pagination`         | `BGridPaginationViewOptions`                                        | Bottom bar pagination element visibility.                                              |
+| `searchOptions`      | `BGridSearchOptions<T>`                                             | Grid in-memory search UI, shortcuts (`Cmd+F`), and highlights.                         |
+| `contextMenuOptions` | `BGridContextMenuOptions<T>`                                        | Right-click and `Shift+F10` cell context menu items.                                   |
+| `reorder`            | `BGridReorderInfo<T>`                                               | Drag and keyboard row reordering configuration.                                        |
+| `summary`            | `{ position: 'top' \| 'bottom'; columns: BGridSummaryColumn<T>[] }` | Static summary row configuration.                                                      |
+| `cellMergeOptions`   | `{ columnsMap: Record<number, BGridCellMergeColumn> }`              | Vertical cell merge rules.                                                             |
+| `pivot`              | `BGridPivotOptions<T>`                                              | Pivot table dimensions, aggregation rules, and metrics.                                |
+| `columnVisibility`   | `boolean \| BGridColumnVisibilityOptions<T>`                        | Enables controlled or uncontrolled column hiding and restore controls (since `1.0.6`). |
+| `tree`               | `BGridTreeOptions<T>`                                               | Renders flat parent-key data as collapsible hierarchical rows.                         |
+| `loading`            | `boolean`                                                           | Displays full-grid loading overlay.                                                    |
+| `spinning`           | `boolean`                                                           | Displays body-area spinner.                                                            |
+| `msg`                | `{ emptyList?: string }`                                            | Custom empty state text.                                                               |
 
 ---
 
 ### BGridColumn
 
-| Property | Type | Description |
-|---|---|---|
-| `id` | `string` | Unique column identifier (recommended for `columnGroups`, toolboxes, and persistence). |
-| `key` | `string \| string[]` | Field key or nested path array to read from `item.values`. |
-| `label` | `ReactNode` | Header label content. |
-| `width` | `number` | Column width in pixels (defaults to `100` if omitted). |
-| `align` | `'left' \| 'center' \| 'right'` | Body cell horizontal text alignment. |
-| `headerAlign` | `'left' \| 'center' \| 'right'` | Header cell horizontal text alignment. |
-| `sortDisable` | `boolean` | Disables sorting on this column. |
-| `className` | `string` | Static class name applied to body cells. |
-| `getClassName` | `(item: BGridDataItem<T>) => string` | Dynamic class name generator for body cells. |
-| `headerClassName` | `string` | Custom class name for the column header. |
-| `headerStyle` | `React.CSSProperties` | Custom CSS style for the column header. |
-| `itemRender` | `React.FC<BGridItemRenderProps<T>>` | Custom cell content render function. |
-| `editable` | `boolean` | Enables editing on this specific column. |
-| `editor` | `BGridCellEditorConfig<T>` | Editor configuration (`type: 'text' \| 'checkbox' \| 'plugin'`). |
-| `editTrigger` | `'click' \| 'dblclick'` | Overrides grid-level edit trigger for this column. |
-| `editorIcon` | `BGridEditorIconConfig<T>` | Inline icon trigger for dropdowns, popups, or lookup dialogs. |
-| `onChangeValue` | `(params: BGridChangeValueParams<T>) => void \| Promise<void>` | Column-level change interceptor with commit/cancel controller. |
-| `getClipboardText` | `(params: BGridCellClipboardTextParams<T>) => any` | Custom string serializer for clipboard copy. |
-| `searchable` | `boolean` | Whether this column participates in grid search (defaults to `true`). |
-| `getSearchText` | `(params: BGridSearchCellParams<T>) => unknown` | Custom string extractor for grid search matching. |
-| `toolbox` | `boolean \| BGridToolboxConfig<T>` | Enables header sort/filter toolbox popup. |
-| `hideable` | `boolean` | Allows this column to be hidden through the visibility menu (defaults to `true`, since `1.0.6`). |
-| `filter` | `false \| BGridColumnFilterConfig<T>` | Column filter configuration (`type: 'values' \| 'text' \| 'number'`). |
-| `sortComparator` | `(a, b, params) => number` | Custom comparator function for sorting. |
+| Property           | Type                                                           | Description                                                                                      |
+| ------------------ | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `id`               | `string`                                                       | Unique column identifier (recommended for `columnGroups`, toolboxes, and persistence).           |
+| `key`              | `string \| string[]`                                           | Field key or nested path array to read from `item.values`.                                       |
+| `label`            | `ReactNode`                                                    | Header label content.                                                                            |
+| `width`            | `number`                                                       | Column width in pixels (defaults to `100` if omitted).                                           |
+| `align`            | `'left' \| 'center' \| 'right'`                                | Body cell horizontal text alignment.                                                             |
+| `headerAlign`      | `'left' \| 'center' \| 'right'`                                | Header cell horizontal text alignment.                                                           |
+| `sortDisable`      | `boolean`                                                      | Disables sorting on this column.                                                                 |
+| `className`        | `string`                                                       | Static class name applied to body cells.                                                         |
+| `getClassName`     | `(item: BGridDataItem<T>) => string`                           | Dynamic class name generator for body cells.                                                     |
+| `headerClassName`  | `string`                                                       | Custom class name for the column header.                                                         |
+| `headerStyle`      | `React.CSSProperties`                                          | Custom CSS style for the column header.                                                          |
+| `itemRender`       | `React.FC<BGridItemRenderProps<T>>`                            | Custom cell content render function.                                                             |
+| `editable`         | `boolean`                                                      | Enables editing on this specific column.                                                         |
+| `editor`           | `BGridCellEditorConfig<T>`                                     | Editor configuration (`type: 'text' \| 'checkbox' \| 'plugin'`).                                 |
+| `editTrigger`      | `'click' \| 'dblclick'`                                        | Overrides grid-level edit trigger for this column.                                               |
+| `editorIcon`       | `BGridEditorIconConfig<T>`                                     | Inline icon trigger for dropdowns, popups, or lookup dialogs.                                    |
+| `onChangeValue`    | `(params: BGridChangeValueParams<T>) => void \| Promise<void>` | Column-level change interceptor with commit/cancel controller.                                   |
+| `getClipboardText` | `(params: BGridCellClipboardTextParams<T>) => any`             | Custom string serializer for clipboard copy.                                                     |
+| `searchable`       | `boolean`                                                      | Whether this column participates in grid search (defaults to `true`).                            |
+| `getSearchText`    | `(params: BGridSearchCellParams<T>) => unknown`                | Custom string extractor for grid search matching.                                                |
+| `toolbox`          | `boolean \| BGridToolboxConfig<T>`                             | Enables header sort/filter toolbox popup.                                                        |
+| `hideable`         | `boolean`                                                      | Allows this column to be hidden through the visibility menu (defaults to `true`, since `1.0.6`). |
+| `filter`           | `false \| BGridColumnFilterConfig<T>`                          | Column filter configuration (`type: 'values' \| 'text' \| 'number'`).                            |
+| `sortComparator`   | `(a, b, params) => number`                                     | Custom comparator function for sorting.                                                          |
 
 ---
 
@@ -1123,7 +1159,7 @@ npm run preview
 
 ## Test Coverage
 
-BeautifulGrid maintains high test coverage to ensure stability across complex features like virtualization, cell editing, and focus management. 
+BeautifulGrid maintains high test coverage to ensure stability across complex features like virtualization, cell editing, and focus management.
 Coverage reports are generated via Vitest. To view the detailed HTML report, run:
 
 ```bash

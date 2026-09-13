@@ -149,6 +149,14 @@ describe('Learn Content Architecture Contracts', () => {
     expect(example).toContain("data-testid='hidden-column-status'");
   });
 
+  it('documents tree folding as available since v1.0.12 in both locales', () => {
+    const koreanGuide = fs.readFileSync(path.join(learnDir, 'tree-folding.md'), 'utf8');
+    const englishGuide = fs.readFileSync(path.join(learnDir, 'en/tree-folding.md'), 'utf8');
+
+    expect(koreanGuide).toContain("sinceVersion: '1.0.12'");
+    expect(englishGuide).toContain("sinceVersion: '1.0.12'");
+  });
+
   it('keeps the context menu guide aligned with its dedicated live example', () => {
     const contextMenuGuide = fs.readFileSync(path.join(learnDir, 'context-menu.md'), 'utf8');
     const contextMenuExample = fs.readFileSync(path.join(examplesDir, 'ContextMenuExample.tsx'), 'utf8');

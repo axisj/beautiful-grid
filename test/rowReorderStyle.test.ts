@@ -15,7 +15,7 @@ describe('Row reorder style contracts', () => {
 
   it('scopes source and shifted transforms to an active grid session', () => {
     expect(libraryCss).toMatch(
-      /\[role='grid'\]\[data-bgrid-row-reordering='true'\][\s\S]*tr\[data-bgrid-row-reorder-role='shift'\][\s\S]*transform:\s*translateY\(var\(--bgrid-row-reorder-offset-y, 0\)\)/,
+      /:is\(\[role='grid'\], \[role='treegrid'\]\)\[data-bgrid-row-reordering='true'\][\s\S]*tr\[data-bgrid-row-reorder-role='shift'\][\s\S]*transform:\s*translateY\(var\(--bgrid-row-reorder-offset-y, 0\)\)/,
     );
     expect(libraryCss).toMatch(
       /tr\[data-bgrid-row-reorder-role='source'\][\s\S]*transform:\s*translateY\(var\(--bgrid-row-drag-offset-y, 0\)\)/,

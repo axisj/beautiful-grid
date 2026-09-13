@@ -58,6 +58,24 @@ describe('site product and navigation contracts', () => {
     expect(header).toContain(".primary-nav a.active");
   });
 
+  it('opens a categorized runnable-example popover from the desktop Learn navigation', () => {
+    const header = readSiteFile('src/components/layout/Header.astro');
+
+    expect(header).toContain("import { getCollection } from 'astro:content';");
+    expect(header).toContain("import { groupLearnArticles, learnPath } from '../learn/learnLocale';");
+    expect(header).toContain('const seenDemoIds = new Set<string>();');
+    expect(header).toContain('seenDemoIds.has(item.data.demoId)');
+    expect(header).toContain('data-learn-nav-menu');
+    expect(header).toContain('aria-haspopup="true"');
+    expect(header).toContain('aria-controls="learn-nav-popover"');
+    expect(header).toContain('groupedRunnableLearn.map((group)');
+    expect(header).toContain('group.items.map((learnItem)');
+    expect(header).toContain("learnNavMenu?.addEventListener('mouseenter', openLearnNavigation)");
+    expect(header).toContain("learnNavMenu?.addEventListener('focusin', openLearnNavigation)");
+    expect(header).toContain("if (event.key === 'Escape')");
+    expect(header).toMatch(/\.learn-nav-menu\.is-open \.learn-nav-popover\s*\{[^}]*visibility:\s*visible;/s);
+  });
+
   it('structures the mobile navigation drawer with 5 primary items, shared Learn catalog, and 1-row bottom controls', () => {
     const drawer = readSiteFile('src/components/layout/MobileNavigationDrawer.astro');
     const header = readSiteFile('src/components/layout/Header.astro');
@@ -644,8 +662,11 @@ describe('site product and navigation contracts', () => {
     const featuredExampleDefinition = homepage.match(/const featuredExamples = \[([\s\S]*?)\n\];/)?.[1] ?? '';
 
     expect(homepage).toContain("import { getCollection } from 'astro:content';");
-    expect(homepage).toContain("const liveExampleCount = (await getCollection('learn')).filter(");
+    expect(homepage).toContain('const liveExampleCount = new Set(');
+    expect(homepage).toContain("(await getCollection('learn')).flatMap((item) =>");
     expect(homepage).toContain("item.data.locale === 'ko' && !item.data.draft && item.data.demoId");
+    expect(homepage).toContain('? [item.data.demoId] : []');
+    expect(homepage).toContain(').size;');
     expect(homepage).toContain('const featuredExamples = [');
     expect(homepage).toContain("href: '/learn/built-in-editors'");
     expect(homepage).toContain("href: '/learn/editor-plugins'");

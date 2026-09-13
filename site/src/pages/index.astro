@@ -102,9 +102,11 @@ const localize = <T,>(value: T): T => {
   return value;
 };
 
-const liveExampleCount = (await getCollection('learn')).filter(
-  (item) => item.data.locale === 'ko' && !item.data.draft && item.data.demoId,
-).length;
+const liveExampleCount = new Set(
+  (await getCollection('learn')).flatMap((item) =>
+    item.data.locale === 'ko' && !item.data.draft && item.data.demoId ? [item.data.demoId] : [],
+  ),
+).size;
 
 const strengthStories = [
   {

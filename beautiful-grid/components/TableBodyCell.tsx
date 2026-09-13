@@ -1,14 +1,15 @@
 import * as React from 'react';
-import { BGridCellEditSession, BGridColumn, BGridDataItem, MoveDirection } from '../types';
+import { AppModelColumn, BGridCellEditSession, BGridDataItem, MoveDirection } from '../types';
 import { PluginCellEditor } from './PluginCellEditor';
 import { CellEditorIcon } from './CellEditorIcon';
 import { CheckboxCellEditor } from './CheckboxCellEditor';
+import { TreeCell } from './TreeCell';
 
 interface Props<T> {
   index: number;
   hostIndex?: number;
   columnIndex: number;
-  column: BGridColumn<T>;
+  column: AppModelColumn<T>;
   item: BGridDataItem<any>;
   valueByRowKey: any;
   handleSave?: (value: any, columnDirection?: MoveDirection, rowDirection?: MoveDirection) => void;
@@ -39,13 +40,7 @@ function Cell({
   let content: React.ReactNode;
   if (column.editor?.type === 'checkbox') {
     content = (
-      <CheckboxCellEditor
-        index={index}
-        columnIndex={columnIndex}
-        column={column}
-        item={item}
-        value={valueByRowKey}
-      />
+      <CheckboxCellEditor index={index} columnIndex={columnIndex} column={column} item={item} value={valueByRowKey} />
     );
   } else if (isPluginEditorActive && editSession) {
     content = (
@@ -85,11 +80,17 @@ function Cell({
 
   return (
     <div
-      className={
-        isPluginEditorActive ? 'bgrid-cell-content bgrid-cell-content-plugin-editor' : 'bgrid-cell-content'
-      }
+      className={isPluginEditorActive ? 'bgrid-cell-content bgrid-cell-content-plugin-editor' : 'bgrid-cell-content'}
     >
-      <div className='bgrid-cell-value'>{content}</div>
+      <div className='bgrid-cell-value'>
+        {column.treeCell ? (
+          <TreeCell column={column} item={item}>
+            {content}
+          </TreeCell>
+        ) : (
+          content
+        )}
+      </div>
       {column.editorIcon && column.editor?.type !== 'checkbox' && cellEditable && (
         <CellEditorIcon
           hostCell={{ rowIndex: hostIndex, columnIndex }}

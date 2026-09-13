@@ -11,10 +11,7 @@ const dataGridContainerSources = [
 ];
 
 const withContainerSources = (exampleFile: string) => [`examples/${exampleFile}`, ...dataGridContainerSources];
-const editingExampleSources = [
-  'examples/editing/shared.ts',
-  'examples/editing/editingExamples.css',
-];
+const editingExampleSources = ['examples/editing/shared.ts', 'examples/editing/editingExamples.css'];
 const editingIconSources = [...editingExampleSources, 'examples/editing/editorIcons.tsx'];
 
 export const demoManifest: Record<string, DemoManifestItem> = {
@@ -25,11 +22,7 @@ export const demoManifest: Record<string, DemoManifestItem> = {
   },
   'item-render': {
     componentFile: 'ItemRenderExample.tsx',
-    sourceFiles: [
-      'examples/ItemRenderExample.tsx',
-      'examples/ItemRenderExample.css',
-      ...dataGridContainerSources,
-    ],
+    sourceFiles: ['examples/ItemRenderExample.tsx', 'examples/ItemRenderExample.css', ...dataGridContainerSources],
     minHeight: 560,
   },
   'sorting-filtering': {
@@ -192,6 +185,11 @@ export const demoManifest: Record<string, DemoManifestItem> = {
     sourceFiles: withContainerSources('ReorderExample.tsx'),
     minHeight: 480,
   },
+  'tree-folding': {
+    componentFile: 'TreeFoldingExample.tsx',
+    sourceFiles: withContainerSources('TreeFoldingExample.tsx'),
+    minHeight: 480,
+  },
   'line-number': {
     componentFile: 'LineNumberExample.tsx',
     sourceFiles: withContainerSources('LineNumberExample.tsx'),
@@ -224,11 +222,7 @@ export const demoManifest: Record<string, DemoManifestItem> = {
   },
   theming: {
     componentFile: 'ThemingExample.tsx',
-    sourceFiles: [
-      'examples/ThemingExample.tsx',
-      'examples/ThemingExample.css',
-      ...dataGridContainerSources,
-    ],
+    sourceFiles: ['examples/ThemingExample.tsx', 'examples/ThemingExample.css', ...dataGridContainerSources],
     minHeight: 610,
   },
   variant: {

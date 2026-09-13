@@ -7,6 +7,7 @@ import {
   BGridColumnVisibilityState,
   BGridColumnWithOptionalWidth,
   BGridDataControl,
+  BGridDataItem,
   BGridDataQuery,
   BGridProps,
   BGridSortParam,
@@ -22,7 +23,9 @@ import {
   getColumnId,
   getColumnKeyToken,
   getFrozenColumnsWidth,
+  getTreeRowPath,
   processDataQuery,
+  projectTreeData,
   projectColumnVisibility,
   resolveStatusOptions,
   resolvePaginationViewOptions,
@@ -30,6 +33,7 @@ import {
   shouldRenderBottomBar,
 } from './utils';
 import { AppStoreInitialState, AppStoreProvider } from './store';
+import { TreeContext, type BGridTreeContextValue } from './components/TreeContext';
 
 function computeModelColumns<T>(
   columns: BGridColumnWithOptionalWidth<T>[],
@@ -109,7 +113,12 @@ export function BGrid<T = Record<string, any>>({
   columnVisibility,
   searchOptions,
   contextMenuOptions,
+  tree,
 }: BGridProps<T>) {
+  const [uncontrolledExpandedRowKeys, setUncontrolledExpandedRowKeys] = React.useState<React.Key[]>(() => [
+    ...(tree?.defaultExpandedRowKeys ?? []),
+  ]);
+  const expandedRowKeys = tree?.expandedRowKeys ?? uncontrolledExpandedRowKeys;
   const warnedSearchControlledRef = React.useRef({
     open: false,
     query: false,
@@ -181,13 +190,15 @@ export function BGrid<T = Record<string, any>>({
   const resolvedDisabled = !!disabled;
   const resolvedOnClick = pivotEnabled || resolvedDisabled ? undefined : onClick;
   const baseOnChangeColumns = pivotEnabled ? undefined : onChangeColumns;
-  const resolvedOnChangeData = pivotEnabled ? undefined : onChangeData;
+  const baseOnChangeData = pivotEnabled ? undefined : onChangeData;
   const resolvedRowKey = pivotEnabled ? undefined : rowKey;
   const resolvedSelectedRowKey = pivotEnabled ? undefined : selectedRowKey;
   const resolvedEditable = pivotEnabled || resolvedDisabled ? false : editable;
   const resolvedShowLineNumber = pivotEnabled ? false : showLineNumber;
   const resolvedGetRowClassName = pivotEnabled ? undefined : getRowClassName;
-  const resolvedCellMergeOptions = visibilityProjection.cellMergeOptions;
+  const requestedTreeEnabled = !!tree && tree.enabled !== false;
+  const treeEnabled = requestedTreeEnabled && !pivotEnabled && resolvedRowKey !== undefined;
+  const resolvedCellMergeOptions = treeEnabled ? undefined : visibilityProjection.cellMergeOptions;
   const resolvedCellSelectionOptions = resolvedDisabled
     ? { ...cellSelectionOptions, enabled: false }
     : cellSelectionOptions;
@@ -202,12 +213,12 @@ export function BGrid<T = Record<string, any>>({
     (resolvedDataControl.query.sortParams.length > 0 || resolvedDataControl.query.filterParams.length > 0);
   const resolvedReorder = React.useMemo(
     () =>
-      pivotEnabled || resolvedDisabled
+      pivotEnabled || resolvedDisabled || treeEnabled
         ? undefined
         : (hasActiveClientQuery || frozenRowCount > 0) && reorder
         ? { ...reorder, enabled: false }
         : reorder,
-    [frozenRowCount, hasActiveClientQuery, pivotEnabled, reorder, resolvedDisabled],
+    [frozenRowCount, hasActiveClientQuery, pivotEnabled, reorder, resolvedDisabled, treeEnabled],
   );
 
   // Development warnings
@@ -239,6 +250,18 @@ export function BGrid<T = Record<string, any>>({
       if (pivotEnabled && contextMenuOptions && !warnedSearchControlledRef.current.pivotContextMenu) {
         warnedSearchControlledRef.current.pivotContextMenu = true;
         console.warn('[BGrid] contextMenuOptions is disabled while pivot mode is active.');
+      }
+      if (requestedTreeEnabled && rowKey === undefined) {
+        console.warn('[BGrid] tree requires rowKey. Falling back to flat rows.');
+      }
+      if (pivotEnabled && requestedTreeEnabled) {
+        console.warn('[BGrid] tree is disabled while pivot mode is active.');
+      }
+      if (treeEnabled && cellMergeOptions) {
+        console.warn('[BGrid] cellMergeOptions is disabled while tree mode is active.');
+      }
+      if (treeEnabled && reorder?.enabled) {
+        console.warn('[BGrid] Row reordering is disabled while tree mode is active.');
       }
       if (hasHiddenColumns && columnSortable) {
         console.warn('[BGrid] Column reordering is disabled while columns are hidden.');
@@ -282,6 +305,10 @@ export function BGrid<T = Record<string, any>>({
     hasHiddenColumns,
     visibilityOptions?.hiddenColumnIds,
     visibilityOptions?.onChange,
+    cellMergeOptions,
+    requestedTreeEnabled,
+    rowKey,
+    treeEnabled,
   ]);
 
   const duplicateToolboxColumnIds = React.useMemo(() => {
@@ -352,9 +379,41 @@ export function BGrid<T = Record<string, any>>({
     ],
   );
 
+  const resolvedTreeColumnId = React.useMemo(() => {
+    if (!treeEnabled || visibilityProjection.columns.length === 0) return undefined;
+    const requestedId = tree?.treeColumnId;
+    return requestedId &&
+      visibilityProjection.columns.some(column => getColumnId(column as BGridColumn<T>) === requestedId)
+      ? requestedId
+      : getColumnId(visibilityProjection.columns[0] as BGridColumn<T>);
+  }, [tree?.treeColumnId, treeEnabled, visibilityProjection.columns]);
+
   const computedColumns: AppModelColumn<T>[] = React.useMemo(() => {
-    return computeModelColumns(visibilityProjection.columns, resolvedFrozenColumnIndex, duplicateToolboxColumnIds);
-  }, [duplicateToolboxColumnIds, resolvedFrozenColumnIndex, visibilityProjection.columns]);
+    const columns = computeModelColumns(
+      visibilityProjection.columns,
+      resolvedFrozenColumnIndex,
+      duplicateToolboxColumnIds,
+    );
+    if (!resolvedTreeColumnId) return columns;
+    return columns.map(column => (column.columnId === resolvedTreeColumnId ? { ...column, treeCell: true } : column));
+  }, [duplicateToolboxColumnIds, resolvedFrozenColumnIndex, resolvedTreeColumnId, visibilityProjection.columns]);
+
+  const warnedTreeColumnIdRef = React.useRef<string | undefined>(undefined);
+  React.useEffect(() => {
+    if (
+      process.env.NODE_ENV === 'production' ||
+      !treeEnabled ||
+      !tree?.treeColumnId ||
+      tree.treeColumnId === resolvedTreeColumnId ||
+      warnedTreeColumnIdRef.current === tree.treeColumnId
+    ) {
+      return;
+    }
+    warnedTreeColumnIdRef.current = tree.treeColumnId;
+    console.warn(
+      `[BGrid] tree.treeColumnId "${tree.treeColumnId}" is not visible. Falling back to the first visible column.`,
+    );
+  }, [resolvedTreeColumnId, tree?.treeColumnId, treeEnabled]);
 
   const queryColumns: AppModelColumn<T>[] = React.useMemo(
     () => computeModelColumns(resolvedColumns, pivotEnabled ? 0 : frozenColumnIndex, duplicateToolboxColumnIds),
@@ -475,8 +534,9 @@ export function BGrid<T = Record<string, any>>({
     };
   }, [resolvedDataControl, resolvedSort]);
 
-  // Process data in client mode
-  const processedResult = React.useMemo(() => {
+  // Apply the existing client query first. Tree mode uses its result as sibling order
+  // and as the direct-match set, then restores the hierarchy during projection.
+  const queryProcessedResult = React.useMemo(() => {
     if (resolvedDataControl?.mode === 'client') {
       return processDataQuery({
         data: resolvedData as any,
@@ -495,7 +555,115 @@ export function BGrid<T = Record<string, any>>({
     };
   }, [queryColumns, resolvedData, resolvedDataControl?.mode, resolvedDataQuery, resolvedRowKey]);
 
+  const treeProjection = React.useMemo(() => {
+    if (!treeEnabled || !tree || resolvedRowKey === undefined) return undefined;
+    const clientQuery = resolvedDataControl?.mode === 'client';
+    return projectTreeData({
+      data: resolvedData as any,
+      rowKey: resolvedRowKey,
+      parentRowKey: tree.parentRowKey,
+      expandedRowKeys,
+      includedSourceIndexes:
+        clientQuery && resolvedDataQuery.filterParams.length > 0
+          ? queryProcessedResult.sourceIndexByVisibleIndex
+          : undefined,
+      orderedSourceIndexes:
+        clientQuery && resolvedDataQuery.sortParams.length > 0
+          ? queryProcessedResult.sourceIndexByVisibleIndex
+          : undefined,
+    });
+  }, [
+    expandedRowKeys,
+    queryProcessedResult.sourceIndexByVisibleIndex,
+    resolvedData,
+    resolvedDataControl?.mode,
+    resolvedDataQuery.filterParams.length,
+    resolvedDataQuery.sortParams.length,
+    resolvedRowKey,
+    tree,
+    treeEnabled,
+  ]);
+
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'production' || !treeProjection || treeProjection.valid) return;
+    console.warn(`[BGrid] Invalid tree data (${treeProjection.diagnostics.join(', ')}). Falling back to flat rows.`);
+  }, [treeProjection]);
+
+  const resolvedTreeProjection = treeProjection?.valid ? treeProjection : undefined;
+  const processedResult = resolvedTreeProjection
+    ? {
+        rows: [],
+        data: resolvedTreeProjection.data,
+        sourceIndexByVisibleIndex: resolvedTreeProjection.sourceIndexByVisibleIndex,
+        visibleIndexBySourceIndex: resolvedTreeProjection.visibleIndexBySourceIndex,
+      }
+    : queryProcessedResult;
+
   const displayData = processedResult.data;
+
+  const resolvedOnChangeData = React.useMemo<BGridProps<T>['onChangeData']>(() => {
+    if (!baseOnChangeData) return undefined;
+    if (!resolvedTreeProjection) return baseOnChangeData;
+    return (index, columnIndex, item, column, meta) => {
+      const treeMeta = resolvedTreeProjection.metaBySourceIndex.get(index);
+      if (!meta || !treeMeta) {
+        baseOnChangeData(index, columnIndex, item, column, meta);
+        return;
+      }
+      baseOnChangeData(index, columnIndex, item, column, {
+        ...meta,
+        tree: {
+          rowKey: treeMeta.rowKey,
+          parentRowKey: treeMeta.parentRowKey,
+          sourceIndex: treeMeta.sourceIndex,
+          depth: treeMeta.depth,
+          path: getTreeRowPath(resolvedTreeProjection.metaBySourceIndex, index),
+        },
+      });
+    };
+  }, [baseOnChangeData, resolvedTreeProjection]);
+
+  const toggleTreeRow = React.useCallback(
+    (meta: Parameters<BGridTreeContextValue['toggle']>[0]) => {
+      if (resolvedDisabled || !tree || !meta.hasChildren) return;
+      const nextExpanded = meta.expanded
+        ? expandedRowKeys.filter(key => !Object.is(key, meta.rowKey))
+        : expandedRowKeys.some(key => Object.is(key, meta.rowKey))
+        ? [...expandedRowKeys]
+        : [...expandedRowKeys, meta.rowKey];
+      if (tree.expandedRowKeys === undefined) setUncontrolledExpandedRowKeys(nextExpanded);
+      const item = resolvedData[meta.sourceIndex] as BGridDataItem<T> | undefined;
+      if (item) {
+        tree.onExpandedRowKeysChange?.(nextExpanded, {
+          rowKey: meta.rowKey,
+          expanded: !meta.expanded,
+          item,
+          sourceIndex: meta.sourceIndex,
+        });
+      }
+    },
+    [expandedRowKeys, resolvedData, resolvedDisabled, tree],
+  );
+
+  const treeContextValue = React.useMemo<BGridTreeContextValue | undefined>(() => {
+    if (!resolvedTreeProjection || !resolvedTreeColumnId || resolvedRowKey === undefined || !tree) return undefined;
+    const indentSize = Number.isFinite(tree.indentSize) && (tree.indentSize ?? -1) >= 0 ? tree.indentSize! : 16;
+    return {
+      treeColumnId: resolvedTreeColumnId,
+      indentSize,
+      icons: tree.icons,
+      expandAriaLabel: tree.expandAriaLabel ?? 'Expand row',
+      collapseAriaLabel: tree.collapseAriaLabel ?? 'Collapse row',
+      disabled: resolvedDisabled,
+      metaByRowKey: resolvedTreeProjection.metaByRowKey,
+      metaBySourceIndex: resolvedTreeProjection.metaBySourceIndex,
+      getRowKey: values => {
+        const key = getCellValueByRowKey(resolvedRowKey, values);
+        return key === undefined || key === null ? undefined : (key as React.Key);
+      },
+      toggle: toggleTreeRow,
+    };
+  }, [resolvedDisabled, resolvedRowKey, resolvedTreeColumnId, resolvedTreeProjection, toggleTreeRow, tree]);
   const rowHeightMetrics = React.useMemo(
     () => createRowHeightMetrics(displayData, itemHeight + itemPadding * 2, getRowHeight),
     [displayData, getRowHeight, itemHeight, itemPadding],
@@ -729,67 +897,70 @@ export function BGrid<T = Record<string, any>>({
 
   return (
     <AppStoreProvider initialState={initialStoreState}>
-      <Table
-        ref={ref}
-        {...{
-          columns: computedColumns,
-          columnsGroup: visibilityProjection.columnsGroup,
-          columnGroups: visibilityProjection.columnGroups,
-          onChangeColumns: resolvedOnChangeColumns,
-          width,
-          height,
-          className,
-          style,
-          loading,
-          disabled: resolvedDisabled,
-          spinning,
-          scrollLeft,
-          scrollTop,
-          headerHeight,
-          footerHeight,
-          bottomBarHeight: resolvedBottomBarHeight,
-          scrollbar: resolvedScrollbar,
-          status: resolvedStatus,
-          pagination: resolvedPagination,
-          summaryHeight,
-          itemHeight,
-          itemPadding,
-          rowHeightMetrics,
-          frozenColumnIndex: resolvedFrozenColumnIndex,
-          frozenRowCount: resolvedFrozenRowCount,
-          rowChecked: resolvedRowChecked,
-          checkedIndexesMap,
-          sort: resolvedSort,
-          sortParams,
-          dataQuery: resolvedDataQuery,
-          dataControl: resolvedDataControl,
-          icons,
-          columnVisibilityState,
-          searchOptions: resolvedSearchOptions,
-          contextMenuOptions: resolvedContextMenuOptions,
-          page: resolvedPage,
-          data: displayData as any,
-          sourceData: resolvedData as any,
-          sourceIndexByVisibleIndex: processedResult.sourceIndexByVisibleIndex,
-          visibleIndexBySourceIndex: processedResult.visibleIndexBySourceIndex,
-          onClick: resolvedOnClick,
-          rowKey: resolvedRowKey,
-          selectedRowKey: resolvedSelectedRowKey,
-          editable: resolvedEditable,
-          editTrigger,
-          onChangeData: resolvedOnChangeData,
-          showLineNumber: resolvedShowLineNumber,
-          msg,
-          getRowClassName: resolvedGetRowClassName,
-          cellMergeOptions: resolvedCellMergeOptions,
-          cellSelectionOptions: resolvedCellSelectionOptions,
-          cellNavigationOptions,
-          variant,
-          summary: resolvedSummary,
-          columnSortable: resolvedColumnSortable,
-          reorder: resolvedReorder,
-        }}
-      />
+      <TreeContext.Provider value={treeContextValue}>
+        <Table
+          ref={ref}
+          {...{
+            columns: computedColumns,
+            columnsGroup: visibilityProjection.columnsGroup,
+            columnGroups: visibilityProjection.columnGroups,
+            onChangeColumns: resolvedOnChangeColumns,
+            width,
+            height,
+            className,
+            style,
+            loading,
+            disabled: resolvedDisabled,
+            spinning,
+            scrollLeft,
+            scrollTop,
+            headerHeight,
+            footerHeight,
+            bottomBarHeight: resolvedBottomBarHeight,
+            scrollbar: resolvedScrollbar,
+            status: resolvedStatus,
+            pagination: resolvedPagination,
+            summaryHeight,
+            itemHeight,
+            itemPadding,
+            rowHeightMetrics,
+            frozenColumnIndex: resolvedFrozenColumnIndex,
+            frozenRowCount: resolvedFrozenRowCount,
+            rowChecked: resolvedRowChecked,
+            checkedIndexesMap,
+            sort: resolvedSort,
+            sortParams,
+            dataQuery: resolvedDataQuery,
+            dataControl: resolvedDataControl,
+            icons,
+            columnVisibilityState,
+            searchOptions: resolvedSearchOptions,
+            contextMenuOptions: resolvedContextMenuOptions,
+            page: resolvedPage,
+            data: displayData as any,
+            sourceData: resolvedData as any,
+            sourceIndexByVisibleIndex: processedResult.sourceIndexByVisibleIndex,
+            visibleIndexBySourceIndex: processedResult.visibleIndexBySourceIndex,
+            onClick: resolvedOnClick,
+            rowKey: resolvedRowKey,
+            selectedRowKey: resolvedSelectedRowKey,
+            editable: resolvedEditable,
+            editTrigger,
+            onChangeData: resolvedOnChangeData,
+            showLineNumber: resolvedShowLineNumber,
+            msg,
+            getRowClassName: resolvedGetRowClassName,
+            cellMergeOptions: resolvedCellMergeOptions,
+            cellSelectionOptions: resolvedCellSelectionOptions,
+            cellNavigationOptions,
+            variant,
+            summary: resolvedSummary,
+            columnSortable: resolvedColumnSortable,
+            reorder: resolvedReorder,
+            treeEnabled: !!treeContextValue,
+          }}
+        />
+      </TreeContext.Provider>
     </AppStoreProvider>
   );
 }

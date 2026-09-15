@@ -38,7 +38,21 @@ const groupDefinitions = [
 
 const typeMetadata: Record<string, { group: string; summary: string }> = {
   BGridProps: { group: 'core', summary: 'BGrid 컴포넌트에 전달하는 최상위 props입니다.' },
-  BGridRef: { group: 'core', summary: 'ref로 접근하는 Grid API입니다. scrollToRow로 표시 행 위치까지 스크롤합니다.' },
+  BGridRef: {
+    group: 'core',
+    summary: 'ref로 접근하는 Grid API입니다. scrollToRow 스크롤, getExportData 논리 데이터 추출, exportCsv 및 exportExcel 파일 다운로드를 제공합니다.',
+  },
+  BGridExportRowScope: { group: 'data', summary: 'Export 대상 행 범위(displayed, checked, source)를 지정합니다.' },
+  BGridExportColumnScope: { group: 'data', summary: 'Export 대상 컬럼 범위(visible, all 또는 컬럼 ID 배열)를 지정합니다.' },
+  BGridExportColumn: { group: 'data', summary: 'Export 결과의 컬럼 메타데이터(columnId, header, column, columnIndex)입니다.' },
+  BGridExportRow: { group: 'data', summary: 'Export 결과의 행 데이터(표시·원본 인덱스, rowKey, values, cells 배열)입니다.' },
+  BGridExportData: { group: 'data', summary: '컬럼과 행 cells 2차원 배열로 구성된 Grid 논리 Export 데이터 모델입니다.' },
+  BGridExportDataOptions: { group: 'data', summary: 'getExportData, exportCsv, exportExcel에 전달하는 행과 컬럼 export 범위 옵션입니다.' },
+  BGridCsvSerializeOptions: { group: 'data', summary: 'Export 데이터를 CSV 문자열로 직렬화할 때의 구분자, 줄바꿈, BOM, 수식 인젝션 방지 설정입니다.' },
+  BGridCsvExportOptions: { group: 'data', summary: 'exportCsv에 전달하는 export 범위 및 CSV 파일 다운로드 옵션입니다.' },
+  BGridExcelSerializeOptions: { group: 'data', summary: 'Export 데이터를 Excel(.xlsx)로 직렬화할 때의 시트 이름 및 헤더 포함 여부 설정입니다.' },
+  BGridExcelExportOptions: { group: 'data', summary: 'exportExcel에 전달하는 export 범위 및 Excel 파일 다운로드 옵션입니다.' },
+  BGridCellExportValueParams: { group: 'data', summary: '컬럼별 getExportValue 변환 함수에 전달되는 셀 문맥입니다.' },
   BGridScrollToRowOptions: { group: 'layout', summary: '행 스크롤의 정렬 위치를 설정합니다. 기본값은 nearest입니다.' },
   BGridColumn: { group: 'core', summary: '한 개 데이터 컬럼의 키, 제목, 너비, 렌더링 및 편집 동작을 정의합니다.' },
   BGridColumnWithOptionalWidth: {
@@ -346,6 +360,10 @@ const memberDescriptions: Record<string, string> = {
   formatResultCount: '현재 결과, 전체 결과와 로드된 행 수를 표시할 React 노드를 만듭니다.',
   rows: '해당 컨텍스트의 행 목록 또는 피벗 행 축 필드 배열입니다.',
   aggregate: '피벗 집계 방식 또는 사용자 집계 함수입니다.',
+  getExportData: '화면 가상 스크롤과 무관하게 전체 논리 행과 컬럼의 Export 데이터 모델을 추출합니다.',
+  exportCsv: 'RFC 4180 호환 CSV 파일로 직렬화하여 브라우저 다운로드를 실행합니다.',
+  exportExcel: '외부 의존성 없이 표준 OpenXML Excel (.xlsx) 파일로 직렬화하여 브라우저 다운로드를 실행합니다.',
+  sheetName: 'Excel 워크시트 탭 이름을 지정합니다. (기본값 Sheet1, 최대 31자)',
 };
 
 const typeMemberDescriptions: Record<string, Record<string, string>> = {

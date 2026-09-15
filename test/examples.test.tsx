@@ -802,4 +802,21 @@ describe('demo examples render intended grid features', () => {
     expect(container).toHaveTextContent('필터:');
     expect(container.querySelectorAll('.bgrid-toolbox-trigger-btn').length).toBeGreaterThan(0);
   });
+
+  it('renders ExportExample with all-rows and checked-rows Excel and CSV export controls', async () => {
+    const { container, getByRole } = await renderExample(() => import('../examples/ExportExample'));
+
+    expectGridShell(container);
+    expect(container).toHaveTextContent('전체 로드 데이터 Excel');
+    expect(container).toHaveTextContent('전체 로드 데이터 CSV');
+    expect(container).toHaveTextContent('선택 행 Excel (0)');
+    expect(container).toHaveTextContent('선택 행 CSV (0)');
+    expect(container).toHaveTextContent('₩150,000');
+
+    const excelAllBtn = getByRole('button', { name: /전체 로드 데이터 Excel/i });
+    expect(excelAllBtn).toBeEnabled();
+
+    const checkedExcelBtn = getByRole('button', { name: /선택 행 Excel/i });
+    expect(checkedExcelBtn).toBeDisabled();
+  });
 });

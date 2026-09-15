@@ -45,6 +45,11 @@ export const demoManifest: Record<string, DemoManifestItem> = {
     sourceFiles: withContainerSources('ContextMenuExample.tsx'),
     minHeight: 620,
   },
+  export: {
+    componentFile: 'ExportExample.tsx',
+    sourceFiles: withContainerSources('ExportExample.tsx'),
+    minHeight: 520,
+  },
   'virtual-scroll': {
     componentFile: 'ScrollExample.tsx',
     sourceFiles: withContainerSources('ScrollExample.tsx'),

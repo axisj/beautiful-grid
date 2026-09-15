@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Key, useCallback, useEffect, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { useAppStore } from '../store';
+import { useAppStore, useAppStoreApi } from '../store';
 import {
   BGridCellAddress,
   BGridCellMoveDirection,
@@ -9,6 +9,8 @@ import {
   BGridCellSelectionRange,
   BGridContextMenuItem,
   BGridContextMenuTarget,
+  BGridColumn,
+  BGridExportDataOptions,
   AppModelColumn,
   BGridColumnGroup,
   BGridColumnGroupNode,
@@ -40,6 +42,9 @@ import {
   rebaseVirtualScrollWindow,
   resolveLogicalCell,
   shouldRenderBottomBar,
+  createGridExportData,
+  serializeGridExportDataToCsv,
+  downloadCsv,
   type BGridRowHeightMetrics,
 } from '../utils';
 import { clamp, ensureCellVisible } from '../utils/coordinate';
@@ -89,6 +94,7 @@ interface Props<T> {
   frozenRowCount?: number;
 
   columns: AppModelColumn<T>[];
+  sourceColumns?: BGridColumn<T>[];
   columnsGroup: BGridColumnGroup[];
   columnGroups: BGridColumnGroupNode[];
   onChangeColumns?: BGridProps<T>['onChangeColumns'];
@@ -141,6 +147,7 @@ interface Props<T> {
 }
 
 function Table<T>(props: Props<T>) {
+  const store = useAppStoreApi<T>();
   const { cellSelectionOptions, onChangeData, sourceIndexByVisibleIndex } = props;
   const cellSelectionEnabled = cellSelectionOptions?.enabled ?? true;
   const rowKeyRegistryState = useRef({
@@ -837,14 +844,49 @@ function Table<T>(props: Props<T>) {
     align: NonNullable<BGridScrollToRowOptions['align']>;
   } | null>(null);
 
+  const sourceColumnsRef = useRef(props.sourceColumns);
+  sourceColumnsRef.current = props.sourceColumns;
+  const getCurrentExportData = useCallback(
+    (options?: BGridExportDataOptions) => {
+      const state = store.getState();
+      return createGridExportData({
+        options,
+        columns: state.columns,
+        sourceColumns: sourceColumnsRef.current,
+        data: state.data,
+        sourceData: state.sourceData,
+        sourceIndexByVisibleIndex: state.sourceIndexByVisibleIndex,
+        visibleIndexBySourceIndex: state.visibleIndexBySourceIndex,
+        checkedIndexesMap: state.checkedIndexesMap,
+        rowKey: state.rowKey,
+      });
+    },
+    [store],
+  );
+
   React.useImperativeHandle(
     props.ref,
     () => ({
       scrollToRow(rowIndex, options) {
         setRowScrollRequest({ rowIndex, align: options?.align ?? 'nearest' });
       },
+      getExportData(options) {
+        return getCurrentExportData(options);
+      },
+      exportCsv(options) {
+        const exportData = getCurrentExportData(options);
+        const csv = serializeGridExportDataToCsv(exportData, options);
+        downloadCsv(csv, options?.fileName ?? 'export.csv');
+      },
+      exportExcel(options) {
+        const exportData = getCurrentExportData(options);
+        void import('../utils/exportExcel').then(({ serializeGridExportDataToExcel, downloadExcel }) => {
+          const excelBytes = serializeGridExportDataToExcel(exportData, options);
+          downloadExcel(excelBytes, options?.fileName ?? 'export.xlsx');
+        });
+      },
     }),
-    [],
+    [getCurrentExportData],
   );
   const scrollRafRef = useRef<number | null>(null);
   const scrollIdleTimerRef = useRef<number | null>(null);

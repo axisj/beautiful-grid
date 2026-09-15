@@ -182,6 +182,16 @@ export interface BGridSearchCellParams<T> {
   value: unknown;
 }
 
+export interface BGridCellExportValueParams<T> {
+  column: BGridColumn<T>;
+  columnId: string;
+  visibleIndex?: number;
+  sourceIndex: number;
+  item: BGridDataItem<T>;
+  values: T;
+  value: unknown;
+}
+
 export interface BGridColumn<T> {
   id?: string;
   key: string | string[];
@@ -222,6 +232,9 @@ export interface BGridColumn<T> {
       bItem: BGridDataItem<T>;
     },
   ) => number;
+  exportable?: boolean;
+  exportHeader?: string | ((column: BGridColumn<T>) => string);
+  getExportValue?: (params: BGridCellExportValueParams<T>) => unknown;
 }
 
 export interface BGridColumnGroup {
@@ -809,13 +822,82 @@ export interface BGridScrollToRowOptions {
   align?: 'start' | 'center' | 'end' | 'nearest';
 }
 
-export interface BGridRef {
+export type BGridExportRowScope = 'displayed' | 'checked' | 'source';
+
+export type BGridExportColumnScope = 'visible' | 'all' | readonly string[];
+
+export interface BGridExportColumn<T> {
+  columnId: string;
+  header: string;
+  column: BGridColumn<T>;
+  columnIndex: number;
+}
+
+export interface BGridExportRow<T> {
+  visibleIndex?: number;
+  sourceIndex: number;
+  rowKey?: React.Key;
+  item: BGridDataItem<T>;
+  values: T;
+  cells: unknown[];
+}
+
+export interface BGridExportData<T> {
+  columns: BGridExportColumn<T>[];
+  rows: BGridExportRow<T>[];
+}
+
+export interface BGridExportDataOptions {
+  rows?: BGridExportRowScope;
+  columns?: BGridExportColumnScope;
+}
+
+export interface BGridCsvSerializeOptions {
+  delimiter?: string;
+  newline?: '\n' | '\r\n';
+  includeHeader?: boolean;
+  bom?: boolean;
+  preventFormulaInjection?: boolean;
+}
+
+export interface BGridCsvExportOptions extends BGridExportDataOptions {
+  fileName?: string;
+  delimiter?: string;
+  newline?: '\n' | '\r\n';
+  includeHeader?: boolean;
+  bom?: boolean;
+  preventFormulaInjection?: boolean;
+}
+
+export interface BGridExcelSerializeOptions {
+  sheetName?: string;
+  includeHeader?: boolean;
+}
+
+export interface BGridExcelExportOptions extends BGridExportDataOptions, BGridExcelSerializeOptions {
+  fileName?: string;
+}
+
+export interface BGridRef<T = any> {
   /**
    * Reveal a zero-based row in the displayed (sorted/filtered) data on the current page.
    * Runs after pending data updates. Invalid indexes and frozen rows are ignored.
    * Preserves horizontal scroll, cell focus and selection; does not load other pages.
    */
   scrollToRow: (rowIndex: number, options?: BGridScrollToRowOptions) => void;
+  /**
+   * Extract logical grid data for export without touching the DOM.
+   * Supports displayed, checked, or source row scopes, and visible, all, or custom column scopes.
+   */
+  getExportData: (options?: BGridExportDataOptions) => BGridExportData<T>;
+  /**
+   * Serialize grid data and trigger a browser CSV file download.
+   */
+  exportCsv: (options?: BGridCsvExportOptions) => void;
+  /**
+   * Serialize grid data and trigger a browser Excel (.xlsx) file download.
+   */
+  exportExcel: (options?: BGridExcelExportOptions) => void;
 }
 
 export interface BGridToolboxMessages {
@@ -867,7 +949,7 @@ export interface BGridMessages {
 }
 
 export interface BGridProps<T> {
-  ref?: React.Ref<BGridRef>;
+  ref?: React.Ref<BGridRef<T>>;
   width: number;
   height: number;
   headerHeight?: number;

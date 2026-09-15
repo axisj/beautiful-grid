@@ -901,6 +901,7 @@ export function BGrid<T = Record<string, any>>({
         <Table
           ref={ref}
           {...{
+            sourceColumns: resolvedColumns as BGridColumn<T>[],
             columns: computedColumns,
             columnsGroup: visibilityProjection.columnsGroup,
             columnGroups: visibilityProjection.columnGroups,

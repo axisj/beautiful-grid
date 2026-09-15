@@ -29,6 +29,7 @@ const SearchExample = React.lazy(() => import('../examples/SearchExample'));
 const ContextMenuExample = React.lazy(() => import('../examples/ContextMenuExample'));
 const ColumnVisibilityExample = React.lazy(() => import('../examples/ColumnVisibilityExample'));
 const TreeFoldingExample = React.lazy(() => import('../examples/TreeFoldingExample'));
+const ExportExample = React.lazy(() => import('../examples/ExportExample'));
 
 interface DemoPageProps {
   title: string;
@@ -77,6 +78,7 @@ const DEMO_ROUTES: Record<string, { title: string; component: React.LazyExoticCo
   '/search': { title: 'Grid Search & Context Menu', component: SearchExample },
   '/contextMenu': { title: 'Cell Context Menu', component: ContextMenuExample },
   '/treeFolding': { title: 'Tree Folding', component: TreeFoldingExample },
+  '/export': { title: 'Data Export (CSV & JSON)', component: ExportExample },
 };
 
 function App() {

@@ -137,6 +137,14 @@ function Nav({ currentPath, onNavigate }: Props) {
             ),
             key: '/contextMenu',
           },
+          {
+            label: (
+              <Space>
+                Export<Tag color='blue'>v1.13+</Tag>
+              </Space>
+            ),
+            key: '/export',
+          },
         ]}
         onTabClick={activeKey => {
           handleNavigate(activeKey);

@@ -826,8 +826,9 @@ Enable drag-and-drop or keyboard row sorting:
 
 ### 11. Summary Row
 
-Add top or bottom summary/aggregation rows:
+Add top or bottom summary/aggregation rows (supports both single-row and multi-row configurations):
 
+#### Single-Row Summary
 ```typescript jsx
 <BGrid
   width={800}
@@ -840,11 +841,53 @@ Add top or bottom summary/aggregation rows:
     columns: [
       { columnIndex: 0, colSpan: 2, itemRender: () => <strong>Total Summary</strong> },
       {
-        columnIndex: 3,
+        columnIndex: 2,
         align: 'right',
         itemRender: ({ data }) => (
           <strong>${data.reduce((sum, item) => sum + (item.values.amount || 0), 0).toLocaleString()}</strong>
         ),
+      },
+    ],
+  }}
+/>
+```
+
+#### Multi-Row Summary (e.g. Average & Total)
+```typescript jsx
+<BGrid
+  width={800}
+  height={400}
+  columns={columns}
+  data={data}
+  rowKey='id'
+  summary={{
+    position: 'bottom',
+    rows: [
+      {
+        style: { backgroundColor: '#fffbeb', fontWeight: 600 },
+        columns: [
+          { columnIndex: 0, colSpan: 2, itemRender: () => <span>Average</span> },
+          {
+            columnIndex: 2,
+            align: 'right',
+            itemRender: ({ data }) => (
+              <span>${(data.reduce((sum, item) => sum + (item.values.amount || 0), 0) / (data.length || 1)).toFixed(2)}</span>
+            ),
+          },
+        ],
+      },
+      {
+        style: { backgroundColor: '#f1f5f9', fontWeight: 700 },
+        columns: [
+          { columnIndex: 0, colSpan: 2, itemRender: () => <strong>Total</strong> },
+          {
+            columnIndex: 2,
+            align: 'right',
+            itemRender: ({ data }) => (
+              <strong>${data.reduce((sum, item) => sum + (item.values.amount || 0), 0).toLocaleString()}</strong>
+            ),
+          },
+        ],
       },
     ],
   }}
@@ -990,8 +1033,11 @@ Below is a categorized reference of `<BGrid>` props. For exact TypeScript types,
 | `data`            | `BGridDataItem<T>[]`                                          | Array of row data wrapped in `{ values: T }`.                    |
 | `rowKey`          | `React.Key \| React.Key[]`                                    | Unique identifier field in `item.values` (string or array path). |
 | `selectedRowKey`  | `React.Key \| React.Key[]`                                    | Key of the currently focused/highlighted row.                    |
-| `rowChecked`      | `BGridRowChecked<T>`                                          | Checkbox / radio row selection configuration.                    |
-| `getRowClassName` | `(ri: number, item: BGridDataItem<T>) => string \| undefined` | Custom row class name generator.                                 |
+| `rowChecked`        | `BGridRowChecked<T>`                                          | Checkbox / radio row selection configuration.                    |
+| `getRowClassName`   | `(ri: number, item: BGridDataItem<T>) => string \| undefined` | Custom row class name generator.                                 |
+| `enableLoadMore`    | `boolean`                                                     | Enables infinite scroll / load-more mechanism.                   |
+| `onLoadMore`        | `(params: { scrollLeft: number; scrollTop: number }) => void` | Callback fired when scrolling reaches the load-more threshold.   |
+| `endLoadMoreRender` | `() => React.ReactNode`                                       | Custom renderer for the load-more indicator or end-of-list.     |
 
 #### Layout & Sizing
 
@@ -999,7 +1045,8 @@ Below is a categorized reference of `<BGrid>` props. For exact TypeScript types,
 | ------------------- | ----------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------ |
 | `headerHeight`      | `number`                            | `30`        | Header row height in pixels.                                                                                 |
 | `bottomBarHeight`   | `number`                            | `30`        | Bottom bar (pagination / status) height in pixels.                                                           |
-| `summaryHeight`     | `number`                            | `30`        | Summary row height in pixels.                                                                                |
+| `summaryHeight`     | `number`                            | Auto        | Total summary height in pixels. Defaults to `summaryRowHeight * number of rows` (or `30` for single-row).    |
+| `summaryRowHeight`  | `number`                            | `30`        | Default height in pixels for each individual summary row.                                                    |
 | `itemHeight`        | `number`                            | `15`        | Body row content height.                                                                                     |
 | `itemPadding`       | `number`                            | `7`         | Body row top/bottom padding (total row height = `itemHeight + itemPadding * 2`).                             |
 | `getRowHeight`      | `(row: T, index: number) => number` | —           | Complete rendered height for each displayed row. Invalid values fall back to `itemHeight + itemPadding * 2`. |
@@ -1007,6 +1054,11 @@ Below is a categorized reference of `<BGrid>` props. For exact TypeScript types,
 | `frozenRowCount`    | `number`                            | `0`         | Number of leading rows pinned below the top summary row.                                                     |
 | `showLineNumber`    | `boolean`                           | `false`     | Shows row index numbers and reorder handles on the left.                                                     |
 | `variant`           | `'default' \| 'vertical-bordered'`  | `'default'` | Visual border styling variant.                                                                               |
+| `className`         | `string`                            | —           | Custom CSS class name for the root grid container.                                                           |
+| `style`             | `React.CSSProperties`               | —           | Inline styles for the root grid container.                                                                   |
+| `disabled`          | `boolean`                           | `false`     | Disables user interactions while preserving view and scrolling.                                              |
+| `scrollTop`         | `number`                            | `0`         | Controlled vertical scroll position in pixels.                                                               |
+| `scrollLeft`        | `number`                            | `0`         | Controlled horizontal scroll position in pixels.                                                             |
 
 #### Columns & Headers
 
@@ -1040,10 +1092,12 @@ Below is a categorized reference of `<BGrid>` props. For exact TypeScript types,
 | `searchOptions`      | `BGridSearchOptions<T>`                                             | Grid in-memory search UI, shortcuts (`Cmd+F`), and highlights.                         |
 | `contextMenuOptions` | `BGridContextMenuOptions<T>`                                        | Right-click and `Shift+F10` cell context menu items.                                   |
 | `reorder`            | `BGridReorderInfo<T>`                                               | Drag and keyboard row reordering configuration.                                        |
-| `summary`            | `{ position: 'top' \| 'bottom'; columns: BGridSummaryColumn<T>[] }` | Static summary row configuration.                                                      |
+| `reorderingInfo`     | `BGridReorderingInfo`                                               | Reorder drop indicator and dragged state callbacks.                                    |
+| `summary`            | `BGridSummaryOptions<T>`                                            | Static summary row(s) configuration. Supports single row (`columns`) or multiple rows (`rows`). |
 | `cellMergeOptions`   | `{ columnsMap: Record<number, BGridCellMergeColumn> }`              | Vertical cell merge rules.                                                             |
 | `pivot`              | `BGridPivotOptions<T>`                                              | Pivot table dimensions, aggregation rules, and metrics.                                |
 | `columnVisibility`   | `boolean \| BGridColumnVisibilityOptions<T>`                        | Enables controlled or uncontrolled column hiding and restore controls (since `1.0.6`). |
+| `icons`              | `BGridToolboxIcons`                                                 | Custom SVG / ReactNode icons for column toolbox, filter, and sort buttons.             |
 | `tree`               | `BGridTreeOptions<T>`                                               | Renders flat parent-key data as collapsible hierarchical rows.                         |
 | `loading`            | `boolean`                                                           | Displays full-grid loading overlay.                                                    |
 | `spinning`           | `boolean`                                                           | Displays body-area spinner.                                                            |

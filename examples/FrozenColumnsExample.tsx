@@ -1,6 +1,6 @@
 import { t } from './i18n';
 import * as React from 'react';
-import { BGrid, type BGridColumn, type BGridDataItem, type BGridProps } from 'beautiful-grid';
+import { BGrid, type BGridColumn, type BGridDataItem, type BGridProps, type BGridSummaryColumn } from 'beautiful-grid';
 import { Select } from 'antd';
 import DataGridContainer from '../components/DataGridContainer';
 import { useContainerSize } from '../hooks/useContainerSize';
@@ -49,7 +49,7 @@ const columns: BGridColumn<EmployeeRow>[] = [
   { key: 'status', label: t('상태', 'Status'), width: 200, align: 'center' },
 ];
 
-const summaryColumns: NonNullable<BGridProps<EmployeeRow>['summary']>['columns'] = [
+const summaryColumns: BGridSummaryColumn<EmployeeRow>[] = [
   { columnIndex: 0, align: 'center', itemRender: () => <strong>{t('인력 요약', 'Workforce Summary')}</strong> },
   { columnIndex: 1, align: 'center', itemRender: ({ data }) => `${t('전체', 'Total')} ${data.length}${t('명', ' people')}` },
   {
@@ -117,7 +117,7 @@ export default function FrozenColumnsExample() {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const { width, height } = useContainerSize(containerRef);
   const summary = React.useMemo<NonNullable<BGridProps<EmployeeRow>['summary']>>(
-    () => ({ position: summaryPosition, columns: summaryColumns }),
+    () => ({ position: summaryPosition, rows: [{ columns: summaryColumns }] }),
     [summaryPosition],
   );
 

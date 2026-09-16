@@ -42,7 +42,7 @@ const [variant, setVariant] = useState<'default' | 'vertical-bordered'>('default
   variant={variant}
   summary={{
     position: 'bottom',
-    columns: summaryColumns,
+    rows: [{ columns: summaryColumns }],
   }}
 />;
 ```

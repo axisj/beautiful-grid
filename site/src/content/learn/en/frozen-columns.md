@@ -56,7 +56,11 @@ A top Summary Row occupies a separate region from frozen data rows. When you use
   frozenRowCount={2}
   summary={{
     position: 'top',
-    columns: [{ columnIndex: 0, itemRender: () => 'Total' }],
+    rows: [
+      {
+        columns: [{ columnIndex: 0, itemRender: () => 'Total' }],
+      },
+    ],
   }}
 />
 ```

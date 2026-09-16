@@ -40,17 +40,21 @@ const sumBy = (rows: BGridDataItem<SalesOrder>[], key: 'quantity' | 'supplyAmoun
 
 const createSummary = (position: 'top' | 'bottom'): BGridProps<SalesOrder>['summary'] => ({
   position,
-  columns: [
+  rows: [
     {
-      columnIndex: 0,
-      colSpan: 3,
-      align: 'center',
-      itemRender: ({ data }) => <strong>{position === 'top' ? t('상단', 'Top') : t('하단', 'Bottom')} {t('매출 합계 ·', 'Total Sales ·')} {data.length}{t('건', 'cases')}</strong>,
+      columns: [
+        {
+          columnIndex: 0,
+          colSpan: 3,
+          align: 'center',
+          itemRender: ({ data }) => <strong>{position === 'top' ? t('상단', 'Top') : t('하단', 'Bottom')} {t('매출 합계 ·', 'Total Sales ·')} {data.length}{t('건', 'cases')}</strong>,
+        },
+        { columnIndex: 3, align: 'right', itemRender: ({ data }) => <strong>{sumBy(data, 'quantity')}{t('개', 'ea')}</strong> },
+        { columnIndex: 4, align: 'right', itemRender: ({ data }) => <strong>{formatWon(sumBy(data, 'supplyAmount'))}</strong> },
+        { columnIndex: 5, align: 'right', itemRender: ({ data }) => <strong>{formatWon(sumBy(data, 'taxAmount'))}</strong> },
+        { columnIndex: 6, align: 'right', itemRender: ({ data }) => <strong>{formatWon(sumBy(data, 'totalAmount'))}</strong> },
+      ],
     },
-    { columnIndex: 3, align: 'right', itemRender: ({ data }) => <strong>{sumBy(data, 'quantity')}{t('개', 'ea')}</strong> },
-    { columnIndex: 4, align: 'right', itemRender: ({ data }) => <strong>{formatWon(sumBy(data, 'supplyAmount'))}</strong> },
-    { columnIndex: 5, align: 'right', itemRender: ({ data }) => <strong>{formatWon(sumBy(data, 'taxAmount'))}</strong> },
-    { columnIndex: 6, align: 'right', itemRender: ({ data }) => <strong>{formatWon(sumBy(data, 'totalAmount'))}</strong> },
   ],
 });
 

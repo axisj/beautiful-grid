@@ -491,14 +491,18 @@ const [query, setQuery] = useState({ sortParams: [], filterParams: [] });
           rowChecked={{ checkedIndexes: [1, 3], onChange: () => undefined }}
           summary={{
             position: 'bottom',
-            columns: [
-              { columnIndex: 0, itemRender: () => <>{t('합계', 'Total')}</> },
+            rows: [
               {
-                columnIndex: 5,
-                align: 'right',
-                itemRender: ({ data }) => (
-                  <>{data.reduce((sum, item) => sum + item.values.amount, 0).toLocaleString(isEn ? 'en-US' : 'ko-KR')}{isEn ? ' KRW' : '원'}</>
-                ),
+                columns: [
+                  { columnIndex: 0, itemRender: () => <>{t('합계', 'Total')}</> },
+                  {
+                    columnIndex: 5,
+                    align: 'right',
+                    itemRender: ({ data }) => (
+                      <>{data.reduce((sum, item) => sum + item.values.amount, 0).toLocaleString(isEn ? 'en-US' : 'ko-KR')}{isEn ? ' KRW' : '원'}</>
+                    ),
+                  },
+                ],
               },
             ],
           }}

@@ -56,7 +56,11 @@ BeautifulGrid는 `frozenColumnIndex`로 왼쪽에 고정할 컬럼 수를, `froz
   frozenRowCount={2}
   summary={{
     position: 'top',
-    columns: [{ columnIndex: 0, itemRender: () => '합계' }],
+    rows: [
+      {
+        columns: [{ columnIndex: 0, itemRender: () => '합계' }],
+      },
+    ],
   }}
 />
 ```

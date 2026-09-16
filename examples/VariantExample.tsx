@@ -1,6 +1,6 @@
 import { t } from './i18n';
 import * as React from 'react';
-import { BGrid, type BGridColumn, type BGridDataItem, type BGridProps } from 'beautiful-grid';
+import { BGrid, type BGridColumn, type BGridDataItem, type BGridProps, type BGridSummaryColumn } from 'beautiful-grid';
 import { Segmented } from 'antd';
 import DataGridContainer from '../components/DataGridContainer';
 import { useContainerSize } from '../hooks/useContainerSize';
@@ -41,7 +41,7 @@ const columns: BGridColumn<SalesRow>[] = [
   },
 ];
 
-const summaryColumns: NonNullable<BGridProps<SalesRow>['summary']>['columns'] = [
+const summaryColumns: BGridSummaryColumn<SalesRow>[] = [
   { columnIndex: 0, align: 'center', itemRender: () => <strong>{t('합계', 'Total')}</strong> },
   {
     columnIndex: 3,
@@ -96,7 +96,7 @@ export default function VariantExample() {
           showLineNumber
           frozenColumnIndex={1}
           variant={variant}
-          summary={{ position: 'bottom', columns: summaryColumns }}
+          summary={{ position: 'bottom', rows: [{ columns: summaryColumns }] }}
         />
       </DataGridContainer>
     </div>

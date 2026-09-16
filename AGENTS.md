@@ -50,7 +50,7 @@ npm run build           # alias of site:build
 npm run preview
 
 # Local verification (run when needed before opening or merging a PR)
-npm run verify:library  # runs lint, test, css check, consumers check, and bundle budget check
+npm run verify:library  # runs lint, test, css check, readme props check, consumers check, and bundle budget check
 npm run verify:site     # runs site font size check, site unit test, astro check, and site build
 ```
 
@@ -71,6 +71,10 @@ Manual release publishing is configured in `.github/workflows/publish-npm.yml`. 
 - **Cell merge**: Pass `cellMergeOptions.columnsMap` keyed by column index; each entry has `mergeBy` (column key to group on).
 - **Static library CSS**: publishable components use prefixed `bgrid-*` classes and `--bgrid-*` CSS custom properties from `beautiful-grid/style.css`. Keep Tailwind utilities in the demo app only. Use inline styles only for runtime-computed dimensions and positions. Do not add runtime CSS-in-JS.
 - **Column `left`**: Always computed in `BGrid.tsx` before entering the store. Do not mutate `left` elsewhere.
+- **Documentation Synchronization**: When adding or updating public APIs, props (`BGridProps`), column options (`BGridColumn`), or new behavior features in `beautiful-grid/`:
+  - Always update `README.md` (both the specific feature guide section and the Props Reference tables).
+  - Run `npm run test:library:readme` (enforced via `npm run verify:library`) to verify that all public props in `types.ts` are documented.
+  - Update relevant interactive examples in `examples/` and documentation in `site/` where applicable.
 
 ## Key Files
 | File | Purpose |

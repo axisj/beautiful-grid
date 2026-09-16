@@ -301,12 +301,16 @@ export default function PropsPlayground({ locale = 'ko' }: { locale?: Locale }) 
       ? undefined
       : {
           position: summaryPosition,
-          columns: [
-            { columnIndex: 0, itemRender: () => <>{t('합계', 'Total')}</> },
+          rows: [
             {
-              columnIndex: 7,
-              align: 'right',
-              itemRender: ({ data }) => <>{data.reduce((total, item) => total + item.values.quantity, 0)}</>,
+              columns: [
+                { columnIndex: 0, itemRender: () => <>{t('합계', 'Total')}</> },
+                {
+                  columnIndex: 7,
+                  align: 'right',
+                  itemRender: ({ data }) => <>{data.reduce((total, item) => total + item.values.quantity, 0)}</>,
+                },
+              ],
             },
           ],
         };

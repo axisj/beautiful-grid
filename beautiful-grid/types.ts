@@ -262,6 +262,7 @@ export interface BGridCellMergeColumn {
 export interface BGridSummaryItemRenderProps<T> {
   column: BGridColumn<T>;
   columnIndex: number;
+  rowIndex?: number;
   data: BGridDataItem<T>[];
 }
 
@@ -270,8 +271,23 @@ export interface BGridSummaryColumn<T> {
   align?: AlignDirection;
   colSpan?: number;
   className?: string;
+  style?: React.CSSProperties;
   getClassName?: (key: string | string[]) => string;
   itemRender?: (props: BGridSummaryItemRenderProps<T>) => React.ReactNode;
+}
+
+export interface BGridSummaryRow<T> {
+  id?: string | number;
+  className?: string;
+  style?: React.CSSProperties;
+  height?: number;
+  columns: BGridSummaryColumn<T>[];
+}
+
+export interface BGridSummaryOptions<T> {
+  columns?: BGridSummaryColumn<T>[];
+  rows?: (BGridSummaryRow<T> | BGridSummaryColumn<T>[])[];
+  position: 'top' | 'bottom';
 }
 
 export enum BGridDataItemStatus {
@@ -957,6 +973,7 @@ export interface BGridProps<T> {
   footerHeight?: number;
   bottomBarHeight?: number;
   summaryHeight?: number;
+  summaryRowHeight?: number;
   itemHeight?: number;
   itemPadding?: number;
   /**
@@ -1075,10 +1092,7 @@ export interface BGridProps<T> {
   };
   cellNavigationOptions?: BGridCellNavigationOptions;
   variant?: 'default' | 'vertical-bordered';
-  summary?: {
-    columns: BGridSummaryColumn<T>[];
-    position: 'top' | 'bottom';
-  };
+  summary?: BGridSummaryOptions<T>;
   columnSortable?: boolean;
   reorder?: BGridReorderInfo<T>;
   reorderingInfo?: BGridReorderingInfo;
@@ -1178,6 +1192,7 @@ export interface AppModel<T> extends BGridProps<T> {
   footerHeight: number;
   bottomBarHeight: number;
   summaryHeight: number;
+  summaryRowHeight?: number;
   itemHeight: number;
   itemPadding: number;
   frozenColumnIndex: number;
@@ -1292,6 +1307,7 @@ export interface AppActions<T> {
   setFooterHeight: (footerHeight: number) => void;
   setBottomBarHeight: (bottomBarHeight: number) => void;
   setSummaryHeight: (summaryHeight: number) => void;
+  setSummaryRowHeight: (summaryRowHeight?: number) => void;
   setItemHeight: (itemHeight: number) => void;
   setItemPadding: (itemPadding: number) => void;
   setFrozenColumnIndex: (frozenColumnIndex: number) => void;

@@ -54,8 +54,69 @@ const createSummary = (position: 'top' | 'bottom'): BGridProps<SalesOrder>['summ
   ],
 });
 
+const createMultiSummary = (position: 'top' | 'bottom'): BGridProps<SalesOrder>['summary'] => ({
+  position,
+  rows: [
+    {
+      style: { backgroundColor: '#fffbeb', fontWeight: 600 },
+      columns: [
+        {
+          columnIndex: 0,
+          colSpan: 3,
+          align: 'center',
+          itemRender: ({ data }) => (
+            <span>
+              {position === 'top' ? t('상단', 'Top') : t('하단', 'Bottom')} {t('평균', 'Average')} ({data.length}{t('건', 'cases')})
+            </span>
+          ),
+        },
+        {
+          columnIndex: 3,
+          align: 'right',
+          itemRender: ({ data }) => <span>{(sumBy(data, 'quantity') / data.length).toFixed(1)}{t('개', 'ea')}</span>,
+        },
+        {
+          columnIndex: 4,
+          align: 'right',
+          itemRender: ({ data }) => <span>{formatWon(Math.round(sumBy(data, 'supplyAmount') / data.length))}</span>,
+        },
+        {
+          columnIndex: 5,
+          align: 'right',
+          itemRender: ({ data }) => <span>{formatWon(Math.round(sumBy(data, 'taxAmount') / data.length))}</span>,
+        },
+        {
+          columnIndex: 6,
+          align: 'right',
+          itemRender: ({ data }) => <span>{formatWon(Math.round(sumBy(data, 'totalAmount') / data.length))}</span>,
+        },
+      ],
+    },
+    {
+      style: { backgroundColor: '#f1f5f9', fontWeight: 700 },
+      columns: [
+        {
+          columnIndex: 0,
+          colSpan: 3,
+          align: 'center',
+          itemRender: ({ data }) => (
+            <strong>
+              {position === 'top' ? t('상단', 'Top') : t('하단', 'Bottom')} {t('합계', 'Total')} ({data.length}{t('건', 'cases')})
+            </strong>
+          ),
+        },
+        { columnIndex: 3, align: 'right', itemRender: ({ data }) => <strong>{sumBy(data, 'quantity')}{t('개', 'ea')}</strong> },
+        { columnIndex: 4, align: 'right', itemRender: ({ data }) => <strong>{formatWon(sumBy(data, 'supplyAmount'))}</strong> },
+        { columnIndex: 5, align: 'right', itemRender: ({ data }) => <strong>{formatWon(sumBy(data, 'taxAmount'))}</strong> },
+        { columnIndex: 6, align: 'right', itemRender: ({ data }) => <strong>{formatWon(sumBy(data, 'totalAmount'))}</strong> },
+      ],
+    },
+  ],
+});
+
 function SummaryExample() {
   const [position, setPosition] = React.useState<'top' | 'bottom'>('top');
+  const [summaryMode, setSummaryMode] = React.useState<'single' | 'multi'>('single');
   const [columns, setColumns] = React.useState<BGridColumn<SalesOrder>[]>([
     { key: 'channel', label: t('주문채널', 'Order Channel'), width: 100, align: 'center' },
     { key: 'orderNo', label: t('주문번호', 'Order Number'), width: 140 },
@@ -70,12 +131,18 @@ function SummaryExample() {
 
   return (
     <>
-      <Radio.Group
-        style={{ marginBottom: 10 }}
-        options={[{ label: t('상단 요약', 'Top Summary'), value: 'top' }, { label: t('하단 요약', 'Bottom Summary'), value: 'bottom' }]}
-        value={position}
-        onChange={event => setPosition(event.target.value)}
-      />
+      <div style={{ display: 'flex', gap: 16, marginBottom: 10, flexWrap: 'wrap' }}>
+        <Radio.Group
+          options={[{ label: t('다중 행 요약 (평균+합계)', 'Multi-row (Avg+Sum)'), value: 'multi' }, { label: t('단일 행 요약', 'Single Row'), value: 'single' }]}
+          value={summaryMode}
+          onChange={event => setSummaryMode(event.target.value)}
+        />
+        <Radio.Group
+          options={[{ label: t('상단 요약', 'Top Summary'), value: 'top' }, { label: t('하단 요약', 'Bottom Summary'), value: 'bottom' }]}
+          value={position}
+          onChange={event => setPosition(event.target.value)}
+        />
+      </div>
       <DataGridContainer ref={containerRef}>
         <BGrid<SalesOrder>
           showLineNumber
@@ -87,7 +154,7 @@ function SummaryExample() {
           rowKey='orderNo'
           onChangeColumns={(_columnIndex, { columns }) => setColumns(columns)}
           variant='vertical-bordered'
-          summary={createSummary(position)}
+          summary={summaryMode === 'multi' ? createMultiSummary(position) : createSummary(position)}
         />
       </DataGridContainer>
     </>

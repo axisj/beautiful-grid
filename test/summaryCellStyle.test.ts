@@ -33,4 +33,31 @@ describe('Summary cell styles', () => {
     expect(computedStyle.paddingLeft).toBe('6.5px');
     expect(computedStyle.paddingRight).toBe('6.5px');
   });
+
+  it('does not apply a right border to data-none filler cell in vertical-bordered mode', () => {
+    const style = document.createElement('style');
+    style.dataset.testLibraryCss = 'true';
+    style.textContent = libraryCss;
+    document.head.appendChild(style);
+
+    document.body.innerHTML = `
+      <div class="bgrid-root">
+        <table class="bgrid-summary-table bgrid-summary-vertical-bordered">
+          <tbody role="rfdg-summary">
+            <tr>
+              <td>Summary label</td>
+              <td data-none></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    const dataCell = document.querySelector('td:not([data-none])')!;
+    const fillerCell = document.querySelector('td[data-none]')!;
+
+    expect(dataCell.matches('.bgrid-summary-vertical-bordered > tbody > tr > td:not([data-none])')).toBe(true);
+    expect(fillerCell.matches('.bgrid-summary-vertical-bordered > tbody > tr > td:not([data-none])')).toBe(false);
+    expect(fillerCell.matches('.bgrid-summary-table > tbody > tr > td[data-none]')).toBe(true);
+  });
 });

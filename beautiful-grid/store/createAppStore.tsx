@@ -108,6 +108,7 @@ export type AppStoreInitialState<T = any> = Partial<
     | 'status'
     | 'pagination'
     | 'summaryHeight'
+    | 'summaryRowHeight'
     | 'itemHeight'
     | 'itemPadding'
     | 'frozenColumnIndex'
@@ -215,6 +216,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
         visible: true,
       },
       summaryHeight: initialState?.summaryHeight ?? 30,
+      summaryRowHeight: initialState?.summaryRowHeight,
       itemHeight: initialState?.itemHeight ?? 15,
       itemPadding: initialState?.itemPadding ?? 7,
       frozenColumnIndex: initialState?.frozenColumnIndex ?? 0,
@@ -966,6 +968,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
       setHeaderHeight: headerHeight => set({ headerHeight }),
       setFooterHeight: footerHeight => set({ footerHeight }),
       setSummaryHeight: summaryHeight => set({ summaryHeight }),
+      setSummaryRowHeight: summaryRowHeight => set({ summaryRowHeight }),
       setItemHeight: itemHeight => set({ itemHeight }),
       setItemPadding: itemPadding => set({ itemPadding }),
       setFrozenColumnIndex: frozenColumnIndex => set({ frozenColumnIndex }),

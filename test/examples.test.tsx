@@ -757,6 +757,12 @@ describe('demo examples render intended grid features', () => {
 
     fireEvent.click(getByText('하단 요약'));
     await waitFor(() => expect(container).toHaveTextContent('하단 매출 합계 · 30건'));
+
+    fireEvent.click(getByText('다중 행 요약 (평균+합계)'));
+    await waitFor(() => {
+      expect(container).toHaveTextContent('하단 평균 (30건)');
+      expect(container).toHaveTextContent('하단 합계 (30건)');
+    });
   });
 
   it('renders ColumnSortExample with draggable header sorting setup', async () => {

@@ -30,6 +30,8 @@ import {
   resolveStatusOptions,
   resolvePaginationViewOptions,
   resolveScrollbarOptions,
+  computeSummaryHeight,
+  DEFAULT_SUMMARY_ROW_HEIGHT,
   shouldRenderBottomBar,
 } from './utils';
 import { AppStoreInitialState, AppStoreProvider } from './store';
@@ -66,7 +68,8 @@ export function BGrid<T = Record<string, any>>({
   height,
   headerHeight = 30,
   footerHeight,
-  summaryHeight = 30,
+  summaryHeight: explicitSummaryHeight,
+  summaryRowHeight = DEFAULT_SUMMARY_ROW_HEIGHT,
   itemHeight = 15,
   itemPadding = 7,
   getRowHeight,
@@ -735,6 +738,16 @@ export function BGrid<T = Record<string, any>>({
     }
   }, [bottomBarHeight, footerHeight]);
 
+  const resolvedSummaryHeight = React.useMemo(
+    () =>
+      computeSummaryHeight({
+        summary: resolvedSummary,
+        summaryHeight: explicitSummaryHeight,
+        summaryRowHeight,
+      }),
+    [resolvedSummary, explicitSummaryHeight, summaryRowHeight],
+  );
+
   const initialStoreState: AppStoreInitialState<T> = React.useMemo(() => {
     const initialWidth = width !== undefined ? Math.max(width, 100) : 0;
     const initialHeight = height !== undefined ? Math.max(height, 100) : 0;
@@ -745,7 +758,7 @@ export function BGrid<T = Record<string, any>>({
             initialHeight -
               headerHeight -
               (initialShowBottomBar ? resolvedBottomBarHeight : 0) -
-              (resolvedSummary ? summaryHeight : 0) -
+              (resolvedSummary ? resolvedSummaryHeight : 0) -
               containerBorderWidth * 2,
             0,
           )
@@ -774,7 +787,8 @@ export function BGrid<T = Record<string, any>>({
       scrollbar: resolvedScrollbar,
       status: resolvedStatus,
       pagination: resolvedPagination,
-      summaryHeight,
+      summaryHeight: resolvedSummaryHeight,
+      summaryRowHeight,
       itemHeight,
       itemPadding,
       frozenColumnIndex: resolvedFrozenColumnIndex,
@@ -846,7 +860,8 @@ export function BGrid<T = Record<string, any>>({
     resolvedScrollbar,
     resolvedStatus,
     resolvedPagination,
-    summaryHeight,
+    resolvedSummaryHeight,
+    summaryRowHeight,
     itemHeight,
     itemPadding,
     rowHeightMetrics,
@@ -921,7 +936,8 @@ export function BGrid<T = Record<string, any>>({
             scrollbar: resolvedScrollbar,
             status: resolvedStatus,
             pagination: resolvedPagination,
-            summaryHeight,
+            summaryHeight: resolvedSummaryHeight,
+            summaryRowHeight,
             itemHeight,
             itemPadding,
             rowHeightMetrics,

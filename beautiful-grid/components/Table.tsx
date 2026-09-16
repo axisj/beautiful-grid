@@ -87,6 +87,7 @@ interface Props<T> {
   status?: BGridResolvedStatusOptions;
   pagination?: BGridResolvedPaginationViewOptions;
   summaryHeight?: number;
+  summaryRowHeight?: number;
   itemHeight?: number;
   itemPadding?: number;
   rowHeightMetrics: BGridRowHeightMetrics;
@@ -182,12 +183,13 @@ function Table<T>(props: Props<T>) {
   );
 
   // [Selector Group 2] Header, Footer, Summary - 헤더/푸터/요약
-  const { headerHeight, footerHeight, bottomBarHeight, summaryHeight } = useAppStore(
+  const { headerHeight, footerHeight, bottomBarHeight, summaryHeight, summaryRowHeight } = useAppStore(
     useShallow(s => ({
       headerHeight: s.headerHeight,
       footerHeight: s.footerHeight,
       bottomBarHeight: s.bottomBarHeight,
       summaryHeight: s.summaryHeight,
+      summaryRowHeight: s.summaryRowHeight,
     })),
   );
 
@@ -283,6 +285,7 @@ function Table<T>(props: Props<T>) {
     setFooterHeight,
     setBottomBarHeight,
     setSummaryHeight,
+    setSummaryRowHeight,
     setItemHeight,
     setItemPadding,
     setLoading,
@@ -298,6 +301,7 @@ function Table<T>(props: Props<T>) {
       setFooterHeight: s.setFooterHeight,
       setBottomBarHeight: s.setBottomBarHeight,
       setSummaryHeight: s.setSummaryHeight,
+      setSummaryRowHeight: s.setSummaryRowHeight,
       setItemHeight: s.setItemHeight,
       setItemPadding: s.setItemPadding,
       setLoading: s.setLoading,
@@ -1798,6 +1802,7 @@ function Table<T>(props: Props<T>) {
     if (props.headerHeight !== undefined) setHeaderHeight(Math.max(props.headerHeight, 22));
     if (props.footerHeight !== undefined) setFooterHeight(props.footerHeight);
     if (props.summaryHeight !== undefined) setSummaryHeight(props.summaryHeight);
+    if (props.summaryRowHeight !== undefined) setSummaryRowHeight(props.summaryRowHeight);
     if (props.itemHeight !== undefined) setItemHeight(props.itemHeight);
     if (props.itemPadding !== undefined) setItemPadding(props.itemPadding);
   }, [
@@ -1805,12 +1810,14 @@ function Table<T>(props: Props<T>) {
     props.headerHeight,
     props.footerHeight,
     props.summaryHeight,
+    props.summaryRowHeight,
     props.itemHeight,
     props.itemPadding,
     setWidth,
     setHeaderHeight,
     setFooterHeight,
     setSummaryHeight,
+    setSummaryRowHeight,
     setItemHeight,
     setItemPadding,
   ]);

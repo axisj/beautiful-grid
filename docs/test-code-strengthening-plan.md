@@ -1,9 +1,11 @@
 # BGrid 전체 기능 테스트 마스터 플랜
 
 > 상태: 전체 기능 기준 계획 수립 완료 · 구현 미착수  
-> 작성일: 2026-08-23 (업데이트: 2026-08-29 엑셀 수식 플랜 반영)  
+> 작성일: 2026-08-23 (업데이트: 2026-09-15 셀 수식 엔진을 비필수 후보로 분리)
 > 대상: `beautiful-grid`의 전체 공개 API, 내부 핵심 로직, 브라우저 동작, 배포 산출물  
 > 기준 소스: `beautiful-grid/types.ts`, `beautiful-grid/index.tsx`, `beautiful-grid/editors/`, `beautiful-grid/utils/`
+
+Excel 셀 수식 입력·계산 엔진은 현재 공개 API가 아니며 이 계획의 필수 구현·테스트 범위에 포함하지 않는다. 관련 설계 아이디어는 `docs/excel-formula-development-plan.md`에 장기 검토안으로만 보존한다. `v1.0.13`의 Excel/CSV 내보내기 기능은 셀 수식 엔진과 별개의 공개 기능으로 다룬다.
 
 ## 0. 이 문서의 목적
 
@@ -84,7 +86,6 @@ U에서 가능한 로직을 E에만 두지 않고, happy-dom이 계산할 수 �
 | `pivot`                                                            | F21           | U, C, E, P |
 | `searchOptions`                                                    | F22           | U, C, E, P |
 | `contextMenuOptions`                                               | F23           | U, C, E, P |
-| `formulaOptions`                                                   | F30           | U, C, E    |
 
 ### 3.2 `BGridColumn<T>` 전체 매핑
 
@@ -103,7 +104,6 @@ U에서 가능한 로직을 E에만 두지 않고, happy-dom이 계산할 수 �
 | `getClipboardText`                  | F13, F21      | 일반/Pivot copy                                        |
 | `searchable`, `getSearchText`       | F22           | 검색 포함/제외와 텍스트 override                       |
 | `toolbox`, `filter`                 | F12           | boolean/config, filter 전 분기                         |
-| `formula`                           | F30           | 컬럼별 수식 입력 활성화 여부 검증                      |
 
 ### 3.3 공개 union과 callback 분기
 
@@ -119,7 +119,6 @@ U에서 가능한 로직을 E에만 두지 않고, happy-dom이 계산할 수 �
 - Clipboard copy/paste error reason 전체
 - text editor의 preserve/replace, startOnInput, commitOnBlur, format/parse
 - plugin editor의 activation, commit/cancel/move, Portal, stale session
-- 수식 엔진 에러( `#REF!`, `#NAME?`, `#DIV/0!`, `#VALUE!`, `#CYCLE!` ) 및 다중 클립보드 포맷 분기
 
 ### 3.4 공개 선언과 실제 런타임의 일치 검사
 
@@ -258,8 +257,6 @@ U에서 가능한 로직을 E에만 두지 않고, happy-dom이 계산할 수 �
 - Clipboard 실패 fallback과 모든 copy error reason을 검증한다.
 - paste의 editable/read-only, parse, 다중 행, row status, metadata를 검증한다.
 - createRowOnPaste와 모든 paste error/limit 분기를 검증한다.
-- 수식 복사 시 `text/plain`과 `application/x-bgrid-formula` 다중 MIME 타입 기록을 검증한다.
-- 클립보드 붙여넣기 시 AST 오프셋 시프트(Shift) 동작 및 '값만 붙여넣기(Paste Special)' 분기를 검증한다.
 
 ### F14. 활성 셀과 키보드
 
@@ -400,14 +397,6 @@ U에서 가능한 로직을 E에만 두지 않고, happy-dom이 계산할 수 �
 - 예제 smoke와 라이브러리 행동 테스트를 분리한다.
 - README 코드를 typecheck하고 deprecated API를 제한한다.
 
-### F30. 엑셀 수식 엔진 (Formula)
-
-- 절대 참조(`$A$1`), 상대 참조(`A1`), 혼합 참조(`$A1`, `A$1`)의 AST 토큰화 및 파싱을 검증한다.
-- 다단 의존성 체인의 캐시 업데이트 트리거를 검증한다.
-- 순환 참조(`A1=B1`, `B1=A1`) 발생 시 무한 루프 차단과 `#CYCLE!` 에러 반환을 확인한다.
-- 외부 데이터 조작 시 수식 캐시(`formulaResults`)와 종속성 그래프가 정확히 갱신되는지 확인한다.
-- 멀티 그리드 인스턴스 환경에서 캐시와 의존성 그래프가 상호 완벽히 격리되는지 검증한다.
-
 ### F29. 성능, 메모리, 호환성
 
 - 10만/100만 행의 DOM row 상한을 검증한다.
@@ -443,7 +432,6 @@ U에서 가능한 로직을 E에만 두지 않고, happy-dom이 계산할 수 �
 | `common` debounce/throttle     | leading/trailing/cancel/flush                      |
 | `number/*`                     | locale/음수/NaN/precision                          |
 | `delay`, `useForceUpdate`      | timer/unmount; 의미 없으면 상위 행동으로 대체      |
-| `formula/*`                    | 파서(상대/절대 참조), AST 시프트 알고리즘, DAG 순환 감지 |
 
 ## 6. 핵심 조합 매트릭스
 
@@ -467,8 +455,6 @@ U에서 가능한 로직을 E에만 두지 않고, happy-dom이 계산할 수 �
 | loading × page/load-more           | 중복 callback과 disabled 상태        |
 | controlled prop × event            | callback 후 parent rerender 전 계약  |
 | unmount × async/listener           | update/leak 없음                     |
-| Formula × Virtual Scroll           | 화면 밖 셀 참조 시 정확한 원본 데이터 평가 여부 |
-| Formula × Row Reorder / Sort       | 참조 파괴 경고 발생 및 정렬 시 계산 결과 기준 처리 여부 |
 
 ## 7. 목표 테스트 구조
 
@@ -549,7 +535,7 @@ lint/unit, component, package, Chromium E2E, site를 병렬화한다. coverage�
 | 3    | 내부 유틸·store 불변식              | 작은 실패 격리                 |
 | 4    | F01~F12                             | 기본 Grid 기능 완전 커버       |
 | 5    | F13~F20                             | 핵심 상호작용 완전 커버        |
-| 6    | F21~F24, F30                        | 고급 기능(수식 포함)과 비동기 수명주기 |
+| 6    | F21~F24                             | 고급 기능과 비동기 수명주기           |
 | 7    | F25~F28                             | CSS/accessibility/package/site |
 | 8    | 조합 매트릭스와 Chromium E2E        | 실제 브라우저 회귀 방어        |
 | 9    | 호환성/성능                         | 장기 운영                      |

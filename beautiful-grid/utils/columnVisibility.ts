@@ -4,6 +4,8 @@ import type {
   BGridColumnGroupNode,
   BGridColumnWithOptionalWidth,
   BGridProps,
+  BGridSummaryColumn,
+  BGridSummaryRow,
 } from '../types';
 import { getColumnId } from './getColumnId';
 
@@ -117,24 +119,32 @@ function projectCellMergeOptions<T>(
   return { ...options, columnsMap };
 }
 
+function projectSummaryColumn<T>(
+  sc: BGridSummaryColumn<T>,
+  vMap: Map<number, number>,
+): BGridSummaryColumn<T>[] {
+  const end = sc.columnIndex + (sc.colSpan ?? 1);
+  const idxs: number[] = [];
+  for (let i = sc.columnIndex; i < end; i++) {
+    const v = vMap.get(i);
+    if (v !== undefined) idxs.push(v);
+  }
+  return idxs.length ? [{ ...sc, columnIndex: idxs[0], colSpan: idxs.length }] : [];
+}
+
 function projectSummary<T>(
   summary: BGridProps<T>['summary'],
-  visibleIndexByOriginalIndex: Map<number, number>,
+  vMap: Map<number, number>,
 ): BGridProps<T>['summary'] {
   if (!summary) return undefined;
-  const columns = summary.columns.flatMap(summaryColumn => {
-    const originalEnd = summaryColumn.columnIndex + (summaryColumn.colSpan ?? 1);
-    const visibleIndexes: number[] = [];
-    for (let index = summaryColumn.columnIndex; index < originalEnd; index += 1) {
-      const visibleIndex = visibleIndexByOriginalIndex.get(index);
-      if (visibleIndex !== undefined) visibleIndexes.push(visibleIndex);
-    }
-    if (!visibleIndexes.length) return [];
-    return [{
-      ...summaryColumn,
-      columnIndex: visibleIndexes[0],
-      colSpan: visibleIndexes.length,
-    }];
-  });
-  return { ...summary, columns };
+  const projectCols = (cols: BGridSummaryColumn<T>[]) => cols.flatMap(c => projectSummaryColumn(c, vMap));
+  return {
+    ...summary,
+    ...(summary.columns ? { columns: projectCols(summary.columns) } : {}),
+    ...(summary.rows
+      ? {
+          rows: summary.rows.map(r => (Array.isArray(r) ? projectCols(r) : { ...r, columns: projectCols(r.columns) })),
+        }
+      : {}),
+  };
 }

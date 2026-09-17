@@ -70,15 +70,23 @@ function ColResizer({ container, columnIndex, hideHandle, bordered, frozenBounda
 
         targetDiv.innerHTML = `<table><thead>${headFrozenHTML}</thead><tbody>${bodyFrozenHTML}</tbody></table>
 <table><thead>${headHTML}</thead><tbody>${bodyHTML}</tbody></table>`;
-        const bodyTarget = document.getElementById('root') ?? document.body;
+        // Measure with the grid's inherited font and real header/body padding.
+        targetDiv.querySelectorAll('table').forEach(table => {
+          table.className = 'bgrid-head-table bgrid-body-table';
+          table.style.tableLayout = 'auto';
+          table.style.width = 'max-content';
+        });
+        const bodyTarget = container.current;
         bodyTarget.append(targetDiv);
 
         await delay(30);
 
-        const targetTd = targetDiv.querySelector(`tr td.bgrid-head-cell[data-column-index="${columnIndex}"]`);
+        const targetTd = targetDiv.querySelector(
+          `tr td.bgrid-head-cell[data-column-index="${columnIndex}"]`,
+        ) as HTMLTableCellElement | null;
 
         if (targetTd) {
-          setColumnWidth(columnIndex, { width: targetTd.getBoundingClientRect().width });
+          setColumnWidth(columnIndex, { width: Math.ceil(targetTd.offsetWidth) + 1 });
           setColumnWidth(columnIndex, { updateColumns: true });
         }
         targetDiv.remove();

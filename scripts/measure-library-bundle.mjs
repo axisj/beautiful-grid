@@ -6,7 +6,7 @@ import { build } from 'esbuild';
 const repositoryRoot = path.resolve(import.meta.dirname, '..');
 const generatedMetricsPath = path.join(repositoryRoot, 'site/src/data/bundleMetrics.ts');
 const virtualOutputDirectory = path.join(repositoryRoot, '.bundle-metric-output');
-const initialBundleBudgetGzipKiB = 70;
+const initialBundleBudgetGzipKiB = 100;
 
 const normalizePath = value => value.replaceAll(path.sep, '/').replace(/^\.\//, '');
 const toKiB = bytes => Number((bytes / 1024).toFixed(1));

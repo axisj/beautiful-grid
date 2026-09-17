@@ -269,10 +269,10 @@ export function CellTextEditorGateway({ containerRef }: Props) {
     endCellEdit(cellEditSession.id);
   }, [cellEditSession, endCellEdit]);
 
-  const startReplace = React.useCallback(() => {
-    if (!activeCell || !canStartText || cellEditSession) return;
+  const startReplace = React.useCallback((preserveInput = false) => {
+    if (!activeCell || !canStartText || cellEditSession || nativeStartRef.current) return;
     nativeStartRef.current = true;
-    if (inputRef.current) inputRef.current.value = '';
+    if (inputRef.current && !preserveInput) inputRef.current.value = '';
     beginCellEdit(activeCell, 'replace');
   }, [activeCell, beginCellEdit, canStartText, cellEditSession]);
 
@@ -296,7 +296,7 @@ export function CellTextEditorGateway({ containerRef }: Props) {
       readOnly={!canStartText && !isTextEditing}
       {...inputProps}
       onBeforeInput={() => startReplace()}
-      onInput={() => startReplace()}
+      onInput={() => startReplace(true)}
       onCompositionStart={() => {
         composingRef.current = true;
         startReplace();

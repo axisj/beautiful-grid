@@ -9,7 +9,7 @@ demoId: 'master-detail'
 features: ['master-detail', 'nested-grid', 'expandable-rows', 'virtual-scroll', 'accessibility']
 relatedGuides: ['data-and-columns', 'tree-folding', 'variable-row-height', 'frozen-columns']
 relatedApi: ['/api/props#masterdetail', '/api/props#rowkey']
-sinceVersion: '1.14.0'
+sinceVersion: '1.15.0'
 lastReviewedAt: '2026-09-17'
 indexable: true
 draft: false

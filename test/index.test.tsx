@@ -2073,12 +2073,14 @@ describe('BGrid CSS Architecture & Style Contracts', () => {
   });
 
   describe('Bottom Bar rendering', () => {
-    it('reserves the custom vertical scrollbar gutter outside the column content width', () => {
+    it.each([100, 300])('reserves only the custom scrollbar gutter for %i px columns', columnWidth => {
+      const sizedColumns = columns.map(column => ({ ...column, width: columnWidth }));
+      const contentWidth = sizedColumns.length * columnWidth;
       const { container, rerender } = render(
         <BGrid<Row>
           width={400}
           height={200}
-          columns={columns}
+          columns={sizedColumns}
           data={data}
           scrollbar={{ variant: 'modern' }}
         />,
@@ -2086,20 +2088,21 @@ describe('BGrid CSS Architecture & Style Contracts', () => {
 
       const scrollPlane = container.querySelector('.bgrid-scroll-plane') as HTMLElement;
       expect(scrollPlane.style.minWidth).toBe(
-        'max(100%, calc(200px + var(--bgrid-scrollbar-modern-gutter-size)))',
+        `max(100%, calc(${contentWidth}px + var(--bgrid-scrollbar-modern-gutter-size)))`,
       );
 
       rerender(
         <BGrid<Row>
           width={400}
           height={200}
-          columns={columns}
+          columns={sizedColumns}
           data={data}
           scrollbar={{ variant: 'native' }}
         />,
       );
 
-      expect(scrollPlane.style.minWidth).toBe('400px');
+      // Native scrollbars reduce the available viewport width, so do not force the outer grid width.
+      expect(scrollPlane.style.minWidth).toBe(`max(100%, ${contentWidth}px)`);
     });
 
     it('does not warn when only the preferred bottomBarHeight prop is provided', () => {

@@ -468,14 +468,35 @@ function Table<T>(props: Props<T>) {
   );
   const mainViewportWidth = Math.max(width - (frozenColumnsWidth ?? 0), 0);
   const logicalBodyContentHeight = rowHeightMetrics.totalHeight;
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const scrollableColumnsWidth = React.useMemo(
+    () =>
+      columns.slice(props.frozenColumnIndex ?? 0).reduce((totalWidth, column) => totalWidth + (column.width ?? 100), 0),
+    [columns, props.frozenColumnIndex],
+  );
+  const stickyTopHeight = headerHeight + (summary?.position === 'top' ? summaryHeight : 0);
+  const stickyBottomHeight = summary?.position === 'bottom' ? summaryHeight : 0;
+  const stickyFixedHeight = stickyTopHeight + stickyBottomHeight;
+  const scrollPlaneContentWidth = (frozenColumnsWidth ?? 0) + scrollableColumnsWidth;
+  const measuredScrollbarMetrics = useScrollbarMetrics(
+    scrollContainerRef,
+    [data.length, itemHeight, itemPadding, contentBodyHeight, width],
+    scrollPlaneContentWidth,
+    stickyFixedHeight,
+  );
+  // Native horizontal scrollbars occupy viewport space; use the measured body height for every scroll path.
+  const effectiveBodyHeight =
+    scrollbar.variant === 'native'
+      ? measuredScrollbarMetrics.vertical.viewportSize || contentBodyHeight
+      : contentBodyHeight;
   const virtualScrollWindowMetrics = React.useMemo(
     () =>
       getVirtualScrollWindowMetrics({
         logicalContentHeight: logicalBodyContentHeight,
-        viewportHeight: contentBodyHeight,
+        viewportHeight: effectiveBodyHeight,
         enabled: scrollbar.variant !== 'native',
       }),
-    [contentBodyHeight, logicalBodyContentHeight, scrollbar.variant],
+    [effectiveBodyHeight, logicalBodyContentHeight, scrollbar.variant],
   );
   const [virtualScrollBase, setVirtualScrollBase] = React.useState(0);
   const virtualScrollBaseRef = useRef(0);
@@ -483,7 +504,6 @@ function Table<T>(props: Props<T>) {
   const searchPopoverRef = useRef<HTMLDivElement>(null);
   const editorPortalRef = useRef<HTMLDivElement>(null);
   const bodyContainerRef = useRef<HTMLDivElement>(null);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const logicalVerticalScrollState = React.useMemo(
     () => ({
       scrollTop,
@@ -771,19 +791,9 @@ function Table<T>(props: Props<T>) {
       storeSourceIndexByVisibleIndex,
     ],
   );
-  const scrollableColumnsWidth = React.useMemo(
-    () =>
-      columns.slice(props.frozenColumnIndex ?? 0).reduce((totalWidth, column) => totalWidth + (column.width ?? 100), 0),
-    [columns, props.frozenColumnIndex],
-  );
-
-  const stickyTopHeight = headerHeight + (summary?.position === 'top' ? summaryHeight : 0);
-  const stickyBottomHeight = summary?.position === 'bottom' ? summaryHeight : 0;
-  const stickyFixedHeight = stickyTopHeight + stickyBottomHeight;
   const scrollViewportHeight = contentBodyHeight + stickyFixedHeight;
   const physicalScrollableRowsHeight = Math.max(virtualScrollWindowMetrics.physicalContentHeight - frozenRowsHeight, 0);
   const scrollPlaneHeight = stickyFixedHeight + virtualScrollWindowMetrics.physicalContentHeight;
-  const scrollPlaneContentWidth = (frozenColumnsWidth ?? 0) + scrollableColumnsWidth;
   const scrollPlaneWidth = Math.max(width, scrollPlaneContentWidth);
   const customVerticalScrollbarGutter =
     scrollbar.vertical.visible && scrollbar.variant === 'classic'
@@ -793,14 +803,9 @@ function Table<T>(props: Props<T>) {
       : undefined;
   const scrollPlaneMinWidth: React.CSSProperties['minWidth'] = customVerticalScrollbarGutter
     ? `max(100%, calc(${scrollPlaneContentWidth}px + ${customVerticalScrollbarGutter}))`
+    : scrollbar.variant === 'native'
+    ? `max(100%, ${scrollPlaneContentWidth}px)`
     : scrollPlaneWidth;
-
-  const measuredScrollbarMetrics = useScrollbarMetrics(
-    scrollContainerRef,
-    [data.length, itemHeight, itemPadding, contentBodyHeight, width],
-    scrollPlaneContentWidth,
-    stickyFixedHeight,
-  );
   const scrollbarMetrics = React.useMemo(
     () =>
       virtualScrollWindowMetrics.enabled
@@ -2882,8 +2887,8 @@ function Table<T>(props: Props<T>) {
               aria-hidden='true'
               style={{
                 top: stickyTopHeight,
-                height: contentBodyHeight,
-                marginBottom: -contentBodyHeight,
+                height: effectiveBodyHeight,
+                marginBottom: -effectiveBodyHeight,
               }}
             />
 

@@ -462,6 +462,19 @@ function Table<T>(props: Props<T>) {
   const rowHeightMetrics = props.rowHeightMetrics;
   const variableRowOffsets = rowHeightMetrics.variable ? rowHeightMetrics.offsets : undefined;
   const scrollableBodyHeight = Math.max(contentBodyHeight - frozenRowsHeight, 0);
+  const stickyTopHeight = headerHeight + (summary?.position === 'top' ? summaryHeight : 0);
+  const stickyBottomHeight = summary?.position === 'bottom' ? summaryHeight : 0;
+  const stickyFixedHeight = stickyTopHeight + stickyBottomHeight;
+  const scrollPlaneContentWidth =
+    (frozenColumnsWidth ?? 0) +
+    columns.slice(props.frozenColumnIndex ?? 0).reduce((totalWidth, column) => totalWidth + (column.width ?? 100), 0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const measuredScrollbarMetrics = useScrollbarMetrics(
+    scrollContainerRef,
+    [data.length, itemHeight, itemPadding, contentBodyHeight, width],
+    scrollPlaneContentWidth,
+    stickyFixedHeight,
+  );
   const scrollOverscanRows = Math.max(
     KEYBOARD_NAVIGATION_ROW_WINDOW_SIZE,
     Math.ceil(scrollableBodyHeight / Math.max(trHeight, 1)),
@@ -471,10 +484,13 @@ function Table<T>(props: Props<T>) {
     () =>
       getVirtualScrollWindowMetrics({
         logicalContentHeight: logicalBodyContentHeight,
-        viewportHeight: contentBodyHeight,
+        viewportHeight:
+          scrollbar.variant === 'native' && measuredScrollbarMetrics.vertical.viewportSize > 0
+            ? measuredScrollbarMetrics.vertical.viewportSize
+            : contentBodyHeight,
         enabled: scrollbar.variant !== 'native',
       }),
-    [contentBodyHeight, logicalBodyContentHeight, scrollbar.variant],
+    [contentBodyHeight, logicalBodyContentHeight, measuredScrollbarMetrics.vertical.viewportSize, scrollbar.variant],
   );
   const [virtualScrollBase, setVirtualScrollBase] = React.useState(0);
   const virtualScrollBaseRef = useRef(0);
@@ -482,7 +498,6 @@ function Table<T>(props: Props<T>) {
   const searchPopoverRef = useRef<HTMLDivElement>(null);
   const editorPortalRef = useRef<HTMLDivElement>(null);
   const bodyContainerRef = useRef<HTMLDivElement>(null);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const logicalVerticalScrollState = React.useMemo(
     () => ({
       scrollTop,
@@ -758,20 +773,9 @@ function Table<T>(props: Props<T>) {
       storeSourceIndexByVisibleIndex,
     ],
   );
-  const scrollableColumnsWidth = React.useMemo(
-    () =>
-      columns.slice(props.frozenColumnIndex ?? 0).reduce((totalWidth, column) => totalWidth + (column.width ?? 100), 0),
-    [columns, props.frozenColumnIndex],
-  );
-
-  const stickyTopHeight = headerHeight + (summary?.position === 'top' ? summaryHeight : 0);
-  const stickyBottomHeight = summary?.position === 'bottom' ? summaryHeight : 0;
-  const stickyFixedHeight = stickyTopHeight + stickyBottomHeight;
   const scrollViewportHeight = contentBodyHeight + stickyFixedHeight;
   const physicalScrollableRowsHeight = Math.max(virtualScrollWindowMetrics.physicalContentHeight - frozenRowsHeight, 0);
   const scrollPlaneHeight = stickyFixedHeight + virtualScrollWindowMetrics.physicalContentHeight;
-  const scrollPlaneContentWidth = (frozenColumnsWidth ?? 0) + scrollableColumnsWidth;
-  const scrollPlaneWidth = Math.max(width, scrollPlaneContentWidth);
   const customVerticalScrollbarGutter =
     scrollbar.vertical.visible && scrollbar.variant === 'classic'
       ? 'var(--bgrid-scrollbar-classic-gutter-size)'
@@ -780,14 +784,7 @@ function Table<T>(props: Props<T>) {
       : undefined;
   const scrollPlaneMinWidth: React.CSSProperties['minWidth'] = customVerticalScrollbarGutter
     ? `max(100%, calc(${scrollPlaneContentWidth}px + ${customVerticalScrollbarGutter}))`
-    : scrollPlaneWidth;
-
-  const measuredScrollbarMetrics = useScrollbarMetrics(
-    scrollContainerRef,
-    [data.length, itemHeight, itemPadding, contentBodyHeight, width],
-    scrollPlaneContentWidth,
-    stickyFixedHeight,
-  );
+    : `max(100%, ${scrollPlaneContentWidth}px)`;
   const scrollbarMetrics = React.useMemo(
     () =>
       virtualScrollWindowMetrics.enabled

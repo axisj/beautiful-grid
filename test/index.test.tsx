@@ -2099,7 +2099,7 @@ describe('BGrid CSS Architecture & Style Contracts', () => {
         />,
       );
 
-      expect(scrollPlane.style.minWidth).toBe('400px');
+      expect(scrollPlane.style.minWidth).toBe('max(100%, 200px)');
     });
 
     it('does not warn when only the preferred bottomBarHeight prop is provided', () => {

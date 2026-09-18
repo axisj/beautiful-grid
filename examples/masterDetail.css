@@ -4,20 +4,14 @@
 
 .master-detail-title {
   color: #194e49;
-  font-size: 13px;
-  font-weight: 600;
 }
 
 .master-detail-count {
   color: #527b75;
-  font-size: 12px;
 }
 
 .master-detail-order-items {
-  height: 130px;
-  overflow: hidden;
-  border: 1px solid #a7cec5;
-  border-radius: 7px;
+  border-color: #a7cec5;
   background: #f7fcfa;
   box-shadow: 0 2px 8px rgb(22 91 80 / 9%);
 }

@@ -5,6 +5,7 @@ import DataGridContainer from '../components/DataGridContainer';
 import { useContainerSize } from '../hooks/useContainerSize';
 import { exampleMsg, t } from './i18n';
 import './masterDetail.css';
+import { Button, Select } from 'antd';
 
 interface OrderItem {
   itemCode: string;
@@ -122,15 +123,15 @@ const masterColumns: BGridColumn<OrderRow>[] = [
     width: 120,
     align: 'center',
     itemRender: ({ value }) => {
-      const color =
+      const colorClass =
         value === 'Delivered'
-          ? '#16a34a'
+          ? 'text-emerald-600'
           : value === 'Shipped'
-          ? '#2563eb'
+          ? 'text-blue-600'
           : value === 'Processing'
-          ? '#d97706'
-          : '#dc2626';
-      return <span style={{ color, fontWeight: 600 }}>{value}</span>;
+          ? 'text-amber-600'
+          : 'text-red-600';
+      return <span className={`font-semibold ${colorClass}`}>{value}</span>;
     },
   },
   {
@@ -179,7 +180,7 @@ function OrderItemsGrid({ items }: { items: OrderItem[] }) {
   const nestedData: BGridDataItem<OrderItem>[] = React.useMemo(() => items.map(it => ({ values: it })), [items]);
 
   return (
-    <div ref={containerRef} className='master-detail-order-items'>
+    <div ref={containerRef} className='master-detail-order-items h-[130px] overflow-hidden border'>
       <BGrid
         className='master-detail-child-grid'
         headerHeight={25}
@@ -229,21 +230,12 @@ export default function MasterDetailExample() {
       const memo = orderMemos[order.orderId] ?? order.notes ?? '';
 
       return (
-        <div
-          style={{
-            padding: '12px 16px',
-            height: '100%',
-            boxSizing: 'border-box',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 8,
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div className='master-detail-title'>
+        <div className='box-border flex h-full flex-col gap-2 px-4 py-3'>
+          <div className='flex items-center justify-between'>
+            <div className='master-detail-title text-[13px] font-semibold'>
               {t('주문 상세 품목', 'Order Items')} — {order.orderId} ({order.customer})
             </div>
-            <span className='master-detail-count'>
+            <span className='master-detail-count text-xs'>
               {t(`총 ${order.items.length}개 품목`, `${order.items.length} line items`)}
             </span>
           </div>
@@ -256,57 +248,35 @@ export default function MasterDetailExample() {
   );
 
   return (
-    <div className='master-detail-example' style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 12 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13 }}>
-          <label style={{ fontWeight: 600 }}>{t('펼침 모드', 'Expand Mode')}:</label>
-          <select
+    <div className='master-detail-example flex h-full flex-col gap-3'>
+      <div className='flex flex-wrap items-center gap-3'>
+        <label className='inline-flex items-center gap-2 font-medium'>
+          <span>{t('펼침 모드', 'Expand Mode')}</span>
+          <Select<BGridMasterDetailExpandMode>
+            className='min-w-[210px]'
             value={expandMode}
-            onChange={e => {
-              const nextMode = e.target.value as BGridMasterDetailExpandMode;
-              setExpandMode(nextMode);
-              if (nextMode === 'single' && expandedRowKeys.length > 1) {
+            options={[
+              { value: 'multiple', label: t('다중 (Multiple)', 'Multiple') },
+              { value: 'single', label: t('단일 (Accordion)', 'Single (Accordion)') },
+            ]}
+            onChange={v => {
+              setExpandMode(v);
+              if (v === 'single' && expandedRowKeys.length > 1) {
                 setExpandedRowKeys(expandedRowKeys.slice(0, 1));
               }
             }}
-            style={{ padding: '4px 8px', borderRadius: 4, border: '1px solid var(--bgrid-border-color, #cbd5e1)' }}
-          >
-            <option value='multiple'>{t('다중 (Multiple)', 'Multiple')}</option>
-            <option value='single'>{t('단일 (Accordion)', 'Single (Accordion)')}</option>
-          </select>
-        </div>
+          />
+        </label>
 
-        <button
-          type='button'
-          onClick={handleExpandAll}
-          style={{
-            padding: '4px 12px',
-            fontSize: 13,
-            borderRadius: 4,
-            border: '1px solid var(--bgrid-border-color, #cbd5e1)',
-            background: 'var(--bgrid-bg, #ffffff)',
-            cursor: 'pointer',
-          }}
-        >
+        <Button size='small' onClick={handleExpandAll}>
           {t('모두 펼치기', 'Expand All')}
-        </button>
+        </Button>
 
-        <button
-          type='button'
-          onClick={handleCollapseAll}
-          style={{
-            padding: '4px 12px',
-            fontSize: 13,
-            borderRadius: 4,
-            border: '1px solid var(--bgrid-border-color, #cbd5e1)',
-            background: 'var(--bgrid-bg, #ffffff)',
-            cursor: 'pointer',
-          }}
-        >
+        <Button size='small' onClick={handleCollapseAll}>
           {t('모두 접기', 'Collapse All')}
-        </button>
+        </Button>
 
-        <span style={{ fontSize: 12, color: 'var(--bgrid-sub-text, #64748b)' }}>
+        <span className='text-xs text-slate-500'>
           {t(
             `펼쳐진 행: ${expandedRowKeys.length}개 (일부 행은 품목이 없어 펼침 불가)`,
             `Expanded: ${expandedRowKeys.length} (Rows with 0 items cannot be expanded)`,
@@ -314,7 +284,7 @@ export default function MasterDetailExample() {
         </span>
       </div>
 
-      <div style={{ flex: 1, minHeight: 0 }}>
+      <div className='min-h-0 flex-1'>
         <DataGridContainer ref={containerRef}>
           <BGrid
             width={width}

@@ -442,7 +442,10 @@ export function useRowReorderController<T>({
       container.style.setProperty('--bgrid-row-reorder-height', `${session.rowHeight}px`);
       store.getState().clearCellSelection();
       store.getState().closeTransientSurfaces();
-      container.querySelectorAll('.bgrid-row-hover').forEach(element => element.classList.remove('bgrid-row-hover'));
+      container.querySelectorAll('.bgrid-row-hover').forEach(element => {
+        if (element.closest('[role="grid"], [role="treegrid"]') !== container) return;
+        element.classList.remove('bgrid-row-hover');
+      });
       store.setState({
         reorderingInfo: {
           fromIndex: session.fromIndex,

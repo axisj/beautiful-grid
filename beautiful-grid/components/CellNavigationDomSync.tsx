@@ -32,6 +32,7 @@ export function CellNavigationDomSync({
         '[data-bgrid-cell-active="true"], [data-bgrid-cell-active-multi-selection="true"]',
       )
       .forEach(cell => {
+        if (cell.closest('[role="grid"], [role="treegrid"]') !== container) return;
         cell.classList.remove('bgrid-cell-active', 'bgrid-cell-active-multi-selection');
         cell.removeAttribute('data-bgrid-cell-active');
         cell.removeAttribute('data-bgrid-cell-active-multi-selection');
@@ -43,6 +44,7 @@ export function CellNavigationDomSync({
           `td[data-bgrid-cell="true"][data-bgrid-logical-row-index="${activeCell.rowIndex}"][data-column-index="${activeCell.columnIndex}"]`,
         )
         .forEach(cell => {
+          if (cell.closest('[role="grid"], [role="treegrid"]') !== container) return;
           cell.classList.add('bgrid-cell-active');
           cell.setAttribute('data-bgrid-cell-active', 'true');
           if (hasMultiCellSelection) {
@@ -62,6 +64,7 @@ export function CellNavigationDomSync({
     const wholeColumnSelection = coversEveryRow && !coversEveryColumn;
 
     container.querySelectorAll<HTMLElement>('.bgrid-line-number-cell[data-row-index]').forEach(cell => {
+      if (cell.closest('[role="grid"], [role="treegrid"]') !== container) return;
       const rowIndex = Number(cell.dataset.rowIndex);
       const active =
         !wholeColumnSelection &&
@@ -73,6 +76,7 @@ export function CellNavigationDomSync({
     });
 
     container.querySelectorAll<HTMLTableCellElement>('[data-header-cell-type][data-column-index]').forEach(cell => {
+      if (cell.closest('[role="grid"], [role="treegrid"]') !== container) return;
       const columnIndex = Number(cell.dataset.columnIndex);
       const active =
         cell.dataset.headerCellType === 'column' &&

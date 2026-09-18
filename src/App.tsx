@@ -30,6 +30,7 @@ const ContextMenuExample = React.lazy(() => import('../examples/ContextMenuExamp
 const ColumnVisibilityExample = React.lazy(() => import('../examples/ColumnVisibilityExample'));
 const TreeFoldingExample = React.lazy(() => import('../examples/TreeFoldingExample'));
 const ExportExample = React.lazy(() => import('../examples/ExportExample'));
+const MasterDetailExample = React.lazy(() => import('../examples/MasterDetailExample'));
 
 interface DemoPageProps {
   title: string;
@@ -79,6 +80,7 @@ const DEMO_ROUTES: Record<string, { title: string; component: React.LazyExoticCo
   '/contextMenu': { title: 'Cell Context Menu', component: ContextMenuExample },
   '/treeFolding': { title: 'Tree Folding', component: TreeFoldingExample },
   '/export': { title: 'Data Export (CSV & JSON)', component: ExportExample },
+  '/masterDetail': { title: 'Master-Detail (Nested Grid)', component: MasterDetailExample },
 };
 
 function App() {

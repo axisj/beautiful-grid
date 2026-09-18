@@ -65,6 +65,8 @@ Watch 1-million row virtual scrolling, keyboard navigation, and interactive cell
   - [12. Cell Merging](#12-cell-merging)
   - [13. Pivot Table](#13-pivot-table)
   - [14. Column Visibility](#14-column-visibility)
+  - [15. Tree Grid](#15-tree-grid)
+  - [16. Master-Detail (Nested Grid)](#16-master-detail-nested-grid)
 - [Props Reference](#props-reference)
   - [BGridProps](#bgridprops)
   - [BGridColumn](#bgridcolumn)
@@ -1012,6 +1014,45 @@ Rows whose parent is missing are treated as roots. Cycles are contained, the sou
 
 ---
 
+### 16. Master-Detail (Nested Grid)
+
+Expand grid rows to reveal subgrids, nested forms, or detailed child records spanning the full width of the grid with isolated event handling.
+
+```typescript jsx
+const [expandedRowKeys, setExpandedRowKeys] = React.useState(['ORD-001']);
+
+<BGrid
+  width={800}
+  height={450}
+  columns={columns}
+  data={orders}
+  rowKey='orderId'
+  masterDetail={{
+    expandMode: 'multiple',
+    expandedRowKeys,
+    onExpandedRowKeysChange: setExpandedRowKeys,
+    hasDetail: item => item.values.items.length > 0,
+    detailRowHeight: 180,
+    detailRender: ({ item }) => (
+      <div style={{ padding: 12 }}>
+        <h4>Order Items ({item.values.items.length})</h4>
+        <BGrid
+          width={760}
+          height={130}
+          columns={itemColumns}
+          data={item.values.items.map(it => ({ values: it }))}
+          rowKey='itemCode'
+        />
+      </div>
+    ),
+  }}
+/>;
+```
+
+Even when frozen columns are configured, the detail panel renders in a unified full-width layer while master row cells preserve their natural row height. Pointer events, clicks, and keystrokes inside the detail view are isolated from parent table selections and shortcuts.
+
+---
+
 ## Props Reference
 
 ### BGridProps
@@ -1099,6 +1140,7 @@ Below is a categorized reference of `<BGrid>` props. For exact TypeScript types,
 | `columnVisibility`   | `boolean \| BGridColumnVisibilityOptions<T>`                        | Enables controlled or uncontrolled column hiding and restore controls (since `1.0.6`). |
 | `icons`              | `BGridToolboxIcons`                                                 | Custom SVG / ReactNode icons for column toolbox, filter, and sort buttons.             |
 | `tree`               | `BGridTreeOptions<T>`                                               | Renders flat parent-key data as collapsible hierarchical rows.                         |
+| `masterDetail`       | `BGridMasterDetailOptions<T>`                                       | Expands rows to display nested subgrids, forms, or custom detail panels.               |
 | `loading`            | `boolean`                                                           | Displays full-grid loading overlay.                                                    |
 | `spinning`           | `boolean`                                                           | Displays body-area spinner.                                                            |
 | `msg`                | `{ emptyList?: string }`                                            | Custom empty state text.                                                               |
@@ -1171,6 +1213,25 @@ interface BGridDataControl {
   multiSort?: boolean;
   query: BGridDataQuery;
   onChange: (query: BGridDataQuery, event: BGridDataQueryChangeEvent) => void;
+}
+```
+
+#### `BGridMasterDetailOptions`
+
+```typescript
+interface BGridMasterDetailOptions<T> {
+  expandMode?: 'multiple' | 'single';
+  expandedRowKeys?: React.Key[];
+  defaultExpandedRowKeys?: React.Key[];
+  onExpandedRowKeysChange?: (
+    expandedRowKeys: React.Key[],
+    event: BGridMasterDetailChangeEvent<T>,
+  ) => void;
+  hasDetail?: (item: BGridDataItem<T>, index: number) => boolean;
+  detailRowHeight?: number;
+  detailRender: (props: BGridMasterDetailRenderProps<T>) => React.ReactNode;
+  expandColumnId?: string;
+  icons?: BGridMasterDetailIcons;
 }
 ```
 

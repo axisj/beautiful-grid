@@ -15,6 +15,7 @@ import {
 } from '../utils';
 import { TableBodyCell } from './TableBodyCell';
 import { TableBodyRow } from './TableBodyRow';
+import { MasterDetailRow } from './MasterDetailCell';
 import { AppModelColumn, BGridDataItem, BGridDataItemStatus, BGridProps, BGridSearchMatch } from '../types';
 import RowSelector from './RowSelector';
 import { GripVertical } from './GripVertical';
@@ -136,6 +137,7 @@ interface Props {
   onRowReorderPointerDown?: (event: React.PointerEvent<HTMLButtonElement>, rowIndex: number) => void;
   onRowReorderKeyDown?: (event: React.KeyboardEvent<HTMLButtonElement>, rowIndex: number) => void;
   rowHeightMetrics?: BGridRowHeightMetrics;
+  viewportWidth?: number;
 }
 
 function getRowReactKey<T>(
@@ -185,6 +187,7 @@ function TableBody({
   onRowReorderPointerDown,
   onRowReorderKeyDown,
   rowHeightMetrics,
+  viewportWidth,
 }: Props) {
   const isLeftRegion = region === 'left';
   // [Selector Group 1] Scroll & Dimensions - 스크롤 및 차원
@@ -353,58 +356,73 @@ function TableBody({
 
           const rowReactKey = getRowReactKey(item, sourceIndex, rowKey, rowKeyRegistry);
 
+          const detailHeight = rowHeightMetrics?.detailHeights?.[ri] ?? 0;
+
           return (
-            <TableBodyRow
-              key={rowReactKey}
-              item={item}
-              data={data}
-              ri={ri}
-              sourceIndex={sourceIndex}
-              columns={columns}
-              startCIdx={startCIdx}
-              endCIdx={endCIdx}
-              frozenColumnIndex={frozenColumnIndex}
-              isLeftRegion={isLeftRegion}
-              showLineNumber={showLineNumber ?? false}
-              hasRowChecked={hasRowChecked}
-              isRadio={Boolean(isRadio)}
-              checked={checkedAll === true || checkedIndexesMap.get(sourceIndex)}
-              rowCheckedDisabled={Boolean(disabled || rowChecked?.disabled?.(sourceIndex, item))}
-              rowStatus={rowStatus}
-              active={active}
-              className={className}
-              resolvedRowHeight={resolvedRowHeight}
-              itemHeight={itemHeight}
-              itemPadding={itemPadding}
-              editable={Boolean(editable)}
-              disabled={Boolean(disabled)}
-              editTrigger={editTrigger}
-              hasOnClick={hasOnClick}
-              cellMergeOptions={cellMergeOptions}
-              mergeColumns={mergeColumns}
-              odd={!mergeColumns ? ri % 2 === 0 : undefined}
-              variant={variant}
-              rowReorderEnabled={rowReorderEnabled}
-              rowReorderRole={rowReorderRole}
-              rowReorderPhase={reorderingInfo?.phase}
-              rowReorderDirection={rowReorderDirection}
-              rowReorderOffset={rowReorderOffset}
-              reorder={reorder}
-              reorderingInfo={reorderingInfo}
-              searchMatchTokens={searchMatchTokens}
-              currentSearchToken={currentSearchToken}
-              isRowEditing={isRowEditing}
-              cellInteractionSession={isRowEditing ? cellInteractionSession : undefined}
-              handleClick={handleClick}
-              setEditItem={setEditItem}
-              setItemValue={setItemValue}
-              handleMoveEditFocus={handleMoveEditFocus}
-              handleChangeChecked={handleChangeChecked}
-              handleChangeCheckedRadio={handleChangeCheckedRadio}
-              getRowSpan={getRowSpan}
-              onRowReorderPointerDown={onRowReorderPointerDown}
-              onRowReorderKeyDown={onRowReorderKeyDown}
-            />
+            <React.Fragment key={rowReactKey}>
+              <TableBodyRow
+                item={item}
+                data={data}
+                ri={ri}
+                sourceIndex={sourceIndex}
+                columns={columns}
+                startCIdx={startCIdx}
+                endCIdx={endCIdx}
+                frozenColumnIndex={frozenColumnIndex}
+                isLeftRegion={isLeftRegion}
+                showLineNumber={showLineNumber ?? false}
+                hasRowChecked={hasRowChecked}
+                isRadio={Boolean(isRadio)}
+                checked={checkedAll === true || checkedIndexesMap.get(sourceIndex)}
+                rowCheckedDisabled={Boolean(disabled || rowChecked?.disabled?.(sourceIndex, item))}
+                rowStatus={rowStatus}
+                active={active}
+                className={className}
+                resolvedRowHeight={resolvedRowHeight}
+                itemHeight={itemHeight}
+                itemPadding={itemPadding}
+                editable={Boolean(editable)}
+                disabled={Boolean(disabled)}
+                editTrigger={editTrigger}
+                hasOnClick={hasOnClick}
+                cellMergeOptions={cellMergeOptions}
+                mergeColumns={mergeColumns}
+                odd={!mergeColumns ? ri % 2 === 0 : undefined}
+                variant={variant}
+                rowReorderEnabled={rowReorderEnabled}
+                rowReorderRole={rowReorderRole}
+                rowReorderPhase={reorderingInfo?.phase}
+                rowReorderDirection={rowReorderDirection}
+                rowReorderOffset={rowReorderOffset}
+                reorder={reorder}
+                reorderingInfo={reorderingInfo}
+                searchMatchTokens={searchMatchTokens}
+                currentSearchToken={currentSearchToken}
+                isRowEditing={isRowEditing}
+                cellInteractionSession={isRowEditing ? cellInteractionSession : undefined}
+                handleClick={handleClick}
+                setEditItem={setEditItem}
+                setItemValue={setItemValue}
+                handleMoveEditFocus={handleMoveEditFocus}
+                handleChangeChecked={handleChangeChecked}
+                handleChangeCheckedRadio={handleChangeCheckedRadio}
+                getRowSpan={getRowSpan}
+                onRowReorderPointerDown={onRowReorderPointerDown}
+                onRowReorderKeyDown={onRowReorderKeyDown}
+              />
+              {detailHeight > 0 && (
+                <MasterDetailRow
+                  item={item}
+                  sourceIndex={sourceIndex}
+                  visibleIndex={ri}
+                  detailHeight={detailHeight}
+                  isLeftRegion={isLeftRegion}
+                  viewportWidth={viewportWidth ?? Math.max(width - (frozenColumnsWidth ?? 0), 0)}
+                  frozenColumnsWidth={frozenColumnsWidth ?? 0}
+                  colSpan={isLeftRegion ? Math.max(frozenColumnIndex, 1) : Math.max(columns.length - frozenColumnIndex, 1)}
+                />
+              )}
+            </React.Fragment>
           );
         })}
 

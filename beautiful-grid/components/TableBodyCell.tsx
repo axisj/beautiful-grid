@@ -4,6 +4,7 @@ import { PluginCellEditor } from './PluginCellEditor';
 import { CellEditorIcon } from './CellEditorIcon';
 import { CheckboxCellEditor } from './CheckboxCellEditor';
 import { TreeCell } from './TreeCell';
+import { MasterDetailCell } from './MasterDetailCell';
 
 interface Props<T> {
   index: number;
@@ -87,6 +88,10 @@ function Cell({
           <TreeCell column={column} item={item}>
             {content}
           </TreeCell>
+        ) : column.masterDetailCell ? (
+          <MasterDetailCell column={column} item={item} sourceIndex={index}>
+            {content}
+          </MasterDetailCell>
         ) : (
           content
         )}

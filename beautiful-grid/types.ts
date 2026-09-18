@@ -1105,6 +1105,8 @@ export interface BGridProps<T> {
   contextMenuOptions?: BGridContextMenuOptions<T>;
   /** Enables hierarchical rows from flat data related by rowKey and parentRowKey. */
   tree?: BGridTreeOptions<T>;
+  /** Enables master-detail expandable rows with full-width detail panels or nested grids. */
+  masterDetail?: BGridMasterDetailOptions<T>;
 }
 
 export interface BGridTreeIcons {
@@ -1148,6 +1150,62 @@ export interface BGridTreeOptions<T> {
   collapseAriaLabel?: string;
 }
 
+export type BGridMasterDetailExpandMode = 'multiple' | 'single';
+
+export interface BGridMasterDetailRenderProps<T> {
+  item: BGridDataItem<T>;
+  rowKey: React.Key;
+  sourceIndex: number;
+  visibleIndex: number;
+  expanded: true;
+  collapse: () => void;
+}
+
+export interface BGridMasterDetailIcons {
+  expanded?: React.ReactNode;
+  collapsed?: React.ReactNode;
+}
+
+export interface BGridMasterDetailChangeEvent<T> {
+  rowKey: React.Key;
+  expanded: boolean;
+  item: BGridDataItem<T>;
+  sourceIndex: number;
+}
+
+export interface BGridMasterDetailOptions<T> {
+  /** Enables or disables master-detail row expansion. Defaults to true when masterDetail is provided. */
+  enabled?: boolean;
+  /** Custom renderer for the expanded detail region. */
+  detailRender: (props: BGridMasterDetailRenderProps<T>) => React.ReactNode;
+  /**
+   * Detail area total height in pixels, including padding and borders.
+   * Accepts a fixed number or a function that returns the height for a given row. Defaults to 200.
+   */
+  detailRowHeight?: number | ((item: BGridDataItem<T>, sourceIndex: number) => number);
+  /** Column ID that renders the toggle button. Defaults to the first visible column. */
+  expandColumnId?: string;
+  /** Determines whether a given row provides an expandable detail area. Defaults to true for all rows. */
+  hasDetail?: (item: BGridDataItem<T>, sourceIndex: number) => boolean;
+  /** 'single' allows only one row expanded at a time (accordion). Defaults to 'multiple'. */
+  expandMode?: BGridMasterDetailExpandMode;
+  /** Controlled expanded row keys. */
+  expandedRowKeys?: readonly React.Key[];
+  /** Initial expanded row keys for uncontrolled usage. */
+  defaultExpandedRowKeys?: readonly React.Key[];
+  /** Callback triggered when the expanded row keys change through user interaction. */
+  onExpandedRowKeysChange?: (
+    keys: React.Key[],
+    event: BGridMasterDetailChangeEvent<T>,
+  ) => void;
+  /** Custom expand/collapse icons. */
+  icons?: BGridMasterDetailIcons;
+  /** Accessibility label for the expand button. */
+  expandAriaLabel?: string;
+  /** Accessibility label for the collapse button. */
+  collapseAriaLabel?: string;
+}
+
 export interface BGridTreeChangeDataMeta {
   rowKey: React.Key;
   parentRowKey?: React.Key;
@@ -1184,6 +1242,8 @@ export interface AppModelColumn<T> extends BGridColumn<T> {
   left: number;
   /** @internal Marks the single column that hosts tree indentation and folding controls. */
   treeCell?: boolean;
+  /** @internal Marks the single column that hosts master-detail expand/collapse toggle controls. */
+  masterDetailCell?: boolean;
 }
 
 export interface AppModel<T> extends BGridProps<T> {

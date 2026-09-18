@@ -36,6 +36,7 @@ import {
 } from './utils';
 import { AppStoreInitialState, AppStoreProvider } from './store';
 import { TreeContext, type BGridTreeContextValue } from './components/TreeContext';
+import { MasterDetailContext, type BGridMasterDetailContextValue } from './components/MasterDetailContext';
 
 function computeModelColumns<T>(
   columns: BGridColumnWithOptionalWidth<T>[],
@@ -60,6 +61,11 @@ function computeModelColumns<T>(
       width: column.width ?? 100,
     } as AppModelColumn<T>;
   });
+}
+
+function encodeMasterDetailRowKey(rowKey: React.Key): string {
+  const codePoints = Array.from(String(rowKey), character => character.codePointAt(0)!.toString(16));
+  return `${typeof rowKey}-${codePoints.join('-')}`;
 }
 
 export function BGrid<T = Record<string, any>>({
@@ -117,11 +123,20 @@ export function BGrid<T = Record<string, any>>({
   searchOptions,
   contextMenuOptions,
   tree,
+  masterDetail,
 }: BGridProps<T>) {
   const [uncontrolledExpandedRowKeys, setUncontrolledExpandedRowKeys] = React.useState<React.Key[]>(() => [
     ...(tree?.defaultExpandedRowKeys ?? []),
   ]);
   const expandedRowKeys = tree?.expandedRowKeys ?? uncontrolledExpandedRowKeys;
+
+  const [uncontrolledMasterDetailExpandedKeys, setUncontrolledMasterDetailExpandedKeys] = React.useState<readonly React.Key[]>(
+    () => masterDetail?.defaultExpandedRowKeys ?? [],
+  );
+  const masterDetailExpandedKeys =
+    masterDetail?.expandedRowKeys !== undefined
+      ? masterDetail.expandedRowKeys
+      : uncontrolledMasterDetailExpandedKeys;
   const warnedSearchControlledRef = React.useRef({
     open: false,
     query: false,
@@ -201,7 +216,15 @@ export function BGrid<T = Record<string, any>>({
   const resolvedGetRowClassName = pivotEnabled ? undefined : getRowClassName;
   const requestedTreeEnabled = !!tree && tree.enabled !== false;
   const treeEnabled = requestedTreeEnabled && !pivotEnabled && resolvedRowKey !== undefined;
-  const resolvedCellMergeOptions = treeEnabled ? undefined : visibilityProjection.cellMergeOptions;
+  const requestedMasterDetailEnabled = !!masterDetail && masterDetail.enabled !== false;
+  const masterDetailEnabled =
+    requestedMasterDetailEnabled &&
+    !pivotEnabled &&
+    !treeEnabled &&
+    resolvedRowKey !== undefined &&
+    frozenRowCount <= 0;
+  const resolvedCellMergeOptions =
+    treeEnabled || masterDetailEnabled ? undefined : visibilityProjection.cellMergeOptions;
   const resolvedCellSelectionOptions = resolvedDisabled
     ? { ...cellSelectionOptions, enabled: false }
     : cellSelectionOptions;
@@ -216,12 +239,12 @@ export function BGrid<T = Record<string, any>>({
     (resolvedDataControl.query.sortParams.length > 0 || resolvedDataControl.query.filterParams.length > 0);
   const resolvedReorder = React.useMemo(
     () =>
-      pivotEnabled || resolvedDisabled || treeEnabled
+      pivotEnabled || resolvedDisabled || treeEnabled || masterDetailEnabled
         ? undefined
         : (hasActiveClientQuery || frozenRowCount > 0) && reorder
         ? { ...reorder, enabled: false }
         : reorder,
-    [frozenRowCount, hasActiveClientQuery, pivotEnabled, reorder, resolvedDisabled, treeEnabled],
+    [frozenRowCount, hasActiveClientQuery, masterDetailEnabled, pivotEnabled, reorder, resolvedDisabled, treeEnabled],
   );
 
   // Development warnings
@@ -266,6 +289,24 @@ export function BGrid<T = Record<string, any>>({
       if (treeEnabled && reorder?.enabled) {
         console.warn('[BGrid] Row reordering is disabled while tree mode is active.');
       }
+      if (requestedMasterDetailEnabled && rowKey === undefined) {
+        console.warn('[BGrid] masterDetail requires rowKey. Falling back to flat rows.');
+      }
+      if (pivotEnabled && requestedMasterDetailEnabled) {
+        console.warn('[BGrid] masterDetail is disabled while pivot mode is active.');
+      }
+      if (treeEnabled && requestedMasterDetailEnabled) {
+        console.warn('[BGrid] masterDetail is disabled while tree mode is active.');
+      }
+      if (masterDetailEnabled && cellMergeOptions) {
+        console.warn('[BGrid] cellMergeOptions is disabled while masterDetail mode is active.');
+      }
+      if (masterDetailEnabled && reorder?.enabled) {
+        console.warn('[BGrid] Row reordering is disabled while masterDetail mode is active.');
+      }
+      if (requestedMasterDetailEnabled && frozenRowCount > 0) {
+        console.warn('[BGrid] masterDetail is disabled when frozenRowCount > 0.');
+      }
       if (hasHiddenColumns && columnSortable) {
         console.warn('[BGrid] Column reordering is disabled while columns are hidden.');
       }
@@ -309,6 +350,8 @@ export function BGrid<T = Record<string, any>>({
     visibilityOptions?.hiddenColumnIds,
     visibilityOptions?.onChange,
     cellMergeOptions,
+    masterDetailEnabled,
+    requestedMasterDetailEnabled,
     requestedTreeEnabled,
     rowKey,
     treeEnabled,
@@ -391,15 +434,37 @@ export function BGrid<T = Record<string, any>>({
       : getColumnId(visibilityProjection.columns[0] as BGridColumn<T>);
   }, [tree?.treeColumnId, treeEnabled, visibilityProjection.columns]);
 
+  const resolvedExpandColumnId = React.useMemo(() => {
+    if (!masterDetailEnabled || visibilityProjection.columns.length === 0) return undefined;
+    const requestedId = masterDetail?.expandColumnId;
+    return requestedId &&
+      visibilityProjection.columns.some(column => getColumnId(column as BGridColumn<T>) === requestedId)
+      ? requestedId
+      : getColumnId(visibilityProjection.columns[0] as BGridColumn<T>);
+  }, [masterDetail?.expandColumnId, masterDetailEnabled, visibilityProjection.columns]);
+
   const computedColumns: AppModelColumn<T>[] = React.useMemo(() => {
-    const columns = computeModelColumns(
+    let columns = computeModelColumns(
       visibilityProjection.columns,
       resolvedFrozenColumnIndex,
       duplicateToolboxColumnIds,
     );
-    if (!resolvedTreeColumnId) return columns;
-    return columns.map(column => (column.columnId === resolvedTreeColumnId ? { ...column, treeCell: true } : column));
-  }, [duplicateToolboxColumnIds, resolvedFrozenColumnIndex, resolvedTreeColumnId, visibilityProjection.columns]);
+    if (resolvedTreeColumnId) {
+      columns = columns.map(column => (column.columnId === resolvedTreeColumnId ? { ...column, treeCell: true } : column));
+    }
+    if (resolvedExpandColumnId) {
+      columns = columns.map(column =>
+        column.columnId === resolvedExpandColumnId ? { ...column, masterDetailCell: true } : column,
+      );
+    }
+    return columns;
+  }, [
+    duplicateToolboxColumnIds,
+    resolvedExpandColumnId,
+    resolvedFrozenColumnIndex,
+    resolvedTreeColumnId,
+    visibilityProjection.columns,
+  ]);
 
   const warnedTreeColumnIdRef = React.useRef<string | undefined>(undefined);
   React.useEffect(() => {
@@ -417,6 +482,23 @@ export function BGrid<T = Record<string, any>>({
       `[BGrid] tree.treeColumnId "${tree.treeColumnId}" is not visible. Falling back to the first visible column.`,
     );
   }, [resolvedTreeColumnId, tree?.treeColumnId, treeEnabled]);
+
+  const warnedExpandColumnIdRef = React.useRef<string | undefined>(undefined);
+  React.useEffect(() => {
+    if (
+      process.env.NODE_ENV === 'production' ||
+      !masterDetailEnabled ||
+      !masterDetail?.expandColumnId ||
+      masterDetail.expandColumnId === resolvedExpandColumnId ||
+      warnedExpandColumnIdRef.current === masterDetail.expandColumnId
+    ) {
+      return;
+    }
+    warnedExpandColumnIdRef.current = masterDetail.expandColumnId;
+    console.warn(
+      `[BGrid] masterDetail.expandColumnId "${masterDetail.expandColumnId}" is not visible. Falling back to the first visible column.`,
+    );
+  }, [masterDetail?.expandColumnId, masterDetailEnabled, resolvedExpandColumnId]);
 
   const queryColumns: AppModelColumn<T>[] = React.useMemo(
     () => computeModelColumns(resolvedColumns, pivotEnabled ? 0 : frozenColumnIndex, duplicateToolboxColumnIds),
@@ -667,10 +749,253 @@ export function BGrid<T = Record<string, any>>({
       toggle: toggleTreeRow,
     };
   }, [resolvedDisabled, resolvedRowKey, resolvedTreeColumnId, resolvedTreeProjection, toggleTreeRow, tree]);
-  const rowHeightMetrics = React.useMemo(
-    () => createRowHeightMetrics(displayData, itemHeight + itemPadding * 2, getRowHeight),
-    [displayData, getRowHeight, itemHeight, itemPadding],
+
+  const rawGridId = React.useId();
+  const gridInstanceId = React.useMemo(() => rawGridId.replace(/[^a-zA-Z0-9_-]/g, '_'), [rawGridId]);
+
+  const masterDetailRowKeysMeta = React.useMemo(() => {
+    if (!masterDetailEnabled || resolvedRowKey === undefined) return undefined;
+    const validKeys = new Set<React.Key>();
+    const rowsByKey = new Map<React.Key, { item: BGridDataItem<T>; sourceIndex: number }>();
+    const duplicateKeys = new Set<React.Key>();
+    const missingKeyIndexes: number[] = [];
+
+    for (let i = 0; i < resolvedData.length; i++) {
+      const key = getCellValueByRowKey(resolvedRowKey, resolvedData[i].values);
+      if (key === undefined || key === null) {
+        missingKeyIndexes.push(i);
+      } else {
+        const k = key as React.Key;
+        if (validKeys.has(k)) {
+          duplicateKeys.add(k);
+        } else {
+          validKeys.add(k);
+          rowsByKey.set(k, { item: resolvedData[i] as BGridDataItem<T>, sourceIndex: i });
+        }
+      }
+    }
+    return { validKeys, rowsByKey, duplicateKeys, missingKeyIndexes };
+  }, [masterDetailEnabled, resolvedData, resolvedRowKey]);
+
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'production' || !masterDetailRowKeysMeta) return;
+    if (masterDetailRowKeysMeta.missingKeyIndexes.length > 0) {
+      console.warn(
+        `[BGrid] masterDetail found ${masterDetailRowKeysMeta.missingKeyIndexes.length} rows with missing or null rowKey at indexes: [${masterDetailRowKeysMeta.missingKeyIndexes.slice(0, 5).join(', ')}${masterDetailRowKeysMeta.missingKeyIndexes.length > 5 ? ', ...' : ''}]. These rows cannot be expanded.`,
+      );
+    }
+    if (masterDetailRowKeysMeta.duplicateKeys.size > 0) {
+      console.warn(
+        `[BGrid] masterDetail found duplicate rowKey values: [${Array.from(masterDetailRowKeysMeta.duplicateKeys).slice(0, 5).join(', ')}]. These rows cannot be expanded.`,
+      );
+    }
+  }, [masterDetailRowKeysMeta]);
+
+  const expandMode = masterDetail?.expandMode ?? 'multiple';
+  const masterDetailHasDetail = masterDetail?.hasDetail;
+  const effectiveMasterDetailExpandedKeysSet = React.useMemo(() => {
+    if (!masterDetailEnabled || !masterDetailRowKeysMeta) return new Set<React.Key>();
+    const set = new Set<React.Key>();
+    for (const key of masterDetailExpandedKeys) {
+      if (masterDetailRowKeysMeta.duplicateKeys.has(key)) continue;
+      const row = masterDetailRowKeysMeta.rowsByKey.get(key);
+      if (!row) continue;
+      if (masterDetailHasDetail) {
+        try {
+          if (!masterDetailHasDetail(row.item, row.sourceIndex)) continue;
+        } catch {
+          continue;
+        }
+      }
+      set.add(key);
+      if (expandMode === 'single') break;
+    }
+    return set;
+  }, [expandMode, masterDetailHasDetail, masterDetailEnabled, masterDetailExpandedKeys, masterDetailRowKeysMeta]);
+
+  const toggleMasterDetailRow = React.useCallback(
+    (rowKey: React.Key, item: BGridDataItem<T>, sourceIndex: number) => {
+      if (resolvedDisabled || !masterDetailEnabled || !masterDetail) return;
+      const isExpanded = effectiveMasterDetailExpandedKeysSet.has(rowKey);
+      let nextKeys: React.Key[];
+      if (expandMode === 'single') {
+        nextKeys = isExpanded ? [] : [rowKey];
+      } else {
+        if (isExpanded) {
+          nextKeys = masterDetailExpandedKeys.filter(k => !Object.is(k, rowKey));
+        } else {
+          const exists = masterDetailExpandedKeys.some(k => Object.is(k, rowKey));
+          nextKeys = exists ? [...masterDetailExpandedKeys] : [...masterDetailExpandedKeys, rowKey];
+        }
+      }
+      if (masterDetail.expandedRowKeys === undefined) {
+        setUncontrolledMasterDetailExpandedKeys(nextKeys);
+      }
+      masterDetail.onExpandedRowKeysChange?.(nextKeys, {
+        rowKey,
+        expanded: !isExpanded,
+        item,
+        sourceIndex,
+      });
+    },
+    [
+      effectiveMasterDetailExpandedKeysSet,
+      expandMode,
+      masterDetail,
+      masterDetailEnabled,
+      masterDetailExpandedKeys,
+      resolvedDisabled,
+    ],
   );
+
+  const collapseMasterDetailRow = React.useCallback(
+    (rowKey: React.Key) => {
+      if (resolvedDisabled || !masterDetailEnabled || !masterDetail) return;
+      if (!effectiveMasterDetailExpandedKeysSet.has(rowKey)) return;
+      let nextKeys: React.Key[];
+      if (expandMode === 'single') {
+        nextKeys = [];
+      } else {
+        nextKeys = masterDetailExpandedKeys.filter(k => !Object.is(k, rowKey));
+      }
+      if (masterDetail.expandedRowKeys === undefined) {
+        setUncontrolledMasterDetailExpandedKeys(nextKeys);
+      }
+      const sourceIndex = resolvedData.findIndex(
+        d => Object.is(getCellValueByRowKey(resolvedRowKey!, d.values), rowKey),
+      );
+      const item = resolvedData[sourceIndex] as BGridDataItem<T> | undefined;
+      if (item) {
+        masterDetail.onExpandedRowKeysChange?.(nextKeys, {
+          rowKey,
+          expanded: false,
+          item,
+          sourceIndex: sourceIndex >= 0 ? sourceIndex : 0,
+        });
+      }
+    },
+    [
+      effectiveMasterDetailExpandedKeysSet,
+      expandMode,
+      masterDetail,
+      masterDetailEnabled,
+      masterDetailExpandedKeys,
+      resolvedData,
+      resolvedDisabled,
+      resolvedRowKey,
+    ],
+  );
+
+  const getToggleElementId = React.useCallback(
+    (rowKey: React.Key) => `${gridInstanceId}-detail-toggle-${encodeMasterDetailRowKey(rowKey)}`,
+    [gridInstanceId],
+  );
+
+  const getDetailElementId = React.useCallback(
+    (rowKey: React.Key) => `${gridInstanceId}-detail-region-${encodeMasterDetailRowKey(rowKey)}`,
+    [gridInstanceId],
+  );
+
+  const masterDetailContextValue = React.useMemo<BGridMasterDetailContextValue | undefined>(() => {
+    if (!masterDetailEnabled || !resolvedExpandColumnId || resolvedRowKey === undefined || !masterDetail) {
+      return undefined;
+    }
+    return {
+      gridId: gridInstanceId,
+      expandColumnId: resolvedExpandColumnId,
+      icons: masterDetail.icons,
+      expandAriaLabel: masterDetail.expandAriaLabel ?? 'Expand row',
+      collapseAriaLabel: masterDetail.collapseAriaLabel ?? 'Collapse row',
+      disabled: resolvedDisabled,
+      expandedKeysSet: effectiveMasterDetailExpandedKeysSet,
+      getRowKey: values => {
+        const key = getCellValueByRowKey(resolvedRowKey, values);
+        return key === undefined || key === null ? undefined : (key as React.Key);
+      },
+      hasDetail: (item, sourceIndex) => {
+        const rowKey = getCellValueByRowKey(resolvedRowKey, item.values);
+        if (rowKey === undefined || rowKey === null) return false;
+        if (masterDetailRowKeysMeta?.duplicateKeys.has(rowKey as React.Key)) return false;
+        if (masterDetail.hasDetail) {
+          try {
+            return masterDetail.hasDetail(item, sourceIndex);
+          } catch {
+            return false;
+          }
+        }
+        return true;
+      },
+      detailRender: masterDetail.detailRender,
+      toggle: toggleMasterDetailRow,
+      collapse: collapseMasterDetailRow,
+      getToggleElementId,
+      getDetailElementId,
+    };
+  }, [
+    collapseMasterDetailRow,
+    effectiveMasterDetailExpandedKeysSet,
+    getDetailElementId,
+    getToggleElementId,
+    gridInstanceId,
+    masterDetail,
+    masterDetailEnabled,
+    masterDetailRowKeysMeta?.duplicateKeys,
+    resolvedDisabled,
+    resolvedExpandColumnId,
+    resolvedRowKey,
+    toggleMasterDetailRow,
+  ]);
+
+  const rowHeightMetrics = React.useMemo(() => {
+    const fallbackHeight = itemHeight + itemPadding * 2;
+    if (!masterDetailEnabled || !masterDetail) {
+      return createRowHeightMetrics(displayData, fallbackHeight, getRowHeight);
+    }
+    return createRowHeightMetrics(displayData, fallbackHeight, getRowHeight, {
+      expandedKeysSet: effectiveMasterDetailExpandedKeysSet,
+      getRowKey: values => {
+        const key = getCellValueByRowKey(resolvedRowKey!, values);
+        return key === undefined || key === null ? undefined : (key as React.Key);
+      },
+      getDetailHeight: (item, sourceIndex) => {
+        if (typeof masterDetail.detailRowHeight === 'function') {
+          try {
+            return masterDetail.detailRowHeight(item, sourceIndex);
+          } catch {
+            return 200;
+          }
+        }
+        return typeof masterDetail.detailRowHeight === 'number' && masterDetail.detailRowHeight > 0
+          ? masterDetail.detailRowHeight
+          : 200;
+      },
+      hasDetail: (item, sourceIndex) => {
+        const rowKey = getCellValueByRowKey(resolvedRowKey!, item.values);
+        if (rowKey === undefined || rowKey === null) return false;
+        if (masterDetailRowKeysMeta?.duplicateKeys.has(rowKey as React.Key)) return false;
+        if (masterDetail.hasDetail) {
+          try {
+            return masterDetail.hasDetail(item, sourceIndex);
+          } catch {
+            return false;
+          }
+        }
+        return true;
+      },
+      sourceIndexByVisibleIndex: processedResult.sourceIndexByVisibleIndex,
+    });
+  }, [
+    displayData,
+    effectiveMasterDetailExpandedKeysSet,
+    getRowHeight,
+    itemHeight,
+    itemPadding,
+    masterDetail,
+    masterDetailEnabled,
+    masterDetailRowKeysMeta?.duplicateKeys,
+    processedResult.sourceIndexByVisibleIndex,
+    resolvedRowKey,
+  ]);
   const resolvedFrozenRowCount = pivotEnabled
     ? 0
     : Math.min(Math.max(Math.floor(frozenRowCount), 0), displayData.length);
@@ -913,70 +1238,72 @@ export function BGrid<T = Record<string, any>>({
   return (
     <AppStoreProvider initialState={initialStoreState}>
       <TreeContext.Provider value={treeContextValue}>
-        <Table
-          ref={ref}
-          {...{
-            sourceColumns: resolvedColumns as BGridColumn<T>[],
-            columns: computedColumns,
-            columnsGroup: visibilityProjection.columnsGroup,
-            columnGroups: visibilityProjection.columnGroups,
-            onChangeColumns: resolvedOnChangeColumns,
-            width,
-            height,
-            className,
-            style,
-            loading,
-            disabled: resolvedDisabled,
-            spinning,
-            scrollLeft,
-            scrollTop,
-            headerHeight,
-            footerHeight,
-            bottomBarHeight: resolvedBottomBarHeight,
-            scrollbar: resolvedScrollbar,
-            status: resolvedStatus,
-            pagination: resolvedPagination,
-            summaryHeight: resolvedSummaryHeight,
-            summaryRowHeight,
-            itemHeight,
-            itemPadding,
-            rowHeightMetrics,
-            frozenColumnIndex: resolvedFrozenColumnIndex,
-            frozenRowCount: resolvedFrozenRowCount,
-            rowChecked: resolvedRowChecked,
-            checkedIndexesMap,
-            sort: resolvedSort,
-            sortParams,
-            dataQuery: resolvedDataQuery,
-            dataControl: resolvedDataControl,
-            icons,
-            columnVisibilityState,
-            searchOptions: resolvedSearchOptions,
-            contextMenuOptions: resolvedContextMenuOptions,
-            page: resolvedPage,
-            data: displayData as any,
-            sourceData: resolvedData as any,
-            sourceIndexByVisibleIndex: processedResult.sourceIndexByVisibleIndex,
-            visibleIndexBySourceIndex: processedResult.visibleIndexBySourceIndex,
-            onClick: resolvedOnClick,
-            rowKey: resolvedRowKey,
-            selectedRowKey: resolvedSelectedRowKey,
-            editable: resolvedEditable,
-            editTrigger,
-            onChangeData: resolvedOnChangeData,
-            showLineNumber: resolvedShowLineNumber,
-            msg,
-            getRowClassName: resolvedGetRowClassName,
-            cellMergeOptions: resolvedCellMergeOptions,
-            cellSelectionOptions: resolvedCellSelectionOptions,
-            cellNavigationOptions,
-            variant,
-            summary: resolvedSummary,
-            columnSortable: resolvedColumnSortable,
-            reorder: resolvedReorder,
-            treeEnabled: !!treeContextValue,
-          }}
-        />
+        <MasterDetailContext.Provider value={masterDetailContextValue}>
+          <Table
+            ref={ref}
+            {...{
+              sourceColumns: resolvedColumns as BGridColumn<T>[],
+              columns: computedColumns,
+              columnsGroup: visibilityProjection.columnsGroup,
+              columnGroups: visibilityProjection.columnGroups,
+              onChangeColumns: resolvedOnChangeColumns,
+              width,
+              height,
+              className,
+              style,
+              loading,
+              disabled: resolvedDisabled,
+              spinning,
+              scrollLeft,
+              scrollTop,
+              headerHeight,
+              footerHeight,
+              bottomBarHeight: resolvedBottomBarHeight,
+              scrollbar: resolvedScrollbar,
+              status: resolvedStatus,
+              pagination: resolvedPagination,
+              summaryHeight: resolvedSummaryHeight,
+              summaryRowHeight,
+              itemHeight,
+              itemPadding,
+              rowHeightMetrics,
+              frozenColumnIndex: resolvedFrozenColumnIndex,
+              frozenRowCount: resolvedFrozenRowCount,
+              rowChecked: resolvedRowChecked,
+              checkedIndexesMap,
+              sort: resolvedSort,
+              sortParams,
+              dataQuery: resolvedDataQuery,
+              dataControl: resolvedDataControl,
+              icons,
+              columnVisibilityState,
+              searchOptions: resolvedSearchOptions,
+              contextMenuOptions: resolvedContextMenuOptions,
+              page: resolvedPage,
+              data: displayData as any,
+              sourceData: resolvedData as any,
+              sourceIndexByVisibleIndex: processedResult.sourceIndexByVisibleIndex,
+              visibleIndexBySourceIndex: processedResult.visibleIndexBySourceIndex,
+              onClick: resolvedOnClick,
+              rowKey: resolvedRowKey,
+              selectedRowKey: resolvedSelectedRowKey,
+              editable: resolvedEditable,
+              editTrigger,
+              onChangeData: resolvedOnChangeData,
+              showLineNumber: resolvedShowLineNumber,
+              msg,
+              getRowClassName: resolvedGetRowClassName,
+              cellMergeOptions: resolvedCellMergeOptions,
+              cellSelectionOptions: resolvedCellSelectionOptions,
+              cellNavigationOptions,
+              variant,
+              summary: resolvedSummary,
+              columnSortable: resolvedColumnSortable,
+              reorder: resolvedReorder,
+              treeEnabled: !!treeContextValue,
+            }}
+          />
+        </MasterDetailContext.Provider>
       </TreeContext.Provider>
     </AppStoreProvider>
   );

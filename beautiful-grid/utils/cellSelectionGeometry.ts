@@ -28,6 +28,8 @@ export interface BGridSelectionGeometryParams {
   frozenRowCount: number;
   frozenColumnsWidth: number;
   rowOffsets?: ArrayLike<number>;
+  rowHeights?: ArrayLike<number>;
+  detailHeights?: ArrayLike<number>;
 }
 
 interface IndexSegment {
@@ -44,6 +46,8 @@ export function getCellSelectionFragments({
   frozenRowCount,
   frozenColumnsWidth,
   rowOffsets,
+  rowHeights,
+  detailHeights,
 }: BGridSelectionGeometryParams): BGridSelectionFragment[] {
   const safeRowCount = Math.max(0, Math.floor(rowCount));
   const safeColumnCount = columns.length;
@@ -94,6 +98,8 @@ export function getCellSelectionFragments({
           selectedColumns,
           rowHeight: safeRowHeight,
           rowOffsets,
+          rowHeights,
+          detailHeights,
           left: frozenDataOffset + getColumnsWidth(columns, 0, leftColumns.start - 1),
           width: getColumnsWidth(columns, leftColumns.start, leftColumns.end),
           top: getRowsTop(topRows.start, 0, safeRowHeight, rowOffsets),
@@ -112,6 +118,8 @@ export function getCellSelectionFragments({
           selectedColumns,
           rowHeight: safeRowHeight,
           rowOffsets,
+          rowHeights,
+          detailHeights,
           left: getMainColumnLeft(columns, mainColumns.start, safeFrozenColumnCount),
           width:
             getMainColumnRight(columns, mainColumns.end, safeFrozenColumnCount) -
@@ -132,6 +140,8 @@ export function getCellSelectionFragments({
           selectedColumns,
           rowHeight: safeRowHeight,
           rowOffsets,
+          rowHeights,
+          detailHeights,
           left: frozenDataOffset + getColumnsWidth(columns, 0, leftColumns.start - 1),
           width: getColumnsWidth(columns, leftColumns.start, leftColumns.end),
           top: getRowsTop(bodyRows.start, safeFrozenRowCount, safeRowHeight, rowOffsets),
@@ -150,6 +160,8 @@ export function getCellSelectionFragments({
           selectedColumns,
           rowHeight: safeRowHeight,
           rowOffsets,
+          rowHeights,
+          detailHeights,
           left: getMainColumnLeft(columns, mainColumns.start, safeFrozenColumnCount),
           width:
             getMainColumnRight(columns, mainColumns.end, safeFrozenColumnCount) -
@@ -211,6 +223,8 @@ function createFragment({
   selectedColumns,
   rowHeight,
   rowOffsets,
+  rowHeights,
+  detailHeights,
   left,
   top,
   width,
@@ -223,6 +237,8 @@ function createFragment({
   selectedColumns: IndexSegment;
   rowHeight: number;
   rowOffsets?: ArrayLike<number>;
+  rowHeights?: ArrayLike<number>;
+  detailHeights?: ArrayLike<number>;
   left: number;
   top: number;
   width: number;
@@ -233,9 +249,7 @@ function createFragment({
     left,
     top,
     width,
-    height: rowOffsets
-      ? (rowOffsets[rows.end + 1] ?? 0) - (rowOffsets[rows.start] ?? 0)
-      : (rows.end - rows.start + 1) * rowHeight,
+    height: getRowsHeight(rows.start, rows.end, rowHeight, rowOffsets, rowHeights, detailHeights),
     edges: {
       top: rows.start === selectedRows.start,
       right: columns.end === selectedColumns.end,
@@ -243,6 +257,32 @@ function createFragment({
       left: columns.start === selectedColumns.start,
     },
   };
+}
+
+function getRowsHeight(
+  start: number,
+  end: number,
+  rowHeight: number,
+  rowOffsets?: ArrayLike<number>,
+  rowHeights?: ArrayLike<number>,
+  detailHeights?: ArrayLike<number>,
+): number {
+  if (rowHeights && rowHeights[end] !== undefined) {
+    const endRowHeight = rowHeights[end];
+    if (start === end) return endRowHeight;
+    const topStart = rowOffsets ? rowOffsets[start] ?? 0 : start * rowHeight;
+    const topEnd = rowOffsets ? rowOffsets[end] ?? 0 : end * rowHeight;
+    return topEnd + endRowHeight - topStart;
+  }
+  if (rowOffsets) {
+    const topStart = rowOffsets[start] ?? 0;
+    const topEnd = rowOffsets[end] ?? 0;
+    const detailEnd = detailHeights?.[end] ?? 0;
+    const endRowHeight = Math.max((rowOffsets[end + 1] ?? (topEnd + rowHeight)) - topEnd - detailEnd, 0);
+    if (start === end) return endRowHeight;
+    return topEnd + endRowHeight - topStart;
+  }
+  return (end - start + 1) * rowHeight;
 }
 
 function getRowsTop(start: number, base: number, rowHeight: number, rowOffsets?: ArrayLike<number>) {

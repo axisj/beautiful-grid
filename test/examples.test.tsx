@@ -825,4 +825,18 @@ describe('demo examples render intended grid features', () => {
     const checkedExcelBtn = getByRole('button', { name: /선택 행 Excel/i });
     expect(checkedExcelBtn).toBeDisabled();
   });
+
+  it('renders MasterDetailExample with expandable rows and nested grid', async () => {
+    const { container, getByText } = await renderExample(() => import('../examples/MasterDetailExample'));
+
+    expectGridShell(container);
+    expect(container).toHaveTextContent('ORD-0001');
+    expect(container).toHaveTextContent('펼침 모드');
+    expect(container).toHaveTextContent('주문 상세 품목');
+    expect(container).toHaveTextContent('Ergonomic Keyboard');
+
+    // Button to expand all
+    const expandAllBtn = getByText('모두 펼치기');
+    expect(expandAllBtn).toBeInTheDocument();
+  });
 });

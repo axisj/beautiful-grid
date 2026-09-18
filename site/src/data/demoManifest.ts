@@ -245,4 +245,9 @@ export const demoManifest: Record<string, DemoManifestItem> = {
     sourceFiles: withContainerSources('ContainerResizeExample.tsx'),
     minHeight: 540,
   },
+  'master-detail': {
+    componentFile: 'MasterDetailExample.tsx',
+    sourceFiles: withContainerSources('MasterDetailExample.tsx'),
+    minHeight: 520,
+  },
 };

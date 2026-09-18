@@ -466,7 +466,6 @@ function Table<T>(props: Props<T>) {
     KEYBOARD_NAVIGATION_ROW_WINDOW_SIZE,
     Math.ceil(scrollableBodyHeight / Math.max(trHeight, 1)),
   );
-  const mainViewportWidth = Math.max(width - (frozenColumnsWidth ?? 0), 0);
   const logicalBodyContentHeight = rowHeightMetrics.totalHeight;
   const virtualScrollWindowMetrics = React.useMemo(
     () =>
@@ -559,6 +558,8 @@ function Table<T>(props: Props<T>) {
         rowCount: data.length,
         rowHeight: trHeight,
         rowOffsets: variableRowOffsets,
+        rowHeights: rowHeightMetrics.heights,
+        detailHeights: rowHeightMetrics.detailHeights,
         frozenColumnCount: props.frozenColumnIndex ?? 0,
         frozenRowCount,
         frozenColumnsWidth: frozenColumnsWidth ?? 0,
@@ -570,6 +571,8 @@ function Table<T>(props: Props<T>) {
       frozenColumnsWidth,
       frozenRowCount,
       props.frozenColumnIndex,
+      rowHeightMetrics.detailHeights,
+      rowHeightMetrics.heights,
       trHeight,
       variableRowOffsets,
     ],
@@ -582,6 +585,8 @@ function Table<T>(props: Props<T>) {
         rowCount: data.length,
         rowHeight: trHeight,
         rowOffsets: variableRowOffsets,
+        rowHeights: rowHeightMetrics.heights,
+        detailHeights: rowHeightMetrics.detailHeights,
         frozenColumnCount: props.frozenColumnIndex ?? 0,
         frozenRowCount,
         frozenColumnsWidth: frozenColumnsWidth ?? 0,
@@ -593,32 +598,14 @@ function Table<T>(props: Props<T>) {
       frozenColumnsWidth,
       frozenRowCount,
       props.frozenColumnIndex,
+      rowHeightMetrics.detailHeights,
+      rowHeightMetrics.heights,
       trHeight,
       variableRowOffsets,
     ],
   );
   const activeOverlayFill = activeCellSelected;
   const activeOverlayRing = !!activeCell && !hasMultiCellSelection;
-  const renderSelectionOverlay = (quadrant: React.ComponentProps<typeof CellSelectionOverlay>['quadrant']) => {
-    const topQuadrant = quadrant === 'top-left' || quadrant === 'top-main';
-    const leftQuadrant = quadrant === 'top-left' || quadrant === 'body-left';
-    return (
-      <CellSelectionOverlay
-        quadrant={quadrant}
-        selectionFragments={selectionFragments}
-        activeFragments={activeFragments}
-        activeFill={activeOverlayFill}
-        activeRing={activeOverlayRing}
-        viewport={{
-          left: leftQuadrant ? 0 : scrollLeft,
-          top: topQuadrant ? 0 : scrollTop,
-          width: leftQuadrant ? frozenColumnsWidth ?? 0 : mainViewportWidth,
-          height: topQuadrant ? frozenRowsHeight : scrollableBodyHeight,
-        }}
-        offsetTop={!topQuadrant && virtualScrollWindowMetrics.enabled ? virtualScrollBase : 0}
-      />
-    );
-  };
   const visibleScrollableRows = React.useMemo(
     () =>
       getVisibleScrollableRowRange({
@@ -823,6 +810,44 @@ function Table<T>(props: Props<T>) {
   const keyboardViewportInsets = {
     right: (frozenColumnsWidth ?? 0) + measuredVerticalScrollbarGutter,
     bottom: stickyFixedHeight + frozenRowsHeight,
+  };
+
+  const verticalScrollbarGutterWidth =
+    scrollbar.vertical.visible && scrollbar.variant === 'classic'
+      ? 25
+      : scrollbar.vertical.visible && scrollbar.variant === 'modern'
+      ? 24
+      : 0;
+
+  const horizontalViewportSize =
+    scrollbarMetrics.horizontal.viewportSize > 0
+      ? scrollbarMetrics.horizontal.viewportSize
+      : Math.max(width - containerBorderWidth * 2, 0);
+
+  const mainViewportWidth = Math.max(
+    horizontalViewportSize - (frozenColumnsWidth ?? 0) - verticalScrollbarGutterWidth,
+    0,
+  );
+
+  const renderSelectionOverlay = (quadrant: React.ComponentProps<typeof CellSelectionOverlay>['quadrant']) => {
+    const topQuadrant = quadrant === 'top-left' || quadrant === 'top-main';
+    const leftQuadrant = quadrant === 'top-left' || quadrant === 'body-left';
+    return (
+      <CellSelectionOverlay
+        quadrant={quadrant}
+        selectionFragments={selectionFragments}
+        activeFragments={activeFragments}
+        activeFill={activeOverlayFill}
+        activeRing={activeOverlayRing}
+        viewport={{
+          left: leftQuadrant ? 0 : scrollLeft,
+          top: topQuadrant ? 0 : scrollTop,
+          width: leftQuadrant ? frozenColumnsWidth ?? 0 : mainViewportWidth,
+          height: topQuadrant ? frozenRowsHeight : scrollableBodyHeight,
+        }}
+        offsetTop={!topQuadrant && virtualScrollWindowMetrics.enabled ? virtualScrollBase : 0}
+      />
+    );
   };
 
   const showBottomBar = shouldRenderBottomBar({
@@ -1077,6 +1102,7 @@ function Table<T>(props: Props<T>) {
 
     hoveredRowIndexesRef.current.forEach(hoveredIndex => {
       containerRef.current?.querySelectorAll(`tr[data-ri="${hoveredIndex}"]`).forEach(el => {
+        if (el.closest('[role="grid"], [role="treegrid"]') !== containerRef.current) return;
         el.classList.remove('bgrid-row-hover');
       });
     });
@@ -1096,6 +1122,7 @@ function Table<T>(props: Props<T>) {
 
       rowIndexes.forEach(rowIndex => {
         containerRef.current?.querySelectorAll(`tr[data-ri="${rowIndex}"]`).forEach(el => {
+          if (el.closest('[role="grid"], [role="treegrid"]') !== containerRef.current) return;
           el.classList.add('bgrid-row-hover');
         });
       });
@@ -1146,7 +1173,12 @@ function Table<T>(props: Props<T>) {
         clearHoveredRow();
         return;
       }
-      const target = evt.target as HTMLElement | null;
+      const target = evt.target instanceof HTMLElement ? evt.target : null;
+      const detailOwner = target?.closest('[data-bgrid-detail-owner]');
+      if (detailOwner && containerRef.current?.contains(detailOwner)) {
+        clearHoveredRow();
+        return;
+      }
       updateAxisSelectionByTarget(target);
       const physicalCellPosition = getCellPosition(target, containerRef.current);
       const cellPosition = physicalCellPosition ? toLogicalCellPosition(physicalCellPosition) : undefined;
@@ -1159,8 +1191,14 @@ function Table<T>(props: Props<T>) {
         );
       }
 
+      const targetGrid = target?.closest('[role="grid"], [role="treegrid"]');
+      if (targetGrid && targetGrid !== containerRef.current && containerRef.current?.contains(targetGrid)) {
+        clearHoveredRow();
+        return;
+      }
+
       const tr = target?.closest('tr[data-ri]');
-      if (!tr || !containerRef.current?.contains(tr)) {
+      if (!tr || tr.closest('[role="grid"], [role="treegrid"]') !== containerRef.current) {
         clearHoveredRow();
         return;
       }
@@ -1191,6 +1229,11 @@ function Table<T>(props: Props<T>) {
   const onBodyPointerDownCapture = useCallback(
     (evt: React.PointerEvent<HTMLDivElement>) => {
       if (disabled) return;
+      const target = evt.target instanceof Element ? evt.target : null;
+      const detailOwner = target?.closest('[data-bgrid-detail-owner]');
+      if (detailOwner && containerRef.current?.contains(detailOwner)) return;
+      const targetGrid = target?.closest('[role="grid"], [role="treegrid"]');
+      if (targetGrid && targetGrid !== containerRef.current && containerRef.current?.contains(targetGrid)) return;
       const navEnabled = cellNavigationOptions?.enabled ?? true;
       if (!cellSelectionEnabled && !navEnabled) return;
       if (evt.button !== 0 || isInteractiveTarget(evt.target)) return;
@@ -2460,6 +2503,15 @@ function Table<T>(props: Props<T>) {
       const container = containerRef.current;
       const activeElement = document.activeElement;
       if (!container || (activeElement !== container && !container.contains(activeElement))) return;
+      const target = evt.target instanceof Element ? evt.target : null;
+      const detailOwner = target?.closest('[data-bgrid-detail-owner]');
+      if (detailOwner && container.contains(detailOwner)) return;
+      const activeDetailOwner = activeElement instanceof Element ? activeElement.closest('[data-bgrid-detail-owner]') : null;
+      if (activeDetailOwner && container.contains(activeDetailOwner)) return;
+      const targetGrid = target?.closest('[role="grid"], [role="treegrid"]');
+      if (targetGrid && targetGrid !== container && container.contains(targetGrid)) return;
+      const activeGrid = activeElement instanceof Element ? activeElement.closest('[role="grid"], [role="treegrid"]') : null;
+      if (activeGrid && activeGrid !== container && container.contains(activeGrid)) return;
       if (disabled) {
         stopArrowRepeat();
         return;
@@ -2475,7 +2527,9 @@ function Table<T>(props: Props<T>) {
           requestSearchOpen(true, 'shortcut');
           setTimeout(
             () => {
-              const input = container.querySelector<HTMLInputElement>('.bgrid-search-input');
+              const input = Array.from(container.querySelectorAll<HTMLInputElement>('.bgrid-search-input')).find(
+                el => el.closest('[role="grid"], [role="treegrid"]') === container,
+              );
               input?.focus({ preventScroll: true });
               input?.select();
             },
@@ -2490,9 +2544,11 @@ function Table<T>(props: Props<T>) {
       const isShift = evt.shiftKey;
 
       if (!cellInteractionSession && activeCell && (evt.key === 'ContextMenu' || (isShift && evt.key === 'F10'))) {
-        const targetCell = container.querySelector<HTMLElement>(
-          `td[data-bgrid-cell="true"][data-row-index="${activeCell.rowIndex}"][data-column-index="${activeCell.columnIndex}"]`,
-        );
+        const targetCell = Array.from(
+          container.querySelectorAll<HTMLElement>(
+            `td[data-bgrid-cell="true"][data-row-index="${activeCell.rowIndex}"][data-column-index="${activeCell.columnIndex}"]`,
+          ),
+        ).find(el => el.closest('[role="grid"], [role="treegrid"]') === container);
         const rect = targetCell?.getBoundingClientRect();
         if (rect && openCellContextMenu(activeCell, rect.left + 8, rect.top + Math.min(rect.height, 20), true)) {
           evt.preventDefault();
@@ -2705,6 +2761,15 @@ function Table<T>(props: Props<T>) {
       const container = containerRef.current;
       const activeElement = document.activeElement;
       if (!container || (activeElement !== container && !container.contains(activeElement))) return;
+      const target = evt.target instanceof Element ? evt.target : null;
+      const detailOwner = target?.closest('[data-bgrid-detail-owner]');
+      if (detailOwner && container.contains(detailOwner)) return;
+      const activeDetailOwner = activeElement instanceof Element ? activeElement.closest('[data-bgrid-detail-owner]') : null;
+      if (activeDetailOwner && container.contains(activeDetailOwner)) return;
+      const targetGrid = target?.closest('[role="grid"], [role="treegrid"]');
+      if (targetGrid && targetGrid !== container && container.contains(targetGrid)) return;
+      const activeGrid = activeElement instanceof Element ? activeElement.closest('[role="grid"], [role="treegrid"]') : null;
+      if (activeGrid && activeGrid !== container && container.contains(activeGrid)) return;
       if (keyboardRuntimeRef.current.disabled) return;
 
       if (isInteractiveTarget(evt.target)) return;
@@ -2717,6 +2782,15 @@ function Table<T>(props: Props<T>) {
       const container = containerRef.current;
       const activeElement = document.activeElement;
       if (!container || (activeElement !== container && !container.contains(activeElement))) return;
+      const target = evt.target instanceof Element ? evt.target : null;
+      const detailOwner = target?.closest('[data-bgrid-detail-owner]');
+      if (detailOwner && container.contains(detailOwner)) return;
+      const activeDetailOwner = activeElement instanceof Element ? activeElement.closest('[data-bgrid-detail-owner]') : null;
+      if (activeDetailOwner && container.contains(activeDetailOwner)) return;
+      const targetGrid = target?.closest('[role="grid"], [role="treegrid"]');
+      if (targetGrid && targetGrid !== container && container.contains(targetGrid)) return;
+      const activeGrid = activeElement instanceof Element ? activeElement.closest('[role="grid"], [role="treegrid"]') : null;
+      if (activeGrid && activeGrid !== container && container.contains(activeGrid)) return;
       if (keyboardRuntimeRef.current.disabled) return;
       if (keyboardRuntimeRef.current.editItemIndex !== undefined && keyboardRuntimeRef.current.editItemIndex >= 0) {
         return;
@@ -2734,13 +2808,26 @@ function Table<T>(props: Props<T>) {
     };
 
     const handlePointerDown = (evt: PointerEvent) => {
+      const container = containerRef.current;
+      const target = evt.target;
+      if (!container) return;
+
+      const detailOwner = target instanceof Element ? target.closest('[data-bgrid-detail-owner]') : null;
+      const targetGrid = target instanceof Element ? target.closest('[role="grid"], [role="treegrid"]') : null;
+      if (
+        (detailOwner && container.contains(detailOwner)) ||
+        (targetGrid && targetGrid !== container && container.contains(targetGrid))
+      ) {
+        const { clearCellSelection, endCellSelectionDrag } = keyboardRuntimeRef.current;
+        endCellSelectionDrag();
+        clearCellSelection();
+        return;
+      }
+
       const { clearCellSelection, clearCellSelectionOnOutsideClick, endCellSelectionDrag } = keyboardRuntimeRef.current;
       if (!clearCellSelectionOnOutsideClick) return;
 
-      const container = containerRef.current;
-      const target = evt.target;
       if (
-        !container ||
         (target instanceof Node && container.contains(target)) ||
         isPointInsideElement(container, evt.clientX, evt.clientY)
       ) {
@@ -2788,7 +2875,9 @@ function Table<T>(props: Props<T>) {
         aria-disabled={disabled ? 'true' : undefined}
         onFocus={event => {
           if (event.target !== event.currentTarget) return;
-          const gateway = event.currentTarget.querySelector('[data-bgrid-text-editor-gateway="true"]');
+          const gateway = Array.from(
+            event.currentTarget.querySelectorAll<HTMLInputElement>('[data-bgrid-text-editor-gateway="true"]'),
+          ).find(el => el.closest('[role="grid"], [role="treegrid"]') === event.currentTarget);
           if (gateway instanceof HTMLInputElement) {
             gateway.focus({ preventScroll: true });
           }
@@ -2830,8 +2919,13 @@ function Table<T>(props: Props<T>) {
           onPointerLeave={onBodyPointerLeave}
           onContextMenuCapture={event => {
             if (disabled) return;
+            const target = event.target instanceof HTMLElement ? event.target : null;
+            const detailOwner = target?.closest('[data-bgrid-detail-owner]');
+            if (detailOwner && containerRef.current?.contains(detailOwner)) return;
+            const targetGrid = target?.closest('[role="grid"], [role="treegrid"]');
+            if (targetGrid && targetGrid !== containerRef.current && containerRef.current?.contains(targetGrid)) return;
             if (isInteractiveTarget(event.target)) return;
-            const cell = getCellPosition(event.target as HTMLElement, containerRef.current);
+            const cell = getCellPosition(target, containerRef.current);
             if (!cell) return;
             if (openCellContextMenu(cell, event.clientX, event.clientY, false)) {
               event.preventDefault();
@@ -2928,6 +3022,7 @@ function Table<T>(props: Props<T>) {
                       role='rfdg-body-top'
                       quadrant='top-main'
                       allowRowReorder={false}
+                      viewportWidth={mainViewportWidth}
                     />
                     {renderSelectionOverlay('top-main')}
                   </div>
@@ -2975,6 +3070,7 @@ function Table<T>(props: Props<T>) {
                     scrollContainerRef={scrollContainerRef}
                     rowRange={scrollableRowRange}
                     quadrant='body-main'
+                    viewportWidth={mainViewportWidth}
                   />
                   {renderSelectionOverlay('body-main')}
                 </ScrollContent>
@@ -3089,10 +3185,10 @@ function getAxisSelectionTarget(
   target: HTMLElement | null,
   container: HTMLElement | null,
 ): AxisSelectionTarget | undefined {
-  if (!target || !container) return undefined;
+  if (!target || !container || !(target instanceof Element)) return undefined;
 
   const lineNumberCell = target.closest('.bgrid-line-number-cell[data-row-index]');
-  if (lineNumberCell instanceof HTMLElement && container.contains(lineNumberCell)) {
+  if (lineNumberCell instanceof HTMLElement && lineNumberCell.closest('[role="grid"], [role="treegrid"]') === container) {
     const rowIndex = Number(lineNumberCell.dataset.rowIndex);
     if (Number.isFinite(rowIndex)) {
       return { axis: 'row', startIndex: rowIndex, endIndex: rowIndex };
@@ -3100,7 +3196,12 @@ function getAxisSelectionTarget(
   }
 
   const headerCell = target.closest('[data-header-cell-type][data-column-index][data-bgrid-axis-selectable="true"]');
-  if (!(headerCell instanceof HTMLTableCellElement) || !container.contains(headerCell)) return undefined;
+  if (
+    !(headerCell instanceof HTMLTableCellElement) ||
+    headerCell.closest('[role="grid"], [role="treegrid"]') !== container
+  ) {
+    return undefined;
+  }
   if (target.closest('.bgrid-col-resizer, .bgrid-toolbox-trigger-btn')) return undefined;
   if (headerCell.classList.contains('drag-item') && target.closest('.bgrid-column-drag-handle')) return undefined;
 
@@ -3152,8 +3253,9 @@ function updateAxisSelectionDragRange(dragState: AxisSelectionDragState, activeR
 }
 
 function getCellPosition(target: HTMLElement | null, container: HTMLElement | null): CellPosition | undefined {
-  const cell = target?.closest('td[data-bgrid-cell="true"]');
-  if (!(cell instanceof HTMLElement) || !container?.contains(cell)) return undefined;
+  if (!target || !(target instanceof Element)) return undefined;
+  const cell = target.closest('td[data-bgrid-cell="true"]');
+  if (!(cell instanceof HTMLElement) || cell.closest('[role="grid"], [role="treegrid"]') !== container) return undefined;
 
   const rowIndex = Number(cell.dataset.rowIndex);
   const columnIndex = Number(cell.dataset.columnIndex);

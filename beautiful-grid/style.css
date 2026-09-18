@@ -467,7 +467,7 @@
   max-height: var(--bgrid-item-cell-height, 28px);
 }
 
-.bgrid-body-table > tbody > tr > td > * {
+.bgrid-body-table > tbody > tr.bgrid-body-row > td > * {
   max-height: var(--bgrid-item-cell-height, 28px);
 }
 
@@ -2448,6 +2448,155 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.bgrid-master-detail-cell {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+
+.bgrid-master-detail-toggle,
+.bgrid-master-detail-toggle-spacer {
+  display: inline-flex;
+  flex: 0 0 18px;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 18px;
+  height: 18px;
+  margin: 0 4px 0 0;
+}
+
+.bgrid-master-detail-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  line-height: 1;
+  font-size: 14px;
+}
+
+.bgrid-master-detail-icon > svg {
+  display: block;
+}
+
+.bgrid-master-detail-toggle {
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 2px;
+}
+
+.bgrid-master-detail-toggle:hover:not(:disabled) {
+  background: var(--bgrid-body-hover-bg);
+}
+
+.bgrid-master-detail-toggle:focus-visible {
+  outline: 2px solid var(--bgrid-active-cell-ring-color);
+  outline-offset: -1px;
+}
+
+.bgrid-master-detail-toggle:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.bgrid-master-detail-cell-content {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bgrid-detail-row,
+.bgrid-detail-row:hover,
+.bgrid-detail-row.bgrid-row-hover,
+.bgrid-detail-frozen-row,
+.bgrid-detail-frozen-row:hover,
+.bgrid-detail-frozen-row.bgrid-row-hover,
+.bgrid-body-table > tbody > tr.bgrid-detail-row,
+.bgrid-body-table > tbody > tr.bgrid-detail-row:hover,
+.bgrid-body-table > tbody > tr.bgrid-detail-row.bgrid-row-hover,
+.bgrid-body-table > tbody > tr.bgrid-detail-frozen-row,
+.bgrid-body-table > tbody > tr.bgrid-detail-frozen-row:hover,
+.bgrid-body-table > tbody > tr.bgrid-detail-frozen-row.bgrid-row-hover {
+  background-color: var(--bgrid-body-bg) !important;
+}
+
+.bgrid-detail-row {
+  box-sizing: border-box;
+  max-height: none !important;
+}
+
+.bgrid-body-table > tbody > tr.bgrid-detail-row > td.bgrid-detail-cell {
+  padding: 0 !important;
+  margin: 0 !important;
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-bottom: 1px solid var(--bgrid-border-color-base) !important;
+  background-color: var(--bgrid-body-bg) !important;
+  vertical-align: top;
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important;
+  white-space: normal !important;
+  text-overflow: clip !important;
+  line-height: normal !important;
+}
+
+.bgrid-body-table > tbody > tr.bgrid-detail-row > td[data-none] {
+  padding: 0 !important;
+  margin: 0 !important;
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-bottom: 1px solid var(--bgrid-border-color-base) !important;
+  background-color: var(--bgrid-body-bg) !important;
+  max-height: none !important;
+}
+
+.bgrid-body-table > tbody > tr.bgrid-detail-row > td.bgrid-detail-cell > * {
+  max-height: none !important;
+}
+
+.bgrid-master-detail-panel {
+  box-sizing: border-box;
+  overflow: auto;
+  pointer-events: auto;
+  background-color: var(--bgrid-body-bg);
+  height: calc(var(--bgrid-item-cell-height) - 1px);
+  min-height: calc(var(--bgrid-item-cell-height) - 1px);
+  max-height: calc(var(--bgrid-item-cell-height) - 1px) !important;
+  max-width: 100%;
+}
+
+.bgrid-detail-frozen-row,
+.bgrid-detail-spacer-row {
+  pointer-events: none;
+  max-height: none !important;
+}
+
+.bgrid-body-table > tbody > tr.bgrid-detail-frozen-row > td,
+.bgrid-body-table > tbody > tr.bgrid-detail-spacer-row > td {
+  padding: 0 !important;
+  margin: 0 !important;
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-bottom: 1px solid var(--bgrid-border-color-base) !important;
+  background-color: var(--bgrid-body-bg) !important;
+  max-height: none !important;
+  height: inherit !important;
 }
 
 .bgrid-editor-icon {

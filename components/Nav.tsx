@@ -145,6 +145,14 @@ function Nav({ currentPath, onNavigate }: Props) {
             ),
             key: '/export',
           },
+          {
+            label: (
+              <Space>
+                Master-Detail<Tag color='blue'>v1.14+</Tag>
+              </Space>
+            ),
+            key: '/masterDetail',
+          },
         ]}
         onTabClick={activeKey => {
           handleNavigate(activeKey);

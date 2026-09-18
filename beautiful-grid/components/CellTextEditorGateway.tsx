@@ -142,11 +142,13 @@ export function CellTextEditorGateway({ containerRef }: Props) {
       return;
     }
 
-    const target = container.querySelector(
-      `td[data-bgrid-cell="true"][data-row-index="${cellEditSession!.hostCell.rowIndex}"][data-column-index="${
-        cellEditSession!.hostCell.columnIndex
-      }"]`,
-    );
+    const target = Array.from(
+      container.querySelectorAll<HTMLElement>(
+        `td[data-bgrid-cell="true"][data-row-index="${cellEditSession!.hostCell.rowIndex}"][data-column-index="${
+          cellEditSession!.hostCell.columnIndex
+        }"]`,
+      ),
+    ).find(el => el.closest('[role="grid"], [role="treegrid"]') === container);
     if (!(target instanceof HTMLElement)) {
       input.style.visibility = 'hidden';
       return;
@@ -154,7 +156,9 @@ export function CellTextEditorGateway({ containerRef }: Props) {
 
     const containerRect = container.getBoundingClientRect();
     const targetRect = target.getBoundingClientRect();
-    const bodyViewport = container.querySelector('.bgrid-body-viewport');
+    const bodyViewport = Array.from(container.querySelectorAll<HTMLElement>('.bgrid-body-viewport')).find(
+      el => el.closest('[role="grid"], [role="treegrid"]') === container,
+    );
     const bodyViewportRect =
       bodyViewport instanceof HTMLElement ? bodyViewport.getBoundingClientRect() : containerRect;
     const editorBox = resolveVisibleTextEditorVerticalBox({

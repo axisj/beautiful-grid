@@ -100,6 +100,57 @@ describe('BGrid live column resize', () => {
     });
   });
 
+  it('uses the grid styles and an integer measured width for BestFit', async () => {
+    const { container } = render(
+      <BGrid<Row>
+        width={300}
+        height={140}
+        columns={[{ key: 'name', label: 'Name', width: 30 }]}
+        data={[{ values: { name: 'one' } }, { values: { name: 'two' } }]}
+      />,
+    );
+    const headerCell = container.querySelector(
+      "[role='rfdg-head'] [data-column-index='0']",
+    ) as HTMLTableCellElement;
+    const resizeHandle = headerCell.querySelector('.bgrid-col-resizer-handle') as HTMLDivElement;
+    const bodyCol = container.querySelector("[role='rfdg-body']")?.closest('table')?.querySelector('col');
+    const grid = container.querySelector("[role='grid']") as HTMLDivElement;
+    const originalAppend = grid.append.bind(grid);
+    let measurementTarget: HTMLDivElement | undefined;
+    let measurementParent: Element | null = null;
+    const append = vi.spyOn(grid, 'append').mockImplementation((...nodes: (Node | string)[]) => {
+      measurementTarget = nodes.find(
+        node => node instanceof HTMLDivElement && node.querySelector('table'),
+      ) as HTMLDivElement | undefined;
+      if (measurementTarget) measurementParent = grid;
+      return originalAppend(...nodes);
+    });
+    const offsetWidth = vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockImplementation(function () {
+      return this.classList.contains('bgrid-head-cell') ? 35 : 0;
+    });
+
+    try {
+      fireEvent.doubleClick(resizeHandle);
+
+      await waitFor(() => {
+        expect(bodyCol).toHaveAttribute('width', '36');
+      });
+
+      const measurementTables = measurementTarget?.querySelectorAll('table');
+
+      expect(measurementParent).toBe(container.querySelector("[role='grid']"));
+      expect(measurementTables).toHaveLength(2);
+      measurementTables?.forEach(table => {
+        expect(table).toHaveClass('bgrid-head-table', 'bgrid-body-table');
+        expect(table.style.tableLayout).toBe('auto');
+        expect(table.style.width).toBe('max-content');
+      });
+    } finally {
+      append.mockRestore();
+      offsetWidth.mockRestore();
+    }
+  });
+
   it('recalculates horizontal scrollbar metrics when a column width changes', async () => {
     function ControlledGrid() {
       const [controlledColumns, setControlledColumns] = useState(columns);
@@ -196,4 +247,3 @@ describe('BGrid live column resize', () => {
     });
   });
 });
-

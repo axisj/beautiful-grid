@@ -74,6 +74,30 @@ describe('built-in text and plugin cell editors', () => {
     expect(cell).toHaveAttribute('data-bgrid-editor-type', 'text');
   });
 
+  it('preserves the first native input when input starts a replacement edit', async () => {
+    const columns: BGridColumn<Row>[] = [
+      { key: 'name', label: 'Name', width: 140, editable: true, editor: { type: 'text' } },
+    ];
+    const { container, getByLabelText } = render(
+      <BGrid<Row>
+        width={220}
+        height={160}
+        columns={columns}
+        data={createData()}
+        editable
+        cellNavigationOptions={{ defaultActiveCell: { rowIndex: 0, columnIndex: 0 } }}
+      />,
+    );
+    const grid = container.querySelector('[role="grid"]') as HTMLElement;
+    grid.focus();
+    const gateway = getByLabelText('행 1, 열 1 텍스트 편집') as HTMLInputElement;
+
+    fireEvent.input(gateway, { target: { value: '1' } });
+
+    await waitFor(() => expect(gateway).toHaveClass('bgrid-text-editor-active'));
+    expect(gateway.value).toBe('1');
+  });
+
   it('preserves the value with F2, commits it, and returns keyboard focus to the same gateway', async () => {
     const onChangeData = vi.fn();
     const columns: BGridColumn<Row>[] = [

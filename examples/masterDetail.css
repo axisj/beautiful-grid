@@ -1,0 +1,87 @@
+.master-detail-example .bgrid-master-detail-panel {
+  background: #f0f8f6;
+}
+
+.master-detail-title {
+  color: #194e49;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.master-detail-count {
+  color: #527b75;
+  font-size: 12px;
+}
+
+.master-detail-order-items {
+  height: 130px;
+  overflow: hidden;
+  border: 1px solid #a7cec5;
+  border-radius: 7px;
+  background: #f7fcfa;
+  box-shadow: 0 2px 8px rgb(22 91 80 / 9%);
+}
+
+.master-detail-order-items .bgrid-root.master-detail-child-grid {
+  --bgrid-primary-color: #0f766e;
+  --bgrid-header-bg: #e0f1ec;
+  --bgrid-header-color: #194e49;
+  --bgrid-header-hover-bg: #cee8e0;
+  --bgrid-header-separator-color: #b0d1c9;
+  --bgrid-border-color-base: #b4d4cc;
+  --bgrid-border-color-light: #cee3dd;
+  --bgrid-border-color-subtle: #e2eee9;
+  --bgrid-body-bg: #f9fcfb;
+  --bgrid-body-odd-bg: #f1f8f5;
+  --bgrid-body-color: #294c48;
+  --bgrid-body-hover-bg: #e7f4ef;
+  --bgrid-body-hover-odd-bg: #def0e9;
+  --bgrid-body-active-bg: #d2ebe2;
+  --bgrid-active-cell-color: #0f766e;
+  --bgrid-active-cell-ring-color: #0f766e;
+  --bgrid-cell-selected-bg: #d9f0e7;
+  --bgrid-cell-selected-border-color: #27917f;
+  --bgrid-scroll-bg: #f9fcfb;
+  --bgrid-scroll-track-bg: #eaf4f0;
+}
+
+:root[data-theme='dark'] .master-detail-example .bgrid-master-detail-panel {
+  background: #102a2a;
+}
+
+:root[data-theme='dark'] .master-detail-title {
+  color: #c0e9df;
+}
+
+:root[data-theme='dark'] .master-detail-count {
+  color: #8fbab0;
+}
+
+:root[data-theme='dark'] .master-detail-order-items {
+  border-color: #38736b;
+  background: #102a29;
+  box-shadow: 0 2px 10px rgb(0 0 0 / 18%);
+}
+
+:root[data-theme='dark'] .master-detail-order-items .bgrid-root.master-detail-child-grid {
+  --bgrid-primary-color: #5bd3be;
+  --bgrid-header-bg: #1b403c;
+  --bgrid-header-color: #ddf5ef;
+  --bgrid-header-hover-bg: #27524c;
+  --bgrid-header-separator-color: #3a7067;
+  --bgrid-border-color-base: #35675f;
+  --bgrid-border-color-light: #2b5953;
+  --bgrid-border-color-subtle: #244842;
+  --bgrid-body-bg: #112c2a;
+  --bgrid-body-odd-bg: #17332f;
+  --bgrid-body-color: #d3eee7;
+  --bgrid-body-hover-bg: #214640;
+  --bgrid-body-hover-odd-bg: #28504a;
+  --bgrid-body-active-bg: #295c52;
+  --bgrid-active-cell-color: #5bd3be;
+  --bgrid-active-cell-ring-color: #5bd3be;
+  --bgrid-cell-selected-bg: #27584e;
+  --bgrid-cell-selected-border-color: #5bd3be;
+  --bgrid-scroll-bg: #112c2a;
+  --bgrid-scroll-track-bg: #193a35;
+}

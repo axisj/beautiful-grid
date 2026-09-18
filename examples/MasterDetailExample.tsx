@@ -4,6 +4,7 @@ import { BGrid, type BGridColumn, type BGridDataItem, type BGridMasterDetailExpa
 import DataGridContainer from '../components/DataGridContainer';
 import { useContainerSize } from '../hooks/useContainerSize';
 import { exampleMsg, t } from './i18n';
+import './masterDetail.css';
 
 interface OrderItem {
   itemCode: string;
@@ -178,11 +179,9 @@ function OrderItemsGrid({ items }: { items: OrderItem[] }) {
   const nestedData: BGridDataItem<OrderItem>[] = React.useMemo(() => items.map(it => ({ values: it })), [items]);
 
   return (
-    <div
-      ref={containerRef}
-      style={{ height: 130, border: '1px solid var(--bgrid-border-color, #e2e8f0)', borderRadius: 4 }}
-    >
+    <div ref={containerRef} className='master-detail-order-items'>
       <BGrid
+        className='master-detail-child-grid'
         headerHeight={25}
         itemHeight={15}
         width={width > 0 ? width : 640}
@@ -241,10 +240,10 @@ export default function MasterDetailExample() {
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ fontWeight: 600, fontSize: 13, color: 'var(--bgrid-text, #1e293b)' }}>
+            <div className='master-detail-title'>
               {t('주문 상세 품목', 'Order Items')} — {order.orderId} ({order.customer})
             </div>
-            <span style={{ fontSize: 12, color: 'var(--bgrid-sub-text, #64748b)' }}>
+            <span className='master-detail-count'>
               {t(`총 ${order.items.length}개 품목`, `${order.items.length} line items`)}
             </span>
           </div>
@@ -257,7 +256,7 @@ export default function MasterDetailExample() {
   );
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 12 }}>
+    <div className='master-detail-example' style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 12 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13 }}>
           <label style={{ fontWeight: 600 }}>{t('펼침 모드', 'Expand Mode')}:</label>

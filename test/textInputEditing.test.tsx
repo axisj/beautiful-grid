@@ -740,4 +740,58 @@ describe('built-in text and plugin cell editors', () => {
     expect(gateway.style.height).toBe('90px');
     expect(gateway.style.textAlign).toBe('center');
   });
+
+  it('keeps the text editor geometry finite while the modal is scaled to zero', async () => {
+    const columns: BGridColumn<Row>[] = [
+      { key: 'name', label: 'Name', width: 140, editable: true, editor: { type: 'text' } },
+    ];
+    const { container, getByLabelText } = render(
+      <BGrid<Row>
+        width={220}
+        height={160}
+        columns={columns}
+        data={createData()}
+        editable
+        cellNavigationOptions={{ defaultActiveCell: { rowIndex: 0, columnIndex: 0 } }}
+      />,
+    );
+    const grid = container.querySelector('[role="grid"]') as HTMLElement;
+    const cell = container.querySelector('td[data-row-index="0"][data-column-index="0"]') as HTMLTableCellElement;
+    const gateway = getByLabelText('행 1, 열 1 텍스트 편집') as HTMLInputElement;
+
+    vi.spyOn(grid, 'getBoundingClientRect').mockReturnValue({
+      top: 0,
+      left: 0,
+      width: 0,
+      height: 0,
+      bottom: 0,
+      right: 0,
+      x: 0,
+      y: 0,
+      toJSON: () => {},
+    });
+    Object.defineProperties(grid, {
+      offsetWidth: { configurable: true, value: 220 },
+      offsetHeight: { configurable: true, value: 160 },
+    });
+    vi.spyOn(cell, 'getBoundingClientRect').mockReturnValue({
+      top: 20,
+      left: 30,
+      width: 140,
+      height: 30,
+      bottom: 50,
+      right: 170,
+      x: 30,
+      y: 20,
+      toJSON: () => {},
+    });
+
+    grid.focus();
+    fireEvent.keyDown(gateway, { key: 'F2' });
+    await waitFor(() => expect(gateway).toHaveClass('bgrid-text-editor-active'));
+
+    expect(gateway.style.transform).not.toMatch(/NaN|Infinity/);
+    expect(gateway.style.width).not.toMatch(/NaN|Infinity/);
+    expect(gateway.style.height).not.toMatch(/NaN|Infinity/);
+  });
 });

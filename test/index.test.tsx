@@ -826,6 +826,44 @@ describe('BGrid cell selection', () => {
     fireEvent.pointerUp(toCell);
   }
 
+  it('keeps the first selected cell active by default after a drag selection', () => {
+    const { container } = render(<BGrid<Row> width={400} height={140} columns={columns} data={data} />);
+
+    dragSelect(getCell(container, 0, 0), getCell(container, 1, 1));
+
+    expect(getCell(container, 0, 0)).toHaveAttribute('data-bgrid-cell-active', 'true');
+    expect(getCell(container, 1, 1)).not.toHaveAttribute('data-bgrid-cell-active', 'true');
+  });
+
+  it('focuses the last selected cell when multi-select focus mode is last', async () => {
+    const pasteData = data.map(item => ({ values: { ...item.values } }));
+    const onChangeData = vi.fn();
+    const { container } = render(
+      <BGrid<Row>
+        width={400}
+        height={140}
+        columns={columns.map(column => ({ ...column, editable: true }))}
+        data={pasteData}
+        editable
+        onChangeData={onChangeData}
+        cellSelectionOptions={{ multiSelectFocusMode: 'last' }}
+      />,
+    );
+
+    dragSelect(getCell(container, 0, 0), getCell(container, 1, 1));
+
+    expect(getCell(container, 0, 0)).not.toHaveAttribute('data-bgrid-cell-active', 'true');
+    expect(getCell(container, 1, 1)).toHaveAttribute('data-bgrid-cell-active', 'true');
+
+    fireEvent.paste(document, {
+      clipboardData: { getData: vi.fn().mockReturnValue('last') },
+    });
+
+    await waitFor(() => expect(getCell(container, 1, 1)).toHaveTextContent('last'));
+    expect(getCell(container, 0, 1)).toHaveTextContent('one');
+    expect(onChangeData).toHaveBeenCalledWith(1, 1, pasteData[1].values, expect.anything());
+  });
+
   let originalClipboard: Clipboard | undefined;
 
   function mockClipboard(writeText = vi.fn().mockResolvedValue(undefined)) {

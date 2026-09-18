@@ -151,6 +151,7 @@ function Table<T>(props: Props<T>) {
   const store = useAppStoreApi<T>();
   const { cellSelectionOptions, onChangeData, sourceIndexByVisibleIndex } = props;
   const cellSelectionEnabled = cellSelectionOptions?.enabled ?? true;
+  const multiSelectFocusMode = cellSelectionOptions?.multiSelectFocusMode ?? 'first';
   const rowKeyRegistryState = useRef({
     sourceData: props.sourceData ?? props.data,
     rowKey: props.rowKey,
@@ -1147,6 +1148,18 @@ function Table<T>(props: Props<T>) {
     [data, props.cellMergeOptions],
   );
 
+  const focusLastSelectedCell = useCallback(
+    (cellPosition: CellPosition, hostCell = cellPosition) => {
+      if (multiSelectFocusMode !== 'last') return;
+
+      setActiveCell(
+        { rowIndex: cellPosition.rowIndex, columnIndex: cellPosition.columnIndex },
+        { rowIndex: hostCell.rowIndex, columnIndex: hostCell.columnIndex },
+      );
+    },
+    [multiSelectFocusMode, setActiveCell],
+  );
+
   const updateAxisSelectionByTarget = useCallback(
     (target: HTMLElement | null) => {
       const dragState = axisSelectionDragRef.current;
@@ -1188,6 +1201,7 @@ function Table<T>(props: Props<T>) {
       const physicalCellPosition = getCellPosition(target, containerRef.current);
       const cellPosition = physicalCellPosition ? toLogicalCellPosition(physicalCellPosition) : undefined;
       if (cellSelectionEnabled && cellSelectionDragRef.current && cellPosition) {
+        focusLastSelectedCell(cellPosition, physicalCellPosition ?? cellPosition);
         setCellSelectionRanges(
           updateSelectionDragRange(
             cellSelectionDragRef.current,
@@ -1224,6 +1238,7 @@ function Table<T>(props: Props<T>) {
       cellSelectionEnabled,
       clearHoveredRow,
       disabled,
+      focusLastSelectedCell,
       setCellSelectionRanges,
       setHoveredRows,
       toLogicalCellPosition,
@@ -1389,9 +1404,10 @@ function Table<T>(props: Props<T>) {
       if (!cellPosition) return;
 
       const logicalCellPosition = toLogicalCellPosition(cellPosition);
+      focusLastSelectedCell(logicalCellPosition, cellPosition);
       setCellSelectionRanges(updateSelectionDragRange(dragState, getRangeFromDrag(dragState, logicalCellPosition)));
     },
-    [setCellSelectionRanges, toLogicalCellPosition],
+    [focusLastSelectedCell, setCellSelectionRanges, toLogicalCellPosition],
   );
 
   const runSelectionAutoScroll = useCallback(() => {

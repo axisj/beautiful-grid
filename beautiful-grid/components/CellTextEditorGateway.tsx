@@ -169,8 +169,8 @@ export function CellTextEditorGateway({ containerRef }: Props) {
       return;
     }
     // Convert viewport pixels back to local pixels during modal scale animations.
-    const scaleX = container.offsetWidth ? containerRect.width / container.offsetWidth : 1;
-    const scaleY = container.offsetHeight ? containerRect.height / container.offsetHeight : 1;
+    const scaleX = container.offsetWidth && containerRect.width ? containerRect.width / container.offsetWidth : 1;
+    const scaleY = container.offsetHeight && containerRect.height ? containerRect.height / container.offsetHeight : 1;
     input.style.transform = `translate(${(targetRect.left - containerRect.left) / scaleX - container.clientLeft}px, ${
       (editorBox.top - containerRect.top) / scaleY - container.clientTop
     }px)`;

@@ -2120,7 +2120,7 @@
   padding-right: var(--bgrid-scrollbar-modern-gutter-size);
 }
 
-[data-scroll-variant='classic'] .bgrid-vertical-scrollbar-area {
+[data-scroll-variant='classic'] > .bgrid-vertical-scrollbar-area {
   width: var(--bgrid-scrollbar-classic-gutter-size);
   border-left-color: var(--bgrid-scrollbar-classic-gutter-border-color);
   background: var(--bgrid-scrollbar-classic-gutter-bg);
@@ -2132,7 +2132,7 @@
   background: var(--bgrid-scrollbar-classic-gutter-bg);
 }
 
-[data-scroll-variant='modern'] .bgrid-vertical-scrollbar-area {
+[data-scroll-variant='modern'] > .bgrid-vertical-scrollbar-area {
   width: var(--bgrid-scrollbar-modern-gutter-size);
   border-left-color: var(--bgrid-scrollbar-modern-gutter-border-color);
   background: var(--bgrid-scrollbar-modern-gutter-bg);
@@ -2332,19 +2332,15 @@
 }
 
 /* Hide native scrollbar when using custom scrollbars */
-[data-scroll-variant='classic'] [role='rfdg-scroll-container']::-webkit-scrollbar,
-[data-scroll-variant='modern'] [role='rfdg-scroll-container']::-webkit-scrollbar,
-[data-scroll-variant='classic'] .bgrid-scroll-container::-webkit-scrollbar,
-[data-scroll-variant='modern'] .bgrid-scroll-container::-webkit-scrollbar {
+[data-scroll-variant='classic'] > .bgrid-scroll-container::-webkit-scrollbar,
+[data-scroll-variant='modern'] > .bgrid-scroll-container::-webkit-scrollbar {
   display: none;
   width: 0 !important;
   height: 0 !important;
 }
 
-[data-scroll-variant='classic'] [role='rfdg-scroll-container'],
-[data-scroll-variant='modern'] [role='rfdg-scroll-container'],
-[data-scroll-variant='classic'] .bgrid-scroll-container,
-[data-scroll-variant='modern'] .bgrid-scroll-container {
+[data-scroll-variant='classic'] > .bgrid-scroll-container,
+[data-scroll-variant='modern'] > .bgrid-scroll-container {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE/Edge */
 }

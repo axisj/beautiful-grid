@@ -35,8 +35,21 @@
   --bgrid-active-cell-ring-color: #0f766e;
   --bgrid-cell-selected-bg: #d9f0e7;
   --bgrid-cell-selected-border-color: #27917f;
+  --bgrid-selection-axis-bg: #d9f0e7;
+  --bgrid-selection-axis-color: #0f766e;
+  --bgrid-selection-axis-border-color: #27917f;
   --bgrid-scroll-bg: #f9fcfb;
   --bgrid-scroll-track-bg: #eaf4f0;
+  --bgrid-scroll-thumb-bg: #7eb5a9;
+  --bgrid-scroll-thumb-hover-bg: #4f9b8a;
+  --bgrid-scroll-corner-bg: #eaf4f0;
+  --bgrid-scrollbar-modern-track-bg: #eaf4f0;
+  --bgrid-scrollbar-modern-thumb-bg: #7eb5a9;
+  --bgrid-scrollbar-modern-thumb-hover-bg: #4f9b8a;
+  --bgrid-scrollbar-modern-button-hover-bg: #d9eee7;
+  --bgrid-scrollbar-modern-icon-color: #427e72;
+  --bgrid-scrollbar-modern-gutter-bg: #f1f8f5;
+  --bgrid-scrollbar-modern-gutter-border-color: #b4d4cc;
 }
 
 :root[data-theme='dark'] .master-detail-example .bgrid-master-detail-panel {
@@ -76,6 +89,19 @@
   --bgrid-active-cell-ring-color: #5bd3be;
   --bgrid-cell-selected-bg: #27584e;
   --bgrid-cell-selected-border-color: #5bd3be;
+  --bgrid-selection-axis-bg: #27584e;
+  --bgrid-selection-axis-color: #a9ecdc;
+  --bgrid-selection-axis-border-color: #5bd3be;
   --bgrid-scroll-bg: #112c2a;
   --bgrid-scroll-track-bg: #193a35;
+  --bgrid-scroll-thumb-bg: #4b9b8b;
+  --bgrid-scroll-thumb-hover-bg: #71c7b4;
+  --bgrid-scroll-corner-bg: #193a35;
+  --bgrid-scrollbar-modern-track-bg: #193a35;
+  --bgrid-scrollbar-modern-thumb-bg: #4b9b8b;
+  --bgrid-scrollbar-modern-thumb-hover-bg: #71c7b4;
+  --bgrid-scrollbar-modern-button-hover-bg: #28504a;
+  --bgrid-scrollbar-modern-icon-color: #8fc8ba;
+  --bgrid-scrollbar-modern-gutter-bg: #17332f;
+  --bgrid-scrollbar-modern-gutter-border-color: #35675f;
 }

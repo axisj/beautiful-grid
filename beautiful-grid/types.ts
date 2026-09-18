@@ -1081,6 +1081,8 @@ export interface BGridProps<T> {
   };
   cellSelectionOptions?: {
     enabled?: boolean;
+    /** Controls which cell remains active after a multi-cell selection. */
+    multiSelectFocusMode?: 'first' | 'last';
     clearOnEscape?: boolean;
     clearOnOutsideClick?: boolean;
     maxClipboardCells?: number;

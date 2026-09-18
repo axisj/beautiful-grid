@@ -662,6 +662,7 @@ Cell range selection and clipboard copy/paste are enabled by default.
   rowKey='id'
   cellSelectionOptions={{
     enabled: true,
+    multiSelectFocusMode: 'first',
     clearOnEscape: true,
     clearOnOutsideClick: true,
     maxClipboardCells: 100000,
@@ -677,6 +678,7 @@ Cell range selection and clipboard copy/paste are enabled by default.
 
 - `Ctrl+C` / `Cmd+C`: Copies selected cells as Tab-separated (`\t`) values and CRLF (`\r\n`) lines, directly pasteable into Excel or Google Sheets.
 - `Ctrl+V` / `Cmd+V`: Pastes clipboard matrix starting from the focused cell across editable columns.
+- `multiSelectFocusMode: 'last'` makes the last cell selected by a drag the active cell and the paste starting point. The default is `'first'` for backward compatibility.
 - Customize copied text on a per-column basis with `getClipboardText: ({ value, values }) => string`.
 
 ---
@@ -1118,7 +1120,7 @@ Below is a categorized reference of `<BGrid>` props. For exact TypeScript types,
 | `onChangeData`          | `(index, columnIndex, item, column, meta) => void` | -            | Callback fired after a cell edit commits.                    |
 | `onClick`               | `(params: BGridClickParams<T>) => void`            | -            | Cell click callback.                                         |
 | `cellNavigationOptions` | `BGridCellNavigationOptions`                       | -            | Active cell focus, arrow key navigation, and repeat options. |
-| `cellSelectionOptions`  | `BGridCellSelectionOptions`                        | -            | Range drag selection and clipboard copy/paste options.       |
+| `cellSelectionOptions`  | `BGridCellSelectionOptions`                        | -            | Range drag selection, active-cell focus, and clipboard copy/paste options. |
 
 #### Additional Features & Overlays
 

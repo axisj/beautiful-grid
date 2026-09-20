@@ -1,4 +1,4 @@
-import { BGridColumn, BGridReorderInfo, BGridRowChecked } from '../types';
+import { BGridColumn, BGridRowChecked } from '../types';
 import { getLineNumberWidth } from './getLineNumber';
 
 interface Props<T> {

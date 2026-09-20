@@ -184,13 +184,11 @@ function Table<T>(props: Props<T>) {
   );
 
   // [Selector Group 2] Header, Footer, Summary - 헤더/푸터/요약
-  const { headerHeight, footerHeight, bottomBarHeight, summaryHeight, summaryRowHeight } = useAppStore(
+  const { headerHeight, bottomBarHeight, summaryHeight } = useAppStore(
     useShallow(s => ({
       headerHeight: s.headerHeight,
-      footerHeight: s.footerHeight,
       bottomBarHeight: s.bottomBarHeight,
       summaryHeight: s.summaryHeight,
-      summaryRowHeight: s.summaryRowHeight,
     })),
   );
 

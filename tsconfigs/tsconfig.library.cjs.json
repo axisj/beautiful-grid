@@ -18,7 +18,6 @@
     "../beautiful-grid/**/*"
   ],
   "exclude": [
-    "node_modules",
-    "**/tree.ts"
+    "node_modules"
   ]
 }

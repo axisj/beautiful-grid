@@ -7,32 +7,26 @@ import {
   getCellValueByRowKey,
   getRowReorderOffset,
   getRowReorderRole,
-  isCellEdited,
-  isCellValueChanged,
-  resolveLogicalCell,
   type BGridRowHeightMetrics,
   useBodyData,
 } from '../utils';
-import { TableBodyCell } from './TableBodyCell';
 import { TableBodyRow } from './TableBodyRow';
 import { MasterDetailRow } from './MasterDetailCell';
 import { AppModelColumn, BGridDataItem, BGridDataItemStatus, BGridProps, BGridSearchMatch } from '../types';
-import RowSelector from './RowSelector';
-import { GripVertical } from './GripVertical';
 
-export type BGridBodyRegion = 'left' | 'main';
+type BGridBodyRegion = 'left' | 'main';
 
 export interface BGridBodyRowRange {
   startRowIndex: number;
   endRowIndex: number;
 }
 
-export interface BGridVisibleColumnRange {
+interface BGridVisibleColumnRange {
   startColumnIndex: number;
   endColumnIndex: number;
 }
 
-export function getVisibleColumnRange(
+function getVisibleColumnRange(
   columns: Pick<AppModelColumn<any>, 'left' | 'width'>[],
   firstScrollableColumnIndex: number,
   scrollLeft: number,
@@ -446,41 +440,6 @@ function TableBody({
   );
 }
 
-function LineNumberTd({
-  bordered,
-  rowStatus,
-  rowIndex,
-  active,
-  className,
-  children,
-  ...rest
-}: React.TdHTMLAttributes<HTMLTableCellElement> & {
-  bordered?: boolean;
-  rowStatus?: 'I' | 'U' | 'D';
-  rowIndex?: number;
-  active?: boolean;
-}) {
-  return (
-    <td
-      className={[
-        'bgrid-line-number-cell',
-        bordered ? 'bordered' : '',
-        active ? 'bgrid-row-axis-active' : '',
-        className ?? '',
-      ]
-        .filter(Boolean)
-        .join(' ')}
-      data-bgrid-row-status={rowStatus}
-      data-bgrid-axis-selectable='true'
-      data-bgrid-row-axis-active={active ? 'true' : undefined}
-      data-row-index={rowIndex}
-      {...rest}
-    >
-      {children}
-    </td>
-  );
-}
-
 function getRowStatusLabel(status?: BGridDataItemStatus): 'I' | 'U' | 'D' | undefined {
   if (status === BGridDataItemStatus.new) return 'I';
   if (status === BGridDataItemStatus.edit) return 'U';
@@ -492,7 +451,7 @@ interface BodyTableProps extends React.TableHTMLAttributes<HTMLTableElement> {
   variant: BGridProps<any>['variant'];
 }
 
-export function BodyTable({ variant, className, children, ...rest }: BodyTableProps) {
+function BodyTable({ variant, className, children, ...rest }: BodyTableProps) {
   return (
     <table
       className={[
@@ -509,55 +468,12 @@ export function BodyTable({ variant, className, children, ...rest }: BodyTablePr
   );
 }
 
-interface TableBodyTrProps extends React.HTMLAttributes<HTMLTableRowElement> {
-  itemHeight: number;
-  itemPadding: number;
-  rowHeight?: number;
-  active?: boolean;
-  editable?: boolean;
-  odd?: boolean;
-  hasOnClick?: boolean;
-}
-
-export function TableBodyTr({
-  itemHeight,
-  itemPadding,
-  rowHeight,
-  active,
-  editable,
-  odd,
-  hasOnClick,
-  className,
-  children,
-  style,
-  ...rest
-}: TableBodyTrProps) {
-  const clickable = !editable && hasOnClick;
-  const rowClassName = ['bgrid-body-row', active ? 'bgrid-row-active' : '', className ?? ''].filter(Boolean).join(' ');
-
-  return (
-    <tr
-      className={rowClassName}
-      data-odd={odd ? 'true' : undefined}
-      data-clickable={clickable ? 'true' : undefined}
-      style={{
-        ['--bgrid-item-line-height' as string]: `${itemHeight}px`,
-        ['--bgrid-item-cell-height' as string]: `${rowHeight ?? itemHeight + itemPadding * 2}px`,
-        ...style,
-      }}
-      {...rest}
-    >
-      {children}
-    </tr>
-  );
-}
-
 interface NoDataTrProps extends React.HTMLAttributes<HTMLTableRowElement> {
   itemHeight: number;
   itemPadding: number;
 }
 
-export function NoDataTr({ children, className, itemHeight, itemPadding, style, ...rest }: NoDataTrProps) {
+function NoDataTr({ children, className, itemHeight, itemPadding, style, ...rest }: NoDataTrProps) {
   return (
     <tr
       className={['bgrid-empty-row', className ?? ''].filter(Boolean).join(' ')}

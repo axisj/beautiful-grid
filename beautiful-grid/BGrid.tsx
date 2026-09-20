@@ -6,7 +6,6 @@ import {
   BGridColumnVisibilityChangeEvent,
   BGridColumnVisibilityState,
   BGridColumnWithOptionalWidth,
-  BGridDataControl,
   BGridDataItem,
   BGridDataQuery,
   BGridProps,

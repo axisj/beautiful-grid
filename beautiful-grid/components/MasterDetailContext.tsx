@@ -3,7 +3,6 @@ import type {
   BGridDataItem,
   BGridMasterDetailIcons,
   BGridMasterDetailOptions,
-  BGridMasterDetailRenderProps,
 } from '../types';
 
 export interface BGridMasterDetailContextValue {

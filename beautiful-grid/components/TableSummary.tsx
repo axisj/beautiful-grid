@@ -10,7 +10,7 @@ interface Props {
   position: NonNullable<BGridProps<any>['summary']>['position'];
 }
 
-export function TableSummary<T>({ position }: Props) {
+export function TableSummary({ position }: Props) {
   // [Selector Group 1] Summary Configuration - 요약 설정
   const { summaryHeight, summaryRowHeight, summary, columns, frozenColumnIndex, variant, data } =
     useAppStore(

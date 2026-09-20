@@ -5,7 +5,6 @@ import type {
   BGridColumnWithOptionalWidth,
   BGridProps,
   BGridSummaryColumn,
-  BGridSummaryRow,
 } from '../types';
 import { getColumnId } from './getColumnId';
 

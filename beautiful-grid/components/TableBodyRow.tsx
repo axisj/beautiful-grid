@@ -83,8 +83,6 @@ interface CellItemProps<T> {
   canonicalItem: BGridDataItem<T>;
   valueByRowKey: any;
   isLeftRegion: boolean;
-  editable: boolean;
-  disabled: boolean;
   editTrigger?: 'click' | 'dblclick';
   rowSpan: number;
   isMerged: boolean;
@@ -113,8 +111,6 @@ function TableBodyCellItemInner<T>({
   canonicalIndex,
   canonicalItem,
   valueByRowKey,
-  editable,
-  disabled,
   editTrigger,
   rowSpan,
   isMerged,
@@ -227,7 +223,6 @@ function TableBodyRowInner<T>({
   item,
   data,
   ri,
-  sourceIndex,
   columns,
   startCIdx,
   endCIdx,
@@ -243,7 +238,6 @@ function TableBodyRowInner<T>({
   className,
   resolvedRowHeight,
   itemHeight,
-  itemPadding,
   editable,
   disabled,
   editTrigger,
@@ -408,8 +402,6 @@ function TableBodyRowInner<T>({
             canonicalItem={canonicalItem}
             valueByRowKey={valueByRowKey}
             isLeftRegion={isLeftRegion}
-            editable={editable}
-            disabled={disabled}
             editTrigger={editTrigger}
             rowSpan={rowSpan}
             isMerged={Boolean(mergeColumns?.[columnIndex])}

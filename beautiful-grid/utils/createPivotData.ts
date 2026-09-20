@@ -219,7 +219,7 @@ function getPivotCellContext<T>(item: BGridDataItem<Record<string, any>>, key: s
 }
 
 function createRowFieldValues(fields: BGridPivotField[], values: any[]) {
-  return fields.reduce((acc, field, index) => {
+  return fields.reduce((acc, _, index) => {
     acc[getPivotRowKey(index)] = values[index];
     return acc;
   }, {} as Record<string, any>);

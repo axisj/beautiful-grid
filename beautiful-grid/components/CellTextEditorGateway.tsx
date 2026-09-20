@@ -335,7 +335,7 @@ export function CellTextEditorGateway({ containerRef }: Props) {
           void commit(event.shiftKey ? 'prev' : 'next');
         }
       }}
-      onBlur={event => {
+      onBlur={() => {
         if (!cellEditSession || !isTextEditing) return;
         if (composingRef.current) {
           pendingBlurRef.current = true;

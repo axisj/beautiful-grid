@@ -1489,7 +1489,7 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
         const columnMap: (SortedColumn | { group: BGridColumnGroup; children: SortedColumn[] })[] = [];
 
         if (trLevel === 0) {
-          get().columns.forEach((c, i) => {
+          get().columns.forEach((_, i) => {
             const cg = columnsGroup.find(cg => {
               return cg.groupStartIndex <= i && cg.groupEndIndex >= i;
             });

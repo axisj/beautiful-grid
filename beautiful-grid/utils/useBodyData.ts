@@ -4,7 +4,7 @@ import { BGridColumn, BGridDataItem, DIRC_MAP, MoveDirection } from '../types';
 import { getCellValueByRowKey } from './getCellValue';
 import { getColumnId } from './getColumnId';
 
-interface CellMergeColumn<T> {
+interface CellMergeColumn {
   columnIndex: number;
   columnKey: string;
   mergeBy: string | string[];
@@ -17,7 +17,7 @@ const mergeRowSpanCache = new WeakMap<BGridDataItem<any>[], Map<string, RowSpanM
 function getMergeCacheKey(
   startIdx: number,
   endNumber: number,
-  mergeColumns: CellMergeColumn<any>[],
+  mergeColumns: CellMergeColumn[],
 ) {
   const columnsSignature = mergeColumns
     .map(
@@ -32,7 +32,7 @@ function computeMergeRowSpans(
   data: BGridDataItem<any>[],
   startIdx: number,
   endNumber: number,
-  mergeColumns: CellMergeColumn<any>[],
+  mergeColumns: CellMergeColumn[],
 ): RowSpanMap {
   const rowSpanMap: RowSpanMap = new Map();
 
@@ -86,7 +86,7 @@ export function useBodyData(startIdx: number, endNumber: number, data: BGridData
 
   const mergeColumns = React.useMemo(() => {
     const columnsMap = cellMergeOptions?.columnsMap;
-    if (!columnsMap) return [] as CellMergeColumn<any>[];
+    if (!columnsMap) return [] as CellMergeColumn[];
 
     return Object.keys(columnsMap).map(k => {
       const columnIndex = Number(k);

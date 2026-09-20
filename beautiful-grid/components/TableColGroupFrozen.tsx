@@ -2,9 +2,7 @@ import * as React from 'react';
 import { useAppStore } from '../store';
 import { getLineNumberWidth } from '../utils';
 
-interface Props {}
-
-function TableColGroupFrozen(props: Props) {
+function TableColGroupFrozen() {
   const frozenColumnIndex = useAppStore(s => s.frozenColumnIndex);
   const data = useAppStore(s => s.data);
   const checkboxHeight = useAppStore(s => Math.min(15, s.itemHeight));

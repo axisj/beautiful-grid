@@ -2576,14 +2576,12 @@
   max-width: 100%;
 }
 
-.bgrid-detail-frozen-row,
-.bgrid-detail-spacer-row {
+.bgrid-detail-frozen-row {
   pointer-events: none;
   max-height: none !important;
 }
 
-.bgrid-body-table > tbody > tr.bgrid-detail-frozen-row > td,
-.bgrid-body-table > tbody > tr.bgrid-detail-spacer-row > td {
+.bgrid-body-table > tbody > tr.bgrid-detail-frozen-row > td {
   padding: 0 !important;
   margin: 0 !important;
   border-top: none !important;

@@ -18,7 +18,6 @@ function ColResizer({ container, columnIndex, hideHandle, bordered, frozenBounda
   const setColumnResizing = useAppStore(s => s.setColumnResizing);
   const endCellEdit = useAppStore(s => s.endCellEdit);
   const disabled = useAppStore(s => s.disabled);
-  const columnsGroup = useAppStore(s => s.columnsGroup);
 
   const onPointerDownResizerHandle = React.useCallback(
     (evt: React.PointerEvent<HTMLDivElement>, columnIndex: number) => {

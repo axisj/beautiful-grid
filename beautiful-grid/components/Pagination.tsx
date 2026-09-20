@@ -3,9 +3,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '../store';
 import { toMoney } from '../utils/number';
 
-interface Props {}
-
-function Pagination(props: Props) {
+function Pagination() {
   // [Selector Group 1] Pagination State - 페이지네이션 상태
   const { page, displayPaginationLength, disabled } = useAppStore(
     useShallow(s => ({

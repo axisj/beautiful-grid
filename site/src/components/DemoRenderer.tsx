@@ -99,6 +99,16 @@ export default function DemoRenderer({ sourcePath }: { sourcePath: string }) {
               menuBg: '#151f33',
               itemHoverBg: '#1a2942',
             },
+            Popover: {
+              colorBgElevated: '#151f33',
+              colorText: '#f2f6fc',
+              colorBorder: '#26344c',
+            },
+            ColorPicker: {
+              colorBgElevated: '#151f33',
+              colorText: '#f2f6fc',
+              colorBorder: '#26344c',
+            },
           }
         : {},
     }),

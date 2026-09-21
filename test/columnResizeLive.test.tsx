@@ -151,6 +151,47 @@ describe('BGrid live column resize', () => {
     }
   });
 
+  it('preserves the full header label when BestFit measures a short Korean title', async () => {
+    const { container } = render(
+      <BGrid<Row>
+        width={300}
+        height={140}
+        columns={[{ key: 'name', label: '이름', width: 30 }]}
+        data={[{ values: { name: 'one' } }]}
+      />,
+    );
+    const headerCell = container.querySelector(
+      "[role='rfdg-head'] [data-column-index='0']",
+    ) as HTMLTableCellElement;
+    const resizeHandle = headerCell.querySelector('.bgrid-col-resizer-handle') as HTMLDivElement;
+    const grid = container.querySelector("[role='grid']") as HTMLDivElement;
+    const originalAppend = grid.append.bind(grid);
+    let measurementTarget: HTMLDivElement | undefined;
+    const append = vi.spyOn(grid, 'append').mockImplementation((...nodes: (Node | string)[]) => {
+      measurementTarget = nodes.find(
+        node => node instanceof HTMLDivElement && node.querySelector('table'),
+      ) as HTMLDivElement | undefined;
+      return originalAppend(...nodes);
+    });
+
+    try {
+      fireEvent.doubleClick(resizeHandle);
+
+      await waitFor(() => expect(measurementTarget).toBeDefined());
+
+      measurementTarget?.querySelectorAll<HTMLElement>(
+        '.bgrid-head-column, .bgrid-head-column-label, .bgrid-head-column-label-text',
+      ).forEach(element => {
+        expect(element.style.minWidth).toBe('max-content');
+        expect(element.style.width).toBe('max-content');
+        expect(element.style.overflow).toBe('visible');
+        expect(element.style.textOverflow).toBe('clip');
+      });
+    } finally {
+      append.mockRestore();
+    }
+  });
+
   it('recalculates horizontal scrollbar metrics when a column width changes', async () => {
     function ControlledGrid() {
       const [controlledColumns, setControlledColumns] = useState(columns);

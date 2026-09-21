@@ -1664,28 +1664,27 @@ function Table<T>(props: Props<T>) {
       // Determine fill rows and cols:
       // 1. Single cell (1x1) copied into multi-cell selection: fill the entire selection.
       // 2. nxm copied into exact multiple NxM selection: repeat pattern across selection.
-      // 3. Otherwise: paste 1:1 matching matrix dimensions.
+      // 3. Otherwise: paste 1:1 matching matrix dimensions, anchored at selection top-left (or activeCell if no range).
       const isSingleClipboardCell = matrix.length === 1 && matrix[0]?.length === 1;
+      const matrixColCount = matrix.reduce((max, row) => Math.max(max, row.length), 0);
       const isExactRowMultiple =
         primaryRange && matrix.length > 0 && selectionRowCount % matrix.length === 0;
       const isExactColMultiple =
         primaryRange &&
-        matrix[0]?.length > 0 &&
-        selectionColCount % (matrix[0]?.length ?? 1) === 0;
+        matrixColCount > 0 &&
+        selectionColCount % matrixColCount === 0;
       const canTileMatrix =
         primaryRange &&
         isExactRowMultiple &&
         isExactColMultiple &&
-        (selectionRowCount > matrix.length || selectionColCount > (matrix[0]?.length ?? 1));
+        (selectionRowCount > matrix.length || selectionColCount > matrixColCount);
 
       let fillRowCount = matrix.length;
-      let fillColCount = matrix[0]?.length ?? 0;
-      let startRowIndex = activeCell.rowIndex;
-      let startColumnIndex = activeCell.columnIndex;
+      let fillColCount = matrixColCount;
+      let startRowIndex = primaryRange ? primaryRange.startRowIndex : activeCell.rowIndex;
+      let startColumnIndex = primaryRange ? primaryRange.startColumnIndex : activeCell.columnIndex;
 
       if (primaryRange && (isSingleClipboardCell || canTileMatrix)) {
-        startRowIndex = primaryRange.startRowIndex;
-        startColumnIndex = primaryRange.startColumnIndex;
         fillRowCount = selectionRowCount;
         fillColCount = selectionColCount;
       }
@@ -1699,7 +1698,7 @@ function Table<T>(props: Props<T>) {
         const requiredRowCount = startRowIndex + fillRowCount;
         while (nextData.length < requiredRowCount) {
           const rowIndex = nextData.length;
-          const matrixRowOffset = (rowIndex - startRowIndex) % matrix.length;
+          const matrixRowOffset = isSingleClipboardCell ? 0 : (rowIndex - startRowIndex) % matrix.length;
           const clipboardRow = matrix[matrixRowOffset];
           if (!clipboardRow) break;
 
@@ -1735,7 +1734,7 @@ function Table<T>(props: Props<T>) {
         const item = logicalResolutionData[rowIndex];
         if (!item || item.status === BGridDataItemStatus.remove) continue;
 
-        const matrixRow = matrix[rowOffset % matrix.length];
+        const matrixRow = isSingleClipboardCell ? matrix[0] : matrix[rowOffset % matrix.length];
         if (!matrixRow || matrixRow.length === 0) continue;
 
         for (let colOffset = 0; colOffset < fillColCount; colOffset++) {
@@ -1745,7 +1744,17 @@ function Table<T>(props: Props<T>) {
           // explicitly opted into editing may receive clipboard values.
           if (!column || column.editable !== true) continue;
 
-          const clipboardValue = matrixRow[colOffset % matrixRow.length] ?? '';
+          let clipboardValue: string;
+          if (isSingleClipboardCell) {
+            clipboardValue = matrix[0]?.[0] ?? '';
+          } else if (canTileMatrix) {
+            const cellColOffset = matrixColCount > 0 ? colOffset % matrixColCount : 0;
+            if (cellColOffset >= matrixRow.length) continue;
+            clipboardValue = matrixRow[cellColOffset] ?? '';
+          } else {
+            if (colOffset >= matrixRow.length) continue;
+            clipboardValue = matrixRow[colOffset] ?? '';
+          }
 
           const logicalCell = resolveLogicalCell(logicalResolutionData, props.cellMergeOptions, {
             rowIndex,

@@ -32,6 +32,22 @@ export interface BGridSelectEditorPluginOptions<Value extends string | number> {
    */
   copyMode?: 'label' | 'value';
   /**
+   * Whether to allow clearing cell values by pasting empty or whitespace-only text.
+   * Defaults to false (unmatched empty text throws parseValueFailed).
+   * When true, pastes `emptyValue` into the cell.
+   */
+  allowEmpty?: boolean;
+  /**
+   * Value written when an empty text is pasted and `allowEmpty` is true.
+   * Defaults to undefined.
+   */
+  emptyValue?: Value | null;
+  /**
+   * Whether to allow pasting options that have `disabled: true`.
+   * Defaults to false (pasting a disabled option throws an error).
+   */
+  allowDisabledOptions?: boolean;
+  /**
    * Custom clipboard parser for this editor.
    * Throw an error to reject the paste for this cell.
    */
@@ -119,19 +135,71 @@ export function createSelectEditorPlugin<T, Value extends string | number = stri
 
   SelectEditor.displayName = `BGridSelectEditor(${options.id})`;
 
+  // Precompute lookup maps for O(1) clipboard parsing and copying
+  const valueMap = new Map<string, BGridSelectEditorOption<Value>>();
+  const labelMap = new Map<string, BGridSelectEditorOption<Value>>();
+  const valueToLabelMap = new Map<unknown, string>();
+  const isNumericValue = options.options.some(opt => typeof opt.value === 'number');
+
+  for (const opt of options.options) {
+    const valKey = String(opt.value);
+    if (!valueMap.has(valKey)) {
+      valueMap.set(valKey, opt);
+    }
+    if (typeof opt.label === 'string' || typeof opt.label === 'number') {
+      const labelText = String(opt.label);
+      const trimmedLabel = labelText.trim();
+      if (!labelMap.has(trimmedLabel)) {
+        labelMap.set(trimmedLabel, opt);
+      }
+      if (!valueToLabelMap.has(opt.value)) {
+        valueToLabelMap.set(opt.value, labelText);
+      }
+    }
+  }
+
   const defaultParseClipboardText = (text: string): Value | unknown => {
     const trimmed = text.trim();
-    const matchedByValue = options.options.find(
-      opt => String(opt.value) === trimmed || opt.value === (trimmed as unknown),
-    );
-    if (matchedByValue) return matchedByValue.value;
 
-    const matchedByLabel = options.options.find(
-      opt => (typeof opt.label === 'string' || typeof opt.label === 'number') && String(opt.label).trim() === trimmed,
-    );
-    if (matchedByLabel) return matchedByLabel.value;
+    // Check empty input
+    if (trimmed === '') {
+      const emptyOption =
+        options.copyMode === 'value'
+          ? (valueMap.get('') ?? labelMap.get(''))
+          : (labelMap.get('') ?? valueMap.get(''));
+      if (emptyOption) {
+        if (emptyOption.disabled && !options.allowDisabledOptions) {
+          throw new Error(`Disabled select option for editor "${options.id}"`);
+        }
+        return emptyOption.value;
+      }
+      if (options.allowEmpty) {
+        return options.emptyValue !== undefined ? options.emptyValue : ('' as unknown as Value);
+      }
+    }
+
+    // Match order depends on copyMode:
+    // If copyMode is 'label' (default), match by label first, then by value.
+    // If copyMode is 'value', match by value first, then by label.
+    const matched =
+      options.copyMode === 'value'
+        ? (valueMap.get(trimmed) ?? labelMap.get(trimmed))
+        : (labelMap.get(trimmed) ?? valueMap.get(trimmed));
+
+    if (matched) {
+      if (matched.disabled && !options.allowDisabledOptions) {
+        throw new Error(`Disabled select option "${text}" for editor "${options.id}"`);
+      }
+      return matched.value;
+    }
 
     if (options.allowCustomValue) {
+      if (isNumericValue) {
+        const num = Number(trimmed);
+        if (!Number.isNaN(num)) {
+          return num as unknown as Value;
+        }
+      }
       return trimmed as unknown as Value;
     }
 
@@ -143,9 +211,9 @@ export function createSelectEditorPlugin<T, Value extends string | number = stri
     if (options.copyMode === 'value') {
       return value;
     }
-    const matched = options.options.find(opt => Object.is(opt.value, value));
-    if (matched && (typeof matched.label === 'string' || typeof matched.label === 'number')) {
-      return String(matched.label);
+    const label = valueToLabelMap.get(value);
+    if (label !== undefined) {
+      return label;
     }
     return value;
   };

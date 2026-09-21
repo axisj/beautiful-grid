@@ -954,5 +954,164 @@ describe('built-in text and plugin cell editors', () => {
 
       expect(setData).toHaveBeenCalledWith('text/plain', '준비');
     });
+
+    it('preserves numeric type when allowCustomValue is true on numeric options', async () => {
+      const onChangeData = vi.fn();
+      interface NumericRow {
+        name: string;
+        code: number;
+      }
+      const codeEditor = createSelectEditorPlugin<NumericRow, number>({
+        id: 'code',
+        options: [
+          { value: 10, label: 'Ten' },
+          { value: 20, label: 'Twenty' },
+        ],
+        allowCustomValue: true,
+      });
+      const columns: BGridColumn<NumericRow>[] = [
+        { key: 'name', label: 'Name', width: 100 },
+        { key: 'code', label: 'Code', width: 100, editable: true, editor: codeEditor },
+      ];
+      const data: BGridDataItem<NumericRow>[] = [{ values: { name: 'item1', code: 10 } }];
+      const { container } = render(
+        <BGrid<NumericRow>
+          width={300}
+          height={160}
+          columns={columns}
+          data={data}
+          editable
+          onChangeData={onChangeData}
+        />,
+      );
+
+      selectCell(getCell(container, 0, 1));
+      fireEvent.paste(document, {
+        clipboardData: { types: ['text/plain'], getData: vi.fn().mockReturnValue('99') },
+      });
+
+      await waitFor(() => expect(onChangeData).toHaveBeenCalledTimes(1));
+      expect(data[0].values.code).toBe(99);
+      expect(typeof data[0].values.code).toBe('number');
+    });
+
+    it('clears cell value when allowEmpty is true and empty text is pasted', async () => {
+      const onChangeData = vi.fn();
+      const statusEditor = createSelectEditorPlugin<Row>({
+        id: 'status',
+        options: [
+          { value: 'ready', label: '준비' },
+          { value: 'done', label: '완료' },
+        ],
+        allowEmpty: true,
+        emptyValue: '',
+      });
+      const columns: BGridColumn<Row>[] = [
+        { key: 'name', label: 'Name', width: 100 },
+        { key: 'status', label: 'Status', width: 100, editable: true, editor: statusEditor },
+      ];
+      const data = [{ values: { name: 'item1', status: 'ready' } }];
+      const { container } = render(
+        <BGrid<Row>
+          width={300}
+          height={160}
+          columns={columns}
+          data={data}
+          editable
+          onChangeData={onChangeData}
+        />,
+      );
+
+      selectCell(getCell(container, 0, 1));
+      fireEvent.paste(document, {
+        clipboardData: { types: ['text/plain'], getData: vi.fn().mockReturnValue('   ') },
+      });
+
+      await waitFor(() => expect(onChangeData).toHaveBeenCalledTimes(1));
+      expect(data[0].values.status).toBe('');
+    });
+
+    it('rejects pasting disabled options when allowDisabledOptions is false', async () => {
+      const onChangeData = vi.fn();
+      const onPasteError = vi.fn();
+      const statusEditor = createSelectEditorPlugin<Row>({
+        id: 'status',
+        options: [
+          { value: 'ready', label: '준비' },
+          { value: 'archived', label: '보관됨', disabled: true },
+        ],
+      });
+      const columns: BGridColumn<Row>[] = [
+        { key: 'name', label: 'Name', width: 100 },
+        { key: 'status', label: 'Status', width: 100, editable: true, editor: statusEditor },
+      ];
+      const data = [{ values: { name: 'item1', status: 'ready' } }];
+      const { container } = render(
+        <BGrid<Row>
+          width={300}
+          height={160}
+          columns={columns}
+          data={data}
+          editable
+          onChangeData={onChangeData}
+          cellSelectionOptions={{ onPasteError }}
+        />,
+      );
+
+      selectCell(getCell(container, 0, 1));
+      fireEvent.paste(document, {
+        clipboardData: { types: ['text/plain'], getData: vi.fn().mockReturnValue('보관됨') },
+      });
+
+      await waitFor(() => {
+        expect(onPasteError).toHaveBeenCalledWith(
+          expect.objectContaining({
+            reason: 'parseValueFailed',
+            rowIndex: 0,
+            columnIndex: 1,
+          }),
+        );
+      });
+      expect(data[0].values.status).toBe('ready');
+      expect(onChangeData).not.toHaveBeenCalled();
+    });
+
+    it('prioritizes label matching over value matching when copyMode is label to avoid collisions', async () => {
+      const onChangeData = vi.fn();
+      // Option 1 has value '1' and label '2'.
+      // Option 2 has value '2' and label 'Two'.
+      const collisionEditor = createSelectEditorPlugin<Row>({
+        id: 'status',
+        copyMode: 'label',
+        options: [
+          { value: '1', label: '2' },
+          { value: '2', label: 'Two' },
+        ],
+      });
+      const columns: BGridColumn<Row>[] = [
+        { key: 'name', label: 'Name', width: 100 },
+        { key: 'status', label: 'Status', width: 100, editable: true, editor: collisionEditor },
+      ];
+      const data = [{ values: { name: 'item1', status: 'ready' } }];
+      const { container } = render(
+        <BGrid<Row>
+          width={300}
+          height={160}
+          columns={columns}
+          data={data}
+          editable
+          onChangeData={onChangeData}
+        />,
+      );
+
+      selectCell(getCell(container, 0, 1));
+      // Pasting '2' should match Option 1 by label '2', NOT Option 2 by value '2'
+      fireEvent.paste(document, {
+        clipboardData: { types: ['text/plain'], getData: vi.fn().mockReturnValue('2') },
+      });
+
+      await waitFor(() => expect(onChangeData).toHaveBeenCalledTimes(1));
+      expect(data[0].values.status).toBe('1');
+    });
   });
 });

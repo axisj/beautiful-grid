@@ -75,6 +75,15 @@ function ColResizer({ container, columnIndex, hideHandle, bordered, frozenBounda
           table.style.tableLayout = 'auto';
           table.style.width = 'max-content';
         });
+        targetDiv.querySelectorAll<HTMLElement>(
+          '.bgrid-head-column, .bgrid-head-column-label, .bgrid-head-column-label-text',
+        ).forEach(element => {
+          // The live header intentionally uses min-width: 0 for ellipsis. BestFit must measure the full label.
+          element.style.minWidth = 'max-content';
+          element.style.width = 'max-content';
+          element.style.overflow = 'visible';
+          element.style.textOverflow = 'clip';
+        });
         const bodyTarget = container.current;
         bodyTarget.append(targetDiv);
 

@@ -583,6 +583,17 @@ const columns: BGridColumn<Item>[] = [
 ];
 ```
 
+`createSelectEditorPlugin` options:
+- `options`: List of `{ value, label, disabled? }` entries.
+- `allowCustomValue?: boolean`: Set `true` to allow pasting arbitrary values not present in `options` (default: `false`, rejecting unlisted values with `parseValueFailed`). Automatically preserves numeric types when option values are numeric.
+- `copyMode?: 'label' | 'value'`: Controls clipboard copy output (`'label'` by default when label is text, or `'value'`). Matching during paste prioritizes the configured `copyMode` to prevent label/value collisions.
+- `allowEmpty?: boolean`: Set `true` to allow clearing cell values when pasting empty text (default: `false`).
+- `emptyValue?: Value | null`: Value written when empty text is pasted with `allowEmpty: true` (default: `''`).
+- `allowDisabledOptions?: boolean`: Set `true` to allow pasting options marked `disabled: true` (default: `false`, rejecting disabled options).
+- `parseClipboardText?`: Override custom clipboard parsing and validation logic.
+- `getClipboardText?`: Override custom clipboard text retrieval logic.
+- `openOnMount?: boolean`: Automatically opens native picker on editor activation (default: `true`).
+
 #### Editor Icons (Lookup & Quick Triggers)
 
 Add inline trigger icons beside cell values using `editorIcon`:
@@ -649,16 +660,15 @@ Configure active cell handling and keyboard behavior with `cellNavigationOptions
 
 ---
 
-### 5. Cell Selection & Clipboard (Excel-compatible)
+### 5. Cell Range Selection & Clipboard Integration
 
 Cell range selection and clipboard copy/paste are enabled by default.
 
 ```typescript jsx
 <BGrid
-  width={800}
-  height={400}
-  columns={columns}
   data={data}
+  columns={columns}
+  editable
   rowKey='id'
   cellSelectionOptions={{
     enabled: true,
@@ -666,20 +676,24 @@ Cell range selection and clipboard copy/paste are enabled by default.
     clearOnEscape: true,
     clearOnOutsideClick: true,
     maxClipboardCells: 100000,
-    maxClipboardTextLength: 8 * 1024 * 1024,
-    onCopyError: error => console.warn('Copy skipped:', error),
-    onPasteError: error => console.warn('Paste failed:', error),
-    createRowOnPaste: ({ rowIndex, clipboardRow, columns }) => ({
+    createRowOnPaste: ({ rowIndex, clipboardRow }) => ({
+      status: BGridDataItemStatus.new,
       values: createNewRowModel(clipboardRow),
     }),
   }}
 />
 ```
 
-- `Ctrl+C` / `Cmd+C`: Copies selected cells as Tab-separated (`\t`) values and CRLF (`\r\n`) lines, directly pasteable into Excel or Google Sheets.
-- `Ctrl+V` / `Cmd+V`: Pastes clipboard matrix starting from the focused cell across editable columns.
-- `multiSelectFocusMode: 'last'` makes the last cell selected by a drag the active cell and the paste starting point. The default is `'first'` for backward compatibility.
-- Customize copied text on a per-column basis with `getClipboardText: ({ value, values }) => string`.
+- `Ctrl+C` / `Cmd+C`: Copies selected cells as Tab-separated (`\t`) values and CRLF (`\r\n`) lines, directly pasteable into Excel or Google Sheets. Columns configured with `createSelectEditorPlugin` copy the display `label` by default.
+- `Ctrl+V` / `Cmd+V`: Pastes clipboard values across editable columns:
+  - **Single cell fill**: Pasting a 1×1 value into a multi-cell selection fills every cell in the selected range.
+  - **Pattern tiling (Repeat)**: Pasting an $n \times m$ matrix into an $N \times M$ selection whose dimensions are exact integer multiples ($N \pmod n = 0$ and $M \pmod m = 0$) tiles/repeats the pattern across the entire selection.
+  - **Non-multiple fallback**: When the selection is not an exact multiple, the matrix pastes once starting at the top-left of the selected range (or focused cell if no range).
+- `multiSelectFocusMode: 'last'` makes the last cell selected by a drag the active cell. The default is `'first'` for backward compatibility.
+- **Paste validation & editor protection**:
+  - `createSelectEditorPlugin` validates pasted text against option values and string labels, mapping labels back to values with $O(1)$ indexed lookup.
+  - By default, unlisted values and disabled options are rejected and reported as `parseValueFailed` through `onPasteError`, preventing data corruption. Set `allowCustomValue: true` on the select editor plugin to allow arbitrary inputs.
+- Customize copied text on a per-column basis with `getClipboardText: ({ value, values }) => string`, or restore/validate custom types with `parseClipboardText: (text, context) => parsedValue`.
 
 ---
 

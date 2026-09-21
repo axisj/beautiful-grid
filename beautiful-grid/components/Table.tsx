@@ -1516,8 +1516,11 @@ function Table<T>(props: Props<T>) {
           rowHasNewLogicalCell = true;
           const logicalItem = data[logicalCell.cell.rowIndex] ?? item;
           const value = getCellValueByRowKey(column.key, logicalItem.values);
-          const clipboardValue = column.getClipboardText
-            ? column.getClipboardText({
+          const pluginClipboardTextGetter =
+            column.editor?.type === 'plugin' ? column.editor.getClipboardText : undefined;
+          const clipboardTextGetter = column.getClipboardText ?? pluginClipboardTextGetter;
+          const clipboardValue = clipboardTextGetter
+            ? clipboardTextGetter({
                 column,
                 index: logicalCell.cell.rowIndex,
                 columnIndex: ci,
@@ -1653,18 +1656,50 @@ function Table<T>(props: Props<T>) {
         return true;
       }
 
-      const startRowIndex = activeCell.rowIndex;
-      const startColumnIndex = activeCell.columnIndex;
+      const primaryRange =
+        cellSelectionRanges.length === 1 ? normalizeCellSelectionRange(cellSelectionRanges[0]) : null;
+      const selectionRowCount = primaryRange ? primaryRange.endRowIndex - primaryRange.startRowIndex + 1 : 1;
+      const selectionColCount = primaryRange ? primaryRange.endColumnIndex - primaryRange.startColumnIndex + 1 : 1;
+
+      // Determine fill rows and cols:
+      // 1. Single cell (1x1) copied into multi-cell selection: fill the entire selection.
+      // 2. nxm copied into exact multiple NxM selection: repeat pattern across selection.
+      // 3. Otherwise: paste 1:1 matching matrix dimensions, anchored at selection top-left (or activeCell if no range).
+      const isSingleClipboardCell = matrix.length === 1 && matrix[0]?.length === 1;
+      const matrixColCount = matrix.reduce((max, row) => Math.max(max, row.length), 0);
+      const isExactRowMultiple =
+        primaryRange && matrix.length > 0 && selectionRowCount % matrix.length === 0;
+      const isExactColMultiple =
+        primaryRange &&
+        matrixColCount > 0 &&
+        selectionColCount % matrixColCount === 0;
+      const canTileMatrix =
+        primaryRange &&
+        isExactRowMultiple &&
+        isExactColMultiple &&
+        (selectionRowCount > matrix.length || selectionColCount > matrixColCount);
+
+      let fillRowCount = matrix.length;
+      let fillColCount = matrixColCount;
+      let startRowIndex = primaryRange ? primaryRange.startRowIndex : activeCell.rowIndex;
+      let startColumnIndex = primaryRange ? primaryRange.startColumnIndex : activeCell.columnIndex;
+
+      if (primaryRange && (isSingleClipboardCell || canTileMatrix)) {
+        fillRowCount = selectionRowCount;
+        fillColCount = selectionColCount;
+      }
+
       const nextData = [...data];
       const appendedRows: Array<{ rowIndex: number; item: BGridDataItem<T> }> = [];
       const changes: Array<{ rowIndex: number; columnIndex: number; item: BGridDataItem<T> }> = [];
       const createRowOnPaste = cellSelectionOptions?.createRowOnPaste;
 
       if (createRowOnPaste) {
-        const requiredRowCount = startRowIndex + matrix.length;
+        const requiredRowCount = startRowIndex + fillRowCount;
         while (nextData.length < requiredRowCount) {
           const rowIndex = nextData.length;
-          const clipboardRow = matrix[rowIndex - startRowIndex];
+          const matrixRowOffset = isSingleClipboardCell ? 0 : (rowIndex - startRowIndex) % matrix.length;
+          const clipboardRow = matrix[matrixRowOffset];
           if (!clipboardRow) break;
 
           let createdItem: BGridDataItem<T> | undefined;
@@ -1694,17 +1729,32 @@ function Table<T>(props: Props<T>) {
         }
       >();
 
-      matrix.forEach((clipboardRow, rowOffset) => {
+      for (let rowOffset = 0; rowOffset < fillRowCount; rowOffset++) {
         const rowIndex = startRowIndex + rowOffset;
         const item = logicalResolutionData[rowIndex];
-        if (!item || item.status === BGridDataItemStatus.remove) return;
+        if (!item || item.status === BGridDataItemStatus.remove) continue;
 
-        clipboardRow.forEach((clipboardValue, columnOffset) => {
-          const columnIndex = startColumnIndex + columnOffset;
+        const matrixRow = isSingleClipboardCell ? matrix[0] : matrix[rowOffset % matrix.length];
+        if (!matrixRow || matrixRow.length === 0) continue;
+
+        for (let colOffset = 0; colOffset < fillColCount; colOffset++) {
+          const columnIndex = startColumnIndex + colOffset;
           const column = columns[columnIndex];
           // Pasting mutates row data without opening an editor, so only columns
           // explicitly opted into editing may receive clipboard values.
-          if (!column || column.editable !== true) return;
+          if (!column || column.editable !== true) continue;
+
+          let clipboardValue: string;
+          if (isSingleClipboardCell) {
+            clipboardValue = matrix[0]?.[0] ?? '';
+          } else if (canTileMatrix) {
+            const cellColOffset = matrixColCount > 0 ? colOffset % matrixColCount : 0;
+            if (cellColOffset >= matrixRow.length) continue;
+            clipboardValue = matrixRow[cellColOffset] ?? '';
+          } else {
+            if (colOffset >= matrixRow.length) continue;
+            clipboardValue = matrixRow[colOffset] ?? '';
+          }
 
           const logicalCell = resolveLogicalCell(logicalResolutionData, props.cellMergeOptions, {
             rowIndex,
@@ -1717,7 +1767,7 @@ function Table<T>(props: Props<T>) {
                 logicalResolutionData[targetRowIndex].status === BGridDataItemStatus.remove,
             )
           ) {
-            return;
+            continue;
           }
 
           const targetKey = `${logicalCell.cell.rowIndex}:${columnIndex}`;
@@ -1731,7 +1781,7 @@ function Table<T>(props: Props<T>) {
                 columnIndex,
               });
             }
-            return;
+            continue;
           }
 
           pasteTargets.set(targetKey, {
@@ -1741,8 +1791,8 @@ function Table<T>(props: Props<T>) {
             clipboardValue,
             conflicted: false,
           });
-        });
-      });
+        }
+      }
 
       let selectionStartRowIndex = Number.POSITIVE_INFINITY;
       let selectionEndRowIndex = Number.NEGATIVE_INFINITY;
@@ -1758,8 +1808,11 @@ function Table<T>(props: Props<T>) {
 
         const currentValue = getCellValueByRowKey(column.key, item.values);
         let nextValue: unknown = target.clipboardValue;
+        const pluginClipboardParser =
+          column.editor?.type === 'plugin' ? column.editor.parseClipboardText : undefined;
         const textEditorParser = column.editor?.type === 'text' ? column.editor.parseValue : undefined;
-        if (column.parseClipboardText || textEditorParser) {
+        const clipboardParser = column.parseClipboardText ?? pluginClipboardParser ?? textEditorParser;
+        if (clipboardParser) {
           try {
             const context = {
               index: target.canonicalRowIndex,
@@ -1770,9 +1823,7 @@ function Table<T>(props: Props<T>) {
               value: currentValue,
               text: target.clipboardValue,
             };
-            nextValue = column.parseClipboardText
-              ? column.parseClipboardText(target.clipboardValue, context)
-              : textEditorParser!(target.clipboardValue, context);
+            nextValue = clipboardParser(target.clipboardValue, context);
           } catch (error) {
             notifyPasteError({
               reason: 'parseValueFailed',
@@ -1839,6 +1890,7 @@ function Table<T>(props: Props<T>) {
     [
       activeCell,
       cellSelectionEnabled,
+      cellSelectionRanges,
       columns,
       data,
       editable,

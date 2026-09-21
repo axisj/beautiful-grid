@@ -859,8 +859,12 @@ describe('BGrid cell selection', () => {
       clipboardData: { getData: vi.fn().mockReturnValue('last') },
     });
 
-    await waitFor(() => expect(getCell(container, 1, 1)).toHaveTextContent('last'));
-    expect(getCell(container, 0, 1)).toHaveTextContent('one');
+    await waitFor(() => {
+      expect(getCell(container, 0, 0)).toHaveTextContent('last');
+      expect(getCell(container, 0, 1)).toHaveTextContent('last');
+      expect(getCell(container, 1, 0)).toHaveTextContent('last');
+      expect(getCell(container, 1, 1)).toHaveTextContent('last');
+    });
     expect(onChangeData).toHaveBeenCalledWith(1, 1, pasteData[1].values, expect.anything());
   });
 
@@ -1878,6 +1882,188 @@ describe('BGrid cell selection', () => {
       expect.objectContaining({ reason: 'mergedCellConflict', rowIndex: 0, columnIndex: 0 }),
     );
     expect(getCell(container, 0, 0).rowSpan).toBe(3);
+  });
+
+  it('fills the entire selection range when pasting a single cell value', async () => {
+    const pasteData = [
+      { values: { id: 1, name: 'one' } },
+      { values: { id: 2, name: 'two' } },
+      { values: { id: 3, name: 'three' } },
+    ];
+    const onChangeData = vi.fn();
+    const editableColumns = columns.map(column => ({ ...column, editable: true }));
+    const { container } = render(
+      <BGrid<Row>
+        width={400}
+        height={200}
+        columns={editableColumns}
+        data={pasteData}
+        editable
+        onChangeData={onChangeData}
+      />,
+    );
+
+    dragSelect(getCell(container, 0, 0), getCell(container, 1, 1));
+    fireEvent.paste(document, {
+      clipboardData: { getData: vi.fn().mockReturnValue('filled') },
+    });
+
+    await waitFor(() => {
+      expect(getCell(container, 0, 0)).toHaveTextContent('filled');
+      expect(getCell(container, 0, 1)).toHaveTextContent('filled');
+      expect(getCell(container, 1, 0)).toHaveTextContent('filled');
+      expect(getCell(container, 1, 1)).toHaveTextContent('filled');
+    });
+    expect(getCell(container, 2, 0)).toHaveTextContent('3');
+    expect(getCell(container, 2, 1)).toHaveTextContent('three');
+    expect(onChangeData).toHaveBeenCalledTimes(4);
+  });
+
+  it('repeats an nxm pattern when pasting into an exact multiple NxM selection range', async () => {
+    const pasteData = [
+      { values: { id: 1, name: 'row1' } },
+      { values: { id: 2, name: 'row2' } },
+      { values: { id: 3, name: 'row3' } },
+      { values: { id: 4, name: 'row4' } },
+    ];
+    const onChangeData = vi.fn();
+    const editableColumns: BGridColumn<Row>[] = [
+      { key: 'name', label: 'Name', width: 100, editable: true },
+    ];
+    const { container } = render(
+      <BGrid<Row>
+        width={400}
+        height={240}
+        columns={editableColumns}
+        data={pasteData}
+        editable
+        onChangeData={onChangeData}
+      />,
+    );
+
+    dragSelect(getCell(container, 0, 0), getCell(container, 3, 0));
+    fireEvent.paste(document, {
+      clipboardData: { getData: vi.fn().mockReturnValue('A\nB') },
+    });
+
+    await waitFor(() => {
+      expect(getCell(container, 0, 0)).toHaveTextContent('A');
+      expect(getCell(container, 1, 0)).toHaveTextContent('B');
+      expect(getCell(container, 2, 0)).toHaveTextContent('A');
+      expect(getCell(container, 3, 0)).toHaveTextContent('B');
+    });
+    expect(onChangeData).toHaveBeenCalledTimes(4);
+  });
+
+  it('pastes 1:1 without repeating when selection dimensions are not an exact multiple of the clipboard matrix', async () => {
+    const pasteData = [
+      { values: { id: 1, name: 'row1' } },
+      { values: { id: 2, name: 'row2' } },
+      { values: { id: 3, name: 'row3' } },
+      { values: { id: 4, name: 'row4' } },
+    ];
+    const onChangeData = vi.fn();
+    const editableColumns: BGridColumn<Row>[] = [
+      { key: 'name', label: 'Name', width: 100, editable: true },
+    ];
+    const { container } = render(
+      <BGrid<Row>
+        width={400}
+        height={240}
+        columns={editableColumns}
+        data={pasteData}
+        editable
+        onChangeData={onChangeData}
+      />,
+    );
+
+    dragSelect(getCell(container, 0, 0), getCell(container, 2, 0));
+    fireEvent.paste(document, {
+      clipboardData: { getData: vi.fn().mockReturnValue('X\nY') },
+    });
+
+    await waitFor(() => {
+      expect(getCell(container, 0, 0)).toHaveTextContent('X');
+      expect(getCell(container, 1, 0)).toHaveTextContent('Y');
+      expect(getCell(container, 2, 0)).toHaveTextContent('row3');
+    });
+    expect(onChangeData).toHaveBeenCalledTimes(2);
+  });
+
+  it('anchors non-multiple paste at the top-left of the selection range even when multiSelectFocusMode is last', async () => {
+    const pasteData = [
+      { values: { id: 1, name: 'row1' } },
+      { values: { id: 2, name: 'row2' } },
+      { values: { id: 3, name: 'row3' } },
+      { values: { id: 4, name: 'row4' } },
+    ];
+    const onChangeData = vi.fn();
+    const editableColumns: BGridColumn<Row>[] = [
+      { key: 'name', label: 'Name', width: 100, editable: true },
+    ];
+    const { container } = render(
+      <BGrid<Row>
+        width={400}
+        height={240}
+        columns={editableColumns}
+        data={pasteData}
+        editable
+        onChangeData={onChangeData}
+        cellSelectionOptions={{ multiSelectFocusMode: 'last' }}
+      />,
+    );
+
+    // Drag from 0 to 2 -> active cell is 2 because multiSelectFocusMode is 'last'
+    dragSelect(getCell(container, 0, 0), getCell(container, 2, 0));
+    expect(getCell(container, 2, 0)).toHaveAttribute('data-bgrid-cell-active', 'true');
+
+    // Paste 2 rows into a 3-row selection (non-multiple)
+    fireEvent.paste(document, {
+      clipboardData: { getData: vi.fn().mockReturnValue('Alpha\nBeta') },
+    });
+
+    await waitFor(() => {
+      expect(getCell(container, 0, 0)).toHaveTextContent('Alpha');
+      expect(getCell(container, 1, 0)).toHaveTextContent('Beta');
+      expect(getCell(container, 2, 0)).toHaveTextContent('row3');
+    });
+    expect(onChangeData).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not duplicate missing columns when pasting a jagged matrix with different row lengths', async () => {
+    const pasteData = [
+      { values: { id: 1, name: 'A1' } },
+      { values: { id: 2, name: 'A2' } },
+    ];
+    const onChangeData = vi.fn();
+    const editableColumns: BGridColumn<Row>[] = [
+      { key: 'id', label: 'ID', width: 100, editable: true },
+      { key: 'name', label: 'Name', width: 100, editable: true },
+    ];
+    const { container } = render(
+      <BGrid<Row>
+        width={400}
+        height={200}
+        columns={editableColumns}
+        data={pasteData}
+        editable
+        onChangeData={onChangeData}
+      />,
+    );
+
+    // Row 1 has 2 cols ("10\tTest"), Row 2 has only 1 col ("20")
+    dragSelect(getCell(container, 0, 0), getCell(container, 1, 1));
+    fireEvent.paste(document, {
+      clipboardData: { getData: vi.fn().mockReturnValue('10\tTest\n20') },
+    });
+
+    await waitFor(() => {
+      expect(getCell(container, 0, 0)).toHaveTextContent('10');
+      expect(getCell(container, 0, 1)).toHaveTextContent('Test');
+      expect(getCell(container, 1, 0)).toHaveTextContent('20');
+      // Cell (1, 1) should remain unchanged ('A2'), NOT duplicate '20'
+      expect(getCell(container, 1, 1)).toHaveTextContent('A2');
+    });
   });
 });
 

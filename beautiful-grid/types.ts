@@ -148,6 +148,13 @@ export interface BGridPluginEditorConfig<T> {
   type: 'plugin';
   id: string;
   component: React.ComponentType<BGridEditorPluginProps<T>>;
+  getClipboardText?: (params: BGridCellClipboardTextParams<T>) => any;
+  /**
+   * Restores text/plain clipboard input to the editor's stored value type.
+   * Takes precedence over built-in fallback parser during multi-cell paste.
+   * Throw to keep the current cell value and report parseValueFailed through onPasteError.
+   */
+  parseClipboardText?: (text: string, params: BGridCellClipboardParseParams<T>) => unknown;
 }
 
 export type BGridCellEditorConfig<T> =

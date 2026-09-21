@@ -859,8 +859,12 @@ describe('BGrid cell selection', () => {
       clipboardData: { getData: vi.fn().mockReturnValue('last') },
     });
 
-    await waitFor(() => expect(getCell(container, 1, 1)).toHaveTextContent('last'));
-    expect(getCell(container, 0, 1)).toHaveTextContent('one');
+    await waitFor(() => {
+      expect(getCell(container, 0, 0)).toHaveTextContent('last');
+      expect(getCell(container, 0, 1)).toHaveTextContent('last');
+      expect(getCell(container, 1, 0)).toHaveTextContent('last');
+      expect(getCell(container, 1, 1)).toHaveTextContent('last');
+    });
     expect(onChangeData).toHaveBeenCalledWith(1, 1, pasteData[1].values, expect.anything());
   });
 
@@ -1878,6 +1882,112 @@ describe('BGrid cell selection', () => {
       expect.objectContaining({ reason: 'mergedCellConflict', rowIndex: 0, columnIndex: 0 }),
     );
     expect(getCell(container, 0, 0).rowSpan).toBe(3);
+  });
+
+  it('fills the entire selection range when pasting a single cell value', async () => {
+    const pasteData = [
+      { values: { id: 1, name: 'one' } },
+      { values: { id: 2, name: 'two' } },
+      { values: { id: 3, name: 'three' } },
+    ];
+    const onChangeData = vi.fn();
+    const editableColumns = columns.map(column => ({ ...column, editable: true }));
+    const { container } = render(
+      <BGrid<Row>
+        width={400}
+        height={200}
+        columns={editableColumns}
+        data={pasteData}
+        editable
+        onChangeData={onChangeData}
+      />,
+    );
+
+    dragSelect(getCell(container, 0, 0), getCell(container, 1, 1));
+    fireEvent.paste(document, {
+      clipboardData: { getData: vi.fn().mockReturnValue('filled') },
+    });
+
+    await waitFor(() => {
+      expect(getCell(container, 0, 0)).toHaveTextContent('filled');
+      expect(getCell(container, 0, 1)).toHaveTextContent('filled');
+      expect(getCell(container, 1, 0)).toHaveTextContent('filled');
+      expect(getCell(container, 1, 1)).toHaveTextContent('filled');
+    });
+    expect(getCell(container, 2, 0)).toHaveTextContent('3');
+    expect(getCell(container, 2, 1)).toHaveTextContent('three');
+    expect(onChangeData).toHaveBeenCalledTimes(4);
+  });
+
+  it('repeats an nxm pattern when pasting into an exact multiple NxM selection range', async () => {
+    const pasteData = [
+      { values: { id: 1, name: 'row1' } },
+      { values: { id: 2, name: 'row2' } },
+      { values: { id: 3, name: 'row3' } },
+      { values: { id: 4, name: 'row4' } },
+    ];
+    const onChangeData = vi.fn();
+    const editableColumns: BGridColumn<Row>[] = [
+      { key: 'name', label: 'Name', width: 100, editable: true },
+    ];
+    const { container } = render(
+      <BGrid<Row>
+        width={400}
+        height={240}
+        columns={editableColumns}
+        data={pasteData}
+        editable
+        onChangeData={onChangeData}
+      />,
+    );
+
+    dragSelect(getCell(container, 0, 0), getCell(container, 3, 0));
+    fireEvent.paste(document, {
+      clipboardData: { getData: vi.fn().mockReturnValue('A\nB') },
+    });
+
+    await waitFor(() => {
+      expect(getCell(container, 0, 0)).toHaveTextContent('A');
+      expect(getCell(container, 1, 0)).toHaveTextContent('B');
+      expect(getCell(container, 2, 0)).toHaveTextContent('A');
+      expect(getCell(container, 3, 0)).toHaveTextContent('B');
+    });
+    expect(onChangeData).toHaveBeenCalledTimes(4);
+  });
+
+  it('pastes 1:1 without repeating when selection dimensions are not an exact multiple of the clipboard matrix', async () => {
+    const pasteData = [
+      { values: { id: 1, name: 'row1' } },
+      { values: { id: 2, name: 'row2' } },
+      { values: { id: 3, name: 'row3' } },
+      { values: { id: 4, name: 'row4' } },
+    ];
+    const onChangeData = vi.fn();
+    const editableColumns: BGridColumn<Row>[] = [
+      { key: 'name', label: 'Name', width: 100, editable: true },
+    ];
+    const { container } = render(
+      <BGrid<Row>
+        width={400}
+        height={240}
+        columns={editableColumns}
+        data={pasteData}
+        editable
+        onChangeData={onChangeData}
+      />,
+    );
+
+    dragSelect(getCell(container, 0, 0), getCell(container, 2, 0));
+    fireEvent.paste(document, {
+      clipboardData: { getData: vi.fn().mockReturnValue('X\nY') },
+    });
+
+    await waitFor(() => {
+      expect(getCell(container, 0, 0)).toHaveTextContent('X');
+      expect(getCell(container, 1, 0)).toHaveTextContent('Y');
+      expect(getCell(container, 2, 0)).toHaveTextContent('row3');
+    });
+    expect(onChangeData).toHaveBeenCalledTimes(2);
   });
 });
 

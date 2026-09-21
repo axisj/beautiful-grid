@@ -1,5 +1,10 @@
 import * as React from 'react';
-import { BGridEditorPluginProps, BGridPluginEditorConfig } from '../types';
+import {
+  BGridCellClipboardParseParams,
+  BGridCellClipboardTextParams,
+  BGridEditorPluginProps,
+  BGridPluginEditorConfig,
+} from '../types';
 import { defineEditorPlugin } from './defineEditorPlugin';
 import { getColumnId } from '../utils/getColumnId';
 
@@ -15,6 +20,26 @@ export interface BGridSelectEditorPluginOptions<Value extends string | number> {
   ariaLabel?: string;
   placeholder?: string;
   openOnMount?: boolean;
+  /**
+   * Whether to allow pasting values that do not match any option value or label.
+   * Defaults to false (unmatched values throw an error and report parseValueFailed).
+   */
+  allowCustomValue?: boolean;
+  /**
+   * Clipboard text mode when copying cells using this editor.
+   * 'label' (default): copies the option's label if it is a string or number.
+   * 'value': copies the option's raw value.
+   */
+  copyMode?: 'label' | 'value';
+  /**
+   * Custom clipboard parser for this editor.
+   * Throw an error to reject the paste for this cell.
+   */
+  parseClipboardText?: <T>(text: string, params: BGridCellClipboardParseParams<T>) => Value | unknown;
+  /**
+   * Custom clipboard text getter for this editor.
+   */
+  getClipboardText?: <T>(params: BGridCellClipboardTextParams<T>) => any;
 }
 
 export function createSelectEditorPlugin<T, Value extends string | number = string>(
@@ -93,8 +118,42 @@ export function createSelectEditorPlugin<T, Value extends string | number = stri
   }
 
   SelectEditor.displayName = `BGridSelectEditor(${options.id})`;
+
+  const defaultParseClipboardText = (text: string): Value | unknown => {
+    const trimmed = text.trim();
+    const matchedByValue = options.options.find(
+      opt => String(opt.value) === trimmed || opt.value === (trimmed as unknown),
+    );
+    if (matchedByValue) return matchedByValue.value;
+
+    const matchedByLabel = options.options.find(
+      opt => (typeof opt.label === 'string' || typeof opt.label === 'number') && String(opt.label).trim() === trimmed,
+    );
+    if (matchedByLabel) return matchedByLabel.value;
+
+    if (options.allowCustomValue) {
+      return trimmed as unknown as Value;
+    }
+
+    throw new Error(`Invalid select value "${text}" for editor "${options.id}"`);
+  };
+
+  const defaultGetClipboardText = (params: BGridCellClipboardTextParams<T>): any => {
+    const { value } = params;
+    if (options.copyMode === 'value') {
+      return value;
+    }
+    const matched = options.options.find(opt => Object.is(opt.value, value));
+    if (matched && (typeof matched.label === 'string' || typeof matched.label === 'number')) {
+      return String(matched.label);
+    }
+    return value;
+  };
+
   return defineEditorPlugin<T>({
     id: options.id,
     component: SelectEditor,
+    parseClipboardText: options.parseClipboardText ?? ((text, _params) => defaultParseClipboardText(text)),
+    getClipboardText: options.getClipboardText ?? defaultGetClipboardText,
   });
 }

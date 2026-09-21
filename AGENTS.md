@@ -55,7 +55,7 @@ npm run verify:site     # runs site font size check, site unit test, astro check
 ```
 
 ### Verification Requirement
-Git pushes do not run local tests. The `Test` GitHub Actions workflow validates pushes and pull requests. Run the relevant local verification command while developing when you need earlier feedback, and always before a manual npm release. If the library bundle size changed, run `npm run update:library:bundle-metrics` and commit `site/src/data/bundleMetrics.ts`.
+Git pushes do not run local tests. The `Test` GitHub Actions workflow validates pushes and pull requests. Run the relevant local verification command while developing when you need earlier feedback, and always before a manual npm release. The site build automatically refreshes `site/src/data/bundleMetrics.ts`. Library bundle verification (`npm run test:library:bundle`) checks initial bundle budget and ESM chunk isolation without failing on metric drift.
 
 Library tsconfigs live in `tsconfigs/tsconfig.library.cjs.json`, `tsconfigs/tsconfig.library.esm.json`, and `tsconfigs/tsconfig.library.types.json`. The Vite demo app uses the root `tsconfig.json` and `vite.config.ts` (`vite.config.mjs` is also present).
 

@@ -87,7 +87,7 @@
     "perf:runtime:help": "node scripts/perf-runtime-compare.mjs --help",
     "site:dev": "npm --prefix site run dev",
     "site:check": "npm --prefix site run check",
-    "site:build": "npm --prefix site run build",
+    "site:build": "npm run update:library:bundle-metrics && npm --prefix site run build",
     "site:test": "npm --prefix site run test",
     "site:test:font-size": "node scripts/check-site-font-sizes.mjs",
     "measure:ai-context": "npm run site:build && node scripts/measure-ai-context.mjs",

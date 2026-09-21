@@ -79,8 +79,10 @@ export function createShadcnTimePickerEditorPlugin<T>(
               }
             }}
           >
-            <span className="truncate">{displayText || t('시간 선택', 'Select Time')}</span>
-            <Clock className="h-4 w-4 opacity-50 shrink-0" />
+            <span className="bgrid-shadcn-trigger-label">{displayText || t('시간 선택', 'Select Time')}</span>
+            <span className="bgrid-shadcn-trigger-icon">
+              <Clock />
+            </span>
           </button>
         </PopoverTrigger>
         <PopoverContent
@@ -99,11 +101,11 @@ export function createShadcnTimePickerEditorPlugin<T>(
             </div>
 
             {/* Time Columns (Hour & Minute) */}
-            <div className="grid grid-cols-2 gap-2 rounded-md border border-slate-100 bg-slate-50/50 p-1.5 dark:border-slate-800 dark:bg-slate-900/50">
+            <div className="grid grid-cols-2 gap-2 rounded-md border border-slate-200 bg-slate-50/40 p-1.5 dark:border-slate-800 dark:bg-slate-900/40">
               {/* Hours */}
               <div className="flex flex-col">
                 <span className="text-center text-[10px] font-semibold text-slate-400 pb-1 dark:text-slate-500">{t('시', 'Hour')}</span>
-                <div className="bgrid-shadcn-scroll flex max-h-40 flex-col overflow-y-auto pr-1">
+                <div className="bgrid-shadcn-scroll flex max-h-40 flex-col gap-0.5 overflow-y-auto pr-1">
                   {HOURS.map(hour => {
                     const isSelected = selectedHour === hour;
                     return (
@@ -111,9 +113,9 @@ export function createShadcnTimePickerEditorPlugin<T>(
                         key={hour}
                         type="button"
                         onClick={() => setSelectedHour(hour)}
-                        className={`rounded-sm py-1 text-xs font-mono transition-colors cursor-pointer border-0 bg-transparent ${
+                        className={`bgrid-shadcn-time-item rounded-sm py-1 text-xs font-mono transition-colors cursor-pointer border-0 bg-transparent ${
                           isSelected
-                            ? 'bg-slate-900 font-bold text-white dark:bg-slate-50 dark:text-slate-900'
+                            ? 'bg-blue-600 font-bold text-white dark:bg-blue-600 dark:text-white'
                             : 'text-slate-700 hover:bg-slate-200/70 dark:text-slate-300 dark:hover:bg-slate-800'
                         }`}
                       >
@@ -127,7 +129,7 @@ export function createShadcnTimePickerEditorPlugin<T>(
               {/* Minutes */}
               <div className="flex flex-col">
                 <span className="text-center text-[10px] font-semibold text-slate-400 pb-1 dark:text-slate-500">{t('분', 'Minute')}</span>
-                <div className="bgrid-shadcn-scroll flex max-h-40 flex-col overflow-y-auto pr-1">
+                <div className="bgrid-shadcn-scroll flex max-h-40 flex-col gap-0.5 overflow-y-auto pr-1">
                   {MINUTES.map(minute => {
                     const isSelected = selectedMinute === minute;
                     return (
@@ -135,9 +137,9 @@ export function createShadcnTimePickerEditorPlugin<T>(
                         key={minute}
                         type="button"
                         onClick={() => setSelectedMinute(minute)}
-                        className={`rounded-sm py-1 text-xs font-mono transition-colors cursor-pointer border-0 bg-transparent ${
+                        className={`bgrid-shadcn-time-item rounded-sm py-1 text-xs font-mono transition-colors cursor-pointer border-0 bg-transparent ${
                           isSelected
-                            ? 'bg-slate-900 font-bold text-white dark:bg-slate-50 dark:text-slate-900'
+                            ? 'bg-blue-600 font-bold text-white dark:bg-blue-600 dark:text-white'
                             : 'text-slate-700 hover:bg-slate-200/70 dark:text-slate-300 dark:hover:bg-slate-800'
                         }`}
                       >
@@ -150,7 +152,7 @@ export function createShadcnTimePickerEditorPlugin<T>(
             </div>
 
             {/* Presets */}
-            <div className="flex flex-wrap gap-1 border-t border-slate-100 pt-2 dark:border-slate-800">
+            <div className="flex flex-wrap gap-1 border-t border-slate-200 pt-2 dark:border-slate-800">
               {[
                 { label: '09:00', h: '09', m: '00' },
                 { label: '11:00', h: '11', m: '00' },
@@ -163,7 +165,7 @@ export function createShadcnTimePickerEditorPlugin<T>(
                   variant="outline"
                   size="sm"
                   onClick={() => handlePreset(p.h, p.m)}
-                  className="h-6 px-2 text-[11px] font-mono dark:border-slate-800"
+                  className="h-6 px-2 text-[11px] font-mono dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
                 >
                   {p.label}
                 </Button>
@@ -171,7 +173,7 @@ export function createShadcnTimePickerEditorPlugin<T>(
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center justify-end gap-1.5 border-t border-slate-100 pt-2 dark:border-slate-800">
+            <div className="flex items-center justify-end gap-1.5 border-t border-slate-200 pt-2 dark:border-slate-800">
               <Button
                 type="button"
                 variant="ghost"
@@ -186,7 +188,7 @@ export function createShadcnTimePickerEditorPlugin<T>(
                 variant="default"
                 size="sm"
                 onClick={handleConfirm}
-                className="h-7 text-xs"
+                className="h-7 text-xs bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700"
               >
                 {t('확인', 'Confirm')}
               </Button>

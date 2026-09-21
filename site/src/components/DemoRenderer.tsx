@@ -74,6 +74,31 @@ export default function DemoRenderer({ sourcePath }: { sourcePath: string }) {
               headerBg: '#151f33',
               titleColor: '#f2f6fc',
             },
+            DatePicker: {
+              colorBgElevated: '#151f33',
+              colorText: '#f2f6fc',
+              colorTextHeading: '#f2f6fc',
+              colorBorder: '#26344c',
+              cellActiveWithRangeBg: '#172b4c',
+              cellHoverBg: '#1a2942',
+            },
+            TimePicker: {
+              colorBgElevated: '#151f33',
+              colorText: '#f2f6fc',
+              colorBorder: '#26344c',
+            },
+            TreeSelect: {
+              colorBgElevated: '#151f33',
+              colorText: '#f2f6fc',
+              nodeSelectedBg: '#172b4c',
+              nodeHoverBg: '#1a2942',
+            },
+            Cascader: {
+              colorBgElevated: '#151f33',
+              colorText: '#f2f6fc',
+              menuBg: '#151f33',
+              itemHoverBg: '#1a2942',
+            },
           }
         : {},
     }),

@@ -443,6 +443,7 @@
 /* Portaled Ant Design popups, dropdowns, pickers, colorpicker and modals */
 :root[data-theme='dark'] :is(
   .ant-select-dropdown,
+  .ant-tree-select-dropdown,
   .ant-picker-dropdown,
   .ant-cascader-dropdown,
   .ant-color-picker-panel,
@@ -454,6 +455,61 @@
   background-color: var(--site-surface-elevated) !important;
   color: var(--site-text-primary) !important;
   box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.7) !important;
+}
+
+:root[data-theme='dark'] .ant-select-tree {
+  background: transparent !important;
+  color: var(--site-text-primary) !important;
+}
+
+:root[data-theme='dark'] .ant-select-tree .ant-select-tree-node-content-wrapper {
+  color: var(--site-text-secondary) !important;
+}
+
+:root[data-theme='dark'] .ant-select-tree .ant-select-tree-node-content-wrapper:hover {
+  background-color: var(--site-surface-subtle) !important;
+  color: var(--site-text-primary) !important;
+}
+
+:root[data-theme='dark'] .ant-select-tree .ant-select-tree-node-content-wrapper.ant-select-tree-node-selected {
+  background-color: var(--site-surface-subtle) !important;
+  color: var(--site-accent-strong) !important;
+}
+
+:root[data-theme='dark'] .ant-select-tree .ant-select-tree-switcher {
+  color: var(--site-text-secondary) !important;
+}
+
+:root[data-theme='dark'] .ant-picker-time-panel {
+  background-color: var(--site-surface-elevated) !important;
+}
+
+:root[data-theme='dark'] .ant-picker-time-panel-column {
+  border-inline-end-color: var(--site-border) !important;
+}
+
+:root[data-theme='dark'] .ant-picker-time-panel-cell {
+  color: var(--site-text-secondary) !important;
+}
+
+:root[data-theme='dark'] .ant-picker-time-panel-cell:hover .ant-picker-time-panel-cell-inner {
+  background-color: var(--site-surface-subtle) !important;
+  color: var(--site-text-primary) !important;
+}
+
+:root[data-theme='dark'] .ant-picker-time-panel-cell-selected .ant-picker-time-panel-cell-inner {
+  background-color: var(--site-accent) !important;
+  color: #08111f !important;
+  font-weight: 600 !important;
+}
+
+:root[data-theme='dark'] .ant-picker-footer {
+  border-top-color: var(--site-border) !important;
+}
+
+:root[data-theme='dark'] .ant-picker-now-btn,
+:root[data-theme='dark'] .ant-picker-ok button {
+  color: var(--site-accent) !important;
 }
 
 :root[data-theme='dark'] :is(

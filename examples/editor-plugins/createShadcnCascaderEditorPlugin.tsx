@@ -2,7 +2,7 @@ import { t } from '../i18n';
 import * as React from 'react';
 import type { BGridEditorPluginProps, BGridPluginEditorConfig } from 'beautiful-grid';
 import { defineEditorPlugin } from 'beautiful-grid/editors';
-import { ChevronRight, Layers } from 'lucide-react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import {
   Popover,
   PopoverContent,
@@ -77,8 +77,10 @@ export function createShadcnCascaderEditorPlugin<T>(
               }
             }}
           >
-            <span className="truncate">{displayText || t('분류 선택', 'Select Category')}</span>
-            <Layers className="h-4 w-4 opacity-50 shrink-0" />
+            <span className="bgrid-shadcn-trigger-label">{displayText || t('분류 선택', 'Select Category')}</span>
+            <span className="bgrid-shadcn-trigger-icon">
+              <ChevronDown />
+            </span>
           </button>
         </PopoverTrigger>
         <PopoverContent
@@ -91,9 +93,9 @@ export function createShadcnCascaderEditorPlugin<T>(
               {t('계층 분류 선택', 'Select Hierarchical Category')}
             </div>
 
-            <div className="flex divide-x divide-slate-100 rounded-md border border-slate-100 bg-slate-50/50 dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900/50">
+            <div className="flex divide-x divide-slate-200 rounded-md border border-slate-200 bg-slate-50/40 dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900/40">
               {/* Level 1 Panel */}
-              <div className="bgrid-shadcn-scroll flex max-h-56 w-32 flex-col overflow-y-auto p-1">
+              <div className="bgrid-shadcn-scroll flex max-h-56 w-32 flex-col gap-0.5 overflow-y-auto p-1 bg-transparent">
                 {level1Options.map(opt => {
                   const isSelected = selectedPath[0] === opt.value;
                   const hasChildren = Boolean(opt.children?.length);
@@ -102,15 +104,15 @@ export function createShadcnCascaderEditorPlugin<T>(
                       key={opt.value}
                       type="button"
                       onClick={() => handleSelectLevel(0, opt)}
-                      className={`flex w-full items-center justify-between rounded-sm px-2.5 py-1.5 text-xs transition-colors cursor-pointer border-0 bg-transparent ${
+                      className={`bgrid-shadcn-cascader-item flex w-full items-center justify-between rounded-sm px-2.5 text-xs transition-colors cursor-pointer border-0 bg-transparent ${
                         isSelected
-                          ? 'bg-slate-900 font-semibold text-white dark:bg-slate-50 dark:text-slate-900'
+                          ? 'bg-blue-600 font-semibold text-white dark:bg-blue-600 dark:text-white'
                           : 'text-slate-700 hover:bg-slate-200/70 dark:text-slate-300 dark:hover:bg-slate-800'
                       }`}
                     >
                       <span className="truncate">{opt.label}</span>
                       {hasChildren && (
-                        <ChevronRight className={`h-3.5 w-3.5 shrink-0 ${isSelected ? 'text-white dark:text-slate-900' : 'text-slate-400'}`} />
+                        <ChevronRight className={`h-3.5 w-3.5 shrink-0 ${isSelected ? 'text-white' : 'text-slate-400'}`} />
                       )}
                     </button>
                   );
@@ -119,7 +121,7 @@ export function createShadcnCascaderEditorPlugin<T>(
 
               {/* Level 2 Panel */}
               {level2Options.length > 0 && (
-                <div className="bgrid-shadcn-scroll flex max-h-56 w-32 flex-col overflow-y-auto p-1 bg-white dark:bg-slate-950">
+                <div className="bgrid-shadcn-scroll flex max-h-56 w-32 flex-col gap-0.5 overflow-y-auto p-1 bg-transparent">
                   {level2Options.map(opt => {
                     const isSelected = selectedPath[1] === opt.value;
                     const hasChildren = Boolean(opt.children?.length);
@@ -128,15 +130,15 @@ export function createShadcnCascaderEditorPlugin<T>(
                         key={opt.value}
                         type="button"
                         onClick={() => handleSelectLevel(1, opt)}
-                        className={`flex w-full items-center justify-between rounded-sm px-2.5 py-1.5 text-xs transition-colors cursor-pointer border-0 bg-transparent ${
+                        className={`bgrid-shadcn-cascader-item flex w-full items-center justify-between rounded-sm px-2.5 text-xs transition-colors cursor-pointer border-0 bg-transparent ${
                           isSelected
-                            ? 'bg-slate-900 font-semibold text-white dark:bg-slate-50 dark:text-slate-900'
-                            : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+                            ? 'bg-blue-600 font-semibold text-white dark:bg-blue-600 dark:text-white'
+                            : 'text-slate-700 hover:bg-slate-200/70 dark:text-slate-300 dark:hover:bg-slate-800'
                         }`}
                       >
                         <span className="truncate">{opt.label}</span>
                         {hasChildren && (
-                          <ChevronRight className={`h-3.5 w-3.5 shrink-0 ${isSelected ? 'text-white dark:text-slate-900' : 'text-slate-400'}`} />
+                          <ChevronRight className={`h-3.5 w-3.5 shrink-0 ${isSelected ? 'text-white' : 'text-slate-400'}`} />
                         )}
                       </button>
                     );
@@ -146,7 +148,7 @@ export function createShadcnCascaderEditorPlugin<T>(
 
               {/* Level 3 Panel if exists */}
               {level3Options.length > 0 && (
-                <div className="bgrid-shadcn-scroll flex max-h-56 w-32 flex-col overflow-y-auto p-1 bg-white dark:bg-slate-950">
+                <div className="bgrid-shadcn-scroll flex max-h-56 w-32 flex-col gap-0.5 overflow-y-auto p-1 bg-transparent">
                   {level3Options.map(opt => {
                     const isSelected = selectedPath[2] === opt.value;
                     return (
@@ -154,10 +156,10 @@ export function createShadcnCascaderEditorPlugin<T>(
                         key={opt.value}
                         type="button"
                         onClick={() => handleSelectLevel(2, opt)}
-                        className={`flex w-full items-center justify-between rounded-sm px-2.5 py-1.5 text-xs transition-colors cursor-pointer border-0 bg-transparent ${
+                        className={`bgrid-shadcn-cascader-item flex w-full items-center justify-between rounded-sm px-2.5 text-xs transition-colors cursor-pointer border-0 bg-transparent ${
                           isSelected
-                            ? 'bg-slate-900 font-semibold text-white dark:bg-slate-50 dark:text-slate-900'
-                            : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+                            ? 'bg-blue-600 font-semibold text-white dark:bg-blue-600 dark:text-white'
+                            : 'text-slate-700 hover:bg-slate-200/70 dark:text-slate-300 dark:hover:bg-slate-800'
                         }`}
                       >
                         <span className="truncate">{opt.label}</span>
@@ -169,7 +171,7 @@ export function createShadcnCascaderEditorPlugin<T>(
             </div>
 
             {selectedPath.length > 0 && (
-              <div className="flex items-center justify-between border-t border-slate-100 px-2 pt-2 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
+              <div className="flex items-center justify-between border-t border-slate-200 px-2 pt-2 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
                 <span>{t('선택 경로', 'Selected Path')}: <strong className="text-slate-900 dark:text-slate-100">{selectedPath.join(' > ')}</strong></span>
               </div>
             )}

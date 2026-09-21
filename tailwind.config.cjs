@@ -2,6 +2,7 @@
 const path = require('node:path');
 
 module.exports = {
+  darkMode: ['selector', '[data-theme="dark"]'],
   content: {
     relative: true,
     files: [

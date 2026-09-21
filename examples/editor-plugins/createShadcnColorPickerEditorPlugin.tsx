@@ -2,7 +2,7 @@ import { t } from '../i18n';
 import * as React from 'react';
 import type { BGridEditorPluginProps, BGridPluginEditorConfig } from 'beautiful-grid';
 import { defineEditorPlugin } from 'beautiful-grid/editors';
-import { Check, Palette } from 'lucide-react';
+import { Check } from 'lucide-react';
 import {
   Popover,
   PopoverContent,
@@ -89,14 +89,12 @@ export function createShadcnColorPickerEditorPlugin<T>(
               }
             }}
           >
-            <div className="flex items-center gap-2">
-              <span
-                className="h-4 w-4 rounded-full border border-slate-300 shadow-sm dark:border-slate-700"
-                style={{ backgroundColor: selectedColor }}
-              />
-              <span className="font-mono text-xs text-slate-700 dark:text-slate-300">{selectedColor}</span>
-            </div>
-            <Palette className="h-4 w-4 opacity-50 shrink-0" />
+            <span className="bgrid-shadcn-trigger-label">{selectedColor.toUpperCase()}</span>
+            <span
+              className="bgrid-color-swatch"
+              style={{ backgroundColor: selectedColor }}
+              aria-hidden="true"
+            />
           </button>
         </PopoverTrigger>
         <PopoverContent
@@ -119,7 +117,7 @@ export function createShadcnColorPickerEditorPlugin<T>(
                     type="button"
                     onClick={() => handleSelectColor(color)}
                     style={{ backgroundColor: color }}
-                    className="relative flex h-8 w-full items-center justify-center rounded-md border border-black/10 shadow-sm transition-transform hover:scale-105 active:scale-95 cursor-pointer dark:border-white/10"
+                    className="relative flex h-8 w-full items-center justify-center rounded-md border border-black/10 shadow-sm transition-transform hover:scale-105 active:scale-95 cursor-pointer dark:border-white/15"
                     aria-label={`${t('색상', 'Color')} ${color}`}
                   >
                     {isSelected && (
@@ -134,7 +132,7 @@ export function createShadcnColorPickerEditorPlugin<T>(
             </div>
 
             {/* Custom HEX Input */}
-            <form onSubmit={handleApplyCustom} className="flex flex-col gap-1.5 border-t border-slate-100 pt-2 dark:border-slate-800">
+            <form onSubmit={handleApplyCustom} className="flex flex-col gap-1.5 border-t border-slate-200 pt-2 dark:border-slate-800">
               <span className="text-xs text-slate-500 font-medium dark:text-slate-400">{t('직접 입력 (HEX)', 'Direct Input (HEX)')}</span>
               <div className="flex items-center gap-1.5">
                 <Input
@@ -142,12 +140,12 @@ export function createShadcnColorPickerEditorPlugin<T>(
                   value={customHex}
                   onChange={e => setCustomHex(e.target.value)}
                   placeholder="#000000"
-                  className="font-mono"
+                  className="font-mono bg-white text-slate-900 border-slate-200 dark:bg-slate-900 dark:text-slate-100 dark:border-slate-700"
                 />
                 <Button
                   type="submit"
                   size="sm"
-                  className="shrink-0"
+                  className="shrink-0 bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700"
                 >
                   {t('적용', 'Apply')}
                 </Button>

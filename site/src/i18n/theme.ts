@@ -20,6 +20,7 @@ export const themeBootstrapScript = `(() => {
     root.dataset.themePreference = safePreference;
     root.dataset.theme = resolved;
     root.style.colorScheme = resolved;
+    root.classList?.toggle('dark', resolved === 'dark');
     root.dataset.themeReady = 'true';
     if (persist) {
       try { window.localStorage.setItem(storageKey, safePreference); } catch {}

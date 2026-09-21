@@ -1,7 +1,7 @@
 import * as React from 'react';
 import type { BGridEditorPluginProps, BGridPluginEditorConfig } from 'beautiful-grid';
 import { defineEditorPlugin } from 'beautiful-grid/editors';
-import { Check, ChevronDown, ChevronRight, Folder, GitBranch, Search } from 'lucide-react';
+import { Check, ChevronDown, ChevronRight, Folder, Search } from 'lucide-react';
 import {
   Popover,
   PopoverContent,
@@ -95,13 +95,15 @@ export function createShadcnTreeSelectEditorPlugin<T>(
               }
             }}
           >
-            <span className="truncate">{currentValue || t('조직 선택', 'Select Organization')}</span>
-            <GitBranch className="h-4 w-4 opacity-50 shrink-0" />
+            <span className="bgrid-shadcn-trigger-label">{currentValue || t('조직 선택', 'Select Organization')}</span>
+            <span className="bgrid-shadcn-trigger-icon">
+              <ChevronDown />
+            </span>
           </button>
         </PopoverTrigger>
         <PopoverContent
           container={getPortalContainer()}
-          className="w-64 p-3"
+          className="w-72 p-3"
           align="start"
         >
           <div className="flex flex-col gap-2">
@@ -110,8 +112,8 @@ export function createShadcnTreeSelectEditorPlugin<T>(
             </div>
 
             {/* Search filter */}
-            <div className="flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2 py-1 dark:border-slate-800 dark:bg-slate-900/70">
-              <Search className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
+            <div className="flex h-8 items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-2.5 dark:border-slate-700 dark:bg-slate-900">
+              <Search className="h-3.5 w-3.5 text-slate-400 dark:text-slate-400 shrink-0" />
               <input
                 type="text"
                 value={searchQuery}
@@ -122,35 +124,35 @@ export function createShadcnTreeSelectEditorPlugin<T>(
             </div>
 
             {/* Tree nodes list */}
-            <div className="bgrid-shadcn-scroll flex max-h-52 flex-col overflow-y-auto pt-1">
+            <div className="bgrid-shadcn-scroll flex max-h-56 flex-col gap-1 overflow-y-auto pt-1">
               {filteredTree.map(group => {
                 const isExpanded = expandedGroups[group.title] ?? true;
                 const hasChildren = Boolean(group.children?.length);
 
                 return (
-                  <div key={group.title} className="flex flex-col">
+                  <div key={group.title} className="flex flex-col gap-0.5">
                     {/* Group Header */}
                     <button
                       type="button"
                       onClick={() => toggleGroup(group.title)}
-                      className="flex items-center gap-1.5 rounded-sm px-1.5 py-1.5 text-left text-xs font-semibold text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors cursor-pointer border-0 bg-transparent"
+                      className="bgrid-shadcn-tree-group flex h-7 min-h-[28px] w-full items-center gap-1.5 rounded-md px-2 text-left text-xs font-semibold text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors cursor-pointer border-0 bg-transparent"
                     >
                       {hasChildren ? (
                         isExpanded ? (
-                          <ChevronDown className="h-3.5 w-3.5 text-slate-500" />
+                          <ChevronDown className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                         ) : (
-                          <ChevronRight className="h-3.5 w-3.5 text-slate-500" />
+                          <ChevronRight className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                         )
                       ) : (
-                        <span className="w-3.5" />
+                        <span className="w-3.5 shrink-0" />
                       )}
-                      <Folder className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
-                      <span>{group.title}</span>
+                      <Folder className="h-4 w-4 text-slate-400 dark:text-slate-500 shrink-0" />
+                      <span className="truncate">{group.title}</span>
                     </button>
 
                     {/* Children */}
                     {hasChildren && isExpanded && (
-                      <div className="ml-4 flex flex-col border-l border-slate-100 pl-1 dark:border-slate-800">
+                      <div className="ml-3.5 my-0.5 flex flex-col gap-0.5 border-l border-slate-200 pl-2 dark:border-slate-800">
                         {group.children?.map(child => {
                           const childVal = child.value || child.title;
                           const isSelected = currentValue === childVal;
@@ -160,14 +162,14 @@ export function createShadcnTreeSelectEditorPlugin<T>(
                               key={childVal}
                               type="button"
                               onClick={() => handleSelectNode(childVal)}
-                              className={`flex items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs transition-colors cursor-pointer border-0 bg-transparent ${
+                              className={`bgrid-shadcn-tree-item flex h-7 min-h-[28px] w-full items-center justify-between rounded-md px-2.5 text-left text-xs transition-colors cursor-pointer border-0 bg-transparent ${
                                 isSelected
-                                  ? 'bg-slate-900 font-semibold text-white dark:bg-slate-50 dark:text-slate-900'
-                                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100'
+                                  ? 'bg-blue-600 font-medium text-white shadow-sm dark:bg-blue-600 dark:text-white'
+                                  : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100'
                               }`}
                             >
                               <span className="truncate">{child.title}</span>
-                              {isSelected && <Check className="h-3.5 w-3.5" />}
+                              {isSelected && <Check className="h-3.5 w-3.5 shrink-0 text-white ml-2" />}
                             </button>
                           );
                         })}

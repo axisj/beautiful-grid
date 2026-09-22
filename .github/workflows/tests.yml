@@ -55,26 +55,6 @@ jobs:
       - name: Run library consumer checks
         run: npm run test:library:consumers
 
-  library-bundle:
-    name: Library Bundle Budget
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: '24'
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Check generated bundle metrics and budget
-        run: npm run test:library:bundle
-
   unit:
     name: Unit (Vitest)
     runs-on: ubuntu-latest

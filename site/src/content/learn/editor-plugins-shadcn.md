@@ -1,6 +1,6 @@
 ---
-title: "외부 에디터 플러그인 (Shadcn UI) (Editor Plugins (Shadcn UI))"
-description: "Shadcn UI (Radix UI)를 기반으로 한 Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect 컴포넌트를 plugin으로 연결하고 popup portal, 다중 변경 commit, 종료 수명주기를 관리하는 방법을 설명합니다."
+title: "공식 Shadcn UI 에디터 플러그인 (Official Shadcn UI Editor Plugins)"
+description: "BeautifulGrid 공식 Shadcn Registry에서 Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect 에디터 소스를 설치하고 사용하는 방법을 설명합니다."
 category: "interaction"
 order: 4
 locale: "ko"
@@ -9,16 +9,52 @@ demoId: "editor-plugins-shadcn"
 features: ["editor-plugin", "defineEditorPlugin", "portal", "shadcn-ui", "popover", "radix-ui"]
 relatedGuides: ["editor-plugins", "built-in-editors", "editing-events", "editor-icons"]
 relatedApi: ["/api/props#columns", "/api/props#editable"]
-lastReviewedAt: "2026-08-29"
+lastReviewedAt: "2026-09-23"
 indexable: true
 draft: false
 ---
 
-[Shadcn UI](https://ui.shadcn.com/)와 같이 Radix UI를 기반으로 동작하는 모던 컴포넌트들을 `defineEditorPlugin()`으로 BeautifulGrid의 셀 에디터에 연결할 수 있습니다. Radix UI는 `SelectPrimitive.Portal`, `PopoverPrimitive.Portal`을 통해 팝업 요소를 전역 DOM에 렌더링하므로, 그리드가 제공하는 `getPortalContainer()`를 전달하여 Grid의 스크롤 컨텍스트, 테마 변수 상속, 바깥 클릭 판정과 완벽히 호환되도록 구성합니다.
+BeautifulGrid는 [Shadcn UI](https://ui.shadcn.com/) 방식에 맞춰 공식 에디터 플러그인을 **Shadcn Registry 소스**로 제공합니다. npm 패키지 내부의 구현을 불러오는 방식이 아니라, 프로젝트가 설치된 소스를 직접 소유하고 디자인 시스템에 맞게 수정할 수 있습니다.
+
+공식 플러그인에는 Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect factory가 포함됩니다. 각 factory는 Grid의 Portal과 편집 수명주기를 이미 연결하므로 애플리케이션에서는 옵션을 구성한 뒤 컬럼의 `editor`에 지정하면 됩니다.
 
 text·기본 Select·Date만 필요하다면 [내장·기본 제공 에디터](/learn/built-in-editors)를, Ant Design UI 연결은 [외부 에디터 플러그인 (AntD)](/learn/editor-plugins)를 확인하세요.
 
-## 1. Shadcn UI Select Plugin 정의
+## 1. 공식 플러그인 설치와 사용
+
+Shadcn CLI로 BeautifulGrid 공식 Registry 항목을 추가합니다.
+
+```sh
+npx shadcn@latest add https://raw.githubusercontent.com/axisj/beautiful-grid-plugins/main/public/r/beautiful-grid-editors.json
+```
+
+기본 설정에서는 `components/beautiful-grid` 아래에 6개 editor factory와 공통 Portal 컴포넌트, 스타일시트가 생성됩니다. 생성된 진입점에서 필요한 factory를 가져옵니다.
+
+```tsx
+import { createShadcnSelectEditorPlugin } from '@/components/beautiful-grid';
+
+type Order = {
+  status: 'ready' | 'progress' | 'done';
+};
+
+const statusEditor = createShadcnSelectEditorPlugin<Order, Order['status']>({
+  id: 'order-status',
+  ariaLabel: '주문 상태 선택',
+  options: [
+    { value: 'ready', label: '접수' },
+    { value: 'progress', label: '진행' },
+    { value: 'done', label: '완료' },
+  ],
+});
+
+const columns: BGridColumn<Order>[] = [
+  { key: 'status', label: '상태', editable: true, editor: statusEditor },
+];
+```
+
+공식 Registry 진입점은 플러그인 스타일도 함께 불러옵니다. 아래 라이브 데모는 6개 에디터의 동작을 보여주며, 실제 프로젝트에서는 위 Registry 설치 명령으로 생성된 소스를 사용합니다.
+
+## 2. 내부 구현 이해: Select와 Portal
 
 Shadcn UI의 `Select` 컴포넌트는 `SelectContent` 팝업을 Portal로 렌더링합니다. `getPortalContainer()`를 전달하고, `onValueChange`에서 변경 배열을 `commit`합니다.
 
@@ -74,7 +110,7 @@ export const shadcnStatusEditor = defineEditorPlugin<Task>({
 
 `commit`은 단일 값도 항상 길이 1의 변경 배열로 받습니다.
 
-## 2. DatePicker와 ColorPicker 연결 (Radix Popover)
+## 3. DatePicker와 ColorPicker 연결 (Radix Popover)
 
 달력 날짜 선택과 색상 팔레트는 Shadcn UI의 `Popover` 컴포넌트를 기반으로 구성합니다.
 
@@ -141,7 +177,7 @@ function ShadcnColorPickerEditor({
 }
 ```
 
-## 3. Cascader, TimePicker, TreeSelect 연결
+## 4. Cascader, TimePicker, TreeSelect 연결
 
 ### Cascader (다단계 계층 선택)
 
@@ -238,9 +274,9 @@ function ShadcnTreeSelectEditor({ value, column, commit, cancel, getPortalContai
 }
 ```
 
-## 4. Popup Portal과 Shadcn UI 설정
+## 5. Popup Portal과 Shadcn UI 설정
 
-Shadcn UI의 기본 설정은 팝업을 전역 `document.body`에 렌더링합니다. 데이터 그리드 내부에서 사용할 때는 `SelectContent`, `PopoverContent`와 같은 팝업 컴포넌트가 그리드 전용 floating portal root에 렌더링되도록 `container` 속성을 추가합니다.
+공식 Registry 소스에는 팝업을 Grid 전용 floating portal root에 렌더링하는 구현이 이미 포함되어 있습니다. 설치된 소스를 디자인 시스템에 맞게 수정할 때도 `SelectContent`, `PopoverContent`의 `container` 전달은 유지해야 합니다.
 
 ```tsx
 // components/ui/popover.tsx
@@ -266,7 +302,7 @@ const PopoverContent = React.forwardRef<
 - 가상 스크롤 및 frozen 컬럼 영역 계산에 포함되어 팝업이 그리드와 함께 정밀하게 동기화
 - 팝업 클릭이 Grid 외부 클릭으로 오인되어 세션이 예기치 않게 종료되는 문제 방지
 
-## 5. 여러 컬럼 원자적 저장
+## 6. 여러 컬럼 원자적 저장과 직접 확장
 
 단일 에디터 조작으로 여러 연관 컬럼을 함께 갱신해야 할 때는 `commit`에 여러 변경 항목을 배열로 전달합니다.
 
@@ -278,3 +314,5 @@ await commit([
 ```
 
 저장 또는 취소 후 DOM 포커스는 Grid가 원래 활성 셀로 안전하게 복원합니다.
+
+공식 factory로 해결되지 않는 앱 전용 입력이나 비동기 자동완성은 `defineEditorPlugin()`으로 별도 플러그인을 정의할 수 있습니다. 일반 사용은 공식 Registry factory에서 시작하고, 필요한 부분만 설치된 소스에서 확장하는 방식을 권장합니다.

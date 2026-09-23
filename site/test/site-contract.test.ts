@@ -52,10 +52,10 @@ describe('site product and navigation contracts', () => {
     expect(header).toContain("href: localizePath('/product-facts', locale), route: '/product-facts', external: false");
     expect(header).toContain("href: localizePath('/open-source', locale), route: '/open-source', external: false");
     expect(header).toContain("href: localizePath('/playground', locale), route: '/playground', external: false");
-    expect(header).toContain("href={productFacts.repositoryUrl}");
+    expect(header).toContain('href={productFacts.repositoryUrl}');
     expect(header).toContain("class:list={['nav-item', { active: isActive }]}");
     expect(header).toContain("aria-current={isActive ? 'page' : undefined}");
-    expect(header).toContain(".primary-nav a.active");
+    expect(header).toContain('.primary-nav a.active');
   });
 
   it('opens a categorized runnable-example popover from the desktop Learn navigation', () => {
@@ -87,7 +87,7 @@ describe('site product and navigation contracts', () => {
     expect(drawer).toContain('aria-labelledby="mobile-drawer-title"');
     expect(drawer).toContain('data-drawer-backdrop');
     expect(drawer).toContain('data-drawer-close');
-    expect(drawer).toContain("groupLearnArticles(allLearn, locale)");
+    expect(drawer).toContain('groupLearnArticles(allLearn, locale)');
     expect(drawer).toContain("route: '/learn'");
     expect(drawer).toContain("route: '/api/props'");
     expect(drawer).toContain("route: '/product-facts'");
@@ -120,7 +120,9 @@ describe('site product and navigation contracts', () => {
   it('keeps guide catalog card hover neutral without a colored top rail', () => {
     const learnIndex = readSiteFile('src/components/learn/LearnIndexPage.astro');
 
-    expect(learnIndex).toMatch(/\.guide-card:hover, \.guide-card:focus-within\s*\{[^}]*border-color:\s*var\(--site-border-strong\);[^}]*background:\s*color-mix\(in srgb, var\(--site-surface-elevated\) 94%, var\(--site-page-bg\)\);[^}]*box-shadow:\s*none;[^}]*transform:\s*translateY\(-2px\);/s);
+    expect(learnIndex).toMatch(
+      /\.guide-card:hover, \.guide-card:focus-within\s*\{[^}]*border-color:\s*var\(--site-border-strong\);[^}]*background:\s*color-mix\(in srgb, var\(--site-surface-elevated\) 94%, var\(--site-page-bg\)\);[^}]*box-shadow:\s*none;[^}]*transform:\s*translateY\(-2px\);/s,
+    );
     expect(learnIndex).not.toContain('.guide-card::before');
     expect(learnIndex).not.toContain('.guide-card:hover::before');
   });
@@ -199,8 +201,14 @@ describe('site product and navigation contracts', () => {
   it('makes the landing-page identity, value, installation, and final Star journey explicit', () => {
     const homepage = readSiteFile('src/pages/index.astro');
     const footer = readSiteFile('src/components/layout/Footer.astro');
-    const hero = homepage.slice(homepage.indexOf('<section class="hero-section">'), homepage.indexOf('<section class="section why-section"'));
-    const finalCta = homepage.slice(homepage.indexOf('<section class="final-cta">'), homepage.indexOf('</MarketingLayout>'));
+    const hero = homepage.slice(
+      homepage.indexOf('<section class="hero-section">'),
+      homepage.indexOf('<section class="section why-section"'),
+    );
+    const finalCta = homepage.slice(
+      homepage.indexOf('<section class="final-cta">'),
+      homepage.indexOf('</MarketingLayout>'),
+    );
 
     expect(hero).toContain('Open-source React Data Grid for business applications');
     expect(hero).toContain('아름답게, 강력하게.');
@@ -215,7 +223,9 @@ describe('site product and navigation contracts', () => {
     expect(hero).toContain('Verified benchmarks for production');
 
     expect(homepage).toContain("id=\"why-bgrid-title\">{t('왜 BeautifulGrid인가요?', 'Why BeautifulGrid?')}</h2>");
-    expect(homepage).toContain('검증된 성능과 풍부한 실무 기능을 누구나 자유롭게 활용할 수 있는 오픈소스로 제공합니다.');
+    expect(homepage).toContain(
+      '검증된 성능과 풍부한 실무 기능을 누구나 자유롭게 활용할 수 있는 오픈소스로 제공합니다.',
+    );
     expect(homepage).toContain("title: 'Apache-2.0'");
     expect(homepage).toContain("title: 'React에 최적화'");
     expect(homepage).toContain("title: '대용량 데이터에 최적화'");
@@ -255,14 +265,22 @@ describe('site product and navigation contracts', () => {
     const homepage = readSiteFile('src/pages/index.astro');
 
     expect(homepage.match(/<article class="capability-item/g)).toHaveLength(4);
-    expect(homepage).toMatch(/\.capability-rail\s*\{[^}]*gap:\s*0;[^}]*overflow:\s*hidden;[^}]*border:\s*1px solid #d8e1eb;[^}]*border-radius:\s*24px;[^}]*box-shadow:\s*none;/s);
-    expect(homepage).toMatch(/\.capability-item\s*\{[^}]*border:\s*0;[^}]*border-right:\s*1px solid #e0e7ef;[^}]*border-radius:\s*0;[^}]*background:\s*transparent;[^}]*box-shadow:\s*none;/s);
+    expect(homepage).toMatch(
+      /\.capability-rail\s*\{[^}]*gap:\s*0;[^}]*overflow:\s*hidden;[^}]*border:\s*1px solid #d8e1eb;[^}]*border-radius:\s*24px;[^}]*box-shadow:\s*none;/s,
+    );
+    expect(homepage).toMatch(
+      /\.capability-item\s*\{[^}]*border:\s*0;[^}]*border-right:\s*1px solid #e0e7ef;[^}]*border-radius:\s*0;[^}]*background:\s*transparent;[^}]*box-shadow:\s*none;/s,
+    );
     expect(homepage).toContain('.capability-item:last-child { border-right: 0; }');
     expect(homepage).not.toContain('.capability-item::after');
-    expect(homepage).toMatch(/\.example-grid\s*\{[^}]*gap:\s*0;[^}]*border-top:\s*1px solid #ced9e6;[^}]*border-left:\s*1px solid #ced9e6;/s);
+    expect(homepage).toMatch(
+      /\.example-grid\s*\{[^}]*gap:\s*0;[^}]*border-top:\s*1px solid #ced9e6;[^}]*border-left:\s*1px solid #ced9e6;/s,
+    );
     expect(homepage).not.toContain('.decision-copy::before');
     expect(homepage).toMatch(/\.strength-card\s*\{[^}]*border:\s*1px solid #dce4ed;[^}]*box-shadow:\s*none;/s);
-    expect(homepage).toMatch(/\.example-card\s*\{[^}]*border:\s*0;[^}]*border-right:\s*1px solid #ced9e6;[^}]*border-bottom:\s*1px solid #ced9e6;[^}]*border-radius:\s*0;[^}]*box-shadow:\s*none;/s);
+    expect(homepage).toMatch(
+      /\.example-card\s*\{[^}]*border:\s*0;[^}]*border-right:\s*1px solid #ced9e6;[^}]*border-bottom:\s*1px solid #ced9e6;[^}]*border-radius:\s*0;[^}]*box-shadow:\s*none;/s,
+    );
     expect(homepage).toContain('.capability-item:nth-child(-n + 2) { border-bottom: 1px solid #e0e7ef; }');
     expect(homepage).not.toContain('.capability-item-fps.is-measured::before');
   });
@@ -271,25 +289,39 @@ describe('site product and navigation contracts', () => {
     const homepage = readSiteFile('src/pages/index.astro');
 
     expect(homepage).toContain('class="container why-layout"');
-    expect(homepage).toMatch(/\.why-section\s*\{[^}]*margin-top:\s*clamp\(24px, 2\.5vw, 36px\);[^}]*padding-block:\s*clamp\(80px, 7vw, 96px\) clamp\(40px, 3\.5vw, 52px\);/s);
+    expect(homepage).toMatch(
+      /\.why-section\s*\{[^}]*margin-top:\s*clamp\(24px, 2\.5vw, 36px\);[^}]*padding-block:\s*clamp\(80px, 7vw, 96px\) clamp\(40px, 3\.5vw, 52px\);/s,
+    );
     expect(homepage).toMatch(/\.strengths-section\s*\{[^}]*padding-top:\s*clamp\(64px, 5vw, 72px\);/s);
-    expect(homepage).toMatch(/\.why-layout\s*\{[^}]*grid-template-columns:\s*minmax\(320px, 0\.72fr\) minmax\(0, 1\.28fr\);/s);
-    expect(homepage).toMatch(/\.why-grid\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\);[^}]*border-top:\s*1px solid #d7e0ea;/s);
-    expect(homepage).toMatch(/\.why-item\s*\{[^}]*min-height:\s*0;[^}]*grid-template-columns:\s*42px minmax\(0, 1fr\);[^}]*border-bottom:\s*1px solid #d7e0ea;[^}]*padding:\s*25px 0 24px;/s);
+    expect(homepage).toMatch(
+      /\.why-layout\s*\{[^}]*grid-template-columns:\s*minmax\(320px, 0\.72fr\) minmax\(0, 1\.28fr\);/s,
+    );
+    expect(homepage).toMatch(
+      /\.why-grid\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\);[^}]*border-top:\s*1px solid #d7e0ea;/s,
+    );
+    expect(homepage).toMatch(
+      /\.why-item\s*\{[^}]*min-height:\s*0;[^}]*grid-template-columns:\s*42px minmax\(0, 1fr\);[^}]*border-bottom:\s*1px solid #d7e0ea;[^}]*padding:\s*25px 0 24px;/s,
+    );
     expect(homepage).not.toContain('min-height: 240px;');
   });
 
   it('links the decision section to runtime and open-source guidance', () => {
     const homepage = readSiteFile('src/pages/index.astro');
 
-    expect(homepage).toContain("href={localizePath('/product-facts', locale)} class=\"btn btn-primary\"");
-    expect(homepage).toContain("href={localizePath('/open-source', locale)} class=\"btn btn-outline\"");
+    expect(homepage).toContain('href={localizePath(\'/product-facts\', locale)} class="btn btn-primary"');
+    expect(homepage).toContain('href={localizePath(\'/open-source\', locale)} class="btn btn-outline"');
     expect(homepage).toContain("t('지원 환경 확인', 'Review runtime support')");
     expect(homepage).toContain("t('오픈소스 안내', 'Explore open source')");
     expect(homepage).toContain("aria-label={t('도입 기준 체크리스트', 'Adoption baseline checklist')}");
-    expect(homepage).toMatch(/\.decision-card\s*\{[^}]*grid-template-columns:\s*minmax\(340px, 0\.78fr\) minmax\(0, 1\.22fr\);[^}]*border:\s*0;[^}]*border-radius:\s*0;[^}]*background:\s*transparent;[^}]*box-shadow:\s*none;/s);
-    expect(homepage).toMatch(/\.decision-list\s*\{[^}]*border-top:\s*1px solid #cbd6e2;[^}]*border-bottom:\s*1px solid #cbd6e2;/s);
-    expect(homepage).toMatch(/\.decision-item\s*\{[^}]*display:\s*grid;[^}]*border:\s*0;[^}]*border-bottom:\s*1px solid #dce4ed;[^}]*border-radius:\s*0;[^}]*background:\s*transparent;[^}]*box-shadow:\s*none;/s);
+    expect(homepage).toMatch(
+      /\.decision-card\s*\{[^}]*grid-template-columns:\s*minmax\(340px, 0\.78fr\) minmax\(0, 1\.22fr\);[^}]*border:\s*0;[^}]*border-radius:\s*0;[^}]*background:\s*transparent;[^}]*box-shadow:\s*none;/s,
+    );
+    expect(homepage).toMatch(
+      /\.decision-list\s*\{[^}]*border-top:\s*1px solid #cbd6e2;[^}]*border-bottom:\s*1px solid #cbd6e2;/s,
+    );
+    expect(homepage).toMatch(
+      /\.decision-item\s*\{[^}]*display:\s*grid;[^}]*border:\s*0;[^}]*border-bottom:\s*1px solid #dce4ed;[^}]*border-radius:\s*0;[^}]*background:\s*transparent;[^}]*box-shadow:\s*none;/s,
+    );
   });
 
   it('keeps the product facts route focused on runtime and compatibility guidance', () => {
@@ -327,20 +359,14 @@ describe('site product and navigation contracts', () => {
     expect(workspace).toContain('소스 코드 보기');
     expect(propsPlayground).toContain('Layout & dimensions');
     expect(propsPlayground).toContain("layout='vertical' size='middle'");
-    expect(propsPlayground).toContain("<Switch checked={checked}");
+    expect(propsPlayground).toContain('<Switch checked={checked}');
     expect(propsPlayground).toContain('Cell navigation & clipboard');
     expect(propsPlayground).toContain('dataControl={dataControl}');
     expect(propsPlayground).toContain("ariaLabel: '상품명 편집'");
     expect(propsPlayground).toContain("label='columnsGroup / columnGroups'");
-    expect(propsPlayground).toContain(
-      "columnsGroup={groupMode === 'columnsGroup' ? legacyColumnGroups",
-    );
-    expect(propsPlayground).toContain(
-      "columnGroups={groupMode === 'columnGroups' ? nestedColumnGroups",
-    );
-    expect(propsPlayground).toContain(
-      'footerHeight={useLegacyFooter ? footerHeight : undefined}',
-    );
+    expect(propsPlayground).toContain("columnsGroup={groupMode === 'columnsGroup' ? legacyColumnGroups");
+    expect(propsPlayground).toContain("columnGroups={groupMode === 'columnGroups' ? nestedColumnGroups");
+    expect(propsPlayground).toContain('footerHeight={useLegacyFooter ? footerHeight : undefined}');
     expect(propsPlayground).not.toContain('itemRender: ({ editable');
     expect(themePlayground).toContain('ColorPicker');
     expect(themePlayground).toContain("name: 'Graphite'");
@@ -461,10 +487,10 @@ describe('site product and navigation contracts', () => {
     expect(footer).toContain("intro: 'BeautifulGrid, built by AXISJ.'");
     expect(footer).toContain('href="https://axisj.com"');
     expect(footer).toContain('href="https://manualtalk.axisj.com"');
-    expect(footer).toContain("href={localizePath('/learn', locale)} data-footer-route=\"/learn\"");
-    expect(footer).toContain("href={localizePath('/product-facts', locale)} data-footer-route=\"/product-facts\"");
-    expect(footer).toContain("href={localizePath('/api/props', locale)} data-footer-route=\"/api/props\"");
-    expect(footer).toContain("href={localizePath('/open-source', locale)} data-footer-route=\"/open-source\"");
+    expect(footer).toContain('href={localizePath(\'/learn\', locale)} data-footer-route="/learn"');
+    expect(footer).toContain('href={localizePath(\'/product-facts\', locale)} data-footer-route="/product-facts"');
+    expect(footer).toContain('href={localizePath(\'/api/props\', locale)} data-footer-route="/api/props"');
+    expect(footer).toContain('href={localizePath(\'/open-source\', locale)} data-footer-route="/open-source"');
     expect(footer).toContain("learn: 'Examples / Learn'");
     expect(footer).toContain('https://www.axboot.dev/');
   });
@@ -503,7 +529,7 @@ describe('site product and navigation contracts', () => {
     expect(heroGrid).toContain("variant='vertical-bordered'");
     expect(heroGrid).toContain('const width = Math.max(Math.floor(element.clientWidth), 280);');
     expect(heroGrid).not.toContain('Math.max(Math.floor(element.clientWidth), 280) - 4');
-    expect(heroGrid).toContain("height: width < 520 ? 280 : width < 720 ? 340 : width < 1000 ? 420 : 520");
+    expect(heroGrid).toContain('height: width < 520 ? 280 : width < 720 ? 340 : width < 1000 ? 420 : 520');
     expect(heroGrid).toContain('const mountStartedAtRef = React.useRef(performance.now())');
     expect(heroGrid).toContain("new CustomEvent('bgrid-home-grid-mounted'");
     expect(heroGrid).toContain('document.documentElement.dataset.bgridHomeGridMountMs');
@@ -520,8 +546,8 @@ describe('site product and navigation contracts', () => {
     expect(themePalettes).toContain("'--bgrid-cell-value-changed-bg': '#fff7ed'");
     expect(heroGridStyles).toContain(':not(.bgrid-cell-value-changed)');
     expect(heroGridStyles).toContain('.bgrid-editor-portal-root .ant-select-item-option-content');
-    expect(heroGrid).toContain("from '../../../../examples/editor-plugins/createAntdDatePickerEditorPlugin'");
-    expect(heroGrid).toContain("from '../../../../examples/editor-plugins/createAntdSelectEditorPlugin'");
+    expect(heroGrid).toContain("from '@beautifuljs/grid-antd'");
+    expect(heroGrid).toContain("import '@beautifuljs/grid-antd/style.css'");
     expect(heroGrid).toContain("from '../../../../examples/editing/editorIcons'");
     expect(heroGrid.match(/createAntdSelectEditorPlugin<OrderRow/g)).toHaveLength(8);
     expect(heroGrid.match(/createAntdDatePickerEditorPlugin<OrderRow/g)).toHaveLength(1);
@@ -550,7 +576,10 @@ describe('site product and navigation contracts', () => {
   it('explains verified feature and performance tradeoffs on the homepage', () => {
     const homepage = readSiteFile('src/pages/index.astro');
     const virtualScrollExample = readFileSync(resolve(repositoryRoot, 'examples/ScrollExample.tsx'), 'utf8');
-    const virtualScrollWindow = readFileSync(resolve(repositoryRoot, 'beautiful-grid/utils/virtualScrollWindow.ts'), 'utf8');
+    const virtualScrollWindow = readFileSync(
+      resolve(repositoryRoot, 'beautiful-grid/utils/virtualScrollWindow.ts'),
+      'utf8',
+    );
     const virtualScrollGuide = readSiteFile('src/content/learn/virtual-scroll.md');
     const englishVirtualScrollGuide = readSiteFile('src/content/learn/en/virtual-scroll.md');
 
@@ -589,7 +618,9 @@ describe('site product and navigation contracts', () => {
   it('keeps the homepage positioning aligned in Korean and English', () => {
     const homepage = readSiteFile('src/pages/index.astro');
 
-    expect(homepage).toContain("t('업무용 애플리케이션을 위한 오픈소스 React Data Grid', 'Open-source React Data Grid for business applications')");
+    expect(homepage).toContain(
+      "t('업무용 애플리케이션을 위한 오픈소스 React Data Grid', 'Open-source React Data Grid for business applications')",
+    );
     expect(homepage).toContain("t('아름답게, 강력하게.', 'Beautiful. Powerful.')");
     expect(homepage).toContain("t('React로 자연스럽게.', 'Naturally React.')");
     expect(homepage).toContain('대용량 가상화부터 실무에 필요한 데이터 기능까지.');
@@ -629,7 +660,9 @@ describe('site product and navigation contracts', () => {
     expect(openSourcePage).toContain('BUILT IN PUBLIC');
     expect(openSourcePage).toContain("t('열린 과정.', 'An open process.')");
     expect(openSourcePage).toContain("t('선택은 당신의 것.', 'The choice is yours.')");
-    expect(openSourcePage).toContain('공개는 참여를 요구하기 위한 장치가 아니라 제품을 검증할 수 있게 하는 약속입니다.');
+    expect(openSourcePage).toContain(
+      '공개는 참여를 요구하기 위한 장치가 아니라 제품을 검증할 수 있게 하는 약속입니다.',
+    );
     expect(openSourcePage).not.toContain('class="open-contract"');
     expect(openSourcePage.match(/기여 안내/g)).toHaveLength(1);
     expect(openSourcePage.indexOf('기여 안내')).toBeGreaterThan(openSourcePage.indexOf('project-resources'));
@@ -682,10 +715,14 @@ describe('site product and navigation contracts', () => {
     expect(homepage).toContain('localizedFeaturedExamples.slice(0, 4)');
     expect(homepage).toContain('localizedFeaturedExamples.slice(4, 8)');
     expect(homepage).toMatch(/\.example-row\s*\{[^}]*display:\s*flex;/s);
-    expect(homepage).toMatch(/\.example-card\s*\{[^}]*transform-origin:\s*center;[^}]*transition:\s*transform 220ms cubic-bezier\(0\.2, 0\.82, 0\.24, 1\)/s);
+    expect(homepage).toMatch(
+      /\.example-card\s*\{[^}]*transform-origin:\s*center;[^}]*transition:\s*transform 220ms cubic-bezier\(0\.2, 0\.82, 0\.24, 1\)/s,
+    );
     expect(homepage).toMatch(/\.example-card:focus-visible\s*\{[^}]*transform:\s*translateY\(-6px\) scale\(1\.025\);/s);
     expect(homepage).toContain('@media (hover: hover) and (pointer: fine)');
-    expect(homepage).toMatch(/\.example-card:hover\s*\{[^}]*box-shadow:\s*none;[^}]*transform:\s*translateY\(-6px\) scale\(1\.025\);/s);
+    expect(homepage).toMatch(
+      /\.example-card:hover\s*\{[^}]*box-shadow:\s*none;[^}]*transform:\s*translateY\(-6px\) scale\(1\.025\);/s,
+    );
     expect(homepage).not.toContain(':has(.example-card:hover)');
     expect(homepage).not.toContain('flex-grow: 1.3');
     expect(homepage).not.toContain('data-demo-carousel');
@@ -746,9 +783,7 @@ describe('site product and navigation contracts', () => {
     expect(demoRenderer).toContain("import '../../../styles/globals.css'");
     expect(demoRenderer).toContain("import '../styles/datagrid-theme.css'");
     expect(demoRenderer).toContain("className='site-grid-theme site-demo-renderer'");
-    expect(demoRenderer).toContain(
-      'algorithm: isDark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm',
-    );
+    expect(demoRenderer).toContain('algorithm: isDark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm');
     expect(demoStyles).toContain('.site-demo-renderer .data-grid-container');
     expect(dataGridThemeStyles).toContain('.site-grid-theme .bgrid-root');
     for (const [token, value] of Object.entries(siteGridThemePalette)) {
@@ -788,14 +823,10 @@ describe('site product and navigation contracts', () => {
     expect(sourcePanel).toContain("const isInsideRepository = !relativeSourcePath.startsWith('..')");
     expect(sourcePanel).toContain("code = readFileSync(absoluteSourcePath, 'utf8')");
     expect(sourcePanel).toContain("blob/master/'");
-    expect(sourcePanel).toContain(
-      "themes={{ light: 'github-light', dark: 'github-dark-high-contrast' }}",
-    );
+    expect(sourcePanel).toContain("themes={{ light: 'github-light', dark: 'github-dark-high-contrast' }}");
     expect(sourcePanel).toContain('defaultColor="light"');
     expect(learnStyles).toContain('background-color: var(--site-surface-elevated, #ffffff);');
-    expect(learnStyles).toContain(
-      'scrollbar-color: var(--site-border-strong, #cbd5e1) var(--site-surface, #f7f9fc);',
-    );
+    expect(learnStyles).toContain('scrollbar-color: var(--site-border-strong, #cbd5e1) var(--site-surface, #f7f9fc);');
   });
 
   it('uses public package imports and a measured container in every DataGrid example', () => {
@@ -907,7 +938,7 @@ describe('site product and navigation contracts', () => {
     expect(demo).toContain("React.useState<ThemeId>('default')");
     expect(demo).toContain("<div className='theming-example'>");
     expect(demo).not.toContain('theming-example--${theme}');
-    expect(demo).toContain("className={`theming-example-grid bgrid-theme-${theme}`}");
+    expect(demo).toContain('className={`theming-example-grid bgrid-theme-${theme}`}');
     expect(demo).toContain("aria-label={t('데이터그리드 테마 선택', 'Select Data Grid Theme')}");
     expect(styles).toContain('.bgrid-theme-brand');
     expect(styles).toContain('.bgrid-theme-dark');

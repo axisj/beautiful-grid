@@ -4,7 +4,8 @@ import { v4 as uuidv4 } from 'uuid';
 import type { BGridChangeDataMeta, BGridColumn, BGridColumnGroup, BGridDataItem } from 'beautiful-grid';
 import { BGridDataItemStatus } from 'beautiful-grid';
 import { createDateEditorPlugin, createSelectEditorPlugin } from 'beautiful-grid/editors';
-import { createAntdSelectEditorPlugin } from './editor-plugins/createAntdSelectEditorPlugin';
+import { createAntdSelectEditorPlugin } from '@beautifuljs/grid-antd';
+import '@beautifuljs/grid-antd/style.css';
 
 export interface Item {
   uuid: string;
@@ -126,9 +127,7 @@ export default function useEditorGrid() {
       current
         .filter(item => item.status !== BGridDataItemStatus.remove)
         .map(item =>
-          item.status === undefined &&
-          item.editedColumnIds === undefined &&
-          item.changedKeys === undefined
+          item.status === undefined && item.editedColumnIds === undefined && item.changedKeys === undefined
             ? item
             : { ...item, status: undefined, editedColumnIds: undefined, changedKeys: undefined },
         ),
@@ -209,7 +208,9 @@ export default function useEditorGrid() {
             editable: true,
             editor: priorityEditor,
             itemRender: ({ value }) =>
-              ({ low: t('낮음', 'Low'), normal: t('보통', 'Normal'), high: t('높음', 'High') })[value as 'low' | 'normal' | 'high'] ?? value,
+              ({ low: t('낮음', 'Low'), normal: t('보통', 'Normal'), high: t('높음', 'High') }[
+                value as 'low' | 'normal' | 'high'
+              ] ?? value),
           },
           {
             key: 'uuid',

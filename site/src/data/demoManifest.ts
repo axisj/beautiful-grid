@@ -77,19 +77,7 @@ export const demoManifest: Record<string, DemoManifestItem> = {
   },
   'editor-plugins': {
     componentFile: 'ExternalEditorPluginExample.tsx',
-    sourceFiles: [
-      ...withContainerSources('ExternalEditorPluginExample.tsx'),
-      ...editingIconSources,
-      'examples/editor-plugins/antdEditorPlugins.css',
-      'examples/editor-plugins/cascaderValue.ts',
-      'examples/editor-plugins/createAntdCascaderEditorPlugin.tsx',
-      'examples/editor-plugins/createAntdColorPickerEditorPlugin.tsx',
-      'examples/editor-plugins/createAntdDatePickerEditorPlugin.tsx',
-      'examples/editor-plugins/createAntdSelectEditorPlugin.tsx',
-      'examples/editor-plugins/createAntdTimePickerEditorPlugin.tsx',
-      'examples/editor-plugins/createAntdTreeSelectEditorPlugin.tsx',
-      'beautiful-grid/editors/defineEditorPlugin.ts',
-    ],
+    sourceFiles: [...withContainerSources('ExternalEditorPluginExample.tsx'), ...editingIconSources],
     minHeight: 500,
   },
   'editor-plugins-shadcn': {

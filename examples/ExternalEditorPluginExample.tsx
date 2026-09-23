@@ -1,15 +1,19 @@
 import { t } from './i18n';
 import * as React from 'react';
 import { BGrid, type BGridColumn, type BGridDataItem } from 'beautiful-grid';
+import {
+  createAntdCascaderEditorPlugin,
+  createAntdColorPickerEditorPlugin,
+  createAntdDatePickerEditorPlugin,
+  createAntdSelectEditorPlugin,
+  createAntdTimePickerEditorPlugin,
+  createAntdTreeSelectEditorPlugin,
+  formatCascaderClipboardText,
+  parseCascaderClipboardText,
+} from '@beautifuljs/grid-antd';
+import '@beautifuljs/grid-antd/style.css';
 import DataGridContainer from '../components/DataGridContainer';
 import { useContainerSize } from '../hooks/useContainerSize';
-import { createAntdCascaderEditorPlugin } from './editor-plugins/createAntdCascaderEditorPlugin';
-import { createAntdColorPickerEditorPlugin } from './editor-plugins/createAntdColorPickerEditorPlugin';
-import { createAntdDatePickerEditorPlugin } from './editor-plugins/createAntdDatePickerEditorPlugin';
-import { createAntdSelectEditorPlugin } from './editor-plugins/createAntdSelectEditorPlugin';
-import { createAntdTimePickerEditorPlugin } from './editor-plugins/createAntdTimePickerEditorPlugin';
-import { createAntdTreeSelectEditorPlugin } from './editor-plugins/createAntdTreeSelectEditorPlugin';
-import { formatCascaderClipboardText, parseCascaderClipboardText } from './editor-plugins/cascaderValue';
 import { CalendarIcon, ChevronDownIcon, ClockIcon } from './editing/editorIcons';
 import {
   applyEditingDataChange,
@@ -104,7 +108,12 @@ const initialCategoryPaths = [
   [t('해외', 'Overseas'), t('유럽', 'Europe')],
 ];
 const initialDeliveryTimes = ['09:30', '11:00', '14:30', '16:00'];
-const initialOrganizations = [t('서울 영업팀', 'Seoul Sales Team'), t('부산 영업팀', 'Busan Sales Team'), t('물류팀', 'Logistics Team'), t('고객지원팀', 'Customer Support Team')];
+const initialOrganizations = [
+  t('서울 영업팀', 'Seoul Sales Team'),
+  t('부산 영업팀', 'Busan Sales Team'),
+  t('물류팀', 'Logistics Team'),
+  t('고객지원팀', 'Customer Support Team'),
+];
 
 const cloneExternalEditorOrders = (): BGridDataItem<ExternalEditorOrder>[] =>
   cloneEditingOrders().map((item, index) => ({
@@ -124,80 +133,102 @@ export default function ExternalEditorPluginExample() {
   const { width, height } = useContainerSize(containerRef);
 
   const columns = React.useMemo<BGridColumn<ExternalEditorOrder>[]>(
-    () => withEditingCellClasses<ExternalEditorOrder>([
-      { key: 'orderCode', label: t('주문 코드', 'Order Code'), width: 140, editable: false },
-      { key: 'customerName', label: t('고객명', 'Customer Name'), width: 160, editable: false },
-      {
-        key: 'status',
-        label: 'Ant Design Select',
-        width: 180,
-        editable: true,
-        editor: antdStatusEditor,
-        editorIcon: { render: <ChevronDownIcon />, ariaLabel: t('Ant Design 상태 선택', 'Ant Design Select Status') },
-      },
-      {
-        key: 'deliveryDate',
-        label: 'Ant Design DatePicker',
-        width: 200,
-        editable: true,
-        editor: antdDeliveryDateEditor,
-        editorIcon: { render: <CalendarIcon />, ariaLabel: t('Ant Design 납기일 선택', 'Ant Design Select Delivery Date') },
-      },
-      {
-        key: 'labelColor',
-        label: 'Ant Design ColorPicker',
-        width: 210,
-        editable: true,
-        editor: antdLabelColorEditor,
-        itemRender: ({ value }) => <>{String(value ?? '')}</>,
-        editorIcon: {
-          render: ({ value }) => (
-            <span
-              className='bgrid-color-swatch'
-              style={{ backgroundColor: typeof value === 'string' ? value : 'transparent' }}
-              aria-hidden='true'
-            />
-          ),
-          ariaLabel: t('Ant Design 라벨 색상 선택', 'Ant Design Select Label Color'),
+    () =>
+      withEditingCellClasses<ExternalEditorOrder>([
+        { key: 'orderCode', label: t('주문 코드', 'Order Code'), width: 140, editable: false },
+        { key: 'customerName', label: t('고객명', 'Customer Name'), width: 160, editable: false },
+        {
+          key: 'status',
+          label: 'Ant Design Select',
+          width: 180,
+          editable: true,
+          editor: antdStatusEditor,
+          editorIcon: { render: <ChevronDownIcon />, ariaLabel: t('Ant Design 상태 선택', 'Ant Design Select Status') },
         },
-      },
-      {
-        key: 'categoryPath',
-        label: 'Ant Design Cascader',
-        width: 200,
-        editable: true,
-        editor: antdCategoryEditor,
-        itemRender: ({ value }) => <>{Array.isArray(value) ? value.join(' / ') : ''}</>,
-        getClipboardText: ({ value }) => formatCascaderClipboardText(value),
-        parseClipboardText: parseCascaderClipboardText,
-        editorIcon: { render: <ChevronDownIcon />, ariaLabel: t('Ant Design 분류 경로 선택', 'Ant Design Select Category Path') },
-      },
-      {
-        key: 'deliveryTime',
-        label: 'Ant Design TimePicker',
-        width: 190,
-        editable: true,
-        editor: antdDeliveryTimeEditor,
-        editorIcon: { render: <ClockIcon />, ariaLabel: t('Ant Design 배송 시간 선택', 'Ant Design Select Delivery Time') },
-      },
-      {
-        key: 'organization',
-        label: 'Ant Design TreeSelect',
-        width: 210,
-        editable: true,
-        editor: antdOrganizationEditor,
-        editorIcon: { render: <ChevronDownIcon />, ariaLabel: t('Ant Design 담당 조직 선택', 'Ant Design Select Responsible Organization') },
-      },
-    ]),
+        {
+          key: 'deliveryDate',
+          label: 'Ant Design DatePicker',
+          width: 200,
+          editable: true,
+          editor: antdDeliveryDateEditor,
+          editorIcon: {
+            render: <CalendarIcon />,
+            ariaLabel: t('Ant Design 납기일 선택', 'Ant Design Select Delivery Date'),
+          },
+        },
+        {
+          key: 'labelColor',
+          label: 'Ant Design ColorPicker',
+          width: 210,
+          editable: true,
+          editor: antdLabelColorEditor,
+          itemRender: ({ value }) => <>{String(value ?? '')}</>,
+          editorIcon: {
+            render: ({ value }) => (
+              <span
+                className='bgrid-color-swatch'
+                style={{ backgroundColor: typeof value === 'string' ? value : 'transparent' }}
+                aria-hidden='true'
+              />
+            ),
+            ariaLabel: t('Ant Design 라벨 색상 선택', 'Ant Design Select Label Color'),
+          },
+        },
+        {
+          key: 'categoryPath',
+          label: 'Ant Design Cascader',
+          width: 200,
+          editable: true,
+          editor: antdCategoryEditor,
+          itemRender: ({ value }) => <>{Array.isArray(value) ? value.join(' / ') : ''}</>,
+          getClipboardText: ({ value }) => formatCascaderClipboardText(value),
+          parseClipboardText: parseCascaderClipboardText,
+          editorIcon: {
+            render: <ChevronDownIcon />,
+            ariaLabel: t('Ant Design 분류 경로 선택', 'Ant Design Select Category Path'),
+          },
+        },
+        {
+          key: 'deliveryTime',
+          label: 'Ant Design TimePicker',
+          width: 190,
+          editable: true,
+          editor: antdDeliveryTimeEditor,
+          editorIcon: {
+            render: <ClockIcon />,
+            ariaLabel: t('Ant Design 배송 시간 선택', 'Ant Design Select Delivery Time'),
+          },
+        },
+        {
+          key: 'organization',
+          label: 'Ant Design TreeSelect',
+          width: 210,
+          editable: true,
+          editor: antdOrganizationEditor,
+          editorIcon: {
+            render: <ChevronDownIcon />,
+            ariaLabel: t('Ant Design 담당 조직 선택', 'Ant Design Select Responsible Organization'),
+          },
+        },
+      ]),
     [],
   );
 
   return (
     <div className='flex min-h-0 flex-col gap-3'>
       <p className='m-0 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm leading-6 text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300'>
-        {t('Ant Design Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect를', 'Ant Design Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect connected via')}{' '}
-        <code>defineEditorPlugin()</code>{t('으로 연결했습니다. 셀을 더블클릭하거나 각 아이콘과 ColorPicker 색상 박스를 클릭해 편집을 시작합니다. popup은 plugin의', '. Double-click a cell or click each icon and ColorPicker color box to start editing. The popup is rendered in the plugin\'s')} <code>getPortalContainer()</code>{t('에 렌더링하고 값 선택 시', ' and upon value selection,')}{' '}
-        <code>commit(changes[])</code>{t('을 호출합니다.', ' is called.')}
+        {t(
+          'Ant Design Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect를',
+          'Ant Design Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect connected via',
+        )}{' '}
+        <code>@beautifuljs/grid-antd</code>
+        {t(
+          ' 패키지로 연결했습니다. 셀을 더블클릭하거나 각 아이콘과 ColorPicker 색상 박스를 클릭해 편집을 시작합니다. popup은 plugin의',
+          " package. Double-click a cell or click each icon and ColorPicker color box to start editing. The popup is rendered in the plugin's",
+        )}{' '}
+        <code>getPortalContainer()</code>
+        {t('에 렌더링하고 값 선택 시', ' and upon value selection,')} <code>commit(changes[])</code>
+        {t('을 호출합니다.', ' is called.')}
       </p>
       <DataGridContainer ref={containerRef} style={{ height: 340 }}>
         <BGrid<ExternalEditorOrder>

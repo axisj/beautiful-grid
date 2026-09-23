@@ -9,23 +9,43 @@ demoId: "editor-plugins"
 features: ["editor-plugin", "defineEditorPlugin", "portal", "commit", "lifecycle"]
 relatedGuides: ["built-in-editors", "editor-plugins-shadcn", "editor-icons", "lookup-editor", "editing-events"]
 relatedApi: ["/api/props#columns", "/api/props#editable"]
-lastReviewedAt: "2026-08-29"
+lastReviewedAt: "2026-09-22"
 indexable: true
 draft: false
 ---
 
-Ant Design Select·DatePicker·ColorPicker·Cascader·TimePicker·TreeSelect, 비동기 자동완성처럼 앱이 이미 사용하는 UI 컴포넌트는 `defineEditorPlugin()`으로 연결합니다. text·기본 Select·Date만 필요하다면 [내장·기본 제공 에디터](/learn/built-in-editors)를 먼저 확인하세요.
+Ant Design Select·DatePicker·ColorPicker·Cascader·TimePicker·TreeSelect는 공식 통합 패키지 `@beautifuljs/grid-antd`로 연결할 수 있습니다. 앱 전용 입력이나 비동기 자동완성은 `defineEditorPlugin()`으로 직접 확장합니다. text·기본 Select·Date만 필요하다면 [내장·기본 제공 에디터](/learn/built-in-editors)를 먼저 확인하세요.
 
-## Plugin 정의
+## 공식 Ant Design 패키지 사용
+
+```sh
+npm install @beautifuljs/grid-antd antd
+```
+
+애플리케이션 진입점에서 통합 스타일을 한 번 불러오고 필요한 factory를 사용합니다.
 
 ```tsx
-function PriorityEditor({
-  value,
-  column,
-  commit,
-  cancel,
-  getPortalContainer,
-}: BGridEditorPluginProps<Task>) {
+import { createAntdSelectEditorPlugin, createAntdDatePickerEditorPlugin } from '@beautifuljs/grid-antd';
+import '@beautifuljs/grid-antd/style.css';
+
+const priorityEditor = createAntdSelectEditorPlugin<Task, Task['priority']>({
+  id: 'task-priority',
+  ariaLabel: '우선순위 편집',
+  options: priorityOptions,
+});
+
+const dueDateEditor = createAntdDatePickerEditorPlugin<Task>({
+  id: 'task-due-date',
+  ariaLabel: '마감일 편집',
+});
+```
+
+패키지는 여섯 editor factory와 Cascader 클립보드 변환 helper를 제공합니다. 실제 사용법은 아래 라이브 예제에서 확인할 수 있습니다.
+
+## 직접 Plugin 정의
+
+```tsx
+function PriorityEditor({ value, column, commit, cancel, getPortalContainer }: BGridEditorPluginProps<Task>) {
   return (
     <Select
       autoFocus
@@ -33,9 +53,7 @@ function PriorityEditor({
       defaultValue={value as Task['priority']}
       getPopupContainer={getPortalContainer}
       options={priorityOptions}
-      onChange={nextValue =>
-        void commit([{ key: column.key, value: nextValue }])
-      }
+      onChange={nextValue => void commit([{ key: column.key, value: nextValue }])}
       onKeyDown={event => {
         if (event.key === 'Escape') cancel();
       }}
@@ -62,10 +80,12 @@ const priorityEditor = defineEditorPlugin<Task>({
   defaultValue={value ? dayjs(String(value)) : null}
   getPopupContainer={getPortalContainer}
   onChange={date =>
-    void commit([{
-      key: column.key,
-      value: date ? date.format('YYYY-MM-DD') : '',
-    }])
+    void commit([
+      {
+        key: column.key,
+        value: date ? date.format('YYYY-MM-DD') : '',
+      },
+    ])
   }
   onOpenChange={open => {
     if (!open) cancel();
@@ -83,10 +103,12 @@ ColorPicker는 드래그 중인 `onChange` 값은 미리보기에만 사용하�
   getPopupContainer={getPortalContainer}
   onChange={(_color, css) => setPreviewColor(css)}
   onChangeComplete={color =>
-    void commit([{
-      key: column.key,
-      value: color.toHexString().toUpperCase(),
-    }])
+    void commit([
+      {
+        key: column.key,
+        value: color.toHexString().toUpperCase(),
+      },
+    ])
   }
 />
 ```
@@ -137,7 +159,7 @@ Cascader는 마지막 항목만 저장하지 않고 선택된 전체 경로를 `
 />
 ```
 
-라이브 예제의 여섯 어댑터는 셀의 `font`, `color`, 높이를 상속합니다. 외부 UI 라이브러리가 자체 글꼴 크기를 지정한다면 editor root와 선택 값 요소에 `font: inherit`을 적용하고, popup에도 `--bgrid-font-family`와 `--bgrid-font-size`를 전달하면 활성화 전후의 셀 스타일이 일관됩니다.
+`@beautifuljs/grid-antd`의 여섯 어댑터는 셀의 `font`, `color`, 높이를 상속합니다. 직접 외부 UI 어댑터를 만들 때 라이브러리가 자체 글꼴 크기를 지정한다면 editor root와 선택 값 요소에 `font: inherit`을 적용하고, popup에도 `--bgrid-font-family`와 `--bgrid-font-size`를 전달하면 활성화 전후의 셀 스타일이 일관됩니다.
 
 ## 복사·붙여넣기 값 변환
 
@@ -150,9 +172,7 @@ const categoryColumn: BGridColumn<Order> = {
   width: 200,
   editable: true,
   editor: categoryEditor,
-  itemRender: ({ value }) => (
-    <>{Array.isArray(value) ? value.join(' / ') : ''}</>
-  ),
+  itemRender: ({ value }) => <>{Array.isArray(value) ? value.join(' / ') : ''}</>,
   getClipboardText: ({ value }) => JSON.stringify(value),
   parseClipboardText: text => {
     const parsed: unknown = JSON.parse(text);

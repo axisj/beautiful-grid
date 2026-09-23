@@ -63,21 +63,20 @@ describe('Learn Content Architecture Contracts', () => {
       expect(guide).toContain('itemRender');
     });
     expect(publicTypes).toContain('parseClipboardText?:');
+    expect(antdExample).toContain("from '@beautifuljs/grid-antd'");
     expect(antdExample).toContain('parseClipboardText: parseCascaderClipboardText');
     expect(shadcnExample).toContain('parseClipboardText: parseCascaderClipboardText');
-    expect(demoManifest['editor-plugins'].sourceFiles).toContain('examples/editor-plugins/cascaderValue.ts');
+    expect(demoManifest['editor-plugins'].sourceFiles).not.toContain('examples/editor-plugins/cascaderValue.ts');
     expect(demoManifest['editor-plugins-shadcn'].sourceFiles).toContain('examples/editor-plugins/cascaderValue.ts');
   });
 
   it('documents merged clipboard atomicity and unsupported payload handling in both locales', () => {
-    const accessibilityGuides = [
-      'accessibility-and-keyboard.md',
-      'en/accessibility-and-keyboard.md',
-    ].map(file => fs.readFileSync(path.join(learnDir, file), 'utf8'));
-    const mergedGuides = [
-      'editing-merged-cells.md',
-      'en/editing-merged-cells.md',
-    ].map(file => fs.readFileSync(path.join(learnDir, file), 'utf8'));
+    const accessibilityGuides = ['accessibility-and-keyboard.md', 'en/accessibility-and-keyboard.md'].map(file =>
+      fs.readFileSync(path.join(learnDir, file), 'utf8'),
+    );
+    const mergedGuides = ['editing-merged-cells.md', 'en/editing-merged-cells.md'].map(file =>
+      fs.readFileSync(path.join(learnDir, file), 'utf8'),
+    );
     const publicTypes = fs.readFileSync(path.join(repositoryRoot, 'beautiful-grid/types.ts'), 'utf8');
     const table = fs.readFileSync(path.join(repositoryRoot, 'beautiful-grid/components/Table.tsx'), 'utf8');
     const homeGrid = fs.readFileSync(path.join(repositoryRoot, 'site/src/components/home/HomeHeroGrid.tsx'), 'utf8');
@@ -164,7 +163,7 @@ describe('Learn Content Architecture Contracts', () => {
     expect(contextMenuGuide).toMatch(/demoId:\s*['"]context-menu['"]/);
     expect(contextMenuGuide).toContain('visibleIndex');
     expect(contextMenuGuide).toContain('sourceIndex');
-    expect(contextMenuGuide).toContain("searchOptions.contextMenu = false");
+    expect(contextMenuGuide).toContain('searchOptions.contextMenu = false');
     expect(contextMenuExample).toContain('contextMenuOptions={{');
     expect(contextMenuExample).toContain("type: 'separator'");
     expect(contextMenuExample).toContain("disabled: target.values.status === t('완료', 'Completed')");

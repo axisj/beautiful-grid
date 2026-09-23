@@ -9,23 +9,43 @@ demoId: "editor-plugins"
 features: ["editor-plugin", "defineEditorPlugin", "portal", "commit", "lifecycle"]
 relatedGuides: ["built-in-editors", "editor-plugins-shadcn", "editor-icons", "lookup-editor", "editing-events"]
 relatedApi: ["/en/api/props#columns", "/en/api/props#editable"]
-lastReviewedAt: "2026-08-29"
+lastReviewedAt: "2026-09-22"
 indexable: true
 draft: false
 ---
 
-Connect UI components already used by your application—such as Ant Design Select, DatePicker, ColorPicker, Cascader, TimePicker, and TreeSelect, or an asynchronous autocomplete—with `defineEditorPlugin()`. If you only need text, basic Select, or Date editing, start with [Built-in Editors](/en/learn/built-in-editors).
+Connect Ant Design Select, DatePicker, ColorPicker, Cascader, TimePicker, and TreeSelect with the official `@beautifuljs/grid-antd` integration package. Extend application-specific inputs and asynchronous autocompletes directly with `defineEditorPlugin()`. If you only need text, basic Select, or Date editing, start with [Built-in Editors](/en/learn/built-in-editors).
 
-## Plugin definition
+## Use the official Ant Design package
+
+```sh
+npm install @beautifuljs/grid-antd antd
+```
+
+Import the integration stylesheet once in your application entry point, then use the factories you need.
 
 ```tsx
-function PriorityEditor({
-  value,
-  column,
-  commit,
-  cancel,
-  getPortalContainer,
-}: BGridEditorPluginProps<Task>) {
+import { createAntdSelectEditorPlugin, createAntdDatePickerEditorPlugin } from '@beautifuljs/grid-antd';
+import '@beautifuljs/grid-antd/style.css';
+
+const priorityEditor = createAntdSelectEditorPlugin<Task, Task['priority']>({
+  id: 'task-priority',
+  ariaLabel: 'Edit priority',
+  options: priorityOptions,
+});
+
+const dueDateEditor = createAntdDatePickerEditorPlugin<Task>({
+  id: 'task-due-date',
+  ariaLabel: 'Edit due date',
+});
+```
+
+The package provides all six editor factories and Cascader clipboard conversion helpers. See the live example below for a complete integration.
+
+## Define a custom plugin
+
+```tsx
+function PriorityEditor({ value, column, commit, cancel, getPortalContainer }: BGridEditorPluginProps<Task>) {
   return (
     <Select
       autoFocus
@@ -33,9 +53,7 @@ function PriorityEditor({
       defaultValue={value as Task['priority']}
       getPopupContainer={getPortalContainer}
       options={priorityOptions}
-      onChange={nextValue =>
-        void commit([{ key: column.key, value: nextValue }])
-      }
+      onChange={nextValue => void commit([{ key: column.key, value: nextValue }])}
       onKeyDown={event => {
         if (event.key === 'Escape') cancel();
       }}
@@ -62,10 +80,12 @@ Convert dates to your application's storage format before committing them. For e
   defaultValue={value ? dayjs(String(value)) : null}
   getPopupContainer={getPortalContainer}
   onChange={date =>
-    void commit([{
-      key: column.key,
-      value: date ? date.format('YYYY-MM-DD') : '',
-    }])
+    void commit([
+      {
+        key: column.key,
+        value: date ? date.format('YYYY-MM-DD') : '',
+      },
+    ])
   }
   onOpenChange={open => {
     if (!open) cancel();
@@ -83,10 +103,12 @@ With ColorPicker, use `onChange` only to preview the value while dragging, then 
   getPopupContainer={getPortalContainer}
   onChange={(_color, css) => setPreviewColor(css)}
   onChangeComplete={color =>
-    void commit([{
-      key: column.key,
-      value: color.toHexString().toUpperCase(),
-    }])
+    void commit([
+      {
+        key: column.key,
+        value: color.toHexString().toUpperCase(),
+      },
+    ])
   }
 />
 ```
@@ -137,7 +159,7 @@ Cascader commits the entire selected path as `string[]`, not just the last item.
 />
 ```
 
-All six adapters in the live example inherit the cell's `font`, `color`, and height. If an external UI library specifies its own font size, apply `font: inherit` to the editor root and selected-value element. Also pass `--bgrid-font-family` and `--bgrid-font-size` to the popup so the cell remains visually consistent before and after activation.
+All six adapters in `@beautifuljs/grid-antd` inherit the cell's `font`, `color`, and height. When building a custom adapter for a UI library that specifies its own font size, apply `font: inherit` to the editor root and selected-value element. Also pass `--bgrid-font-family` and `--bgrid-font-size` to the popup so the cell remains visually consistent before and after activation.
 
 ## Convert values for copy and paste
 
@@ -150,9 +172,7 @@ const categoryColumn: BGridColumn<Order> = {
   width: 200,
   editable: true,
   editor: categoryEditor,
-  itemRender: ({ value }) => (
-    <>{Array.isArray(value) ? value.join(' / ') : ''}</>
-  ),
+  itemRender: ({ value }) => <>{Array.isArray(value) ? value.join(' / ') : ''}</>,
   getClipboardText: ({ value }) => JSON.stringify(value),
   parseClipboardText: text => {
     const parsed: unknown = JSON.parse(text);

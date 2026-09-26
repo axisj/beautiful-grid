@@ -75,7 +75,7 @@ export const demoManifest: Record<string, DemoManifestItem> = {
     ],
     minHeight: 500,
   },
-  'editor-plugins': {
+  'editor-plugins-antd': {
     componentFile: 'ExternalEditorPluginExample.tsx',
     sourceFiles: [...withContainerSources('ExternalEditorPluginExample.tsx'), ...editingIconSources],
     minHeight: 500,
@@ -96,6 +96,22 @@ export const demoManifest: Record<string, DemoManifestItem> = {
       'components/ui/popover.tsx',
       'components/ui/utils.ts',
       'beautiful-grid/editors/defineEditorPlugin.ts',
+    ],
+    minHeight: 500,
+  },
+  'editor-plugins-mui': {
+    componentFile: 'ExternalMuiEditorPluginExample.tsx',
+    sourceFiles: [
+      ...withContainerSources('ExternalMuiEditorPluginExample.tsx'),
+      ...editingIconSources,
+    ],
+    minHeight: 500,
+  },
+  'editor-plugins-mantine': {
+    componentFile: 'ExternalMantineEditorPluginExample.tsx',
+    sourceFiles: [
+      ...withContainerSources('ExternalMantineEditorPluginExample.tsx'),
+      ...editingIconSources,
     ],
     minHeight: 500,
   },

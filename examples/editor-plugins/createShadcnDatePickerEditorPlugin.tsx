@@ -196,15 +196,16 @@ export function createShadcnDatePickerEditorPlugin<T>(
                   <button
                     key={dateStr}
                     type="button"
+                    data-selected={isSelected ? 'true' : undefined}
                     onClick={() => handleSelectDate(date)}
-                    className={`flex h-8 w-8 items-center justify-center rounded-md text-xs transition-colors cursor-pointer border-0 bg-transparent ${
+                    className={`bgrid-shadcn-date-item flex h-8 w-8 items-center justify-center rounded-md text-xs transition-colors cursor-pointer border-0 ${
                       isSelected
                         ? 'bg-blue-600 font-bold text-white shadow-sm dark:bg-blue-600 dark:text-white'
                         : isToday
-                        ? 'border border-blue-600 font-bold text-blue-600 dark:border-blue-400 dark:text-blue-400'
+                        ? 'border border-blue-600 font-bold text-blue-600 bg-transparent dark:border-blue-400 dark:text-blue-400'
                         : isCurrentMonth
-                        ? 'font-medium text-slate-800 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
-                        : 'font-normal text-slate-400 opacity-40 hover:bg-slate-50 dark:text-slate-600 dark:hover:bg-slate-900'
+                        ? 'bg-transparent font-medium text-slate-800 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
+                        : 'bg-transparent font-normal text-slate-400 opacity-40 hover:bg-slate-50 dark:text-slate-600 dark:hover:bg-slate-900'
                     }`}
                   >
                     {date.getDate()}

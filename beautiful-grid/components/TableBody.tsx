@@ -232,9 +232,8 @@ function TableBody({
   );
 
   // [Selector Group 5] Display Options - 표시 옵션
-  const { msg, getRowClassName, cellMergeOptions, variant, onClick, sourceIndexByVisibleIndex } = useAppStore(
+  const { getRowClassName, cellMergeOptions, variant, onClick, sourceIndexByVisibleIndex } = useAppStore(
     useShallow(s => ({
-      msg: s.msg,
       getRowClassName: s.getRowClassName,
       cellMergeOptions: s.cellMergeOptions,
       variant: s.variant,
@@ -420,21 +419,7 @@ function TableBody({
           );
         })}
 
-        {endNumber - startIdx < 1 &&
-          (isLeftRegion ? (
-            <NoDataTr itemHeight={itemHeight} itemPadding={itemPadding} />
-          ) : (
-            <NoDataTr itemHeight={itemHeight} itemPadding={itemPadding}>
-              {msg?.emptyList ? (
-                <>
-                  <td className={'bgrid-empty-cell'} colSpan={columns.slice(frozenColumnIndex).length}>
-                    {msg.emptyList}
-                  </td>
-                  <td data-none />
-                </>
-              ) : null}
-            </NoDataTr>
-          ))}
+        {endNumber - startIdx < 1 && <NoDataTr itemHeight={itemHeight} itemPadding={itemPadding} aria-hidden='true' />}
       </tbody>
     </BodyTable>
   );

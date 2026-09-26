@@ -9,7 +9,7 @@ demoId: "built-in-editors"
 features: ["text-editor", "checkbox-editor", "checkbox-header", "select-editor", "date-editor", "parseValue", "formatValue"]
 relatedGuides: ["editing", "editor-icons", "editor-plugins", "editing-events"]
 relatedApi: ["/en/api/props#columns", "/en/api/props#editable"]
-lastReviewedAt: "2026-08-27"
+lastReviewedAt: "2026-09-24"
 indexable: true
 draft: false
 ---
@@ -95,3 +95,9 @@ The standard Date editor activates only the numeric date input when entered thro
 ```
 
 The Grid does not infer an icon from the editor type. Provide an icon that matches your product design system through `editorIcon.render`.
+
+## Use your application's UI library
+
+Choose an official UI integration when you need richer pickers or controls that match the rest of your application. BeautifulGrid provides editor plugins for Ant Design, Shadcn UI, MUI, and Mantine, with popup portals and save and cancel lifecycles already connected.
+
+[Compare official editor plugins and installation options →](/en/plugins)

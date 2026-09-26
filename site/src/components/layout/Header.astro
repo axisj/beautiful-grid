@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import { productFacts } from '../../data/productFacts';
 import { commonMessages, localizePath, normalizeLocale, type Locale } from '../../i18n';
 import { groupLearnArticles, learnPath } from '../learn/learnLocale';
+import { isPluginLearnSlug } from '../plugins/pluginLocale';
 import SitePreferences from './SitePreferences.astro';
 import MobileNavigationDrawer from './MobileNavigationDrawer.astro';
 
@@ -12,19 +13,28 @@ const locale = normalizeLocale(Astro.props.locale);
 const adaptiveLocale = Astro.props.adaptiveLocale ?? false;
 const messages = commonMessages[locale];
 const pathname = Astro.url.pathname;
+const normalizedPathname = pathname.replace(/\/$/, '') || '/';
+const isPluginRoute =
+  normalizedPathname === '/plugins' ||
+  normalizedPathname.startsWith('/plugins/') ||
+  normalizedPathname === '/en/plugins' ||
+  normalizedPathname.startsWith('/en/plugins/');
 const checkActive = (route: string) => {
   if (!route) return false;
   if (route === '/learn') {
     return (
-      pathname === '/learn' ||
-      pathname.startsWith('/learn/') ||
-      pathname === '/en/learn' ||
-      pathname.startsWith('/en/learn/') ||
-      pathname.startsWith('/examples/') ||
-      pathname.startsWith('/demo/') ||
-      pathname.startsWith('/docs/')
+      !isPluginRoute && (
+        pathname === '/learn' ||
+        pathname.startsWith('/learn/') ||
+        pathname === '/en/learn' ||
+        pathname.startsWith('/en/learn/') ||
+        pathname.startsWith('/examples/') ||
+        pathname.startsWith('/demo/') ||
+        pathname.startsWith('/docs/')
+      )
     );
   }
+  if (route === '/plugins') return isPluginRoute;
   if (route === '/api/props') {
     return (
       pathname === '/api/props' ||
@@ -42,6 +52,7 @@ const checkActive = (route: string) => {
 
 const navigation = [
   { label: messages.guideExamples, koLabel: commonMessages.ko.guideExamples, enLabel: commonMessages.en.guideExamples, href: localizePath('/learn', locale), route: '/learn', external: false },
+  { label: messages.plugins, koLabel: commonMessages.ko.plugins, enLabel: commonMessages.en.plugins, href: localizePath('/plugins', locale), route: '/plugins', external: false },
   { label: 'API', koLabel: 'API', enLabel: 'API', href: localizePath('/api/props', locale), route: '/api/props', external: false },
   { label: messages.adoptionGuide, koLabel: commonMessages.ko.adoptionGuide, enLabel: commonMessages.en.adoptionGuide, href: localizePath('/product-facts', locale), route: '/product-facts', external: false },
   { label: messages.openSource, koLabel: commonMessages.ko.openSource, enLabel: commonMessages.en.openSource, href: localizePath('/open-source', locale), route: '/open-source', external: false },
@@ -50,7 +61,8 @@ const navigation = [
 
 const seenDemoIds = new Set<string>();
 const runnableLearn = (await getCollection('learn')).filter((item) => {
-  if (item.data.locale !== locale || item.data.draft || !item.data.demoId || seenDemoIds.has(item.data.demoId)) {
+  const slug = item.id.replace(/^en\//, '').replace(/\.(md|mdx)$/, '');
+  if (item.data.locale !== locale || item.data.draft || isPluginLearnSlug(slug) || !item.data.demoId || seenDemoIds.has(item.data.demoId)) {
     return false;
   }
   seenDemoIds.add(item.data.demoId);

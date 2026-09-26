@@ -48,6 +48,7 @@ describe('site product and navigation contracts', () => {
     const header = readSiteFile('src/components/layout/Header.astro');
 
     expect(header).toContain("href: localizePath('/learn', locale), route: '/learn', external: false");
+    expect(header).toContain("href: localizePath('/plugins', locale), route: '/plugins', external: false");
     expect(header).toContain("href: localizePath('/api/props', locale), route: '/api/props', external: false");
     expect(header).toContain("href: localizePath('/product-facts', locale), route: '/product-facts', external: false");
     expect(header).toContain("href: localizePath('/open-source', locale), route: '/open-source', external: false");
@@ -56,6 +57,38 @@ describe('site product and navigation contracts', () => {
     expect(header).toContain("class:list={['nav-item', { active: isActive }]}");
     expect(header).toContain("aria-current={isActive ? 'page' : undefined}");
     expect(header).toContain('.primary-nav a.active');
+  });
+
+  it('publishes standalone plugin pages and redirects legacy Learn URLs', () => {
+    const config = readSiteFile('astro.config.mjs');
+    const pluginPage = readSiteFile('src/pages/plugins/[slug].astro');
+    const englishPluginPage = readSiteFile('src/pages/en/plugins/[slug].astro');
+    const pluginLayout = readSiteFile('src/layouts/PluginLayout.astro');
+    const learnMarkdownPage = readSiteFile('src/pages/learn/[slug].md.ts');
+    const englishLearnMarkdownPage = readSiteFile('src/pages/en/learn/[slug].md.ts');
+
+    expect(pluginPage).toContain('<PluginArticlePage locale="ko"');
+    expect(englishPluginPage).toContain('<PluginArticlePage locale="en"');
+    expect(pluginLayout).toContain('<PluginSidebar');
+    expect(config).toContain("'/learn/editor-plugins': { status: 301, destination: '/plugins' }");
+    expect(config).toContain("'/en/learn/editor-plugins-mantine': { status: 301, destination: '/en/plugins/mantine' }");
+    expect(config).toContain("'/learn/editor-plugins.md': { status: 301, destination: '/plugins.md' }");
+    expect(config).toContain("'/en/learn/editor-plugins-mantine.md': { status: 301, destination: '/en/plugins/mantine.md' }");
+    expect(learnMarkdownPage).toContain('!isPluginLearnSlug(learnSlug(entry.id))');
+    expect(englishLearnMarkdownPage).toContain('!isPluginLearnSlug(learnSlug(entry.id))');
+  });
+
+  it('deduplicates provider-backed design systems used by root-level demos', () => {
+    const astroConfig = readSiteFile('astro.config.mjs');
+
+    expect(astroConfig).toContain("'@mantine/core'");
+    expect(astroConfig).toContain("'@mantine/dates'");
+    expect(astroConfig).toContain("'@mui/material'");
+    expect(astroConfig).toContain("'@mui/x-date-pickers'");
+    expect(astroConfig).toContain("'@radix-ui/react-popover'");
+    expect(astroConfig).toContain("'@radix-ui/react-select'");
+    expect(astroConfig).toContain("'@radix-ui/react-slot'");
+    expect(astroConfig).toContain("'class-variance-authority'");
   });
 
   it('opens a categorized runnable-example popover from the desktop Learn navigation', () => {
@@ -76,7 +109,7 @@ describe('site product and navigation contracts', () => {
     expect(header).toMatch(/\.learn-nav-menu\.is-open \.learn-nav-popover\s*\{[^}]*visibility:\s*visible;/s);
   });
 
-  it('structures the mobile navigation drawer with 5 primary items, shared Learn catalog, and 1-row bottom controls', () => {
+  it('structures the mobile navigation drawer with 6 primary items, shared Learn catalog, and 1-row bottom controls', () => {
     const drawer = readSiteFile('src/components/layout/MobileNavigationDrawer.astro');
     const header = readSiteFile('src/components/layout/Header.astro');
     const learnLocale = readSiteFile('src/components/learn/learnLocale.ts');
@@ -89,6 +122,7 @@ describe('site product and navigation contracts', () => {
     expect(drawer).toContain('data-drawer-close');
     expect(drawer).toContain('groupLearnArticles(allLearn, locale)');
     expect(drawer).toContain("route: '/learn'");
+    expect(drawer).toContain("route: '/plugins'");
     expect(drawer).toContain("route: '/api/props'");
     expect(drawer).toContain("route: '/product-facts'");
     expect(drawer).toContain("route: '/open-source'");
@@ -351,7 +385,7 @@ describe('site product and navigation contracts', () => {
     const playgroundStyles = readSiteFile('src/components/playground/Playground.css');
 
     expect(demoManifest['dynamic-props']).toBeUndefined();
-    expect(astroConfig).toContain("dedupe: ['react', 'react-dom']");
+    expect(astroConfig).toContain("'react-dom',");
     expect(playground).toContain("import PropsPlayground from './PropsPlayground'");
     expect(playground).toContain('Props & Features');
     expect(playground).toContain('Theme Builder');
@@ -702,7 +736,7 @@ describe('site product and navigation contracts', () => {
     expect(homepage).toContain(').size;');
     expect(homepage).toContain('const featuredExamples = [');
     expect(homepage).toContain("href: '/learn/built-in-editors'");
-    expect(homepage).toContain("href: '/learn/editor-plugins'");
+    expect(homepage).toContain("href: '/plugins'");
     expect(homepage).toContain("href: '/learn/editing-merged-cells'");
     expect(homepage).toContain("href: '/learn/pivot'");
     expect(homepage).toContain("href: '/learn/row-selection'");

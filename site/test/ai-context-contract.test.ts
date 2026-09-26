@@ -31,7 +31,9 @@ describe('AI-readable documentation contract', () => {
     expect(linkLines.length).toBeGreaterThanOrEqual(essentialAiContextLinks.length + taskAiContextLinks.length + exampleAiContextLinks.length);
     expect(linkLines.every(line => /\): \S/.test(line))).toBe(true);
     for (const link of taskAiContextLinks.filter(link => link.url.startsWith('https://bgrid.axisj.com/'))) {
-      const slug = link.url.match(/\/en\/learn\/([^/]+)\.md$/)?.[1];
+      const slug = link.url.endsWith('/en/plugins.md')
+        ? 'editor-plugins'
+        : link.url.match(/\/en\/learn\/([^/]+)\.md$/)?.[1];
       expect(slug && readSiteFile(`src/content/learn/en/${slug}.md`).length).toBeGreaterThan(100);
     }
     for (const link of exampleAiContextLinks) {
@@ -54,6 +56,14 @@ describe('AI-readable documentation contract', () => {
     expect(layout).toContain('rel="describedby"');
     expect(layout).toContain('type="text/markdown"');
     expect(readSiteFile('src/data/learnMarkdown.ts')).toContain("route.endsWith('.md')");
+  });
+
+  it('measures plugin guides from their standalone Markdown routes', () => {
+    const measurementScript = readFileSync(resolve(repositoryRoot, 'scripts/measure-ai-context.mjs'), 'utf8');
+
+    expect(measurementScript).toContain("'editor-plugins-mantine'");
+    expect(measurementScript).toContain("path.join(distRoot, localePrefix, 'plugins.md')");
+    expect(measurementScript).toContain("path.join(distRoot, localePrefix, 'plugins'");
   });
 
   it('publishes a scoped, reproducible homepage measurement instead of an agent-wide savings claim', () => {

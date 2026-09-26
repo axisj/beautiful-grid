@@ -90,11 +90,13 @@ export function createShadcnColorPickerEditorPlugin<T>(
             }}
           >
             <span className="bgrid-shadcn-trigger-label">{selectedColor.toUpperCase()}</span>
-            <span
-              className="bgrid-color-swatch"
-              style={{ backgroundColor: selectedColor }}
-              aria-hidden="true"
-            />
+            <span className="bgrid-shadcn-trigger-icon">
+              <span
+                className="bgrid-color-swatch"
+                style={{ backgroundColor: selectedColor }}
+                aria-hidden="true"
+              />
+            </span>
           </button>
         </PopoverTrigger>
         <PopoverContent

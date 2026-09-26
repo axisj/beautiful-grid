@@ -18,7 +18,7 @@ draft: false
 
 During an API request, show a **semi-transparent loading overlay and spinner** so users do not mistake a blank screen for a frozen application. When a search returns 0 rows, display a clear message such as **"No data found"**. Both are fundamental to a polished user experience.
 
-BeautifulGrid controls loading indicators and empty-state messages with `loading`, `spinning`, and `msg.emptyList`.
+BeautifulGrid controls loading indicators and empty-state messages with `loading`, `spinning`, and `msg.emptyList`. Even with frozen columns, the empty state spans the entire body so the frozen and scrollable regions read as one surface.
 
 ---
 

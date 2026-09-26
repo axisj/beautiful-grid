@@ -161,11 +161,12 @@ export function createShadcnTreeSelectEditorPlugin<T>(
                             <button
                               key={childVal}
                               type="button"
+                              data-selected={isSelected ? 'true' : undefined}
                               onClick={() => handleSelectNode(childVal)}
-                              className={`bgrid-shadcn-tree-item flex h-7 min-h-[28px] w-full items-center justify-between rounded-md px-2.5 text-left text-xs transition-colors cursor-pointer border-0 bg-transparent ${
+                              className={`bgrid-shadcn-tree-item flex h-7 min-h-[28px] w-full items-center justify-between rounded-md px-2.5 text-left text-xs transition-colors cursor-pointer border-0 ${
                                 isSelected
                                   ? 'bg-blue-600 font-medium text-white shadow-sm dark:bg-blue-600 dark:text-white'
-                                  : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100'
+                                  : 'bg-transparent text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100'
                               }`}
                             >
                               <span className="truncate">{child.title}</span>

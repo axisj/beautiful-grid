@@ -92,26 +92,38 @@ describe('BGrid row selection', () => {
   });
 });
 
-describe('BGrid empty state row', () => {
-  it('uses the configured item height and padding', async () => {
+describe('BGrid empty state', () => {
+  it('renders one body-wide message over frozen and scrollable regions', async () => {
     const emptyMessage = 'No rows available';
-    render(
-      <BGrid<{ id: number }>
+    const { container } = render(
+      <BGrid<{ id: number; value: string }>
         width={300}
         height={120}
-        columns={[{ key: 'id', label: 'ID', width: 100 }]}
+        columns={[
+          { key: 'id', label: 'ID', width: 100 },
+          { key: 'value', label: 'Value', width: 300 },
+        ]}
         data={[]}
+        frozenColumnIndex={1}
         itemHeight={30}
         itemPadding={8}
         msg={{ emptyList: emptyMessage }}
       />,
     );
 
-    const emptyRow = (await screen.findByText(emptyMessage)).closest('tr');
+    const emptyState = (await screen.findByText(emptyMessage)).closest('.bgrid-empty-state');
+    const emptyRows = container.querySelectorAll('.bgrid-empty-row');
 
-    expect(emptyRow).not.toBeNull();
-    expect(emptyRow?.style.getPropertyValue('--bgrid-item-line-height')).toBe('30px');
-    expect(emptyRow?.style.getPropertyValue('--bgrid-item-cell-height')).toBe('46px');
+    expect(emptyState?.parentElement).toHaveClass('bgrid-body-viewport');
+    expect(screen.getAllByText(emptyMessage)).toHaveLength(1);
+    expect(container.querySelector('[role="rfdg-body-frozen"]')).not.toHaveTextContent(emptyMessage);
+    expect(container.querySelector('[role="rfdg-body"]')).not.toHaveTextContent(emptyMessage);
+    expect(emptyRows).toHaveLength(2);
+    emptyRows.forEach(emptyRow => {
+      expect(emptyRow).toHaveAttribute('aria-hidden', 'true');
+      expect((emptyRow as HTMLElement).style.getPropertyValue('--bgrid-item-line-height')).toBe('30px');
+      expect((emptyRow as HTMLElement).style.getPropertyValue('--bgrid-item-cell-height')).toBe('46px');
+    });
   });
 
   it('does not render a text node inside the empty row when emptyList is an empty string', async () => {
@@ -135,6 +147,7 @@ describe('BGrid empty state row', () => {
       });
 
       expect(emptyRow.childNodes).toHaveLength(0);
+      expect(container.querySelector('.bgrid-empty-state')).not.toBeInTheDocument();
       expect(
         consoleError.mock.calls.filter(call =>
           call.some(arg => typeof arg === 'string' && arg.includes('cannot be a child of')),

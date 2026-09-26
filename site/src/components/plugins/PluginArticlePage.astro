@@ -1,0 +1,49 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import { localizePath, type Locale } from '../../i18n';
+import PluginLayout from '../../layouts/PluginLayout.astro';
+import LiveDemoIsland from '../learn/LiveDemoIsland.astro';
+import SourceCodePanel from '../learn/SourceCodePanel.astro';
+import RelatedGuides from '../learn/RelatedGuides.astro';
+import { learnMessages, learnSlug } from '../learn/learnLocale';
+import PluginBreadcrumb from './PluginBreadcrumb.astro';
+import PluginPager from './PluginPager.astro';
+import { isPluginLearnSlug } from './pluginLocale';
+
+interface Props { locale: Locale; item: CollectionEntry<'learn'>; }
+const { locale, item } = Astro.props;
+const slug = learnSlug(item.id);
+if (!isPluginLearnSlug(slug)) throw new Error(`Unknown plugin guide: ${slug}`);
+const messages = learnMessages[locale];
+const { Content } = await render(item);
+---
+
+<PluginLayout title={`${item.data.title} | BeautifulGrid Plugins`} description={item.data.description} canonicalPath={localizePath(item.data.canonicalPath, locale)} locale={locale} currentSlug={slug}>
+  <article>
+    <header class="learn-header">
+      <PluginBreadcrumb locale={locale} title={item.data.title} />
+      <h1>{item.data.title}</h1>
+      <p class="learn-header-desc">{item.data.description}</p>
+      <div class="learn-meta-bar">
+        <div class="learn-tags">{item.data.features.map(feature => <span class="badge">#{feature}</span>)}</div>
+        <span>{messages.reviewedAt}: {item.data.lastReviewedAt}</span>
+        {item.data.relatedApi.length > 0 && (
+          <div class="learn-related-api">
+            <span style="color: var(--site-text-muted);">{messages.relatedApi}:</span>
+            {item.data.relatedApi.map(apiPath => <a href={localizePath(apiPath, locale)} style="font-family: var(--site-font-mono); font-size: .8125rem;">{apiPath.split('#')[1] || 'API'}</a>)}
+          </div>
+        )}
+      </div>
+    </header>
+
+    {item.data.demoId && (
+      <section aria-label={messages.liveDemoSection} data-plugin-live-demo={slug}>
+        <LiveDemoIsland locale={locale} demoId={item.data.demoId} slug={slug} title={item.data.title} />
+      </section>
+    )}
+    {item.data.demoId && <section aria-label={messages.sourceSection}><SourceCodePanel locale={locale} demoId={item.data.demoId} /></section>}
+    <div class="learn-content"><Content /></div>
+    <RelatedGuides locale={locale} relatedSlugs={item.data.relatedGuides} />
+    <PluginPager locale={locale} currentSlug={slug} />
+  </article>
+</PluginLayout>

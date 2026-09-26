@@ -50,7 +50,7 @@ export const taskAiContextLinks: AiContextLink[] = [
   ['Data and columns', 'data-and-columns', 'Shape wrapped row data, define columns, use nested keys, and keep row identity stable.'],
   ['Cell editing', 'editing', 'Implement edit transactions, validation, immutable row updates, and post-save movement.'],
   ['Built-in editors', 'built-in-editors', 'Configure text and checkbox editors, header selection, value mapping, and accessibility labels.'],
-  ['Editor plugins', 'editor-plugins', 'Connect custom or third-party editors with commit, cancel, movement, and portal contracts.'],
+  ['Editor plugins', 'editor-plugins', 'Choose the official Ant Design, Shadcn UI, MUI, or Mantine integration and follow the shared commit, cancel, and portal contracts.'],
   ['Sorting and filtering', 'sorting-filtering', 'Control multi-sort, value/text/number filters, and server-side query state.'],
   ['Column visibility', 'column-visibility', 'Hide, restore, and persist columns through controlled or uncontrolled visibility state.'],
   ['Search', 'search', 'Configure grid search, controlled state, keyboard shortcuts, result navigation, and labels.'],
@@ -64,7 +64,7 @@ export const taskAiContextLinks: AiContextLink[] = [
   ['Theming', 'theming', 'Apply CSS variables, scope themes, style changed cells, and theme portal-based UI.'],
 ].map(([title, slug, description]) => ({
   title,
-  url: `${siteUrl}/en/learn/${slug}.md`,
+  url: slug === 'editor-plugins' ? `${siteUrl}/en/plugins.md` : `${siteUrl}/en/learn/${slug}.md`,
   description,
 })).concat({
   title: 'Cell selection and clipboard',

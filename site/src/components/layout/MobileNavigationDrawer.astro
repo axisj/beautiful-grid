@@ -17,11 +17,18 @@ const adaptiveLocale = Astro.props.adaptiveLocale ?? false;
 const messages = commonMessages[locale];
 
 const pathname = Astro.url.pathname;
-const isLearnRoute =
+const normalizedPathname = pathname.replace(/\/$/, '') || '/';
+const isPluginRoute =
+  normalizedPathname === '/plugins' ||
+  normalizedPathname.startsWith('/plugins/') ||
+  normalizedPathname === '/en/plugins' ||
+  normalizedPathname.startsWith('/en/plugins/');
+const isLearnRoute = !isPluginRoute && (
   pathname === '/learn' ||
   pathname.startsWith('/learn/') ||
   pathname === '/en/learn' ||
-  pathname.startsWith('/en/learn/');
+  pathname.startsWith('/en/learn/')
+);
 
 // Slug computation
 let currentSlug = Astro.props.currentSlug;
@@ -43,6 +50,15 @@ const navItems = [
     href: localizePath('/learn', locale),
     route: '/learn',
     isLearn: true,
+    external: false,
+  },
+  {
+    label: messages.plugins,
+    koLabel: commonMessages.ko.plugins,
+    enLabel: commonMessages.en.plugins,
+    href: localizePath('/plugins', locale),
+    route: '/plugins',
+    isLearn: false,
     external: false,
   },
   {
@@ -89,6 +105,7 @@ const checkActive = (route: string) => {
   if (route === '/learn') {
     return isLearnRoute;
   }
+  if (route === '/plugins') return isPluginRoute;
   if (route === '/product-facts') {
     return pathname === localizePath('/product-facts', locale) || pathname === localizePath('/performance', locale);
   }

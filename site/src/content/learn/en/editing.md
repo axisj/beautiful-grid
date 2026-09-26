@@ -182,7 +182,7 @@ The index in `scrollToRow(rowIndex, { align })` is a **zero-based index in the d
 | Goal | Next guide |
 | --- | --- |
 | Use text, Select, and Date editors | [Built-in Editors](/en/learn/built-in-editors) |
-| Integrate Ant Design or another external UI library | [External Editor Plugins](/en/learn/editor-plugins) |
+| Integrate Ant Design or another external UI library | [External Editor Plugins](/en/plugins) |
 | Show dropdown or search icons in idle cells | [Editor Icons](/en/learn/editor-icons) |
 | Combine autocomplete input with a lookup modal | [Lookup Editor](/en/learn/lookup-editor) |
 | Validate changes and update related cells | [Editing Events and Transactions](/en/learn/editing-events) |

@@ -31,24 +31,75 @@ describe('Learn Content Architecture Contracts', () => {
     expect(gettingStartedGuide).not.toContain('주문 출고 예외 관리');
   });
 
-  it('documents cell editing and external editor plugins as distinct linked guides', () => {
+  it('routes built-in editor readers through the official plugin hub', () => {
     const editingGuide = fs.readFileSync(path.join(learnDir, 'editing.md'), 'utf8');
-    const pluginGuide = fs.readFileSync(path.join(learnDir, 'editor-plugins.md'), 'utf8');
+    const builtInGuide = fs.readFileSync(path.join(learnDir, 'built-in-editors.md'), 'utf8');
+    const pluginHub = fs.readFileSync(path.join(learnDir, 'editor-plugins.md'), 'utf8');
+    const antdGuide = fs.readFileSync(path.join(learnDir, 'editor-plugins-antd.md'), 'utf8');
 
     expect(editingGuide).toContain('title: "셀 편집 시작하기 (Cell Editing)"');
     expect(editingGuide).toContain('demoId: "editing"');
-    expect(editingGuide).toContain('](/learn/editor-plugins)');
-    expect(pluginGuide).toContain('title: "외부 에디터 플러그인 (AntD) (Editor Plugins (AntD))"');
-    expect(pluginGuide).toContain('demoId: "editor-plugins"');
-    expect(pluginGuide).toContain('defineEditorPlugin');
-    expect(pluginGuide).toContain('getPortalContainer');
-    expect(pluginGuide).toContain('](/learn/built-in-editors)');
+    expect(editingGuide).toContain('](/plugins)');
+    expect(builtInGuide).toContain('](/plugins)');
+    expect(pluginHub).toContain('title: "에디터 플러그인 개요 (Editor Plugins Overview)"');
+    expect(pluginHub).toContain('canonicalPath: "/plugins"');
+    expect(pluginHub).not.toMatch(/^demoId:/m);
+    expect(pluginHub).toContain('](/plugins/antd)');
+    expect(pluginHub).toContain('](/plugins/shadcn)');
+    expect(pluginHub).toContain('](/plugins/mui)');
+    expect(pluginHub).toContain('](/plugins/mantine)');
+    expect(pluginHub).toContain('](/plugins/custom)');
+    expect(antdGuide).toContain('demoId: "editor-plugins-antd"');
+    expect(antdGuide).toContain('defineEditorPlugin');
+    expect(antdGuide).toContain('getPortalContainer');
+  });
+
+  it('separates plugin routes and navigation from the Learn catalog', () => {
+    const pluginLayout = fs.readFileSync(path.join(repositoryRoot, 'site/src/layouts/PluginLayout.astro'), 'utf8');
+    const pluginSidebar = fs.readFileSync(path.join(repositoryRoot, 'site/src/components/plugins/PluginSidebar.astro'), 'utf8');
+    const pluginRoutes = fs.readFileSync(path.join(repositoryRoot, 'site/src/components/plugins/pluginLocale.ts'), 'utf8');
+    const learnLocale = fs.readFileSync(path.join(repositoryRoot, 'site/src/components/learn/learnLocale.ts'), 'utf8');
+
+    expect(pluginLayout).toContain('<PluginSidebar');
+    expect(pluginLayout).not.toContain('<LearnSidebar');
+    expect(pluginSidebar).toContain('data-plugin-sidebar');
+    expect(pluginRoutes).toContain("localizePath(routeSlug ? `/plugins/${routeSlug}` : '/plugins', locale)");
+    expect(learnLocale).toContain('!isPluginLearnSlug(learnSlug(item.id))');
+  });
+
+  it('renders a matching live demo before source code on every localized plugin detail page', () => {
+    const pluginArticle = fs.readFileSync(
+      path.join(repositoryRoot, 'site/src/components/plugins/PluginArticlePage.astro'),
+      'utf8',
+    );
+    const liveDemoIsland = fs.readFileSync(
+      path.join(repositoryRoot, 'site/src/components/learn/LiveDemoIsland.astro'),
+      'utf8',
+    );
+    const pluginSlugs = ['antd', 'shadcn', 'mui', 'mantine'];
+
+    for (const slug of pluginSlugs) {
+      for (const localePrefix of ['', 'en/']) {
+        const guide = fs.readFileSync(
+          path.join(learnDir, `${localePrefix}editor-plugins-${slug}.md`),
+          'utf8',
+        );
+        expect(guide).toContain(`demoId: "editor-plugins-${slug}"`);
+      }
+      expect(demoManifest[`editor-plugins-${slug}`]).toBeDefined();
+    }
+
+    expect(pluginArticle).toContain('data-plugin-live-demo={slug}');
+    expect(pluginArticle.indexOf('<LiveDemoIsland')).toBeLessThan(pluginArticle.indexOf('<SourceCodePanel'));
+    expect(liveDemoIsland).toContain('client:only="react"');
+    expect(liveDemoIsland).toContain('slot="fallback"');
+    expect(liveDemoIsland).toContain('messages.demoLoading');
   });
 
   it('documents clipboard value conversion for plugin editors in both locales', () => {
     const guides = [
-      'editor-plugins.md',
-      'en/editor-plugins.md',
+      'editor-plugins-antd.md',
+      'en/editor-plugins-antd.md',
       'editor-plugins-shadcn.md',
       'en/editor-plugins-shadcn.md',
     ].map(file => fs.readFileSync(path.join(learnDir, file), 'utf8'));
@@ -66,8 +117,49 @@ describe('Learn Content Architecture Contracts', () => {
     expect(antdExample).toContain("from '@beautifuljs/grid-antd'");
     expect(antdExample).toContain('parseClipboardText: parseCascaderClipboardText');
     expect(shadcnExample).toContain('parseClipboardText: parseCascaderClipboardText');
-    expect(demoManifest['editor-plugins'].sourceFiles).not.toContain('examples/editor-plugins/cascaderValue.ts');
+    expect(demoManifest['editor-plugins-antd'].sourceFiles).not.toContain('examples/editor-plugins/cascaderValue.ts');
     expect(demoManifest['editor-plugins-shadcn'].sourceFiles).toContain('examples/editor-plugins/cascaderValue.ts');
+  });
+
+  it('documents and demonstrates the official MUI and Mantine packages with their exact supported scope', () => {
+    const integrations = [
+      {
+        slug: 'mui',
+        packageName: '@beautifuljs/grid-mui',
+        example: 'ExternalMuiEditorPluginExample.tsx',
+        factoryPrefix: 'Mui',
+      },
+      {
+        slug: 'mantine',
+        packageName: '@beautifuljs/grid-mantine',
+        example: 'ExternalMantineEditorPluginExample.tsx',
+        factoryPrefix: 'Mantine',
+      },
+    ];
+
+    integrations.forEach(({ slug, packageName, example, factoryPrefix }) => {
+      const guides = [
+        fs.readFileSync(path.join(learnDir, `editor-plugins-${slug}.md`), 'utf8'),
+        fs.readFileSync(path.join(learnDir, `en/editor-plugins-${slug}.md`), 'utf8'),
+      ];
+      const source = fs.readFileSync(path.join(examplesDir, example), 'utf8');
+
+      guides.forEach(guide => {
+        expect(guide).toContain(packageName);
+        for (const editor of ['Select', 'DatePicker', 'ColorPicker', 'TimePicker']) {
+          expect(guide).toContain(editor);
+        }
+        expect(guide).toContain('Cascader');
+        expect(guide).toContain('TreeSelect');
+      });
+      expect(source).toContain(`from '${packageName}'`);
+      for (const editor of ['Select', 'DatePicker', 'ColorPicker', 'TimePicker']) {
+        expect(source).toContain(`create${factoryPrefix}${editor}EditorPlugin`);
+      }
+      expect(source).not.toContain(`create${factoryPrefix}CascaderEditorPlugin`);
+      expect(source).not.toContain(`create${factoryPrefix}TreeSelectEditorPlugin`);
+      expect(demoManifest[`editor-plugins-${slug}`].componentFile).toBe(example);
+    });
   });
 
   it('documents merged clipboard atomicity and unsupported payload handling in both locales', () => {
@@ -226,7 +318,16 @@ describe('Learn Content Architecture Contracts', () => {
       );
 
       // 4. canonicalPath check
-      expect(fmText).toMatch(new RegExp(`canonicalPath:\\s*["']/learn/${slug}["']`));
+      const pluginCanonicalPaths: Record<string, string> = {
+        'editor-plugins': '/plugins',
+        'editor-plugins-custom': '/plugins/custom',
+        'editor-plugins-antd': '/plugins/antd',
+        'editor-plugins-shadcn': '/plugins/shadcn',
+        'editor-plugins-mui': '/plugins/mui',
+        'editor-plugins-mantine': '/plugins/mantine',
+      };
+      const canonicalPath = pluginCanonicalPaths[slug] || `/learn/${slug}`;
+      expect(fmText).toMatch(new RegExp(`canonicalPath:\\s*["']${canonicalPath}["']`));
 
       // 5. lastReviewedAt format (YYYY-MM-DD)
       expect(fmText).toMatch(/lastReviewedAt:\s*["']\d{4}-\d{2}-\d{2}["']/);

@@ -1,6 +1,7 @@
 import React from 'react';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { MantineProvider } from '@mantine/core';
 
 type ExampleModule = { default: React.ComponentType };
 
@@ -9,6 +10,8 @@ const editingExamples: Array<[string, () => Promise<ExampleModule>]> = [
   ['built-in editors', () => import('../examples/BuiltInEditorsExample')],
   ['external editor plugin', () => import('../examples/ExternalEditorPluginExample')],
   ['external shadcn editor plugin', () => import('../examples/ExternalShadcnEditorPluginExample')],
+  ['external MUI editor plugin', () => import('../examples/ExternalMuiEditorPluginExample')],
+  ['external Mantine editor plugin', () => import('../examples/ExternalMantineEditorPluginExample')],
   ['editor icons', () => import('../examples/EditorIconExample')],
   ['lookup editor', () => import('../examples/LookupEditorExample')],
   ['editing events', () => import('../examples/EditingEventsExample')],
@@ -17,7 +20,11 @@ const editingExamples: Array<[string, () => Promise<ExampleModule>]> = [
 
 async function renderExample(load: () => Promise<ExampleModule>) {
   const { default: Example } = await load();
-  const result = render(<Example />);
+  const result = render(
+    <MantineProvider>
+      <Example />
+    </MantineProvider>,
+  );
 
   await waitFor(() => {
     expect(result.container.querySelector("[role='grid']")).toBeInTheDocument();
@@ -129,6 +136,33 @@ describe('demo examples render intended grid features', () => {
       expect(container.querySelector('.bgrid-antd-color-editor')).toBeInTheDocument();
     });
   });
+
+  it.each([
+    ['MUI', () => import('../examples/ExternalMuiEditorPluginExample'), 'mui'],
+    ['Mantine', () => import('../examples/ExternalMantineEditorPluginExample'), 'mantine'],
+  ])('opens all four supported %s plugin editors', async (name, load, classPrefix) => {
+    const editors = [
+      [1, `${name} 주문 상태 선택`, `.bgrid-${classPrefix}-select-editor`],
+      [2, `${name} 납기일 선택`, `.bgrid-${classPrefix}-date-editor`],
+      [3, `${name} 라벨 색상 선택`, `.bgrid-${classPrefix}-color-editor`],
+      [4, `${name} 배송 시간 선택`, `.bgrid-${classPrefix}-time-editor`],
+    ] as const;
+
+    for (const [columnIndex, ariaLabel, editorSelector] of editors) {
+      const { container } = await renderExample(load);
+      const cell = container.querySelector(
+        `td[data-row-index="0"][data-column-index="${columnIndex}"]`,
+      ) as HTMLElement;
+
+      fireEvent.doubleClick(cell);
+      await waitFor(() => {
+        const editor = container.querySelector(editorSelector);
+        expect(editor).toBeInTheDocument();
+        expect(editor?.matches(`[aria-label="${ariaLabel}"]`) || editor?.querySelector(`[aria-label="${ariaLabel}"]`)).toBeTruthy();
+      });
+      cleanup();
+    }
+  }, 20_000);
 
   it.each([
     [2, 'Shadcn UI 주문 상태 선택'],
@@ -551,9 +585,15 @@ describe('demo examples render intended grid features', () => {
     expect(getByText('그리드 처리 시작')).toBeInTheDocument();
     expect(container).toHaveTextContent('SKU-00001');
     expect(container).toHaveTextContent('프리미엄 무선 키보드');
+    expect(container.querySelector('[role="rfdg-frozen-header"]')).toBeInTheDocument();
 
     fireEvent.click(getByText('빈 검색 결과'));
-    await waitFor(() => expect(container).toHaveTextContent('조회 조건에 일치하는 상품이 없습니다.'));
+    await waitFor(() => {
+      expect(container.querySelector('.bgrid-empty-state')).toHaveTextContent('조회 조건에 일치하는 상품이 없습니다.');
+      expect(container.querySelector('[role="rfdg-body-frozen"]')).not.toHaveTextContent(
+        '조회 조건에 일치하는 상품이 없습니다.',
+      );
+    });
 
     fireEvent.click(getByText('상품 데이터 복원'));
     await waitFor(() => expect(container).toHaveTextContent('SKU-00001'));

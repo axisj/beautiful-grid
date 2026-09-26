@@ -236,7 +236,7 @@ function Table<T>(props: Props<T>) {
   );
 
   // [Selector Group 5] State - 상태
-  const { rowChecked, page, loading, spinning, disabled, showLineNumber, summary, scrollbar, status, pagination } =
+  const { rowChecked, page, loading, spinning, disabled, showLineNumber, summary, scrollbar, status, pagination, msg } =
     useAppStore(
       useShallow(s => ({
         rowChecked: s.rowChecked,
@@ -249,6 +249,7 @@ function Table<T>(props: Props<T>) {
         scrollbar: s.scrollbar,
         status: s.status,
         pagination: s.pagination,
+        msg: s.msg,
       })),
     );
 
@@ -3172,6 +3173,11 @@ function Table<T>(props: Props<T>) {
           style={{ top: stickyTopHeight, height: contentBodyHeight }}
           data-last={!page ? 'true' : undefined}
         >
+          {data.length === 0 && msg?.emptyList ? (
+            <div className='bgrid-empty-state' role='status'>
+              {msg.emptyList}
+            </div>
+          ) : null}
           {rowReorderController.preview?.visible && (
             <div
               className='bgrid-row-reorder-preview'

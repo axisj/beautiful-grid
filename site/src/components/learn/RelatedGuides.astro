@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import type { Locale } from '../../i18n';
 import { categoryLabel, learnMessages, learnPath, learnSlug } from './learnLocale';
+import { isPluginLearnSlug, pluginMessages, pluginPath } from '../plugins/pluginLocale';
 
 interface Props {
   locale: Locale;
@@ -27,9 +28,10 @@ const relatedItems = allLearn.filter(item => {
     <div class="related-cards-grid">
       {relatedItems.map(item => {
         const slug = learnSlug(item.id);
+        const pluginGuide = isPluginLearnSlug(slug);
         return (
-          <a href={learnPath(slug, locale)} class="card related-card">
-            <div class="related-card-badge">{categoryLabel(item.data.category, locale)}</div>
+          <a href={pluginGuide ? pluginPath(slug, locale) : learnPath(slug, locale)} class="card related-card">
+            <div class="related-card-badge">{pluginGuide ? pluginMessages[locale].sectionTitle : categoryLabel(item.data.category, locale)}</div>
             <h3 class="related-card-title">{item.data.title}</h3>
             <p class="related-card-desc">{item.data.description}</p>
             <div class="related-card-footer">

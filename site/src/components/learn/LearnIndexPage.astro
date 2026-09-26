@@ -23,6 +23,7 @@ import {
   learnPath,
   learnSlug,
 } from './learnLocale';
+import { isPluginLearnSlug } from '../plugins/pluginLocale';
 
 interface Props {
   locale: Locale;
@@ -32,7 +33,7 @@ interface Props {
 const { locale, items } = Astro.props;
 const messages = learnMessages[locale];
 const visibleItems = items
-  .filter(item => item.data.locale === locale && !item.data.draft)
+  .filter(item => item.data.locale === locale && !item.data.draft && !isPluginLearnSlug(learnSlug(item.id)))
   .sort((a, b) => a.data.order - b.data.order);
 
 const pageCopy = locale === 'en'

@@ -1,0 +1,54 @@
+---
+import { getCollection } from 'astro:content';
+import type { Locale } from '../../i18n';
+import { learnSlug, splitLocalizedTitle } from '../learn/learnLocale';
+import { isPluginLearnSlug, pluginLearnSlugs, pluginMessages, pluginPath } from './pluginLocale';
+
+interface Props {
+  locale: Locale;
+  currentSlug: string;
+}
+
+const { locale, currentSlug } = Astro.props;
+const messages = pluginMessages[locale];
+const allLearn = await getCollection('learn');
+const entries = pluginLearnSlugs.flatMap(slug => {
+  const item = allLearn.find(entry => entry.data.locale === locale && learnSlug(entry.id) === slug && !entry.data.draft);
+  return item ? [{ item, slug }] : [];
+});
+---
+
+<nav aria-label={messages.navigation} class="plugin-sidebar" data-plugin-sidebar>
+  <div class="plugin-sidebar-title">{messages.sectionTitle}</div>
+  <ul>
+    {entries.map(({ item, slug }) => {
+      if (!isPluginLearnSlug(slug)) return null;
+      const title = locale === 'ko' ? splitLocalizedTitle(item.data.title) : { korean: '', english: item.data.title };
+      const isCurrent = currentSlug === slug;
+      return (
+        <li>
+          <a
+            href={pluginPath(slug, locale)}
+            class:list={['plugin-sidebar-link', { active: isCurrent }]}
+            aria-current={isCurrent ? 'page' : undefined}
+          >
+            <span class="plugin-sidebar-title-en" lang="en">{title.english || item.data.title}</span>
+            {title.korean && <span class="plugin-sidebar-title-ko" lang="ko">{title.korean}</span>}
+          </a>
+        </li>
+      );
+    })}
+  </ul>
+</nav>
+
+<style>
+  .plugin-sidebar { position: sticky; top: calc(var(--site-header-offset, 68px) + .75rem); padding-right: .75rem; }
+  .plugin-sidebar-title { margin-bottom: 1rem; padding: 0 .625rem 1rem; border-bottom: 1px solid var(--site-border); color: var(--site-text-primary); font-size: .9375rem; font-weight: 800; }
+  ul { display: flex; flex-direction: column; gap: .25rem; margin: 0; padding: 0; list-style: none; }
+  .plugin-sidebar-link { display: flex; flex-direction: column; gap: .125rem; padding: .625rem; border-radius: var(--site-radius-sm, 6px); color: var(--site-text-secondary); line-height: 1.35; text-decoration: none; transition: color .15s ease, background-color .15s ease; }
+  .plugin-sidebar-link:hover { background: var(--site-surface, #f7f9fc); color: var(--site-text-primary); text-decoration: none; }
+  .plugin-sidebar-link.active { background: rgba(37, 99, 235, .08); color: var(--site-accent, #2563eb); }
+  .plugin-sidebar-title-en { color: inherit; font-size: .875rem; font-weight: 700; }
+  .plugin-sidebar-title-ko { color: var(--site-text-muted); font-size: .8125rem; font-weight: 500; word-break: keep-all; }
+  .plugin-sidebar-link.active .plugin-sidebar-title-ko { color: var(--site-accent, #2563eb); }
+</style>

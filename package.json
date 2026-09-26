@@ -47,7 +47,7 @@
     "access": "public"
   },
   "engines": {
-    "node": "22.x"
+    "node": "24.x"
   },
   "volta": {
     "node": "24.16.0"
@@ -112,6 +112,14 @@
   },
   "devDependencies": {
     "@beautifuljs/grid-antd": "^0.1.0",
+    "@beautifuljs/grid-mantine": "^0.1.1",
+    "@beautifuljs/grid-mui": "^0.1.1",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mantine/core": "^9.6.2",
+    "@mantine/dates": "^9.6.2",
+    "@mui/material": "^9.4.0",
+    "@mui/x-date-pickers": "^9.14.0",
     "@playwright/test": "^1.54.2",
     "@radix-ui/react-popover": "^1.1.23",
     "@radix-ui/react-select": "^2.3.7",

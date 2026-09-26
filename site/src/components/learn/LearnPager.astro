@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import { localeFromPath, type Locale } from '../../i18n';
 import { learnCategoryOrder, learnMessages, learnPath, learnSlug } from './learnLocale';
+import { isPluginLearnSlug } from '../plugins/pluginLocale';
 
 interface Props {
   locale?: Locale;
@@ -14,7 +15,7 @@ const messages = learnMessages[locale];
 const allLearn = await getCollection('learn');
 
 const sorted = allLearn
-  .filter(item => item.data.locale === locale && !item.data.draft)
+  .filter(item => item.data.locale === locale && !item.data.draft && !isPluginLearnSlug(learnSlug(item.id)))
   .sort((a, b) => {
     const catA = learnCategoryOrder.indexOf(a.data.category);
     const catB = learnCategoryOrder.indexOf(b.data.category);

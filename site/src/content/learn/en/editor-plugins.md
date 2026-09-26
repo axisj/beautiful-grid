@@ -1,230 +1,95 @@
 ---
-title: "External Editor Plugins (AntD)"
-description: "Connect Ant Design or application-specific inputs as editor plugins and manage popup portals, multi-value commits, and the editor lifecycle."
+title: "Editor Plugins Overview"
+description: "Compare the official Ant Design, Shadcn UI, MUI, and Mantine integrations and open the installation and usage guide that matches your project."
 category: "interaction"
 order: 3
 locale: "en"
-canonicalPath: "/en/learn/editor-plugins"
-demoId: "editor-plugins"
-features: ["editor-plugin", "defineEditorPlugin", "portal", "commit", "lifecycle"]
-relatedGuides: ["built-in-editors", "editor-plugins-shadcn", "editor-icons", "lookup-editor", "editing-events"]
-relatedApi: ["/en/api/props#columns", "/en/api/props#editable"]
-lastReviewedAt: "2026-09-22"
+canonicalPath: "/en/plugins"
+features: ["editor-plugin", "defineEditorPlugin", "custom-plugin", "antd", "shadcn-ui", "mui", "mantine", "portal"]
+relatedGuides: ["editor-plugins-custom", "built-in-editors", "editor-plugins-antd", "editor-plugins-shadcn", "editor-plugins-mui", "editor-plugins-mantine"]
+relatedApi: ["/api/props#columns", "/api/props#editable"]
+lastReviewedAt: "2026-09-26"
 indexable: true
 draft: false
 ---
 
-Connect Ant Design Select, DatePicker, ColorPicker, Cascader, TimePicker, and TreeSelect with the official `@beautifuljs/grid-antd` integration package. Extend application-specific inputs and asynchronous autocompletes directly with `defineEditorPlugin()`. If you only need text, basic Select, or Date editing, start with [Built-in Editors](/en/learn/built-in-editors).
+BeautifulGrid's official editor plugins connect input components from external UI libraries to the Grid editing lifecycle. Each integration renders popups through `getPortalContainer()`, saves selections through `commit(changes[])`, and handles cancellation and focus restoration consistently.
 
-## Use the official Ant Design package
+If text, basic Select, Date, and checkbox editors are enough, start with [Built-in Editors](/en/learn/built-in-editors) and avoid adding another UI dependency. When internal design systems or custom asynchronous inputs are required, author custom plugins directly by following the [Custom Plugin Guide](/en/plugins/custom).
 
-```sh
-npm install @beautifuljs/grid-antd antd
-```
+## Choose an integration
 
-Import the integration stylesheet once in your application entry point, then use the factories you need.
+| Integration | Distribution | Supported editors | Guide |
+| --- | --- | --- | --- |
+| Custom Plugins | Built with `defineEditorPlugin()` | In-house design systems, async autocomplete, modal lookups, any custom UI | [Custom Plugin Guide](/en/plugins/custom) |
+| Ant Design | `@beautifuljs/grid-antd` npm package | Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect | [Ant Design plugin](/en/plugins/antd) |
+| Shadcn UI | Official Registry source | Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect | [Shadcn UI plugin](/en/plugins/shadcn) |
+| MUI | `@beautifuljs/grid-mui` npm package | Select, DatePicker, ColorPicker, TimePicker | [MUI plugin](/en/plugins/mui) |
+| Mantine | `@beautifuljs/grid-mantine` npm package | Select, DatePicker, ColorPicker, TimePicker | [Mantine plugin](/en/plugins/mantine) |
 
-```tsx
-import { createAntdSelectEditorPlugin, createAntdDatePickerEditorPlugin } from '@beautifuljs/grid-antd';
-import '@beautifuljs/grid-antd/style.css';
+MUI and Mantine do not provide direct equivalents for Cascader and TreeSelect, so those editor families are intentionally outside their integration scope. Use the Ant Design or Shadcn UI integration, or follow the [Custom Plugin Guide](/en/plugins/custom) to author an application-specific plugin when needed.
 
-const priorityEditor = createAntdSelectEditorPlugin<Task, Task['priority']>({
-  id: 'task-priority',
-  ariaLabel: 'Edit priority',
-  options: priorityOptions,
-});
+## Shared setup flow
 
-const dueDateEditor = createAntdDatePickerEditorPlugin<Task>({
-  id: 'task-due-date',
-  ariaLabel: 'Edit due date',
-});
-```
-
-The package provides all six editor factories and Cascader clipboard conversion helpers. See the live example below for a complete integration.
-
-## Define a custom plugin
+1. Install BeautifulGrid, your UI library, and the corresponding official plugin.
+2. Import the UI library and plugin styles once from the application entry point.
+3. Create editor configurations with the required `create...EditorPlugin()` factories.
+4. Assign each configuration to an `editable: true` column's `editor`.
 
 ```tsx
-function PriorityEditor({ value, column, commit, cancel, getPortalContainer }: BGridEditorPluginProps<Task>) {
+const statusEditor = createLibrarySelectEditorPlugin<Order, Order['status']>({
+  id: 'order-status',
+  ariaLabel: 'Select order status',
+  options: statusOptions,
+});
+
+const columns: BGridColumn<Order>[] = [
+  { key: 'status', label: 'Status', editable: true, editor: statusEditor },
+];
+```
+
+Factory names and Provider and stylesheet requirements vary by library. Open the matching guide above for exact installation commands, Provider setup, a runnable editing example, and the supported editor scope.
+
+## Application-specific inputs: Custom Plugin Guide
+
+Connect internal design system components, asynchronous remote autocompletes, or modal search dialogs with `defineEditorPlugin()`.
+
+```tsx
+import { defineEditorPlugin } from 'beautiful-grid/editors';
+import type { BGridEditorPluginProps } from 'beautiful-grid';
+
+function InHouseStatusEditor({
+  value,
+  column,
+  commit,
+  cancel,
+  getPortalContainer,
+}: BGridEditorPluginProps<Order>) {
   return (
-    <Select
+    <MyDesignSystemSelect
       autoFocus
-      open
-      defaultValue={value as Task['priority']}
-      getPopupContainer={getPortalContainer}
-      options={priorityOptions}
-      onChange={nextValue => void commit([{ key: column.key, value: nextValue }])}
-      onKeyDown={event => {
-        if (event.key === 'Escape') cancel();
+      defaultValue={value}
+      portalContainer={getPortalContainer()}
+      onChange={next => void commit([{ key: column.key, value: next }])}
+      onKeyDown={e => {
+        if (e.key === 'Escape') cancel();
       }}
     />
   );
 }
 
-const priorityEditor = defineEditorPlugin<Task>({
-  id: 'task-priority',
-  component: PriorityEditor,
+export const inHouseStatusPlugin = defineEditorPlugin<Order>({
+  id: 'inhouse-order-status',
+  component: InHouseStatusEditor,
+  getClipboardText: ({ value }) => String(value ?? ''),
+  parseClipboardText: text => text.trim(),
 });
 ```
 
-Pass even a single value to `commit` as a change array of length `1`. A cell value can itself be an array, so the API deliberately avoids an ambiguous `commit(value)` form.
+### Three Core Rules for Custom Plugins
 
-## Connect DatePicker and ColorPicker
+- **Always use `getPortalContainer()`**: Render dropdowns and popups in the container returned by `getPortalContainer()` to synchronize with Grid virtual scrolling and click-outside listeners.
+- **Single terminal action**: Call either `commit()` or `cancel()` exactly once, and guard against duplicate calls during unmount.
+- **Clipboard support**: Provide `getClipboardText` and `parseClipboardText` to handle copying and multi-cell paste validation cleanly.
 
-Convert dates to your application's storage format before committing them. For example, if you store a `dayjs` value as a `YYYY-MM-DD` string, connect the picker as follows.
-
-```tsx
-<DatePicker
-  autoFocus
-  open
-  defaultValue={value ? dayjs(String(value)) : null}
-  getPopupContainer={getPortalContainer}
-  onChange={date =>
-    void commit([
-      {
-        key: column.key,
-        value: date ? date.format('YYYY-MM-DD') : '',
-      },
-    ])
-  }
-  onOpenChange={open => {
-    if (!open) cancel();
-  }}
-/>
-```
-
-With ColorPicker, use `onChange` only to preview the value while dragging, then save the final color from `onChangeComplete` when the interaction ends.
-
-```tsx
-<ColorPicker
-  open
-  defaultValue={String(value)}
-  disabledAlpha
-  getPopupContainer={getPortalContainer}
-  onChange={(_color, css) => setPreviewColor(css)}
-  onChangeComplete={color =>
-    void commit([
-      {
-        key: column.key,
-        value: color.toHexString().toUpperCase(),
-      },
-    ])
-  }
-/>
-```
-
-## Connect Cascader, TimePicker, and TreeSelect
-
-Cascader commits the entire selected path as `string[]`, not just the last item. TimePicker uses `needConfirm` so editing does not end while the user is choosing an hour and minute; convert the value to your application's storage format in `onOk`. TreeSelect stores the selected node's `value` directly.
-
-```tsx
-<Cascader
-  open
-  defaultValue={value as string[]}
-  options={categoryOptions}
-  getPopupContainer={getPortalContainer}
-  onChange={path =>
-    void commit([{
-      key: column.key,
-      value: Array.from(path, String),
-    }])
-  }
-/>
-
-<TimePicker
-  open
-  needConfirm
-  defaultValue={dayjs(String(value), 'HH:mm')}
-  format='HH:mm'
-  getPopupContainer={getPortalContainer}
-  onOk={time =>
-    void commit([{
-      key: column.key,
-      value: time ? time.format('HH:mm') : '',
-    }])
-  }
-/>
-
-<TreeSelect
-  open
-  defaultValue={String(value)}
-  treeData={organizationTree}
-  getPopupContainer={getPortalContainer}
-  onChange={nodeValue =>
-    void commit([{
-      key: column.key,
-      value: nodeValue,
-    }])
-  }
-/>
-```
-
-All six adapters in `@beautifuljs/grid-antd` inherit the cell's `font`, `color`, and height. When building a custom adapter for a UI library that specifies its own font size, apply `font: inherit` to the editor root and selected-value element. Also pass `--bgrid-font-family` and `--bgrid-font-size` to the popup so the cell remains visually consistent before and after activation.
-
-## Convert values for copy and paste
-
-The clipboard carries tab- and newline-delimited `text/plain`, not the editor's React value. Neither the cell's `itemRender` nor the editor's `defaultValue` participates in clipboard conversion. A non-string cell such as a Cascader that stores `string[]` must therefore define both directions of the column's clipboard contract.
-
-```tsx
-const categoryColumn: BGridColumn<Order> = {
-  key: 'categoryPath',
-  label: 'Category',
-  width: 200,
-  editable: true,
-  editor: categoryEditor,
-  itemRender: ({ value }) => <>{Array.isArray(value) ? value.join(' / ') : ''}</>,
-  getClipboardText: ({ value }) => JSON.stringify(value),
-  parseClipboardText: text => {
-    const parsed: unknown = JSON.parse(text);
-    if (!Array.isArray(parsed) || !parsed.every(segment => typeof segment === 'string')) {
-      throw new TypeError('Category path must be a JSON string array.');
-    }
-    return parsed;
-  },
-};
-```
-
-The example formats the cell as `Domestic / Seoul` but copies a lossless `["Domestic","Seoul"]`. Paste restores a `string[]`, so Ant Design Cascader receives the same path through `defaultValue`. If you prefer a human-readable path such as `Domestic / Seoul` on the clipboard, define escaping and validation for path values that may themselves contain `/`.
-
-Conversion follows this order:
-
-1. Copy uses the column's `getClipboardText`. Without it, strings remain unchanged, numbers and booleans become strings, `Date` becomes an ISO string, and arrays or objects are JSON-serialized.
-2. Paste first uses the column's `parseClipboardText`. It applies to every editable column, regardless of whether the editor is text, checkbox, or plugin based.
-3. If the column has no parser and its built-in text editor defines `parseValue`, the Grid uses that existing parser.
-4. Without either parser, the Grid stores the clipboard string as-is. A structured value can then become a string and disappear from the editor's selected-value display.
-
-Validate each domain explicitly: finite numbers with `Number.isFinite(Number(text))`, booleans through an allowed token map (`true`/`false` or `Y`/`N`), dates in the application's storage format, and enums against the option list. JSON plus shape validation is recommended for arrays and objects. If the parser throws, that cell remains unchanged and `cellSelectionOptions.onPasteError` receives `parseValueFailed`. The second `parseClipboardText` argument exposes the current `value`, row `values`, `item`, `index`, `columnIndex`, `column`, and original `text`.
-
-## Save multiple columns at once
-
-When an autocomplete resolves both a code and a name, send both changes in one request.
-
-```tsx
-await commit([
-  { key: 'customerCode', value: selected.code },
-  { key: 'customerName', value: selected.name },
-]);
-```
-
-If a target `key` or `columnId` is missing or ambiguous, the entire commit is rejected without a partial save.
-
-## Plugin props
-
-- `value`, `item`, `values`, `column`, `index`, `columnIndex`: context for the current logical cell
-- `commit(changes, options?)`: save the change list and end the session
-- `cancel()`: keep the original value and end the session
-- `move(direction)`: move to the specified cell without saving
-- `sessionId`: identifies the session associated with an asynchronous callback
-- `getPortalContainer()`: returns the Grid-specific floating portal root for popup UI
-
-## Popup and session-ending rules
-
-Rendering a popup directly in the UI library's default `document.body` portal can make the Grid treat popup interaction as an outside click. Rendering it inside the Grid DOM can instead clip a large picker at the container's `overflow: hidden` boundary. `getPortalContainer()` returns a Grid-tracked floating portal directly under `document.body`, so connect it whenever the external component supports a custom portal. This portal copies the Grid theme variables and participates in frozen/scroll position calculations and outside-click detection.
-
-Use only one of `commit`, `cancel`, or `move` as the final action for a session. The library honors only the first completion request, so a `cancel()` triggered by blur immediately after selection cannot overwrite a successful save. If asynchronous validation fails and the `commit()` Promise rejects, the editor remains open so the user can correct the value and try again.
-
-```tsx
-await commit(changes, { move: 'next' });
-```
-
-Do not move DOM focus manually after saving or canceling. The Grid restores focus to the active cell.
+For a complete step-by-step walkthrough, debounce search examples, and multi-column atomic commits, see the **[Custom Plugin Guide](/en/plugins/custom)**.

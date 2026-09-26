@@ -103,11 +103,12 @@ export function createShadcnCascaderEditorPlugin<T>(
                     <button
                       key={opt.value}
                       type="button"
+                      data-selected={isSelected ? 'true' : undefined}
                       onClick={() => handleSelectLevel(0, opt)}
-                      className={`bgrid-shadcn-cascader-item flex w-full items-center justify-between rounded-sm px-2.5 text-xs transition-colors cursor-pointer border-0 bg-transparent ${
+                      className={`bgrid-shadcn-cascader-item flex w-full items-center justify-between rounded-sm px-2.5 text-xs transition-colors cursor-pointer border-0 ${
                         isSelected
                           ? 'bg-blue-600 font-semibold text-white dark:bg-blue-600 dark:text-white'
-                          : 'text-slate-700 hover:bg-slate-200/70 dark:text-slate-300 dark:hover:bg-slate-800'
+                          : 'bg-transparent text-slate-700 hover:bg-slate-200/70 dark:text-slate-300 dark:hover:bg-slate-800'
                       }`}
                     >
                       <span className="truncate">{opt.label}</span>
@@ -129,11 +130,12 @@ export function createShadcnCascaderEditorPlugin<T>(
                       <button
                         key={opt.value}
                         type="button"
+                        data-selected={isSelected ? 'true' : undefined}
                         onClick={() => handleSelectLevel(1, opt)}
-                        className={`bgrid-shadcn-cascader-item flex w-full items-center justify-between rounded-sm px-2.5 text-xs transition-colors cursor-pointer border-0 bg-transparent ${
+                        className={`bgrid-shadcn-cascader-item flex w-full items-center justify-between rounded-sm px-2.5 text-xs transition-colors cursor-pointer border-0 ${
                           isSelected
                             ? 'bg-blue-600 font-semibold text-white dark:bg-blue-600 dark:text-white'
-                            : 'text-slate-700 hover:bg-slate-200/70 dark:text-slate-300 dark:hover:bg-slate-800'
+                            : 'bg-transparent text-slate-700 hover:bg-slate-200/70 dark:text-slate-300 dark:hover:bg-slate-800'
                         }`}
                       >
                         <span className="truncate">{opt.label}</span>
@@ -155,11 +157,12 @@ export function createShadcnCascaderEditorPlugin<T>(
                       <button
                         key={opt.value}
                         type="button"
+                        data-selected={isSelected ? 'true' : undefined}
                         onClick={() => handleSelectLevel(2, opt)}
-                        className={`bgrid-shadcn-cascader-item flex w-full items-center justify-between rounded-sm px-2.5 text-xs transition-colors cursor-pointer border-0 bg-transparent ${
+                        className={`bgrid-shadcn-cascader-item flex w-full items-center justify-between rounded-sm px-2.5 text-xs transition-colors cursor-pointer border-0 ${
                           isSelected
                             ? 'bg-blue-600 font-semibold text-white dark:bg-blue-600 dark:text-white'
-                            : 'text-slate-700 hover:bg-slate-200/70 dark:text-slate-300 dark:hover:bg-slate-800'
+                            : 'bg-transparent text-slate-700 hover:bg-slate-200/70 dark:text-slate-300 dark:hover:bg-slate-800'
                         }`}
                       >
                         <span className="truncate">{opt.label}</span>

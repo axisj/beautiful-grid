@@ -14,11 +14,25 @@ const benchmarkSlugs = [
   'cell-merge',
   'virtual-scroll',
 ];
+const pluginGuideSlugs = new Set([
+  'editor-plugins',
+  'editor-plugins-custom',
+  'editor-plugins-antd',
+  'editor-plugins-shadcn',
+  'editor-plugins-mui',
+  'editor-plugins-mantine',
+]);
+
+function markdownGuideOutputPath(localePrefix, slug) {
+  if (!pluginGuideSlugs.has(slug)) return path.join(distRoot, localePrefix, 'learn', `${slug}.md`);
+  if (slug === 'editor-plugins') return path.join(distRoot, localePrefix, 'plugins.md');
+  return path.join(distRoot, localePrefix, 'plugins', `${slug.replace('editor-plugins-', '')}.md`);
+}
 
 async function assertMarkdownRouteCoverage() {
   const localeConfigurations = [
-    { sourceDirectory: path.join(siteRoot, 'src/content/learn'), outputDirectory: path.join(distRoot, 'learn') },
-    { sourceDirectory: path.join(siteRoot, 'src/content/learn/en'), outputDirectory: path.join(distRoot, 'en/learn') },
+    { sourceDirectory: path.join(siteRoot, 'src/content/learn'), localePrefix: '' },
+    { sourceDirectory: path.join(siteRoot, 'src/content/learn/en'), localePrefix: 'en' },
   ];
 
   let guideCount = 0;
@@ -28,7 +42,7 @@ async function assertMarkdownRouteCoverage() {
     guideCount += sourceFiles.length;
     for (const sourceFile of sourceFiles) {
       const slug = sourceFile.name.replace(/\.mdx?$/, '');
-      await readFile(path.join(configuration.outputDirectory, `${slug}.md`), 'utf8');
+      await readFile(markdownGuideOutputPath(configuration.localePrefix, slug), 'utf8');
     }
   }
 

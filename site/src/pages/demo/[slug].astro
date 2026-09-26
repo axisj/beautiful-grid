@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import DemoOnlyLayout from '../../layouts/DemoOnlyLayout.astro';
 import { demoManifest } from '../../data/demoManifest';
 import DemoRenderer from '../../components/DemoRenderer';
+import { isPluginLearnSlug, pluginPath } from '../../components/plugins/pluginLocale';
 
 export async function getStaticPaths() {
   const allLearn = await getCollection('learn');
@@ -21,11 +22,12 @@ const { item } = Astro.props;
 const slug = item.id.replace(/\.(md|mdx)$/, '');
 const demoId = item.data.demoId!;
 const manifestItem = demoManifest[demoId];
+const canonicalPath = isPluginLearnSlug(slug) ? pluginPath(slug, 'ko') : `/learn/${slug}`;
 ---
 
 <DemoOnlyLayout
   title={`${item.data.title} Demo | BeautifulGrid`}
-  canonicalPath={`/learn/${slug}`}
+  canonicalPath={canonicalPath}
 >
   <div class="demo-only-surface">
     <DemoRenderer client:only="react" sourcePath={manifestItem.componentFile} />

@@ -59,6 +59,7 @@ function LoadingExample() {
           headerHeight={35}
           data={data}
           columns={columns}
+          frozenColumnIndex={2}
           rowKey='sku'
           onChangeColumns={(_columnIndex, { columns }) => setColumns(columns)}
           loading={loading}

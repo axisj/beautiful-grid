@@ -2,7 +2,7 @@
 title: "Editor Icons"
 description: "Display dropdown, calendar, and search icons beside cell values and connect them to editor activation or an independent callback."
 category: "interaction"
-order: 5
+order: 8
 locale: "en"
 canonicalPath: "/en/learn/editor-icons"
 demoId: "editor-icons"

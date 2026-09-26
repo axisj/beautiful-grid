@@ -1,0 +1,18 @@
+---
+import { getCollection } from 'astro:content';
+import PluginArticlePage from '../../../components/plugins/PluginArticlePage.astro';
+import { learnSlug } from '../../../components/learn/learnLocale';
+import { isPluginLearnSlug, pluginRouteSlug, type PluginLearnSlug } from '../../../components/plugins/pluginLocale';
+
+export async function getStaticPaths() {
+  return (await getCollection('learn'))
+    .filter(entry => {
+      const slug = learnSlug(entry.id);
+      return entry.data.locale === 'en' && !entry.data.draft && isPluginLearnSlug(slug) && slug !== 'editor-plugins';
+    })
+    .map(item => ({ params: { slug: pluginRouteSlug(learnSlug(item.id) as PluginLearnSlug) }, props: { item } }));
+}
+
+const { item } = Astro.props;
+---
+<PluginArticlePage locale="en" item={item} />

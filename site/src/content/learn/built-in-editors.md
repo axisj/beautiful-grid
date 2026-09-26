@@ -9,7 +9,7 @@ demoId: "built-in-editors"
 features: ["text-editor", "checkbox-editor", "checkbox-header", "select-editor", "date-editor", "parseValue", "formatValue"]
 relatedGuides: ["editing", "editor-icons", "editor-plugins", "editing-events"]
 relatedApi: ["/api/props#columns", "/api/props#editable"]
-lastReviewedAt: "2026-08-27"
+lastReviewedAt: "2026-09-24"
 indexable: true
 draft: false
 ---
@@ -95,3 +95,9 @@ factory는 컴포넌트 바깥이나 `useMemo` 안에서 한 번만 생성하세
 ```
 
 아이콘의 모양은 editor 종류로 자동 추론하지 않습니다. 제품 디자인 시스템에 맞는 아이콘을 `editorIcon.render`로 명시합니다.
+
+## 앱의 UI 라이브러리를 그대로 사용하기
+
+내장 editor보다 풍부한 picker나 애플리케이션과 동일한 디자인이 필요하다면 공식 UI 통합을 사용하세요. BeautifulGrid는 Ant Design, Shadcn UI, MUI, Mantine용 editor plugin을 제공하며 popup portal과 저장·취소 수명주기를 미리 연결해 둡니다.
+
+[공식 에디터 플러그인 비교와 설치 방법 보기 →](/plugins)

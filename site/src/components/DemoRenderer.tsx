@@ -1,5 +1,9 @@
 import React, { Suspense } from 'react';
 import { ConfigProvider, theme as antdTheme } from 'antd';
+import { createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
+import { MantineProvider } from '@mantine/core';
+import '@mantine/core/styles.css';
+import '@mantine/dates/styles.css';
 import '../../../styles/globals.css';
 import '../styles/datagrid-theme.css';
 import './DemoRenderer.css';
@@ -114,6 +118,10 @@ export default function DemoRenderer({ sourcePath }: { sourcePath: string }) {
     }),
     [isDark],
   );
+  const muiTheme = React.useMemo(
+    () => createTheme({ palette: { mode: isDark ? 'dark' : 'light' } }),
+    [isDark],
+  );
 
   if (!loadComponent) {
     return <div style={{ color: 'red', padding: '2rem', textAlign: 'center' }}>Component not found: {resolvedPath}</div>;
@@ -123,11 +131,15 @@ export default function DemoRenderer({ sourcePath }: { sourcePath: string }) {
 
   return (
     <ConfigProvider theme={antdThemeConfig}>
-      <Suspense fallback={<div className='site-demo-loading'>Loading Demo...</div>}>
-        <div className='site-grid-theme site-demo-renderer'>
-          <LazyComponent />
-        </div>
-      </Suspense>
+      <MuiThemeProvider theme={muiTheme}>
+        <MantineProvider forceColorScheme={isDark ? 'dark' : 'light'}>
+          <Suspense fallback={<div className='site-demo-loading'>Loading Demo...</div>}>
+            <div className='site-grid-theme site-demo-renderer'>
+              <LazyComponent />
+            </div>
+          </Suspense>
+        </MantineProvider>
+      </MuiThemeProvider>
     </ConfigProvider>
   );
 }

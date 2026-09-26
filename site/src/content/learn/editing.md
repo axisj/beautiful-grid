@@ -182,7 +182,7 @@ function deleteCheckedRows() {
 | 하고 싶은 일 | 다음 문서 |
 | --- | --- |
 | text, Select, Date 사용 | [내장·기본 제공 에디터](/learn/built-in-editors) |
-| Ant Design 등 외부 UI 연결 | [외부 에디터 플러그인](/learn/editor-plugins) |
+| Ant Design 등 외부 UI 연결 | [외부 에디터 플러그인](/plugins) |
 | 평상시 셀에 화살표·검색 아이콘 표시 | [에디터 아이콘](/learn/editor-icons) |
 | autocomplete 입력과 lookup 모달 함께 사용 | [Lookup 에디터](/learn/lookup-editor) |
 | 연관 셀 변경과 검증 | [편집 이벤트와 트랜잭션](/learn/editing-events) |

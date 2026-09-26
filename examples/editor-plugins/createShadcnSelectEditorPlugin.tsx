@@ -52,7 +52,7 @@ export function createShadcnSelectEditorPlugin<T, Value extends string | number>
             }
           }}
         >
-          <SelectValue />
+          <SelectValue className="bgrid-shadcn-trigger-label" />
         </SelectTrigger>
         <SelectContent container={getPortalContainer()}>
           {options.options.map(opt => (

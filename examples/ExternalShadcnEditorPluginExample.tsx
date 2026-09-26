@@ -10,7 +10,7 @@ import { createShadcnCascaderEditorPlugin } from './editor-plugins/createShadcnC
 import { createShadcnTimePickerEditorPlugin } from './editor-plugins/createShadcnTimePickerEditorPlugin';
 import { createShadcnTreeSelectEditorPlugin } from './editor-plugins/createShadcnTreeSelectEditorPlugin';
 import { formatCascaderClipboardText, parseCascaderClipboardText } from './editor-plugins/cascaderValue';
-import { CalendarIcon, ChevronDownIcon, ClockIcon } from './editing/editorIcons';
+import { Calendar, ChevronDown, Clock } from 'lucide-react';
 import {
   applyEditingDataChange,
   cloneEditingOrders,
@@ -134,7 +134,10 @@ export default function ExternalShadcnEditorPluginExample() {
         width: 180,
         editable: true,
         editor: shadcnStatusEditor,
-        editorIcon: { render: <ChevronDownIcon />, ariaLabel: t('Shadcn UI 상태 선택', 'Shadcn UI Select Status') },
+        editorIcon: {
+          render: <ChevronDown className="h-3.5 w-3.5" />,
+          ariaLabel: t('Shadcn UI 상태 선택', 'Shadcn UI Select Status'),
+        },
       },
       {
         key: 'deliveryDate',
@@ -142,7 +145,10 @@ export default function ExternalShadcnEditorPluginExample() {
         width: 200,
         editable: true,
         editor: shadcnDeliveryDateEditor,
-        editorIcon: { render: <CalendarIcon />, ariaLabel: t('Shadcn UI 납기일 선택', 'Shadcn UI Select Delivery Date') },
+        editorIcon: {
+          render: <Calendar className="h-3.5 w-3.5" />,
+          ariaLabel: t('Shadcn UI 납기일 선택', 'Shadcn UI Select Delivery Date'),
+        },
       },
       {
         key: 'labelColor',
@@ -171,7 +177,10 @@ export default function ExternalShadcnEditorPluginExample() {
         itemRender: ({ value }) => <>{Array.isArray(value) ? value.join(' / ') : ''}</>,
         getClipboardText: ({ value }) => formatCascaderClipboardText(value),
         parseClipboardText: parseCascaderClipboardText,
-        editorIcon: { render: <ChevronDownIcon />, ariaLabel: t('Shadcn UI 분류 경로 선택', 'Shadcn UI Select Category Path') },
+        editorIcon: {
+          render: <ChevronDown className="h-3.5 w-3.5" />,
+          ariaLabel: t('Shadcn UI 분류 경로 선택', 'Shadcn UI Select Category Path'),
+        },
       },
       {
         key: 'deliveryTime',
@@ -179,7 +188,10 @@ export default function ExternalShadcnEditorPluginExample() {
         width: 190,
         editable: true,
         editor: shadcnDeliveryTimeEditor,
-        editorIcon: { render: <ClockIcon />, ariaLabel: t('Shadcn UI 배송 시간 선택', 'Shadcn UI Select Delivery Time') },
+        editorIcon: {
+          render: <Clock className="h-3.5 w-3.5" />,
+          ariaLabel: t('Shadcn UI 배송 시간 선택', 'Shadcn UI Select Delivery Time'),
+        },
       },
       {
         key: 'organization',
@@ -187,7 +199,10 @@ export default function ExternalShadcnEditorPluginExample() {
         width: 210,
         editable: true,
         editor: shadcnOrganizationEditor,
-        editorIcon: { render: <ChevronDownIcon />, ariaLabel: t('Shadcn UI 담당 조직 선택', 'Shadcn UI Select Responsible Organization') },
+        editorIcon: {
+          render: <ChevronDown className="h-3.5 w-3.5" />,
+          ariaLabel: t('Shadcn UI 담당 조직 선택', 'Shadcn UI Select Responsible Organization'),
+        },
       },
     ]),
     [],

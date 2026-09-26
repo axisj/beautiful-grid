@@ -1,13 +1,13 @@
 ---
-title: "공식 Shadcn UI 에디터 플러그인 (Official Shadcn UI Editor Plugins)"
+title: "Shadcn UI 에디터 플러그인 (Shadcn UI Editor Plugins)"
 description: "BeautifulGrid 공식 Shadcn Registry에서 Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect 에디터 소스를 설치하고 사용하는 방법을 설명합니다."
 category: "interaction"
-order: 4
+order: 5
 locale: "ko"
-canonicalPath: "/learn/editor-plugins-shadcn"
+canonicalPath: "/plugins/shadcn"
 demoId: "editor-plugins-shadcn"
 features: ["editor-plugin", "defineEditorPlugin", "portal", "shadcn-ui", "popover", "radix-ui"]
-relatedGuides: ["editor-plugins", "built-in-editors", "editing-events", "editor-icons"]
+relatedGuides: ["editor-plugins", "editor-plugins-antd", "editor-plugins-mui", "editor-plugins-mantine", "built-in-editors"]
 relatedApi: ["/api/props#columns", "/api/props#editable"]
 lastReviewedAt: "2026-09-23"
 indexable: true
@@ -18,7 +18,7 @@ BeautifulGrid는 [Shadcn UI](https://ui.shadcn.com/) 방식에 맞춰 공식 에
 
 공식 플러그인에는 Select, DatePicker, ColorPicker, Cascader, TimePicker, TreeSelect factory가 포함됩니다. 각 factory는 Grid의 Portal과 편집 수명주기를 이미 연결하므로 애플리케이션에서는 옵션을 구성한 뒤 컬럼의 `editor`에 지정하면 됩니다.
 
-text·기본 Select·Date만 필요하다면 [내장·기본 제공 에디터](/learn/built-in-editors)를, Ant Design UI 연결은 [외부 에디터 플러그인 (AntD)](/learn/editor-plugins)를 확인하세요.
+text·기본 Select·Date만 필요하다면 [내장·기본 제공 에디터](/learn/built-in-editors)를, 다른 공식 통합과의 비교는 [공식 에디터 플러그인](/plugins)을 확인하세요.
 
 ## 1. 공식 플러그인 설치와 사용
 
@@ -223,7 +223,7 @@ Shadcn UI Cascader가 `string[]`을 commit하더라도 Grid 클립보드는 `tex
 }
 ```
 
-이렇게 하면 복사된 `["국내","서울"]`이 붙여넣기 시 다시 `string[]`가 되고, idle 셀과 Shadcn trigger가 모두 `국내 / 서울`을 표시합니다. 일반적인 값 타입별 변환 우선순위와 검증 규칙은 [AntD 예제의 복사·붙여넣기 값 변환](/learn/editor-plugins#복사붙여넣기-값-변환)을 참고하세요. 핵심은 `itemRender`는 화면 표시, `getClipboardText`는 직렬화, `parseClipboardText`는 타입 복원이라는 세 책임을 분리하는 것입니다.
+이렇게 하면 복사된 `["국내","서울"]`이 붙여넣기 시 다시 `string[]`가 되고, idle 셀과 Shadcn trigger가 모두 `국내 / 서울`을 표시합니다. 일반적인 값 타입별 변환 우선순위와 검증 규칙은 [AntD 예제의 복사·붙여넣기 값 변환](/plugins/antd#복사붙여넣기-값-변환)을 참고하세요. 핵심은 `itemRender`는 화면 표시, `getClipboardText`는 직렬화, `parseClipboardText`는 타입 복원이라는 세 책임을 분리하는 것입니다.
 
 ### TimePicker (시간·분 선택)
 

@@ -1,0 +1,9 @@
+---
+import { getCollection } from 'astro:content';
+import PluginArticlePage from '../../components/plugins/PluginArticlePage.astro';
+import { learnSlug } from '../../components/learn/learnLocale';
+
+const item = (await getCollection('learn')).find(entry => entry.data.locale === 'ko' && learnSlug(entry.id) === 'editor-plugins');
+if (!item) throw new Error('Korean plugin overview not found');
+---
+<PluginArticlePage locale="ko" item={item} />

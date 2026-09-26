@@ -3,7 +3,7 @@ import { render, type CollectionEntry } from 'astro:content';
 import { localizePath, type Locale } from '../../i18n';
 import LearnLayout from '../../layouts/LearnLayout.astro';
 import LearnBreadcrumb from './LearnBreadcrumb.astro';
-import LiveDemoPanel from './LiveDemoPanel';
+import LiveDemoIsland from './LiveDemoIsland.astro';
 import SourceCodePanel from './SourceCodePanel.astro';
 import RelatedGuides from './RelatedGuides.astro';
 import LearnPager from './LearnPager.astro';
@@ -43,7 +43,7 @@ const { Content } = await render(item);
 
     {item.data.demoId && (
       <section aria-label={messages.liveDemoSection}>
-        <LiveDemoPanel client:only="react" locale={locale} demoId={item.data.demoId} slug={slug} title={item.data.title} />
+        <LiveDemoIsland locale={locale} demoId={item.data.demoId} slug={slug} title={item.data.title} />
       </section>
     )}
     {item.data.demoId && (

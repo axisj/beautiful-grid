@@ -1159,7 +1159,7 @@ Below is a categorized reference of `<BGrid>` props. For exact TypeScript types,
 | `masterDetail`       | `BGridMasterDetailOptions<T>`                                       | Expands rows to display nested subgrids, forms, or custom detail panels.               |
 | `loading`            | `boolean`                                                           | Displays full-grid loading overlay.                                                    |
 | `spinning`           | `boolean`                                                           | Displays body-area spinner.                                                            |
-| `msg`                | `{ emptyList?: string }`                                            | Custom empty state text.                                                               |
+| `msg`                | `{ emptyList?: string }`                                            | Custom body-wide empty state text. It spans frozen and scrollable regions.              |
 
 ---
 

@@ -1,11 +1,13 @@
 ---
 import { getCollection } from 'astro:content';
 import LearnArticlePage from '../../components/learn/LearnArticlePage.astro';
+import { learnSlug } from '../../components/learn/learnLocale';
+import { isPluginLearnSlug } from '../../components/plugins/pluginLocale';
 
 export async function getStaticPaths() {
   const allLearn = await getCollection('learn');
   return allLearn
-    .filter(item => item.data.locale === 'ko' && !item.data.draft)
+    .filter(item => item.data.locale === 'ko' && !item.data.draft && !isPluginLearnSlug(learnSlug(item.id)))
     .map(item => ({
       params: { slug: item.id.replace(/\.(md|mdx)$/, '') },
       props: { item },

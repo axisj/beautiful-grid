@@ -1,0 +1,31 @@
+---
+import type { Locale } from '../../i18n';
+import { demoManifest } from '../../data/demoManifest';
+import LiveDemoPanel from './LiveDemoPanel';
+import { learnMessages } from './learnLocale';
+
+interface Props {
+  locale: Locale;
+  demoId: string;
+  slug: string;
+  title: string;
+}
+
+const { locale, demoId, slug, title } = Astro.props;
+const messages = learnMessages[locale];
+const minHeight = demoManifest[demoId]?.minHeight ?? 450;
+---
+
+<LiveDemoPanel client:only="react" locale={locale} demoId={demoId} slug={slug} title={title}>
+  <div slot="fallback" class="learn-demo-card" data-demo-loading>
+    <div class="learn-demo-header">
+      <div class="learn-demo-title-area">
+        <span class="learn-demo-badge">LIVE DEMO</span>
+        <span class="learn-demo-caption">{messages.interactiveExample(title)}</span>
+      </div>
+    </div>
+    <div class="learn-demo-surface" style={`min-height: ${minHeight}px`}>
+      <div class="site-demo-loading" role="status" aria-live="polite">{messages.demoLoading}</div>
+    </div>
+  </div>
+</LiveDemoPanel>

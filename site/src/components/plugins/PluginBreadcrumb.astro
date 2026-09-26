@@ -1,0 +1,24 @@
+---
+import type { Locale } from '../../i18n';
+import { pluginMessages, pluginPath } from './pluginLocale';
+
+interface Props { locale: Locale; title: string; }
+const { locale, title } = Astro.props;
+const messages = pluginMessages[locale];
+---
+<nav aria-label={messages.breadcrumb} class="learn-breadcrumb">
+  <ol>
+    <li><a href={pluginPath('editor-plugins', locale)}>{messages.sectionTitle}</a></li>
+    <li class="separator">/</li>
+    <li aria-current="page" class="current"><span>{title}</span></li>
+  </ol>
+</nav>
+
+<style>
+  .learn-breadcrumb { margin-bottom: .75rem; color: var(--site-text-muted); font-size: .875rem; }
+  .learn-breadcrumb ol { display: flex; flex-wrap: wrap; align-items: center; gap: .375rem; margin: 0; padding: 0; list-style: none; }
+  .learn-breadcrumb a { color: var(--site-text-secondary); text-decoration: none; }
+  .learn-breadcrumb a:hover { color: var(--site-accent); text-decoration: underline; }
+  .separator { color: var(--site-text-muted); user-select: none; }
+  .current { color: var(--site-text-primary); font-weight: 500; }
+</style>

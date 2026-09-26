@@ -112,11 +112,12 @@ export function createShadcnTimePickerEditorPlugin<T>(
                       <button
                         key={hour}
                         type="button"
+                        data-selected={isSelected ? 'true' : undefined}
                         onClick={() => setSelectedHour(hour)}
-                        className={`bgrid-shadcn-time-item rounded-sm py-1 text-xs font-mono transition-colors cursor-pointer border-0 bg-transparent ${
+                        className={`bgrid-shadcn-time-item rounded-sm py-1 text-xs font-mono transition-colors cursor-pointer border-0 ${
                           isSelected
                             ? 'bg-blue-600 font-bold text-white dark:bg-blue-600 dark:text-white'
-                            : 'text-slate-700 hover:bg-slate-200/70 dark:text-slate-300 dark:hover:bg-slate-800'
+                            : 'bg-transparent text-slate-700 hover:bg-slate-200/70 dark:text-slate-300 dark:hover:bg-slate-800'
                         }`}
                       >
                         {hour}
@@ -136,11 +137,12 @@ export function createShadcnTimePickerEditorPlugin<T>(
                       <button
                         key={minute}
                         type="button"
+                        data-selected={isSelected ? 'true' : undefined}
                         onClick={() => setSelectedMinute(minute)}
-                        className={`bgrid-shadcn-time-item rounded-sm py-1 text-xs font-mono transition-colors cursor-pointer border-0 bg-transparent ${
+                        className={`bgrid-shadcn-time-item rounded-sm py-1 text-xs font-mono transition-colors cursor-pointer border-0 ${
                           isSelected
                             ? 'bg-blue-600 font-bold text-white dark:bg-blue-600 dark:text-white'
-                            : 'text-slate-700 hover:bg-slate-200/70 dark:text-slate-300 dark:hover:bg-slate-800'
+                            : 'bg-transparent text-slate-700 hover:bg-slate-200/70 dark:text-slate-300 dark:hover:bg-slate-800'
                         }`}
                       >
                         {minute}

@@ -1,13 +1,13 @@
 ---
-title: "Official Shadcn UI Editor Plugins"
+title: "Shadcn UI Editor Plugins"
 description: "Install and use the official BeautifulGrid Shadcn Registry source for Select, DatePicker, ColorPicker, Cascader, TimePicker, and TreeSelect editors."
 category: "interaction"
-order: 4
+order: 5
 locale: "en"
-canonicalPath: "/en/learn/editor-plugins-shadcn"
+canonicalPath: "/en/plugins/shadcn"
 demoId: "editor-plugins-shadcn"
 features: ["editor-plugin", "defineEditorPlugin", "portal", "shadcn-ui", "popover", "radix-ui"]
-relatedGuides: ["editor-plugins", "built-in-editors", "editing-events", "editor-icons"]
+relatedGuides: ["editor-plugins", "editor-plugins-antd", "editor-plugins-mui", "editor-plugins-mantine", "built-in-editors"]
 relatedApi: ["/en/api/props#columns", "/en/api/props#editable"]
 lastReviewedAt: "2026-09-23"
 indexable: true
@@ -18,7 +18,7 @@ BeautifulGrid distributes its official [Shadcn UI](https://ui.shadcn.com/) edito
 
 The official plugin includes Select, DatePicker, ColorPicker, Cascader, TimePicker, and TreeSelect factories. Each factory already integrates the Grid Portal and editor lifecycle, so application code only configures options and assigns the result to a column's `editor`.
 
-If you only need text, basic Select, or Date editing, start with [Built-in Editors](/en/learn/built-in-editors). For Ant Design integrations, see [External Editor Plugins (AntD)](/en/learn/editor-plugins).
+If you only need text, basic Select, or Date editing, start with [Built-in Editors](/en/learn/built-in-editors). Compare every official integration in [Editor Plugins Overview](/en/plugins).
 
 ## 1. Install and Use the Official Plugin
 
@@ -223,7 +223,7 @@ Even though the Shadcn UI Cascader commits a `string[]`, the Grid clipboard carr
 }
 ```
 
-The copied `["Domestic","Seoul"]` becomes a `string[]` again on paste, so both the idle cell and Shadcn trigger display `Domestic / Seoul`. See [copy/paste value conversion in the AntD guide](/en/learn/editor-plugins#convert-values-for-copy-and-paste) for conversion precedence and validation rules across value types. Keep the three responsibilities separate: `itemRender` controls display, `getClipboardText` serializes, and `parseClipboardText` restores the stored type.
+The copied `["Domestic","Seoul"]` becomes a `string[]` again on paste, so both the idle cell and Shadcn trigger display `Domestic / Seoul`. See [copy/paste value conversion in the AntD guide](/en/plugins/antd#convert-values-for-copy-and-paste) for conversion precedence and validation rules across value types. Keep the three responsibilities separate: `itemRender` controls display, `getClipboardText` serializes, and `parseClipboardText` restores the stored type.
 
 ### TimePicker (Hour & Minute Selector)
 

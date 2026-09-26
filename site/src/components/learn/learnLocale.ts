@@ -1,4 +1,5 @@
 import { localizePath, type Locale } from '../../i18n';
+import { isPluginLearnSlug } from '../plugins/pluginLocale';
 
 export const learnCategoryOrder = [
   'getting-started',
@@ -42,6 +43,7 @@ export const learnMessages = {
     reset: '초기화',
     resetTitle: '데모 상태를 초기값으로 되돌립니다',
     resetAria: '데모 초기화',
+    demoLoading: '인터랙티브 데모를 불러오는 중입니다…',
     demoOnlyActionTitle: '새 탭에서 그리드 동작 화면만 봅니다',
     demoOnlyAria: (title: string) => `${title} 데모만 새 탭으로 보기`,
     demoErrorHeading: '데모 렌더링 중 오류가 발생했습니다',
@@ -91,6 +93,7 @@ export const learnMessages = {
     reset: 'Reset',
     resetTitle: 'Reset the demo to its initial state',
     resetAria: 'Reset demo',
+    demoLoading: 'Loading the interactive demo…',
     demoOnlyActionTitle: 'Open the Grid-only demo in a new tab',
     demoOnlyAria: (title: string) => `Open the ${title} standalone demo in a new tab`,
     demoErrorHeading: 'The demo could not be rendered',
@@ -186,7 +189,7 @@ export function groupLearnArticles(
   return learnCategoryOrder
     .map((cat) => {
       const filtered = allLearn
-        .filter((item) => item.data.locale === locale && item.data.category === cat && !item.data.draft)
+        .filter((item) => item.data.locale === locale && item.data.category === cat && !item.data.draft && !isPluginLearnSlug(learnSlug(item.id)))
         .sort((a, b) => a.data.order - b.data.order);
 
       const items: GroupedLearnItem[] = filtered.map((item) => {

@@ -1871,7 +1871,18 @@ export function AppStoreProvider<T = any>({ children, initialState }: AppStorePr
               },
         ),
       setCellSelecting: cellSelecting => set(state => (state.disabled && cellSelecting ? {} : { cellSelecting })),
-      clearCellSelection: () => set({ cellSelectionRange: undefined, cellSelectionRanges: [], cellSelecting: false }),
+      clearCellSelection: () =>
+        set(state => {
+          // Outside clicks reach every mounted grid; keep an empty selection from notifying subscribers again.
+          if (
+            state.cellSelectionRange === undefined &&
+            (state.cellSelectionRanges?.length ?? 0) === 0 &&
+            !state.cellSelecting
+          ) {
+            return state;
+          }
+          return { cellSelectionRange: undefined, cellSelectionRanges: [], cellSelecting: false };
+        }),
     }));
   }
   return <StoreContext.Provider value={storeRef.current}>{children}</StoreContext.Provider>;

@@ -808,6 +808,7 @@
   cursor: pointer;
   min-width: 20px;
   height: 20px;
+  padding: 0 1px;
 }
 
 .bgrid-page-no:hover {
